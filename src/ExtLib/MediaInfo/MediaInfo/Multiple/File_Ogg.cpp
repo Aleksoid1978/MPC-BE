@@ -344,10 +344,10 @@ void File_Ogg::Data_Parse()
 
             //Parsing
             int64u Size=Chunk_Sizes[Chunk_Sizes_Pos];
+            if (Size>Element_Size-Element_Offset)
+                Size=Element_Size-Element_Offset; // Shcunk size is bigger than content size, buggy file
             if (continued || Parser->File_Offset!=Parser->File_Size)
             {
-                if (Size>Element_Size-Element_Offset)
-                    Size=Element_Size-Element_Offset; // Shcunk size is bigger than content size, buggy file
                 Open_Buffer_Continue(Parser, Buffer+Buffer_Offset+(size_t)Element_Offset, Size);
             }
             Element_Offset+=Size;

@@ -1270,8 +1270,7 @@ void File_Ffv1::SliceContent(states &States)
 
     #if MEDIAINFO_TRACE
         bool Trace_Activated_Save=Trace_Activated;
-        if (Trace_Activated)
-            Trace_Activated=false; // Trace is too huge, deactivating it during pixel decoding
+        Trace_Activated=false; // Trace is too huge, deactivating it during pixel decoding
     #endif //MEDIAINFO_TRACE
 
     if (!coder_type)
@@ -1679,7 +1678,7 @@ int32s File_Ffv1::pixel_GR(int32s context)
     {
         if (context)
         {
-            if (context >= Context_GR_Size)
+            if ((size_t)context >= Context_GR_Size)
             {
                 BS->Skip(BS->Remain());
                 return 0;

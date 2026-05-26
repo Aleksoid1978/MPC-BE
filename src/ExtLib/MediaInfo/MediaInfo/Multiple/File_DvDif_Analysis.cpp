@@ -1874,7 +1874,7 @@ void File_DvDif::Errors_Stats_Update()
                                  | (Coherency_Flags[Coherency_PackInVid]?0:(1<<1))
                                  | (Coherency_Flags[Coherency_PackInAud]?0:(1<<2))
                                  | ((!Video_StaNonZero)?0:(1<<3))
-                                 | ((Audio_TotalErrors<((DSF?100:90)*(FSC_WasSet?2:1)))?0:(1<<4))
+                                 | ((Audio_TotalErrors<(size_t)((DSF?100:90)*(FSC_WasSet?2:1)))?0:(1<<4))
                                  | ((Coherency_Flags[Coherency_video_source] && Coherency_Flags[Coherency_video_control])?0:(1<<5))
                                  | ((Coherency_Flags[Coherency_audio_source] && Coherency_Flags[Coherency_audio_control])?0:(1<<6))
                                  ;

@@ -1243,25 +1243,25 @@ static const char* Exif_ExifIFD_Tag_LightSource_Name(int16u value) {
 //---------------------------------------------------------------------------
 static string Exif_IFDExif_Flash_Name(int8u value) {
     string flash;
-    switch (value & 0b00011000) {
-    case 0b00000000: flash += "Unknown"; break;
-    case 0b00001000: flash += "On"; break;
-    case 0b00010000: flash += "Off"; break;
-    case 0b00011000: flash += "Auto"; break;
+    switch (value & 0x18) {
+    case 0x00: flash += "Unknown"; break;
+    case 0x08: flash += "On"; break;
+    case 0x10: flash += "Off"; break;
+    case 0x18: flash += "Auto"; break;
     }
-    switch (value & 0b00000001) {
-    case 0b00000000: flash += ", Did not fire"; break;
-    case 0b00000001: flash += ", Fired"; break;
+    switch (value & 0x01) {
+    case 0x00: flash += ", Did not fire"; break;
+    case 0x01: flash += ", Fired"; break;
     }
-    switch (value & 0b00100000) {
-    case 0b00100000: flash += ", No flash function"; break;
+    switch (value & 0x20) {
+    case 0x20: flash += ", No flash function"; break;
     }
-    switch (value & 0b01000000) {
-    case 0b01000000: flash += ", Red-eye reduction"; break;
+    switch (value & 0x40) {
+    case 0x40: flash += ", Red-eye reduction"; break;
     }
-    switch (value & 0b00000110) {
-    case 0b00000100: flash += ", Return not detected"; break;
-    case 0b00000110: flash += ", Return detected"; break;
+    switch (value & 0x06) {
+    case 0x04: flash += ", Return not detected"; break;
+    case 0x06: flash += ", Return detected"; break;
     }
     return flash;
 }
@@ -1698,7 +1698,7 @@ void File_Exif::Streams_Finish()
             switch (Item.first) {
             case IFDExif::ExposureTime: {
                 ParameterC = "ShutterSpeed_Time";
-                const auto exposure_time{ Item.second.Read().To_float64() };
+                const float64 exposure_time{ Item.second.Read().To_float64() };
                 string ShutterSpeed_Time;
                 if (exposure_time < 0.25001 && exposure_time > 0) {
                     ShutterSpeed_Time = "1/" + std::to_string(static_cast<int>(round(1 / exposure_time)));
@@ -1970,8 +1970,7 @@ void File_Exif::Streams_Finish()
             Ztring Value;
             const char* ParameterC = nullptr;
             string ParameterS;
-            switch (Item.first) {
-            }
+
             FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
         }
     }
@@ -2020,7 +2019,7 @@ void File_Exif::FileHeader_Parse()
             }
             currentIFD = Kind_MakernoteApple;
             SkipHeader = true;
-            IFD_Offsets[Element_Offset] = currentIFD;
+            IFD_Offsets[static_cast<int32u>(Element_Offset)] = currentIFD;
         }
         else if (Buffer_Size >= 6 && !strncmp(reinterpret_cast<const char*>(Buffer), "Nikon", 6)) { // the char* contains a terminating \0
             Skip_String(6,                                      "Identifier");
@@ -2038,7 +2037,7 @@ void File_Exif::FileHeader_Parse()
             currentIFD = Kind_MakernoteSony;
             OffsetFromContainer = -static_cast<int64s>(MakernoteOffset);
             SkipHeader = true;
-            IFD_Offsets[MakernoteOffset + Element_Offset] = currentIFD;
+            IFD_Offsets[MakernoteOffset + static_cast<int32u>(Element_Offset)] = currentIFD;
         }
         else if (Buffer_Size > 26 && 
             (!strncmp(reinterpret_cast<const char*>(Buffer) + Buffer_Size - 8, "\x49\x49\x2A\x00", 4)) || // Canon Makernote footer
@@ -2130,7 +2129,7 @@ void File_Exif::Header_Parse()
         Header_Fill_Code(IfdItems.begin()->second.Tag);
         #endif //MEDIAINFO_TRACE
         auto SizePerBlock = Exif_Type_Size(IfdItems.begin()->second.Type);
-        auto Size = static_cast<int64u>(SizePerBlock) * IfdItems.begin()->second.Count;
+        auto Size = static_cast<int32u>(SizePerBlock) * IfdItems.begin()->second.Count;
         if (IfdItems.size() > 1) {
             // Found buggy IFD with 2 items having the right size but the second item has a buggy offset
             auto Next = IfdItems.begin();
@@ -2139,7 +2138,7 @@ void File_Exif::Header_Parse()
             if (Size > MaxSize) {
                 bool IsCurated = false;
                 if (IfdItems.size() > 2) {
-                    auto Size1 = static_cast<int64u>(Exif_Type_Size(Next->second.Type)) * Next->second.Count;
+                    auto Size1 = static_cast<int32u>(Exif_Type_Size(Next->second.Type)) * Next->second.Count;
                     auto Next2 = Next;
                     ++Next2;
                     auto MaxSize2 = Next2->first - IfdItems.begin()->first;
@@ -2439,7 +2438,7 @@ void File_Exif::Makernote()
     File_Exif MI{};
     MI.IsMakernote = true;
     MI.LittleEndian = LittleEndian;
-    MI.MakernoteOffset = Buffer_Offset;
+    MI.MakernoteOffset = static_cast<int32u>(Buffer_Offset);
     Open_Buffer_Init(&MI);
     Open_Buffer_Continue(&MI);
     Open_Buffer_Finalize(&MI);
@@ -2464,6 +2463,8 @@ void File_Exif::ICC_Profile()
     Open_Buffer_Init(ICC_Parser.get());
     Open_Buffer_Continue(ICC_Parser.get());
     Open_Buffer_Finalize(ICC_Parser.get());
+    #else
+    Skip_XX(Element_Size - Element_Offset,                      "ICC Profile");
     #endif
 }
 
@@ -2473,14 +2474,12 @@ void File_Exif::XMP()
     #if defined(MEDIAINFO_XMP_YES)
     File_Xmp MI{};
     Open_Buffer_Init(&MI);
-    auto Element_Offset_Sav = Element_Offset;
     Open_Buffer_Continue(&MI);
-    Element_Offset = Element_Offset_Sav;
     Open_Buffer_Finalize(&MI);
-    Element_Show(); //TODO: why is it needed?
     Merge(MI, Stream_General, 0, 0, false);
-    #endif
+    #else
     Skip_UTF8(Element_Size - Element_Offset,                    "XMP metadata");
+    #endif
 }
 
 //---------------------------------------------------------------------------
@@ -2494,7 +2493,7 @@ void File_Exif::PhotoshopImageResources()
     Open_Buffer_Finalize(&MI);
     Merge(MI, Stream_General, 0, 0, false);
     #else
-    Skip_UTF8(Element_Size - Element_Offset,                    "Photoshop Tags");
+    Skip_XX(Element_Size - Element_Offset,                      "Photoshop Tags");
     #endif
 }
 
@@ -2509,7 +2508,7 @@ void File_Exif::IPTC_NAA()
     Open_Buffer_Finalize(&MI);
     Merge(MI, Stream_General, 0, 0, false);
     #else
-    Skip_UTF8(Element_Size - Element_Offset,                    "IPTC-NAA data");
+    Skip_XX(Element_Size - Element_Offset,                      "IPTC-NAA data");
     #endif
 }
 
@@ -2654,11 +2653,7 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             int16u Ret16;
             #if MEDIAINFO_TRACE
                 Get_X2 (Ret16,                                  "Data");
-                switch (IfdItem.Tag)
-                {
-                            
-                    default : Element_Info1(Ztring::ToZtring(Ret16));
-                }
+                Element_Info1(Ztring::ToZtring(Ret16));
             #else //MEDIAINFO_TRACE
                 if (Element_Offset+2>Element_Size)
                 {
@@ -2674,7 +2669,7 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             Param_Info1C((currentIFD == Kind_IFD0 || currentIFD == Kind_IFD1) && IfdItem.Tag == IFD0::Orientation, Exif_IFD0_Orientation_Name(Ret16));
             Param_Info1C((currentIFD == Kind_IFD0 || currentIFD == Kind_IFD1 || currentIFD == Kind_IFD2 || currentIFD == Kind_SubIFD0 || currentIFD == Kind_SubIFD1 || currentIFD == Kind_SubIFD2) && IfdItem.Tag == IFD0::Compression, Tiff_Compression_Name(Ret16));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::LightSource, Exif_ExifIFD_Tag_LightSource_Name(Ret16));
-            Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::Flash, Exif_IFDExif_Flash_Name(Ret16));
+            Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::Flash, Exif_IFDExif_Flash_Name(static_cast<int8u>(Ret16)));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::ColorSpace, Exif_IFDExif_ColorSpace_Name(Ret16));
             Param_Info1C(currentIFD == Kind_Exif && IfdItem.Tag == IFDExif::CompositeImage, Exif_IFDExif_CompositeImage_Name(Ret16));
             Param_Info1C(currentIFD == Kind_MakernoteNikon && IfdItem.Tag == IFDMakernoteNikon::CropHiSpeed, Exif_IFDMakernoteNikon_CropHiSpeed_Name(Ret16));

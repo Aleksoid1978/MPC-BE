@@ -23,6 +23,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Av1.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include "ThirdParty/fmt/format.h"
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -40,7 +41,7 @@ extern const char* Mpegv_matrix_coefficients_ColorSpace(int8u matrix_coefficient
 extern const char* Avc_video_full_range[];
 
 //---------------------------------------------------------------------------
-const char* Av1_obu_type(int8u obu_type)
+static const char* Av1_obu_type(int8u obu_type)
 {
     switch (obu_type)
     {
@@ -58,7 +59,7 @@ const char* Av1_obu_type(int8u obu_type)
 }
 
 //---------------------------------------------------------------------------
-const char* Av1_seq_profile(int8u seq_profile)
+static const char* Av1_seq_profile(int8u seq_profile)
 {
     switch (seq_profile)
     {
@@ -70,7 +71,7 @@ const char* Av1_seq_profile(int8u seq_profile)
 }
 
 //---------------------------------------------------------------------------
-const char* Av1_metadata_type(int8u metadata_type)
+static const char* Av1_metadata_type(int8u metadata_type)
 {
     switch (metadata_type)
     {
@@ -84,7 +85,7 @@ const char* Av1_metadata_type(int8u metadata_type)
 }
 
 //---------------------------------------------------------------------------
-const char* Av1_frame_type[4] =
+static const char* Av1_frame_type[4] =
 {
     "Key",
     "Inter",
@@ -98,6 +99,39 @@ static const char* Av1_chroma_sample_position[3] =
     "Type 0",
     "Type 2",
     "3",
+};
+
+//---------------------------------------------------------------------------
+static const char* Av1_scalability_mode[] = {
+    "L1T2",                // 0
+    "L1T3",                // 1
+    "L2T1",                // 2
+    "L2T2",                // 3
+    "L2T3",                // 4
+    "S2T1",                // 5
+    "S2T2",                // 6
+    "S2T3",                // 7
+    "L2T1h",               // 8
+    "L2T2h",               // 9
+    "L2T3h",               // 10
+    "S2T1h",               // 11
+    "S2T2h",               // 12
+    "S2T3h",               // 13
+    "SS",                  // 14
+    "L3T1",                // 15
+    "L3T2",                // 16
+    "L3T3",                // 17
+    "S3T1",                // 18
+    "S3T2",                // 19
+    "S3T3",                // 20
+    "L3T2_KEY",            // 21
+    "L3T3_KEY",            // 22
+    "L4T5_KEY",            // 23
+    "L4T7_KEY",            // 24
+    "L3T2_KEY_SHIFT",      // 25
+    "L3T3_KEY_SHIFT",      // 26
+    "L4T5_KEY_SHIFT",      // 27
+    "L4T7_KEY_SHIFT"       // 28
 };
 
 //***************************************************************************
@@ -119,10 +153,6 @@ File_Av1::File_Av1()
     //In
     Frame_Count_Valid=0;
     FrameIsAlwaysComplete=false;
-
-    //Temp
-    sequence_header_Parsed=false;
-    SeenFrameHeader=false;
 }
 
 //---------------------------------------------------------------------------
@@ -141,9 +171,6 @@ void File_Av1::Streams_Accept()
 
     Stream_Prepare(Stream_Video);
     Fill(Stream_Video, 0, Video_Format, "AV1");
-
-    if (!Frame_Count_Valid)
-        Frame_Count_Valid=Config->ParseSpeed>=0.3?8:(IsSub?1:2);
 }
 
 //---------------------------------------------------------------------------
@@ -155,6 +182,17 @@ void File_Av1::Streams_Fill()
 void File_Av1::Streams_Finish()
 {
     Fill(Stream_Video, 0, Video_Format_Settings_GOP, GOP_Detect(GOP));
+    for (const auto& item : scalability_structure_seen) {
+        string svc = "Scalable Video Coding (";
+        if (item < sizeof(Av1_scalability_mode) / sizeof(Av1_scalability_mode[0])) {
+            svc += Av1_scalability_mode[item];
+        }
+        else {
+            svc += fmt::to_string(item);
+        }
+        svc += ')';
+        Fill(Stream_Video, 0, Video_Format_Settings, svc);
+    }
 
     //Merge info about different HDR formats
     auto HDR_Format = HDR.find(Video_HDR_Format);
@@ -243,6 +281,13 @@ void File_Av1::Read_Buffer_OutOfBand()
     Open_Buffer_Continue(Buffer, Buffer_Size);
 }
 
+//---------------------------------------------------------------------------
+void File_Av1::Read_Buffer_Init()
+{
+    if (!Frame_Count_Valid)
+        Frame_Count_Valid = IsSub ? 1 : 2;
+}
+
 //***************************************************************************
 // Buffer - Per element
 //***************************************************************************
@@ -252,12 +297,27 @@ void File_Av1::Header_Parse()
 {
     //Parsing
     int8u obu_type;
-    bool obu_extension_flag;
+    bool obu_extension_flag, obu_has_size_field;
+    int64u obu_size{};
+    if (IsAnnexB) {
+        Get_leb128 (obu_size,                                   "obu_size");
+        obu_size += Element_Offset;
+        DataMustAlwaysBeComplete = Element_Level > 3;
+        if (!DataMustAlwaysBeComplete)
+        {
+            Header_Fill_Size(obu_size);
+            switch (Element_Level) {
+            case 2:  Header_Fill_Code(0, "temporal_unit"); break;
+            case 3:  Header_Fill_Code(0, "frame_unit"); break;
+            }
+            return;
+        }
+    }
     BS_Begin();
     Mark_0 ();
     Get_S1 ( 4, obu_type,                                       "obu_type");
     Get_SB (    obu_extension_flag,                             "obu_extension_flag");
-    Skip_SB(                                                    "obu_has_size_field");
+    Get_SB (    obu_has_size_field,                             "obu_has_size_field");
     Skip_SB(                                                    "obu_reserved_1bit");
     if (obu_extension_flag)
     {
@@ -267,14 +327,26 @@ void File_Av1::Header_Parse()
     }
     BS_End();
 
-    int64u obu_size;
-    Get_leb128 (obu_size,                                       "obu_size");
+    if (obu_has_size_field) {
+        int64u obu_size2;
+        Get_leb128 (obu_size2,                                  "obu_size");
+        if (!IsAnnexB) {
+            obu_size = Element_Offset + obu_size2;
+        }
+        else if (obu_size != Element_Offset + obu_size2) {
+            Trusted_IsNot("obu_size mismatch");
+        }
+    }
+    else if (IsAnnexB) {
+    }
+    else if (FrameIsAlwaysComplete) {
+        obu_size = Element_Size;
+    }
+    else {
+        Trusted_IsNot("obu_size");
+    }
 
-    FILLING_BEGIN();
-    Header_Fill_Size(Element_Offset+obu_size);
-    FILLING_END();
-
-    if (FrameIsAlwaysComplete && (Element_IsWaitingForMoreData() || Element_Offset+obu_size>Element_Size))
+    if (FrameIsAlwaysComplete && (Element_IsWaitingForMoreData() || obu_size>Element_Size))
     {
         // Trashing the remaining bytes, as the the frame is always complete so remaining bytes should not be prepending the next frame
         Buffer_Offset=Buffer_Size;
@@ -283,17 +355,17 @@ void File_Av1::Header_Parse()
     }
 
     FILLING_BEGIN();
-        Header_Fill_Code(obu_type, Av1_obu_type(obu_type));
+    Header_Fill_Size(obu_size);
+    Header_Fill_Code(obu_type, Av1_obu_type(obu_type));
     FILLING_END();
 }
 
 //---------------------------------------------------------------------------
 void File_Av1::Data_Parse()
 {
-    //Probing mode in case of raw stream //TODO: better reject of bad files
-    if (!IsSub && !Status[IsAccepted] && (!Element_Code || Element_Code>6))
+    if (IsAnnexB && Element_Level <= 2)
     {
-        Reject();
+        Element_ThisIsAList();
         return;
     }
 
@@ -309,6 +381,10 @@ void File_Av1::Data_Parse()
         case  0xF : padding(); break;
         default   : Skip_XX(Element_Size-Element_Offset,        "Data");
     }
+
+    if (!Status[IsAccepted] && Frame_Count && !IsSub && File_Offset + Buffer_Offset + Element_TotalSize_Get() >= File_Size) {
+        Accept();
+    }
 }
 
 //***************************************************************************
@@ -316,12 +392,20 @@ void File_Av1::Data_Parse()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Av1::trailing_bits()
+{
+    Mark_1();
+    while (Data_BS_Remain())
+        Mark_0();
+}
+
+//---------------------------------------------------------------------------
 void File_Av1::sequence_header()
 {
     //Parsing
     int32u max_frame_width_minus_1, max_frame_height_minus_1;
-    int8u seq_profile, seq_level_idx[33]{}, operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients, chroma_sample_position;
-    bool reduced_still_picture_header, seq_tier[33], timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y, film_grain_params_present;
+    int8u seq_profile, seq_level_idx[33]{}, operating_points_cnt_minus_1, buffer_delay_length_minus_1, frame_width_bits_minus_1, frame_height_bits_minus_1, seq_force_screen_content_tools, BitDepth, color_primaries, transfer_characteristics, matrix_coefficients, chroma_sample_position{};
+    bool timing_info_present_flag, decoder_model_info_present_flag, seq_choose_screen_content_tools, mono_chrome, color_range, color_description_present_flag, subsampling_x, subsampling_y, film_grain_params_present;
     BS_Begin();
     Get_S1 ( 3, seq_profile,                                    "seq_profile"); Param_Info1(Av1_seq_profile(seq_profile));
     Skip_SB(                                                    "still_picture");
@@ -330,7 +414,6 @@ void File_Av1::sequence_header()
     {
         Get_S1 ( 5, seq_level_idx[0],                           "seq_level_idx[0]");
         decoder_model_info_present_flag=false;
-        seq_tier[0]=false;
     }
     else
     {
@@ -348,7 +431,8 @@ void File_Av1::sequence_header()
                 Skip_S1( 5,                                     "frame_presentation_time_length_minus_1");
             TEST_SB_END();
         TEST_SB_END();
-        Skip_SB(                                                "initial_display_delay_present_flag");
+        bool initial_display_delay_present_flag;
+        Get_SB (initial_display_delay_present_flag,             "initial_display_delay_present_flag");
         Get_S1 ( 5, operating_points_cnt_minus_1,               "operating_points_cnt_minus_1");
         for (int8u i=0; i<=operating_points_cnt_minus_1; i++)
         {
@@ -356,7 +440,7 @@ void File_Av1::sequence_header()
             Skip_S2(12,                                         "operating_point_idc[i]");
             Get_S1(5, seq_level_idx[i],                         "seq_level_idx[i]");
             if (seq_level_idx[i]>7)
-                Get_SB(seq_tier[i],                             "seq_tier[i]");
+                Skip_SB(                                        "seq_tier[i]");
             if (timing_info_present_flag && decoder_model_info_present_flag)
             {
                 TEST_SB_SKIP(                                   "decoder_model_present_for_this_op[i]");
@@ -365,6 +449,11 @@ void File_Av1::sequence_header()
                     Skip_SB(                                    "low_delay_mode_flag[op]");
                 TEST_SB_END();
 
+            }
+            if (initial_display_delay_present_flag) {
+                TEST_SB_SKIP(                                   "initial_display_delay_present_for_this_op[i]");
+                    Skip_S1(4,                                  "initial_display_delay_minus_1[i]");
+                TEST_SB_END();
             }
             Element_End0();
         }
@@ -482,23 +571,19 @@ void File_Av1::sequence_header()
         Skip_SB(                                                "separate_uv_delta_q");
     Element_End0();
     Get_SB (film_grain_params_present,                          "film_grain_params_present");
-    Mark_1();
-    if (Data_BS_Remain()<8)
-        while (Data_BS_Remain())
-            Mark_0();
+    trailing_bits();
     BS_End();
 
     FILLING_BEGIN_PRECISE();
         if (!sequence_header_Parsed)
         {
-            if (IsSub)
-                Accept();
             Fill(Stream_Video, 0, Video_Format_Profile, Ztring().From_UTF8(Av1_seq_profile(seq_profile))+(seq_level_idx[0]==31?Ztring():(__T("@L")+Ztring().From_Number(2+(seq_level_idx[0]>>2))+__T(".")+Ztring().From_Number(seq_level_idx[0]&3))));
             Fill(Stream_Video, 0, Video_Width, max_frame_width_minus_1+1);
             Fill(Stream_Video, 0, Video_Height, max_frame_height_minus_1+1);
             Fill(Stream_Video, 0, Video_BitDepth, BitDepth);
-            Fill(Stream_Video, 0, Video_ColorSpace, mono_chrome?"Y":((color_primaries==1 && transfer_characteristics==13 && matrix_coefficients==0)?"RGB":"YUV"));
-            if (Retrieve(Stream_Video, 0, Video_ColorSpace)==__T("YUV"))
+            string ColorSpace = mono_chrome ? "Y" : ((color_primaries == 1 && transfer_characteristics == 13 && matrix_coefficients == 0) ? "RGB" : "YUV");
+            Fill(Stream_Video, 0, Video_ColorSpace, ColorSpace);
+            if (ColorSpace == "YUV")
             {
                 Fill(Stream_Video, 0, Video_ChromaSubsampling, subsampling_x?(subsampling_y?"4:2:0":"4:2:2"):"4:4:4"); // "!subsampling_x && subsampling_y" (4:4:0) not possible
                 if (subsampling_x && subsampling_y && chroma_sample_position)
@@ -516,6 +601,7 @@ void File_Av1::sequence_header()
             if (film_grain_params_present)
                 Fill(Stream_Video, 0, Video_Format_Settings, "Film Grain Synthesis");
 
+            Buffer_MaximumSize = 0x10000000; // Frames may be big
             sequence_header_Parsed=true;
         }
     FILLING_END();
@@ -550,13 +636,46 @@ void File_Av1::frame_header()
     }
 
     //Parsing
+    frame_header_uncompressed_header();
+    if (show_existing_frame) {
+        SeenFrameHeader = false;
+    }
+    else {
+        SeenFrameHeader = true;
+    }
+
+    FILLING_BEGIN();
+    if (sequence_header_Parsed) {
+        Frame_Count++;
+        if (!Status[IsAccepted]) {
+            if (Frame_Count >= Frame_Count_Valid) {
+                Accept();
+            }
+        }
+        if (!Status[IsFilled] && Frame_Count >= (Frame_Count_Valid << 2)) {
+            Fill();
+            if (Config->ParseSpeed <= 1.0) {
+                Finish();
+            }
+        }
+    }
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::frame_header_uncompressed_header()
+{
+    //Parsing
     BS_Begin();
     Element_Begin1("uncompressed_header");
+    if (reduced_still_picture_header) {
+        show_existing_frame = false;
+    }
+    else {
         int8u frame_type;
-        TEST_SB_SKIP(                                           "show_existing_frame");
+        TEST_SB_GET (show_existing_frame,                       "show_existing_frame");
+            Skip_BS(Data_BS_Remain(),                           "(Not parsed)");
             BS_End();
-            SeenFrameHeader = 0;
-            Skip_XX(Element_Size-Element_Offset,                "Data");
             return;
         TEST_SB_END();
         Get_S1 (2, frame_type,                                  "frame_type"); Param_Info1(Av1_frame_type[frame_type]);
@@ -567,17 +686,10 @@ void File_Av1::frame_header()
             GOP.push_back(' ');
         FILLING_END();
         if (GOP.size()>=512)
-            GOP.resize(384);
+            GOP.erase(0, 128);
+    }
     Element_End0();
     BS_End();
-
-    FILLING_BEGIN();
-        if (!Status[IsAccepted])
-            Accept();
-        Frame_Count++;
-        if (Frame_Count>=Frame_Count_Valid)
-            Finish();
-    FILLING_END();
 }
 
 //---------------------------------------------------------------------------
@@ -592,13 +704,15 @@ void File_Av1::metadata()
     //Parsing
     int64u metadata_type;
     Get_leb128 (metadata_type,                                  "metadata_type");
-    Param_Info1(Av1_metadata_type(metadata_type));
+    Param_Info1(Av1_metadata_type(static_cast<int8u>(metadata_type)));
 
     switch (metadata_type)
     {
         case    1 : metadata_hdr_cll(); break;
         case    2 : metadata_hdr_mdcv(); break;
+        case    3 : metadata_scalability(); break;
         case    4 : metadata_itu_t_t35(); break;
+        case    5 : metadata_timecode(); break;
         default   : Skip_XX(Element_Size-Element_Offset,        "Data");
     }
 }
@@ -608,6 +722,10 @@ void File_Av1::metadata_hdr_cll()
 {
     //Parsing
     Get_LightLevel(maximum_content_light_level, maximum_frame_average_light_level);
+
+    BS_Begin();
+    trailing_bits();
+    BS_End();
 }
 
 //---------------------------------------------------------------------------
@@ -621,6 +739,10 @@ void File_Av1::metadata_hdr_mdcv()
         HDR[Video_HDR_Format_Compatibility][HdrFormat_SmpteSt2086] = "HDR10";
     }
     Get_MasteringDisplayColorVolume(HDR[Video_MasteringDisplay_ColorPrimaries][HdrFormat_SmpteSt2086], HDR[Video_MasteringDisplay_Luminance][HdrFormat_SmpteSt2086], true);
+
+    BS_Begin();
+    trailing_bits();
+    BS_End();
 }
 
 //---------------------------------------------------------------------------
@@ -634,7 +756,7 @@ void File_Av1::metadata_itu_t_t35()
 
     switch (itu_t_t35_country_code)
     {
-    case 0xB5: metadata_itu_t_t35_B5(); break; // USA
+    case 0xB5: Param_Info1("United States"); metadata_itu_t_t35_B5(); break;
     }
 }
 
@@ -646,7 +768,8 @@ void File_Av1::metadata_itu_t_t35_B5()
 
     switch (itu_t_t35_terminal_provider_code)
     {
-    case 0x003C: metadata_itu_t_t35_B5_003C(); break;
+    case 0x003C: Param_Info1("Samsung Electronics America"); metadata_itu_t_t35_B5_003C(); break;
+    case 0x5890: Param_Info1("AOMedia"); metadata_itu_t_t35_B5_5890(); break;
     }
 }
 
@@ -658,7 +781,7 @@ void File_Av1::metadata_itu_t_t35_B5_003C()
 
     switch (itu_t_t35_terminal_provider_oriented_code)
     {
-    case 0x0001: metadata_itu_t_t35_B5_003C_0001(); break;
+    case 0x0001: case 0x0003: metadata_itu_t_t35_B5_003C_0001(); break;
     }
 }
 
@@ -693,6 +816,144 @@ void File_Av1::metadata_itu_t_t35_B5_003C_0001_04()
                 HDR[Video_HDR_Format_Compatibility][HdrFormat_SmpteSt209440]=tone_mapping_flag?__T("HDR10+ Profile B"):__T("HDR10+ Profile A");
         }
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_itu_t_t35_B5_5890()
+{
+    int8u itu_t_t35_terminal_provider_oriented_code;
+    Get_B1(itu_t_t35_terminal_provider_oriented_code,           "itu_t_t35_terminal_provider_oriented_code");
+
+    switch (itu_t_t35_terminal_provider_oriented_code)
+    {
+    case 0x01: metadata_itu_t_t35_B5_5890_01(); break;
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_itu_t_t35_B5_5890_01()
+{
+    Element_Info1("AOMedia Film Grain Synthesis 1 (AFGS1)");
+
+    Element_Begin1("av1_film_grain_param_sets");
+    BS_Begin();
+    bool afgs1_enable_flag;
+    Get_SB(afgs1_enable_flag,                                   "afgs1_enable_flag");
+    if (!afgs1_enable_flag) {
+        BS_End();
+        return;
+    }
+    Skip_S1(4,                                                  "reserved_4bits");
+    Skip_S1(3,                                                  "num_film_grain_sets_minus1");
+    BS_End();
+    Skip_XX(Element_Size - Element_Offset, "(Not parsed)");
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_scalability()
+{
+    int8u scalability_mode_idc;
+    Get_B1(scalability_mode_idc,                                "scalability_mode_idc");
+    if (scalability_mode_idc == 14)
+        scalability_structure();
+    BS_Begin();
+    trailing_bits();
+    BS_End();
+
+    FILLING_BEGIN_PRECISE();
+    scalability_structure_seen.insert(scalability_mode_idc);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::scalability_structure()
+{
+    Element_Begin1("scalability_structure");
+    BS_Begin();
+    int8u spatial_layers_cnt_minus_1;
+    bool spatial_layer_dimensions_present_flag, spatial_layer_description_present_flag, temporal_group_description_present_flag;
+    Get_S1(2, spatial_layers_cnt_minus_1,                       "spatial_layers_cnt_minus_1");
+    Get_SB(spatial_layer_dimensions_present_flag,               "spatial_layer_dimensions_present_flag");
+    Get_SB(spatial_layer_description_present_flag,              "spatial_layer_description_present_flag");
+    Get_SB(temporal_group_description_present_flag,             "temporal_group_description_present_flag");
+    Skip_S1(3,                                                  "scalability_structure_reserved_3bits");
+    BS_End();
+    if (spatial_layer_dimensions_present_flag) {
+        Element_Begin1("spatial_layer_dimensions");
+        for (int8u i = 0; i <= spatial_layers_cnt_minus_1; ++i) {
+            Element_Begin1("spatial_layer_dimensions");
+            Skip_B2(                                            "spatial_layer_max_width");
+            Skip_B2(                                            "spatial_layer_max_height");
+            Element_End0();
+        }
+        Element_End0();
+    }
+    if (spatial_layer_description_present_flag) {
+        Element_Begin1("spatial_layer_descriptions");
+        for (int8u i = 0; i <= spatial_layers_cnt_minus_1; i++) {
+            Element_Begin1("spatial_layer_description");
+            Skip_B1(                                            "spatial_layer_ref_id[i]");
+            Element_End0();
+        }
+        Element_End0();
+    }
+    if (temporal_group_description_present_flag) {
+        Element_Begin1("temporal_group_descriptions");
+        int8u temporal_group_size;
+        Get_B1(temporal_group_size,                             "temporal_group_size");
+        for (int8u i = 0; i < temporal_group_size; ++i) {
+            Element_Begin1("temporal_group_description");
+            int8u temporal_group_ref_cnt_i;
+            BS_Begin();
+            Skip_S1(3,                                          "temporal_group_temporal_id");
+            Skip_SB(                                            "temporal_group_temporal_switching_up_point_flag");
+            Skip_SB(                                            "temporal_group_spatial_switching_up_point_flag");
+            Get_S1(3, temporal_group_ref_cnt_i,                 "temporal_group_ref_cnt");
+            BS_End();
+            for (int8u j = 0; j < temporal_group_ref_cnt_i; ++j) {
+                Skip_B1(                                        "temporal_group_ref_pic_diff");
+            }
+            Element_End0();
+        }
+        Element_End0();
+    }
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_timecode()
+{
+    BS_Begin();
+    Skip_S1(5,                                                  "counting_type");
+    bool full_timestamp_flag;
+    Get_SB(full_timestamp_flag,                                 "full_timestamp_flag");
+    Skip_SB(                                                    "discontinuity_flag");
+    Skip_SB(                                                    "cnt_dropped_flag");
+    Skip_S2(9,                                                  "n_frames");
+    if (full_timestamp_flag) {
+        Skip_S1(6,                                              "seconds_value");
+        Skip_S1(6,                                              "minutes_value");
+        Skip_S1(5,                                              "hours_value");
+    }
+    else {
+        TEST_SB_SKIP(                                           "seconds_flag");
+            Skip_S1(6,                                          "seconds_value");
+            TEST_SB_SKIP(                                       "minutes_flag");
+                Skip_S1(6,                                      "minutes_value");
+                TEST_SB_SKIP(                                   "hours_flag");
+                    Skip_S1(5,                                  "hours_value");
+                TEST_SB_END();
+            TEST_SB_END();
+        TEST_SB_END();
+    }
+    int8u time_offset_length;
+    Get_S1(5, time_offset_length,                               "time_offset_length");
+    if (time_offset_length > 0) {
+        Skip_BS(time_offset_length,                             "time_offset_value");
+    }
+    trailing_bits();
+    BS_End();
 }
 
 //---------------------------------------------------------------------------
@@ -844,8 +1105,10 @@ void File_Av1::Get_leb128(int64u& Info, const char* Name)
             #if MEDIAINFO_TRACE
                 if (Trace_Activated)
                 {
-                    Param(Name, Info, i+1);
+                    Element_Offset-=(1LL+i);
+                    Param(Name, Info, (i+1)*8);
                     Param_Info(__T("(")+Ztring::ToZtring(i+1)+__T(" bytes)"));
+                    Element_Offset+=(1LL+i);
                 }
             #endif //MEDIAINFO_TRACE
             return;

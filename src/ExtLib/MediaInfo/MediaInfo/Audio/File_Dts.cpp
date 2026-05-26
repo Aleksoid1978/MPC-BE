@@ -1928,7 +1928,6 @@ void File_Dts::XLL()
 
     // Parsing
     int32u LLFrameSize;
-    int16u ChSetHeaderSize;
     int8u Bits4FrameFsize, NumChSetsInFrame, SegmentsInFrame, Bits4SSize, Bits4ChMask;
     bool ScalableLSBs;
     Element_Begin1("Header");
@@ -2124,7 +2123,7 @@ void File_Dts::XXCH()
     Element_Begin1("Header");
     vector<int16u> ChSetFsizeXXCHs;
     int16u CoreSpkrActivityMask;
-    int8u HeaderSizeXXCH, Bits4SpkrMaskXXCH, NumChSetsInXXCH;
+    int8u Bits4SpkrMaskXXCH, NumChSetsInXXCH;
     bool bCRCPresent4ChSetHeaderXXCH;
     auto Element_Offset_Start=Element_Offset;
     BS_Begin();

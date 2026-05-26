@@ -57,12 +57,14 @@ class File_Xmp : public File__Analyze
 {
 public:
     bool Wait{ false };
+    bool NoTrace{ false };
     gc_items* GContainerItems{ nullptr };
     gm_data* GainMapData{ nullptr };
 
 private :
     //Buffer - File header
     bool FileHeader_Begin() override;
+    void Read_Buffer_Continue() override;
 
     //Element namespaces
     void dc(const string& name, const string& value);

@@ -486,7 +486,20 @@ void Amazon_AWS_Sign(struct curl_slist* &HttpHeader, const Http::Url &File_URL, 
     char timeStamp_Buffer[17];
     time_t timeStamp_Time=time(0);
 
-    strftime(timeStamp_Buffer, sizeof(timeStamp_Buffer), "%Y%m%dT%H%M%SZ", gmtime(&timeStamp_Time));
+    #if defined(_WIN32)
+        // MSVC and MinGW-w64 argument order and return value differs from C11 standard
+        tm Gmt_Temp;
+        errno_t gmtime_s_Result = gmtime_s(&Gmt_Temp, &timeStamp_Time);
+        tm* Gmt = gmtime_s_Result ? nullptr : &Gmt_Temp;
+    #elif defined(_POSIX_VERSION) || defined(__APPLE__)
+        // POSIX
+        tm Gmt_Temp;
+        tm* Gmt = gmtime_r(&timeStamp_Time, &Gmt_Temp);
+    #else
+        // Fallback: not thread-safe, but prevents compile errors
+        tm* Gmt = gmtime(&timeStamp_Time);
+    #endif
+    strftime(timeStamp_Buffer, sizeof(timeStamp_Buffer), "%Y%m%dT%H%M%SZ", Gmt);
 
     string timeStamp(timeStamp_Buffer);
     string dateStamp=timeStamp.substr(0, 8);
@@ -705,14 +718,28 @@ size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *da
                 return size*nmemb;
             }
         }
-        double File_SizeD;
-        CURLcode Result=curl_easy_getinfo(((Reader_libcurl::curl_data*)data)->Curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &File_SizeD);
-        if (Result==CURLE_OK && File_SizeD==0)
+        curl_off_t File_Size;
+        CURLcode Result;
+#if LIBCURL_VERSION_NUM >= 0x073700 // if we know during compilation that libcurl >= 7.55.0
+        Result = curl_easy_getinfo(((Reader_libcurl::curl_data*)data)->Curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &File_Size);
+#else // runtime mode or libcurl < 7.55.0
+#ifdef MEDIAINFO_LIBCURL_DLL_RUNTIME // if in runtime mode we have the new headers to support new API but do not know the version used at runtime so attempt with new API first
+        Result = curl_easy_getinfo(((Reader_libcurl::curl_data*)data)->Curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &File_Size);
+        if (Result == CURLE_UNKNOWN_OPTION) { // fallback to old API if new one fails, libcurl < 7.55.0
+#endif // if not runtime mode then we already know libcurl < 7.55.0
+            double File_SizeD;
+            Result = curl_easy_getinfo(((Reader_libcurl::curl_data*)data)->Curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &File_SizeD);
+            File_Size = static_cast<curl_off_t>(File_SizeD);
+#ifdef MEDIAINFO_LIBCURL_DLL_RUNTIME
+        }
+#endif
+#endif
+        if (Result==CURLE_OK && File_Size==0)
         {
             ((Reader_libcurl::curl_data*)data)->Init_NotAFile=true;
             return 0; //Great chances it is FTP file listing due to interogation mark in the file name
         }
-        else if (Result==CURLE_OK && File_SizeD!=-1)
+        else if (Result==CURLE_OK && File_Size!=-1)
         {
             if (((Reader_libcurl::curl_data*)data)->FileSize!=(int64u)-1)
             {
@@ -732,14 +759,14 @@ size_t libcurl_WriteData_CallBack(void *ptr, size_t size, size_t nmemb, void *da
 
                 //More iterations (growing file)
                 ((Reader_libcurl::curl_data*)data)->CountOfSeconds=0;
-                ((Reader_libcurl::curl_data*)data)->FileSize+=(int64u)File_SizeD;
+                ((Reader_libcurl::curl_data*)data)->FileSize+=File_Size;
                 ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init(((Reader_libcurl::curl_data*)data)->FileSize);
             }
             else
             {
                 //First time
-                ((Reader_libcurl::curl_data*)data)->FileSize=(int64u)File_SizeD;
-                ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init((int64u)File_SizeD, ((Reader_libcurl::curl_data*)data)->File_Name);
+                ((Reader_libcurl::curl_data*)data)->FileSize=File_Size;
+                ((Reader_libcurl::curl_data*)data)->MI->Open_Buffer_Init(File_Size, ((Reader_libcurl::curl_data*)data)->File_Name);
             }
         }
         else
@@ -793,6 +820,7 @@ bool Reader_libcurl_HomeIsSet()
     #ifdef WINDOWS_UWP
         return false; //Environment is not aviable
     #else
+        #pragma warning(suppress : 4996) //'getenv': This function or variable may be unsafe.
         return getenv("HOME")?true:false;
     #endif
 }
@@ -805,12 +833,14 @@ Ztring Reader_libcurl_ExpandFileName(const Ztring &FileName)
         Ztring FileName_Modified(FileName);
         if (FileName_Modified.find(__T("$HOME"))==0)
         {
+            #pragma warning(suppress : 4996) //'getenv': This function or variable may be unsafe.
             char* env=getenv("HOME");
             if (env)
                 FileName_Modified.FindAndReplace(__T("$HOME"), Ztring().From_Local(env));
         }
         if (FileName_Modified.find(__T('~'))==0)
         {
+            #pragma warning(suppress : 4996) //'getenv': This function or variable may be unsafe.
             char* env=getenv("HOME");
             if (env)
                 FileName_Modified.FindAndReplace(__T("~"), Ztring().From_Local(env));
@@ -883,7 +913,7 @@ size_t Reader_libcurl::Format_Test(MediaInfo_Internal* MI, String File_Name)
 void Reader_libcurl::Curl_Log(int Result, const Ztring &Message)
 {
 #if MEDIAINFO_EVENTS
-    if (Result == CURLE_UNKNOWN_TELNET_OPTION)
+    if (Result == CURLE_UNKNOWN_OPTION)
         MediaInfoLib::Config.Log_Send(0xC0, 0xFF, 0xF1010102, Reader_libcurl_FileNameWithoutPasswordAndParameters(Curl_Data->File_Name) + Message);
     else
     {
@@ -1091,6 +1121,11 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
         Curl_Data->Time_Max=time(0)+(time_t)MI->Config.File_TimeToLive_Get();
     if (!MI->Config.File_Curl_Get(__T("UserAgent")).empty())
         curl_easy_setopt(Curl_Data->Curl, CURLOPT_USERAGENT, MI->Config.File_Curl_Get(__T("UserAgent")).To_Local().c_str());
+    else {
+        auto Info_Version = Config.Info_Version_Get();
+        Info_Version.FindAndReplace(__T(" - v"), __T("/"));
+        curl_easy_setopt(Curl_Data->Curl, CURLOPT_USERAGENT, Info_Version.To_Local().c_str());
+    }
     if (!MI->Config.File_Curl_Get(__T("Proxy")).empty())
         curl_easy_setopt(Curl_Data->Curl, CURLOPT_PROXY, MI->Config.File_Curl_Get(__T("Proxy")).To_Local().c_str());
     ZtringList HttpHeaderStrings; HttpHeaderStrings.Separator_Set(0, EOL); //End of line is set depending of the platform: \n on Linux, \r on Mac, or \r\n on Windows
@@ -1187,7 +1222,7 @@ size_t Reader_libcurl::Format_Test_PerParser(MediaInfo_Internal* MI, const Strin
                 #ifdef MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
                 CURLcode Result=curl_easy_setopt(Curl_Data->Curl, CURLOPT_SSH_KNOWNHOSTS, Curl_Data->Ssh_KnownHostsFileName.c_str());
                 #else //MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
-                const CURLcode Result=CURLE_UNKNOWN_TELNET_OPTION;
+                const CURLcode Result=CURLE_UNKNOWN_OPTION;
                 #endif //MEDIAINFO_LIBCURL_CURLOPT_SSH_KNOWNHOSTS
                 if (Result)
                 {

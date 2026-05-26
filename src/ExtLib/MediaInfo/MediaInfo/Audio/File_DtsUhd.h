@@ -70,7 +70,7 @@ protected :
         int16u ObjectList[256]={0};
         int32u NumObjects=0; /* Valid entries in 'ObjectList' array */
         int32u NumStaticMDPackets=0;
-        int PacketsAcquired=0;
+        int32u PacketsAcquired=0;
         int32u StaticMDPacketByteSize=0;
         std::vector<int8u> Buffer;
     };

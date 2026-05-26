@@ -367,11 +367,11 @@ public:
     uint8_t GetSeconds() const { return Seconds_; }
     void SetSeconds(uint8_t Value) { Seconds_ = Value; }
     uint32_t GetFrames() const { return Frames_; }
-    void SetFrames(int64_t Value) { Frames_ = Value; }
+    void SetFrames(int32_t Value) { Frames_ = Value; }
 
     uint32_t GetFramesMax() const { return FramesMax_; }
     void SetFramesMax(uint32_t Value = 0) { FramesMax_ = Value; }
-    float GetFrameRate() { return ((uint64_t)GetFramesMax() + 1) / (Is1001fps() ? 1.001 : 1.000); }
+    float GetFrameRate() const { return (float)(((uint64_t)GetFramesMax() + 1) / (Is1001fps() ? 1.001 : 1.000)); }
 
     TimeCode& SetDropFrame(bool Value = true) { Flags_.DropFrame(Value); return *this; }
     bool IsDropFrame() const { return Flags_.IsDropFrame(); }

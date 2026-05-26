@@ -111,10 +111,10 @@ protected :
     #if defined(MEDIAINFO_EIA608_YES)
         std::vector<File__Analyze*> CC_Parsers;
     #endif
-    Ztring Recorded_Date_Date;
-    Ztring Recorded_Date_Time;
     Ztring Encoded_Library_Settings;
     TimeCode TimeCode_FirstFrame;
+    int32u Recorded_Date_Date{};
+    int32u Recorded_Date_Time{};
     int64u FrameSize_Theory; //The size of a frame
     int8u  SCT;
     int8u  SCT_Old;

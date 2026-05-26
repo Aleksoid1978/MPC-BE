@@ -265,12 +265,26 @@ void File_VorbisCom::Data_Parse()
                 Fill(StreamKind_Common, 0, "Encoded_Date", Encoded_Date+__T(' ')+Encoded_Time);
         }
         else if (Key==__T("DESCRIPTION"))            Fill(StreamKind_Common,   0, "Description", Value);
-        else if (Key==__T("DISC"))                   Fill(StreamKind_Common,   0, "Part", Value, true);
-        else if (Key==__T("DISCNUMBER"))             Fill(StreamKind_Common,   0, "Part", Value, true);
-        else if (Key==__T("DISCTOTAL"))              {if (Value!=Retrieve(StreamKind_Common, 0, "Part/Position_Total")) Fill(StreamKind_Common,   0, "Part/Position_Total", Value);}
+        else if (Key==__T("DISC"))
+        {
+            auto SlashPos=Value.find(__T('/'));
+            if (SlashPos!=Error)
+            {
+                auto Position_Total=Value.substr(SlashPos + 1);
+                auto Position=Value.substr(0, SlashPos);
+                {if (Position_Total!=Retrieve(StreamKind_Common, 0, General_Part_Position_Total)) Fill(Stream_General, 0, General_Part_Position_Total, Position_Total);}
+                {if (Position!=Retrieve(StreamKind_Common, 0, General_Part_Position)) Fill(Stream_General, 0, General_Part_Position, Position);}
+            }
+            else
+                {if (Value!=Retrieve(StreamKind_Common, 0, General_Part_Position)) Fill(Stream_General, 0, General_Part_Position, Value);}
+        }
+        else if (Key==__T("DISCNUMBER"))             {if (Value!=Retrieve(StreamKind_Common, 0, General_Part_Position)) Fill(StreamKind_Common,   0, General_Part_Position, Value, true);}
+        else if (Key==__T("DISCSUBTITLE"))           Fill(StreamKind_Common,   0, General_Part, Value, true);
+        else if (Key==__T("DISCTOTAL"))              {if (Value!=Retrieve(StreamKind_Common, 0, General_Part_Position_Total)) Fill(StreamKind_Common,   0, General_Part_Position_Total, Value);}
         else if (Key==__T("ENCODEDBY"))              Fill(StreamKind_Common,   0, "EncodedBy", Value);
         else if (Key==__T("ENCODED-BY"))             Fill(StreamKind_Common,   0, "EncodedBy", Value);
         else if (Key==__T("ENCODER"))                Fill(StreamKind_Common,   0, "Encoded_Application", Value);
+        else if (Key==__T("ENCODER_OPTIONS"))        Fill(StreamKind_Specific, 0, "Encoded_Library_Settings", Value);
         else if (Key==__T("ENCODED_USING"))          Fill(StreamKind_Common,   0, "Encoded_Application", Value);
         else if (Key==__T("ENCODER_URL"))            Fill(StreamKind_Common,   0, "Encoded_Application/Url", Value);
         else if (Key==__T("ENSEMBLE"))               Accompaniments.push_back(Value);
@@ -327,7 +341,7 @@ void File_VorbisCom::Data_Parse()
             }
         }
         else if (Key==__T("TOTALTRACKS"))            {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Common,   0, "Track/Position_Total", Value);}
-        else if (Key==__T("TOTALDISCS"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Part/Position_Total")) Fill(StreamKind_Common,   0, "Part/Position_Total", Value);}
+        else if (Key==__T("TOTALDISCS"))             {if (Value!=Retrieve(StreamKind_Common, 0, General_Part_Position_Total)) Fill(StreamKind_Common,   0, General_Part_Position_Total, Value);}
         else if (Key==__T("TRACK_COMMENT"))          Fill(StreamKind_Multiple, 0, "Comment", Value);
         else if (Key==__T("TRACKNUMBER"))            Fill(StreamKind_Multiple, 0, "Track/Position", Value);
         else if (Key==__T("TRACKTOTAL"))             {if (Value!=Retrieve(StreamKind_Common, 0, "Track/Position_Total")) Fill(StreamKind_Multiple, 0, "Track/Position_Total", Value);}

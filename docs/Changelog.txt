@@ -81,7 +81,7 @@ Updated libraries:
 	ffmpeg n8.2-dev-1322-g4492ad7228;
 	libpng git-v1.6.55-9-g7d52a8087;
 	Little-CMS git-lcms2.18-26-gf739cda;
-	MediaInfo git-v26.01-2-gd94a5679a;
+	MediaInfo git-v26.05-38-g702c9b7fd;
 	ZenLib git-v0.4.41-91-g073f297;
 	zlib 1.3.2.
 

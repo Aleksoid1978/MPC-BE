@@ -195,7 +195,7 @@ void File_Vbi::Line21()
     // Check luminance min & max
     int8u Level_Min = (int8u)-1;
     int8u Level_Max = 0;
-    for (int i = 0; i < Buffer_Size; i++) {
+    for (size_t i = 0; i < Buffer_Size; i++) {
         auto Value = Buffer[i];
         Level_Min = min(Level_Min, Value);
         Level_Max = max(Level_Max, Value);
@@ -214,7 +214,7 @@ void File_Vbi::Line21()
     size_t Current_Pos_Max = 0; // Max index of the lowest (0) or highest (1) current value
     int8u Current_Value = (int8u)-1;
     bool Is1 = false;
-    for (int i = 0; i < Buffer_Size; i++) {
+    for (size_t i = 0; i < Buffer_Size; i++) {
         auto Value = Buffer[i];
         if (Value <= Level_0) {
             // Is 0
@@ -299,7 +299,7 @@ void File_Vbi::Line21()
     auto Idx_Min = Get_Buffer_Index(7); // Begin of S1
     ClockRunIn_0_x2 += Step_x12 / 12; // From start of a bit to middle of a bit
     auto Idx_Max = Get_Buffer_Index(8); // Middle of S2
-    for (int Idx = Idx_Min; Idx < Idx_Max; Idx++) {
+    for (unsigned Idx = Idx_Min; Idx < Idx_Max; Idx++) {
         if (Buffer[Idx] > Level_0) {
             return; // Issue between begin of S1 and middle of S2, not 0
         }
@@ -348,7 +348,7 @@ void File_Vbi::Vitc()
     // Check luminance min & max
     int8u Level_Min = (int8u)-1;
     int8u Level_Max = 0;
-    for (int i = 0; i < Buffer_Size; i++) {
+    for (size_t i = 0; i < Buffer_Size; i++) {
         auto Value = Buffer[i];
         Level_Min = min(Level_Min, Value);
         Level_Max = max(Level_Max, Value);
@@ -366,7 +366,7 @@ void File_Vbi::Vitc()
     size_t Step_x81 = 0; // Step between each bit
     size_t Current_Pos_PreviousChange = 0; // Min index of the 0 level or the 1 level
     bool Is1 = false;
-    for (int i = 0; i < Buffer_Size; i++) {
+    for (size_t i = 0; i < Buffer_Size; i++) {
         auto Value = Buffer[i];
         if (Value <= Level_0) {
             // Is 0
@@ -470,7 +470,7 @@ void File_Vbi::Teletext()
     // Check luminance min & max
     int8u Level_Min = (int8u)-1;
     int8u Level_Max = 0;
-    for (int i = 0; i < Buffer_Size; i++) {
+    for (size_t i = 0; i < Buffer_Size; i++) {
         auto Value = Buffer[i];
         Level_Min = min(Level_Min, Value);
         Level_Max = max(Level_Max, Value);

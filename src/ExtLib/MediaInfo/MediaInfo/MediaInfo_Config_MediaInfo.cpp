@@ -1853,8 +1853,10 @@ void MediaInfo_Config_MediaInfo::File_Hash_Set (HashWrapper::HashFunctions Funti
     Hash_Functions=Funtions;
     
     //Legacy
+    #if MEDIAINFO_MD5
     if (File_Md5)
         Hash_Functions.set(HashWrapper::MD5);
+    #endif
 }
 
 HashWrapper::HashFunctions MediaInfo_Config_MediaInfo::File_Hash_Get ()

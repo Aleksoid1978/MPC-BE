@@ -284,7 +284,7 @@ void File_Opus::Stream()
         break;
     }
     default:
-        Skip_XX(Element_Size,                                   "Data");
+        Skip_XX(Element_Size - Element_Offset,                  "Data");
         break;
     }
 

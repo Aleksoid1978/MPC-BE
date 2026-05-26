@@ -55,9 +55,13 @@ private:
     void ia_mix_presentation();
     void ia_sequence_header();
     void ParamDefinition(int64u param_definition_type);
+    void RenderingConfig();
     void ia_parameter_block();
-    void ia_temporal_delimiter() {}; // Temporal Delimiter OBU has an empty payload.
+    void ia_temporal_delimiter();
     void ia_audio_frame(bool audio_substream_id_in_bitstream);
+    void ia_metadata();
+    void metadata_itu_t_t35();
+    void metadata_iamf_tags();
 
     //Temp
     int64u Frame_Count_Valid{};
@@ -77,6 +81,8 @@ private:
     std::map<int64u, int32u> codecs;            // codec_config_id  -> codec_id
     std::map<int64u, int64u> substreams;        // audio_substream_id -> codec_config_id
     std::map<int64u, int64u> mixpresentations;  // mix_presentation_id -> num_sub_mixes
+    int8u num_objects_total{};
+    bool optional_fields_flag{};
 
     // Helpers
     void Get_leb128(int64u& Info, const char* Name);

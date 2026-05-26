@@ -49,9 +49,15 @@ private :
         bool    general_progressive_source_flag;
         bool    general_interlaced_source_flag;
         bool    general_frame_only_constraint_flag;
-        bool    general_max_8bit_constraint_flag;
-        bool    general_max_10bit_constraint_flag;
         bool    general_max_12bit_constraint_flag;
+        bool    general_max_10bit_constraint_flag;
+        bool    general_max_8bit_constraint_flag;
+        bool    general_max_422chroma_constraint_flag;
+        bool    general_max_420chroma_constraint_flag;
+        bool    general_max_monochrome_constraint_flag;
+        bool    general_intra_constraint_flag;
+        bool    general_one_picture_only_constraint_flag;
+        bool    general_lower_bit_rate_constraint_flag;
         bool    general_max_14bit_constraint_flag;
 
         profile_tier_level_struct& Clear()
@@ -63,9 +69,15 @@ private :
             general_progressive_source_flag = true;
             general_interlaced_source_flag = true;
             general_frame_only_constraint_flag = true;
-            general_max_8bit_constraint_flag = true;
-            general_max_10bit_constraint_flag = true;
             general_max_12bit_constraint_flag = true;
+            general_max_10bit_constraint_flag = true;
+            general_max_8bit_constraint_flag = true;
+            general_max_422chroma_constraint_flag = true;
+            general_max_420chroma_constraint_flag = true;
+            general_max_monochrome_constraint_flag = true;
+            general_intra_constraint_flag = true;
+            general_one_picture_only_constraint_flag = true;
+            general_lower_bit_rate_constraint_flag = true;
             general_max_14bit_constraint_flag = true;
             return *this;
         }

@@ -252,6 +252,7 @@ private :
         int32u LastSequenceNumber = 0;
     };
     std::map<int16u, jpegxtext> JpegXtExt_List;
+    int64u Parsing_NonJPEG{};
 };
 
 } //NameSpace

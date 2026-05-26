@@ -31,6 +31,18 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Multiple/File_Ivf.h"
+#if defined(MEDIAINFO_AV1_YES)
+    #include "MediaInfo/Video/File_Av1.h"
+#endif
+#if defined(MEDIAINFO_AV2_YES)
+    #include "MediaInfo/Video/File_Av2.h"
+#endif
+#if defined(MEDIAINFO_VP8_YES)
+    #include "MediaInfo/Video/File_Vp8.h"
+#endif
+#if defined(MEDIAINFO_VP9_YES)
+    #include "MediaInfo/Video/File_Vp9.h"
+#endif
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -64,7 +76,7 @@ bool File_Ivf::FileHeader_Begin()
 void File_Ivf::FileHeader_Parse()
 {
     //Parsing
-    int32u frame_rate_num, frame_rate_den, frame_count, fourcc;
+    int32u fourcc, frame_rate_num, frame_rate_den, frame_count;
     int16u version, header_size, width, height;
 
     Skip_C4 (                                                   "Signature");
@@ -122,9 +134,62 @@ void File_Ivf::FileHeader_Parse()
             Fill(Stream_Video, 0, Video_StreamSize, File_Size-header_size-12*frame_count); //Overhead is 12 byte per frame
         }
 
+        auto const Format = Retrieve(Stream_Video, 0, Video_Format).To_UTF8();
+        #if defined(MEDIAINFO_AV1_YES)
+            if (Format == "AV1") {
+                MI.reset(new File_Av1());
+            }
+        #endif
+        #if defined(MEDIAINFO_AV2_YES)
+            if (Format == "AV2") {
+                MI.reset(new File_Av2());
+                static_cast<File_Av2*>(MI.get())->IsAnnexB = true;
+            }
+        #endif
+        #if defined(MEDIAINFO_VP8_YES)
+            if (Format == "VP8") {
+                MI.reset(new File_Vp8());
+            }
+        #endif
+        #if defined(MEDIAINFO_VP9_YES)
+            if (Format == "VP9") {
+                MI.reset(new File_Vp9());
+            }
+        #endif
+    FILLING_END();
+
+    if (MI) {
+        MI->FrameIsAlwaysComplete = true;
+        Open_Buffer_Init(MI.get());
+    }
+    else {
         //No more need data
         Finish("IVF");
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Ivf::Header_Parse()
+{
+    int32u frame_size;
+    Get_L4 (frame_size,                                         "Frame Size");
+    Skip_L8(                                                    "Presentation Timestamp");
+
+    FILLING_BEGIN();
+    Header_Fill_Size(frame_size + 12LL);
+    Header_Fill_Code(0x0, "Frame");
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Ivf::Data_Parse()
+{
+    Open_Buffer_Continue(MI.get());
+    if (MI->Status[IsFinished]) {
+        Open_Buffer_Finalize(MI.get());
+        Merge(*MI, Stream_Video, 0, 0, false);
+        Finish();
+    }
 }
 
 } //NameSpace

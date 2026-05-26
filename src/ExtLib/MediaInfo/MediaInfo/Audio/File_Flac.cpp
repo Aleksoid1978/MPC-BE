@@ -157,13 +157,13 @@ void File_Flac::Header_Parse()
         if (coded_size == 0)
             coded_size = 1;
         Skip_XX(coded_size,                                     "Coded Number");
-        if (blocksizebits == 0b0110)
+        if (blocksizebits == 0x06)
             Skip_B1(                                            "Uncommon Block Size");
-        else if (blocksizebits == 0b0111)
+        else if (blocksizebits == 0x07)
             Skip_B2(                                            "Uncommon Block Size");
-        if (sampleratebits == 0b1100)
+        if (sampleratebits == 0x0C)
             Skip_B1(                                            "Uncommon Sample Rate");
-        else if (sampleratebits == 0b1101 || sampleratebits == 0b1110)
+        else if (sampleratebits == 0x0D || sampleratebits == 0x0E)
             Skip_B2(                                            "Uncommon Sample Rate");
         Get_B1(crc,                                             "Frame Header CRC");
         #if MEDIAINFO_TRACE
@@ -183,7 +183,7 @@ void File_Flac::Header_Parse()
             Param_Info1(CRC_8 == crc ? "OK" : "NOK");
         }
         #endif // MEDIAINFO_TRACE
-        Length=IsSub?(Element_Size-Element_Offset):0; // Unknown if raw, else full frame
+        Length=IsSub?static_cast<int32u>(Element_Size-Element_Offset):0; // Unknown if raw, else full frame
     }
     else
     {

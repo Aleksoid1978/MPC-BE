@@ -3118,8 +3118,7 @@ void File_Mpegv::slice_start_macroblock_block(int8u i)
                     Element_Info1(Mpegv_dct_coefficients[dct_coefficient].mapped_to2);
                     Element_Info1(Mpegv_dct_coefficients[dct_coefficient].mapped_to3);
         }
-        if (IsFirst)
-            IsFirst=false;
+        IsFirst=false;
         Element_Trace_End0();
     }
 }
@@ -4068,8 +4067,7 @@ void File_Mpegv::group_start()
         Time_Current_Seconds=60*60*Hours+60*Minutes+Seconds;
         Time_Current_Frames =Frames;
 
-        if (!group_start_IsParsed)
-            group_start_IsParsed=true;
+        group_start_IsParsed=true;
         if (!group_start_FirstPass)
         {
             group_start_FirstPass=true;

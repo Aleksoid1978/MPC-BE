@@ -146,8 +146,14 @@
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
+#if defined(MEDIAINFO_APV_YES)
+    #include "MediaInfo/Video/File_Apv.h"
+#endif
 #if defined(MEDIAINFO_AV1_YES)
     #include "MediaInfo/Video/File_Av1.h"
+#endif
+#if defined(MEDIAINFO_AV2_YES)
+    #include "MediaInfo/Video/File_Av2.h"
 #endif
 #if defined(MEDIAINFO_AVSV_YES)
     #include "MediaInfo/Video/File_AvsV.h"
@@ -331,6 +337,9 @@
 #endif
 #if defined(MEDIAINFO_BPG_YES)
     #include "MediaInfo/Image/File_Bpg.h"
+#endif
+#if defined(MEDIAINFO_AMIGAICON_YES)
+    #include "MediaInfo/Image/File_AmigaIcon.h"
 #endif
 #if defined(MEDIAINFO_DDS_YES)
     #include "MediaInfo/Image/File_Dds.h"
@@ -596,8 +605,15 @@ File__MultipleParsing::File__MultipleParsing()
     #if defined(MEDIAINFO_HEVC_YES)
         Parser.push_back(new File_Hevc());
     #endif
+    #if defined(MEDIAINFO_APV_YES)
+        Parser.push_back(new File_Apv());
+    #endif
     #if defined(MEDIAINFO_AV1_YES)
+        {auto Temp=new File_Av1(); Temp->IsAnnexB=true; Parser.push_back(Temp);}
         Parser.push_back(new File_Av1());
+    #endif
+    #if defined(MEDIAINFO_AV2_YES)
+        {auto Temp=new File_Av2(); Temp->IsAnnexB=true; Parser.push_back(Temp);}
     #endif
     #if defined(MEDIAINFO_AVS3V_YES)
         Parser.push_back(new File_Avs3V());
@@ -769,6 +785,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_BPG_YES)
         Parser.push_back(new File_Bpg());
+    #endif
+    #if defined(MEDIAINFO_AMIGAICON_YES)
+        Parser.push_back(new File_AmigaIcon());
     #endif
     #if defined(MEDIAINFO_DDS_YES)
         Parser.push_back(new File_Dds());

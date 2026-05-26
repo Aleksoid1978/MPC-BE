@@ -29,6 +29,7 @@
 #if MEDIAINFO_SEEK
     #include "MediaInfo/MediaInfo_Internal.h"
 #endif //MEDIAINFO_SEEK
+#include <array>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -214,6 +215,94 @@ const char*  Dv_consumer_camera_1_fcm[]=
     "auto focus",
     "manual focus",
 };
+
+//---------------------------------------------------------------------------
+static std::array<char, 10> DvDif_Date2String(int32u Value)
+{
+    unsigned YY = Value & 0xFF;
+    unsigned YU = Value & 0xF;
+    Value >>= 4;
+    unsigned YT = Value & 0xF;
+    Value >>= 4;
+    unsigned MM = Value & 0x1F;
+    unsigned MU = Value & 0xF;
+    Value >>= 4;
+    unsigned MT = Value & 0x1;
+    Value >>= 4;
+    unsigned DD = Value & 0x3F;
+    unsigned DU = Value & 0xF;
+    Value >>= 4;
+    unsigned DT = Value & 0x3;
+    std::array<char, 10> Result;
+    if (YT >= 10 || YU >= 10 || MU >= 10 || DU >= 10 || !MM || MM > 0x12 || !DD || DD > 0x31) {
+        Result[0] = '\0';
+        return Result;
+    }
+    Result[0] = YY >= 0x95 ? '1' : '2';
+    Result[1] = YY >= 0x95 ? '9' : '0';
+    Result[2] = '0' + YT;
+    Result[3] = '0' + YU;
+    Result[4] = '-';
+    Result[5] = '0' + MT;
+    Result[6] = '0' + MU;
+    Result[7] = '-';
+    Result[8] = '0' + DT;
+    Result[9] = '0' + DU;
+    return Result;
+}
+
+//---------------------------------------------------------------------------
+static std::array<char, 12> DvDif_Time2String(int32u Value, bool DSF = false)
+{
+    unsigned HH = Value & 0x3F;
+    unsigned HU = Value & 0xF;
+    Value >>= 4;
+    unsigned HT = Value & 0x3;
+    Value >>= 4;
+    unsigned MM = Value & 0x7F;
+    unsigned MU = Value & 0xF;
+    Value >>= 4;
+    unsigned MT = Value & 0x7;
+    Value >>= 4;
+    unsigned SS = Value & 0x7F;
+    unsigned SU = Value & 0xF;
+    Value >>= 4;
+    unsigned ST = Value & 0x7;
+    Value >>= 4;
+    unsigned FU = Value & 0xF;
+    Value >>= 4;
+    unsigned FT = Value & 0x3;
+    std::array<char, 12> Result;
+    if (HU >= 10 || MU >= 10 || SU >= 10 || HH >= 0x24 || MM >= 0x60 || SS >= 0x60) {
+        Result[0] = '\0';
+        return Result;
+    }
+    Result[0] = '0' + HT;
+    Result[1] = '0' + HU;
+    Result[2] = ':';
+    Result[3] = '0' + MT;
+    Result[4] = '0' + MU;
+    Result[5] = ':';
+    Result[6] = '0' + ST;
+    Result[7] = '0' + SU;
+    if (FU < 10) {
+        unsigned FF = FT * 10 + FU;
+        unsigned const FrameRate = DSF ? 25 : 30;
+        if (FF < FrameRate) {
+            auto ms = (FF * 1000 + FrameRate / 2) / FrameRate;
+            Result[8] = '.';
+            Result[9] = '0' + ms / 100;
+            ms = ms % 100;
+            Result[10] = '0' + ms / 10;
+            ms = ms % 10;
+            Result[11] = '0' + ms;
+        }
+    }
+    else {
+        Result[8] = '\0';
+    }
+    return Result;
+}
 
 //***************************************************************************
 // Constructor/Destructor
@@ -553,17 +642,20 @@ void File_DvDif::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_DvDif::Streams_Finish()
 {
-    if (!Recorded_Date_Date.empty())
+    if (Recorded_Date_Date && ((Recorded_Date_Date & 0x003F1FFF) != 0x00010170 || (Recorded_Date_Time & 0x007F7F3F))) // Avoid 1970-01-01 00:00:00
     {
-        Ztring Recorded_Date(Recorded_Date_Date);
-        if (Recorded_Date_Time.size()>4)
-        {
-            Recorded_Date+=__T(" ");
-            Recorded_Date+=Recorded_Date_Time;
+        const auto Date = DvDif_Date2String(Recorded_Date_Date);
+        if (Date[0]) {
+            string Recorded_Date(Date.data(), sizeof(Date));
+            const auto Time = DvDif_Time2String(Recorded_Date_Time, DSF);
+            if (!Time.empty()) {
+                Recorded_Date += ' ';
+                Recorded_Date.append(Time.data(), Time[8] ? sizeof(Time) : 8);
+            }
+            if (Count_Get(Stream_General) == 0)
+                Stream_Prepare(Stream_General);
+            Fill(Stream_General, 0, General_Recorded_Date, Recorded_Date, true, true);
         }
-        if (Count_Get(Stream_General)==0)
-            Stream_Prepare(Stream_General);
-        Fill(Stream_General, 0, General_Recorded_Date, Recorded_Date, true);
     }
 
     float64 OverallBitRate=Retrieve_Const(Stream_General, 0, General_OverallBitRate).To_float64();
@@ -1787,119 +1879,96 @@ void File_DvDif::consumer_camera_2()
 void File_DvDif::recdate(bool FromVideo)
 {
     // Coherency test
-    int32u Test;
-    Peek_B4(Test);
-    if (Test==(int32u)-1)
+    int32u Value;
+    #if MEDIAINFO_TRACE
+    if (Trace_Activated) {
+        Peek_B4(Value);
+    }
+    else
+    #endif //MEDIAINFO_TRACE
+        Get_B4 (Value,                                          nullptr);
+
+    const auto Date = DvDif_Date2String(Value);
+    FILLING_BEGIN()
+        if (FromVideo && Frame_Count == 1 && !Recorded_Date_Date && Date[0]) {
+            Recorded_Date_Date = Value;
+        }
+    FILLING_END()
+
+    #if MEDIAINFO_TRACE
+    if (!Trace_Activated) {
+        return;
+    }
+    if (!Value || Value == (int32u)-1)
     {
         Skip_B4(                                                "Junk");
         return;
     }
-
+    Element_Info1(string(Date.data(), sizeof(Date)));
     BS_Begin();
-
-    int8u Temp;
-    int16u Year=0;
-    int8u  Month=0, Day=0;
     Skip_S1(8,                                                  "Time zone specific"); //ds, tm, tens of time zone, units of time zone, 0xFF for Unknwon
     Skip_SB(                                                    "1");
     Skip_SB(                                                    "1");
-    Get_S1 (2, Temp,                                            "Days (Tens)");
-    Day+=Temp*10;
-    Get_S1 (4, Temp,                                            "Days (Units)");
-    Day+=Temp;
+    Skip_S1(2,                                                  "Days (Tens)");
+    Skip_S1(4,                                                  "Days (Units)");
     Skip_SB(                                                    "1");
     Skip_SB(                                                    "1");
     Skip_SB(                                                    "1");
-    Get_S1 (1, Temp,                                            "Month (Tens)");
-    Month+=Temp*10;
-    Get_S1 (4, Temp,                                            "Month (Units)");
-    Month+=Temp;
-    Get_S1 (4, Temp,                                            "Year (Tens)");
-    Year+=Temp*10;
-    Get_S1 (4, Temp,                                            "Year (Units)");
-    Year+=Temp;
-    Year+=Year<25?2000:1900;
-    Element_Info1(Ztring::ToZtring(Year)+__T("-")+Ztring::ToZtring(Month)+__T("-")+Ztring::ToZtring(Day));
-
+    Skip_S1(1,                                                  "Month (Tens)");
+    Skip_S1(4,                                                  "Month (Units)");
+    Skip_S1(4,                                                  "Year (Tens)");
+    Skip_S1(4,                                                  "Year (Units)");
     BS_End();
-
-    if (FromVideo && Frame_Count==1 && Year!=2065 && Month && Month<=12 && Day && Day<=31 && Recorded_Date_Date.empty())
-    {
-        Ztring MonthString;
-        if (Month<10)
-            MonthString.assign(1, __T('0'));
-        MonthString+=Ztring::ToZtring(Month);
-        Ztring DayString;
-        if (Day<10)
-            DayString.assign(1, __T('0'));
-        DayString+=Ztring::ToZtring(Day);
-        Recorded_Date_Date=Ztring::ToZtring(Year)+__T('-')+MonthString+__T('-')+DayString;
-    }
+    #endif //MEDIAINFO_TRACE
 }
 
 //---------------------------------------------------------------------------
 void File_DvDif::rectime(bool FromVideo)
 {
     // Coherency test
-    int32u Test;
-    Peek_B4(Test);
-    if (Test==(int32u)-1)
-    {
-        Skip_B4(                                            "Junk");
+    int32u Value;
+    #if MEDIAINFO_TRACE
+    if (Trace_Activated) {
+        Peek_B4(Value);
+    }
+    else
+    #endif //MEDIAINFO_TRACE
+        Get_B4 (Value,                                          nullptr);
+
+    const auto Time = DvDif_Time2String(Value, DSF_IsValid && DSF);
+    FILLING_BEGIN()
+        if (FromVideo && Frame_Count == 1 && !Recorded_Date_Time && Time[0]) {
+            Recorded_Date_Time = Value;
+        }
+    FILLING_END()
+
+    #if MEDIAINFO_TRACE
+    if (!Trace_Activated) {
         return;
     }
-
-    if (!DSF_IsValid)
+    if (!Value || Value == (int32u)-1)
     {
-        Trusted_IsNot("Not in right order");
+        Skip_B4(                                                "Junk");
         return;
     }
-
+    Element_Info1(string(Time.data(), Time[8] ? sizeof(Time) : 8));
     BS_Begin();
-
-    if (Buffer[Buffer_Offset+(size_t)Element_Offset  ]==0x00
-     && Buffer[Buffer_Offset+(size_t)Element_Offset+1]==0x00
-     && Buffer[Buffer_Offset+(size_t)Element_Offset+2]==0x00
-     && Buffer[Buffer_Offset+(size_t)Element_Offset+3]==0x00
-    )
-    {
-        Skip_XX(4,                                              "All zero");
-        return;
-    }
-
-    int8u Temp;
-    int64u Time=0;
-    int8u Frames=0;
-    Skip_SB(                                                    "Unknown");
-    Skip_SB(                                                    "1");
-    Get_S1 (2, Temp,                                            "Frames (Tens)");
-    Frames+=Temp*10;
-    Get_S1 (4, Temp,                                            "Frames (Units)");
-    Frames+=Temp;
-    if (Temp!=0xF && DSF_IsValid)
-        Time+=(int64u)(Frames/(DSF?25.000:29.970));
-    Skip_SB(                                                    "1");
-    Get_S1 (3, Temp,                                            "Seconds (Tens)");
-    Time+=Temp*10*1000;
-    Get_S1 (4, Temp,                                            "Seconds (Units)");
-    Time+=Temp*1000;
-    Skip_SB(                                                    "1");
-    Get_S1 (3, Temp,                                            "Minutes (Tens)");
-    Time+=Temp*10*60*1000;
-    Get_S1 (4, Temp,                                            "Minutes (Units)");
-    Time+=Temp*60*1000;
     Skip_SB(                                                    "1");
     Skip_SB(                                                    "1");
-    Get_S1 (2, Temp,                                            "Hours (Tens)");
-    Time+=Temp*10*60*60*1000;
-    Get_S1 (4, Temp,                                            "Hours (Units)");
-    Time+=Temp*60*60*1000;
-    Element_Info1(Ztring().Duration_From_Milliseconds(Time));
-
+    Skip_S1(2,                                                  "Frames (Tens)");
+    Skip_S1(4,                                                  "Frames (Units)");
+    Skip_SB(                                                    "1");
+    Skip_S1(3,                                                  "Seconds (Tens)");
+    Skip_S1(4,                                                  "Seconds (Units)");
+    Skip_SB(                                                    "1");
+    Skip_S1(3,                                                  "Minutes (Tens)");
+    Skip_S1(4,                                                  "Minutes (Units)");
+    Skip_SB(                                                    "1");
+    Skip_SB(                                                    "1");
+    Skip_S1(2,                                                  "Hours (Tens)");
+    Skip_S1(4,                                                  "Hours (Units)");
     BS_End();
-
-    if (FromVideo && Frame_Count==1 && Time!=167185000 && Recorded_Date_Time.empty()) //If all bits are set to 1, this is invalid
-        Recorded_Date_Time.Duration_From_Milliseconds(Time);
+    #endif //MEDIAINFO_TRACE
 }
 
 } //NameSpace

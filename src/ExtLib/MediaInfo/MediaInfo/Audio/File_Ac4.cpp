@@ -197,7 +197,6 @@ static const char* Ac4_content_classifier_ext(const string& language_tag_bytes)
     }
     #define CC3(_A,_B,_C) ((_A<<16)|(_B<<8)|(_C))
     auto Language = CC3(language_tag_bytes[0], language_tag_bytes[1], language_tag_bytes[2]);
-    const char* ToAdd;
     #define CC3_MAP(_A,_B,_C,_D) case CC3(_A, _B, _C): return _D;
     switch (Language) {
         CC3_MAP('q', 'a', 's', "audio description with spoken subtitles, decoder mix");
@@ -3470,7 +3469,6 @@ void File_Ac4::oamd_substream_info(group_substream& G, bool b_substreams_present
 void File_Ac4::oamd_common_data()
 {
     int8u add_data_bytes;
-    int16u bits_used;
 
     Element_Begin1(                                             "oamd_common_data");
     TESTELSE_SB_SKIP(                                           "b_default_screen_size_ratio");
@@ -3852,7 +3850,6 @@ void File_Ac4::metadata(audio_substream& AudioSubstream, size_t Substream_Index)
         {
             Element_Begin1("umd_payload");
             int32u umd_payload_id,  umd_payload_size;
-            int8u extSizeBits;
             bool b_smpoffst, b_discard_unknown_payload;
             Get_S4 (5, umd_payload_id,                          "umd_payload_id");
             if (!umd_payload_id)
@@ -3898,12 +3895,12 @@ void File_Ac4::metadata(audio_substream& AudioSubstream, size_t Substream_Index)
             Element_End0();
             Get_V4 (8, umd_payload_size,                        "umd_payload_size");
 
-            switch (umd_payload_id)
-            {
-                default:
+            //switch (umd_payload_id)
+            //{
+            //    default:
                     if (umd_payload_size)
-                        Skip_BS(umd_payload_size*8,             "(Unknown)");
-            }
+                        Skip_BS((size_t)umd_payload_size*8,     "(Unknown)");
+            //}
             Element_End0();
         }
     TEST_SB_END();
@@ -4720,7 +4717,6 @@ void File_Ac4::drc_compression_curve(drc_decoder_config_curve& C)
 //---------------------------------------------------------------------------
 void File_Ac4::further_loudness_info(loudness_info& L, bool sus_ver, bool b_presentation_ldn)
 {
-    bool b_loudcorr_type;
     Element_Begin1("further_loudness_info");
     if (b_presentation_ldn || !sus_ver)
     {

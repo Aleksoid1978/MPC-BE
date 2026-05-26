@@ -218,6 +218,9 @@ void File_C2pa::Header_Parse()
 //---------------------------------------------------------------------------
 void File_C2pa::Data_Parse()
 {
+    #pragma warning(push)
+    #pragma warning(disable: 4065) // switch statement contains 'default' but no 'case' labels
+
     //Parsing
     DATA_BEGIN
     LIST(ISO__c2pa)
@@ -278,6 +281,8 @@ void File_C2pa::Data_Parse()
             ATOM_END_DEFAULT
         ATOM_END_DEFAULT
     DATA_END_DEFAULT
+
+    #pragma warning(pop)
 }
 
 //***************************************************************************

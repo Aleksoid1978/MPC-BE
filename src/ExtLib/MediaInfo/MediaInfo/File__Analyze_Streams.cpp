@@ -35,6 +35,7 @@
 #include <cstdlib>
 #include <iomanip>
 #include <limits>
+#include <type_traits>
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -522,23 +523,44 @@ void File__Analyze::Attachment(const char* MuxingMode, const Ztring& Description
         return;
     }
 
+    auto containsWord = [](const std::string& text, const std::string& word) {
+        auto pos = text.find(word);
+        while (pos != std::string::npos)
+        {
+            bool leftOk =
+                (pos == 0) ||
+                !std::isalpha(static_cast<unsigned char>(text[pos - 1]));
+
+            bool rightOk =
+                (pos + word.size() >= text.size()) ||
+                !std::isalpha(static_cast<unsigned char>(text[pos + word.size()]));
+            if (leftOk && rightOk)
+                return true;
+
+            pos = text.find(word, pos + 1);
+        }
+
+        return false;
+    };
+
     Ztring ModifiedType(Type);
-    if (ModifiedType.empty()) {
+    if (ModifiedType.empty() && (IsCover || MimeType.empty() || MimeType.rfind(__T("image/"), 0) == 0)) {
         auto Description_Lower(Description);
         Description_Lower.MakeLowerCase();
-        if (Description_Lower.find(__T("thumbnail")) != string::npos && Description_Lower.find(__T("c2pa.thumbnail")) == string::npos) {
+        auto Description_String = Description_Lower.To_UTF8();
+        if (containsWord(Description_String, "thumbnail") && Description_String.find("c2pa.thumbnail") == string::npos) {
             IsCover = true;
             ModifiedType = "Thumbnail";
         }
-        if (Description_Lower.find(__T("cover")) != string::npos || Description_Lower.find(__T("front")) != string::npos) {
+        if (containsWord(Description_String, "cover") || containsWord(Description_String, "front") || containsWord(Description_String, "frontcover")) {
             IsCover = true;
             ModifiedType = "Cover";
         }
-        if (Description_Lower.find(__T("back")) != string::npos) {
+        if (containsWord(Description_String, "back") || containsWord(Description_String, "backcover")) {
             IsCover = true;
             ModifiedType = "Cover_Back";
         }
-        if (Description_Lower.find(__T("cd")) != string::npos && Description_Lower.find(__T("uuid")) == string::npos) {
+        if (containsWord(Description_String, "cd") && !containsWord(Description_String, "uuid")) {
             IsCover = true;
             ModifiedType = "Cover_Media";
         }
@@ -1361,6 +1383,31 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
 
         if (Value_NotBOM_Pos)
             return Fill(StreamKind, StreamPos, Parameter, Value.substr(Value_NotBOM_Pos), Replace);
+    }
+
+    // Replace bad characters
+    const auto IsBadChar = [](Char Character) {
+        auto c = static_cast<typename std::make_unsigned<Char>::type>(Character);
+        return
+            ((c < 0x20 &&
+              c != 0x09 && c != 0x0A && c != 0x0D)) // C0 Keep TAB, LF, CR
+            || (c >= 0x7F && c < 0xA0);             // DEL + C1
+    };
+    auto it = std::find_if(Value.begin(), Value.end(), IsBadChar);
+    if (it != Value.end()) {
+        Ztring Cleaned;
+        Cleaned.reserve(Value.size());
+        Cleaned.append(Value.begin(), it);
+        for (auto i = it; i != Value.end(); ++i) {
+            Cleaned += IsBadChar(*i) ?
+            #if defined(UNICODE) || defined (_UNICODE)
+                L'\uFFFD'
+            #else
+                '?'
+            #endif
+                : *i;
+        }
+        return Fill(StreamKind, StreamPos, Parameter, Cleaned, Replace);
     }
 
     // Ignore useless values
@@ -2496,7 +2543,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     if (Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size())
     {
         Parameter-=MediaInfoLib::Config.Info_Get(StreamKind).size();
-        if (KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
+        if ((size_t)KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos][Parameter][KindOfInfo];
     }
@@ -2504,7 +2551,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
     if (KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
 
-    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
+    if ((size_t)StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
@@ -2521,15 +2568,15 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, size_t Pa
     if (Parameter>=MediaInfoLib::Config.Info_Get(StreamKind).size())
     {
         Parameter-=MediaInfoLib::Config.Info_Get(StreamKind).size();
-        if (KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
+        if ((size_t)KindOfInfo>=(*Stream_More)[StreamKind][StreamPos][Parameter].size())
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos][Parameter][KindOfInfo];
     }
 
-    if (KindOfInfo!=Info_Text)
+    if ((size_t)KindOfInfo!=Info_Text)
         return MediaInfoLib::Config.Info_Get(StreamKind, Parameter, KindOfInfo);
 
-    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
+    if ((size_t)StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter);
 }
@@ -2562,7 +2609,7 @@ const Ztring &File__Analyze::Retrieve_Const (stream_t StreamKind, size_t StreamP
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos](Parameter_Pos, 1);
     }
-    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
+    if ((size_t)StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter_Pos);
 }
@@ -2588,7 +2635,7 @@ Ztring File__Analyze::Retrieve (stream_t StreamKind, size_t StreamPos, const cha
             return MediaInfoLib::Config.EmptyString_Get();
         return (*Stream_More)[StreamKind][StreamPos](Parameter_Pos, 1);
     }
-    if (StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
+    if ((size_t)StreamKind>=(*Stream).size() || StreamPos>=(*Stream)[StreamKind].size() || Parameter_Pos>=(*Stream)[StreamKind][StreamPos].size())
         return MediaInfoLib::Config.EmptyString_Get();
     return (*Stream)[StreamKind][StreamPos](Parameter_Pos);
 }
@@ -3759,6 +3806,8 @@ void File__Analyze::FileSize_FileSize123(stream_t StreamKind, size_t StreamPos, 
         case  2 : Measure=__T(" MiB");  MeasureIsAlwaysSame=true;  break;
         case  3 : Measure=__T(" GiB");  MeasureIsAlwaysSame=true;  break;
         case  4 : Measure=__T(" TiB");  MeasureIsAlwaysSame=true;  break;
+        case  5 : Measure=__T(" PiB");  MeasureIsAlwaysSame=true;  break;
+        case  6 : Measure=__T(" EiB");  MeasureIsAlwaysSame=true;  break;
         default : Measure=__T(" ?iB");  MeasureIsAlwaysSame=true;
     }
     Fill(StreamKind, StreamPos, Parameter+2, MediaInfoLib::Config.Language_Get(Ztring::ToZtring(F1,  0), Measure, MeasureIsAlwaysSame), true); // /String1

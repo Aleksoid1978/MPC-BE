@@ -180,6 +180,13 @@ static inline int8u Reverse8(int n)
 }
 
 //---------------------------------------------------------------------------
+void File_SmpteSt0302::Read_Buffer_Unsynched()
+{
+    for (auto Parser : Parsers)
+        Parser->Open_Buffer_Unsynch();
+}
+
+//---------------------------------------------------------------------------
 void File_SmpteSt0302::Read_Buffer_Continue()
 {
     //Parsing

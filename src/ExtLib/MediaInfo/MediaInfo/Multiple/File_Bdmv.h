@@ -33,6 +33,9 @@ public :
     void BDMV(); //The BDMV directory
 
 private :
+    //Streams management
+    void Streams_Accept();
+
     //Buffer - File header
     bool FileHeader_Begin();
 
@@ -68,11 +71,12 @@ private :
     void StreamCodingInfo_Text();
 
     //Temp
-    int8u stream_type;
     std::map<int32u, size_t> Types; //Key is the start address
     int64u Mpls_PlayList_Duration;
     int64u Mpls_PlayList_PlayItem_Duration;
+    int32u type_indicator;
     int16u Mpls_PlayList_number_of_SubPaths;
+    int8u  stream_type;
     bool   Mpls_PlayList_IsParsed;
     std::set<Ztring> Clip_Information_file_names;
 };

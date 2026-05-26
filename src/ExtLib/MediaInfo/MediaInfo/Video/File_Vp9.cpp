@@ -310,6 +310,8 @@ void File_Vp9::Read_Buffer_Continue()
                         subsampling=3;
                 }
             }
+            else
+                Skip_SB(                                        "reserved");
             Element_End0();
         }
         else

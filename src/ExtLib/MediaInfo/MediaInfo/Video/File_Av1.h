@@ -11,8 +11,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
-#include "MediaInfo/File__Duplicate.h"
-#include <cmath>
+#include <set>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -27,6 +26,7 @@ class File_Av1 : public File__Analyze
 public :
     //In
     int64u Frame_Count_Valid;
+    bool IsAnnexB = {};
 
     //Constructor/Destructor
     File_Av1();
@@ -43,15 +43,18 @@ private :
 
     //Buffer - Global
     void Read_Buffer_OutOfBand();
+    void Read_Buffer_Init();
 
     //Buffer - Per element
     void Header_Parse();
     void Data_Parse();
 
     //Elements
+    void trailing_bits();
     void sequence_header();
     void temporal_delimiter();
     void frame_header();
+    void frame_header_uncompressed_header();
     void tile_group();
     void metadata();
     void metadata_hdr_cll();
@@ -61,14 +64,21 @@ private :
     void metadata_itu_t_t35_B5_003C();
     void metadata_itu_t_t35_B5_003C_0001();
     void metadata_itu_t_t35_B5_003C_0001_04();
+    void metadata_itu_t_t35_B5_5890();
+    void metadata_itu_t_t35_B5_5890_01();
+    void metadata_scalability();
+    void scalability_structure();
+    void metadata_timecode();
     void frame();
     void padding();
 
     //Temp
     Ztring  maximum_content_light_level;
     Ztring  maximum_frame_average_light_level;
-    bool  sequence_header_Parsed;
-    bool  SeenFrameHeader;
+    bool  sequence_header_Parsed{};
+    bool  SeenFrameHeader{};
+    bool  reduced_still_picture_header{};
+    bool  show_existing_frame{};
     string GOP;
     enum hdr_format
     {
@@ -78,6 +88,7 @@ private :
     };
     typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
     hdr HDR;
+    std::set<int8u> scalability_structure_seen;
 
     //Helpers
     std::string GOP_Detect(std::string PictureTypes);

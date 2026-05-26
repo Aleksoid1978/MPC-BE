@@ -101,6 +101,7 @@ private :
     void meta_iprp();
     void meta_iprp_ipco();
     void meta_iprp_ipco_av1C();
+    void meta_iprp_ipco_av2C();
     void meta_iprp_ipco_auxC();
     void meta_iprp_ipco_avcC();
     void meta_iprp_ipco_clap();
@@ -227,9 +228,11 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AALP();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ACLR();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_APRG();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_apvC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ARES();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_AORD();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_av1C();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_av2C();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcC();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_avcE();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_bitr();

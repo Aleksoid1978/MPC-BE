@@ -552,7 +552,7 @@ void File_Nsv::Header_Parse()
     Get_L2 (audio_len,                                          "audio_len");
     auto num_aux=aux_plus_video_len&0xF;
     int32u video_len=aux_plus_video_len>>4;
-    for (auto i=0; i<num_aux; i++)
+    for (auto i=0U; i<num_aux; i++)
     {
         int16u aux_chunk_len;
         Get_L2 (aux_chunk_len,                                  "aux_chunk_len");

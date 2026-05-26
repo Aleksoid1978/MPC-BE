@@ -445,6 +445,23 @@ static Ztring Bdmv_Decimal_Hexa(int64u Number)
 }
 
 //***************************************************************************
+// Streams management
+//***************************************************************************
+
+//---------------------------------------------------------------------------
+void File_Bdmv::Streams_Accept()
+{
+    switch (type_indicator)
+    {
+    case Elements::CLPI: Fill(Stream_General, 0, General_Format, "Blu-ray Clip info"); break;
+    case Elements::INDX: Fill(Stream_General, 0, General_Format, "Blu-ray Index"); break;
+    case Elements::MOBJ: Fill(Stream_General, 0, General_Format, "Blu-ray Movie object"); break;
+    case Elements::MPLS: Fill(Stream_General, 0, General_Format, "Blu-ray Playlist"); break;
+    default:;
+    }
+}
+
+//***************************************************************************
 // Buffer - File header
 //***************************************************************************
 
@@ -498,7 +515,6 @@ void File_Bdmv::Read_Buffer_Continue()
     }
 
     //Parsing
-    int32u type_indicator;
     int16u version_numberH;
     Element_Begin1("Header");
     Get_C4 (type_indicator,                                     "type_indicator");
@@ -509,14 +525,6 @@ void File_Bdmv::Read_Buffer_Continue()
 
     FILLING_BEGIN();
         Accept("BDMV");
-        switch (type_indicator)
-        {
-            case Elements::CLPI : Fill(Stream_General, 0, General_Format, "Blu-ray Clip info"); break;
-            case Elements::INDX : Fill(Stream_General, 0, General_Format, "Blu-ray Index"); break;
-            case Elements::MOBJ : Fill(Stream_General, 0, General_Format, "Blu-ray Movie object"); break;
-            case Elements::MPLS : Fill(Stream_General, 0, General_Format, "Blu-ray Playlist"); break;
-            default             : ;
-        }
     FILLING_END();
 
     if (version_numberH==0x3031 || version_numberH==0x3032 || version_numberH==0x3033) //Version 1, 2 or 3 (3 = UHD Blu-ray)

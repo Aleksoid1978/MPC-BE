@@ -124,6 +124,8 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+#pragma warning(disable: 4065) // switch statement contains 'default' but no 'case' labels
+
 #if defined(MEDIAINFO_IAB_YES)
     Ztring ChannelLayout_2018_Rename(const Ztring& Channels, const Ztring& Format);
 #endif
@@ -367,6 +369,16 @@ static const char* Mxf_EssenceContainer(const int128u EssenceContainer)
                                                          default   : return "";
                                                     }
                                          default   : return "";
+                                    }
+                        case 0x21 : //Fraunhofer
+                                    switch (Code3)
+                                    {
+                                        case 0x02 :
+                                            switch (Code4)
+                                            {
+                                                default: return "Cinegy Daniel2";
+                                            }
+                                        default: return "Cinegy";
                                     }
                         default   : return "";
                     }
@@ -724,6 +736,17 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
                                                     }
                                          default   : return "";
                                     }
+                        case 0x21 : //Fraunhofer
+                                    switch (Code3)
+                                    {
+                                        case 0x01 :
+                                                    switch (Code4)
+                                                    {
+                                                        case 0x01 : return "Cinegy Daniel2";
+                                                        default   : return "";
+                                                    }
+                                        default   : return "Cinegy";
+                                    }
                         default   : return "";
                     }
         default   : return "";
@@ -733,6 +756,7 @@ static const char* Mxf_EssenceCompression(const int128u EssenceCompression)
 //---------------------------------------------------------------------------
 static const char* Mxf_EssenceCompression_Profile(const int128u& EssenceCompression)
 {
+    int8u Code1=(int8u)((EssenceCompression.lo&0xFF00000000000000LL)>>56);
     int8u Code2=(int8u)((EssenceCompression.lo&0x00FF000000000000LL)>>48);
     int8u Code3=(int8u)((EssenceCompression.lo&0x0000FF0000000000LL)>>40);
     int8u Code4=(int8u)((EssenceCompression.lo&0x000000FF00000000LL)>>32);
@@ -741,61 +765,115 @@ static const char* Mxf_EssenceCompression_Profile(const int128u& EssenceCompress
     int8u Code7=(int8u)((EssenceCompression.lo&0x000000000000FF00LL)>> 8);
     int8u Code8=(int8u)((EssenceCompression.lo&0x00000000000000FFLL)    );
 
-    switch (Code2)
+    switch (Code1)
     {
-        case 0x01 : //Picture
-                    switch (Code3)
+        case 0x04 : // Parametric
+                    switch (Code2)
                     {
-                        case 0x02 : //Coding characteristics
-                                    switch (Code4)
+                        case 0x01 : //Picture
+                                    switch (Code3)
                                     {
-                                        case 0x02 : //Compressed coding
-                                                    switch (Code5)
+                                        case 0x02 : //Coding characteristics
+                                                    switch (Code4)
                                                     {
-                                                        case 0x01 : //MPEG Compression
-                                                                    switch (Code6)
+                                                        case 0x02 : //Compressed coding
+                                                                    switch (Code5)
                                                                     {
-                                                                        case 0x20 : //MPEG-4 Visual
-                                                                                    switch (Code7)
+                                                                        case 0x03 : //Individual Picture Coding Schemes
+                                                                                    switch (Code6)
                                                                                     {
-                                                                                        case 0x10 : //
-                                                                                                    switch (Code8)
+                                                                                        case 0x06 : //ProRes
+                                                                                                    switch (Code7)
                                                                                                     {
-                                                                                                        case 0x01 :
-                                                                                                        case 0x02 :
-                                                                                                        case 0x03 :
-                                                                                                        case 0x04 :
-                                                                                                                    return Mpeg4v_Profile_Level(B8(11100000)+Code8);
-                                                                                                        case 0x05 :
-                                                                                                        case 0x06 :
-                                                                                                                    return Mpeg4v_Profile_Level(B8(11101011)-5+Code8);
+                                                                                                        case 0x01 : return "422 Proxy";
+                                                                                                        case 0x02 : return "422 LT";
+                                                                                                        case 0x03 : return "422";
+                                                                                                        case 0x04 : return "422 HQ";
+                                                                                                        case 0x05 : return "4444";
+                                                                                                        case 0x06 : return "4444 XQ";
                                                                                                         default   : return "";
                                                                                                     }
                                                                                         default   : return "";
                                                                                     }
                                                                         default   : return "";
                                                                     }
-                                                        case 0x03 : //Individual Picure Coding Schemes
-                                                                    switch (Code6)
+                                                         default   : return "";
+                                                    }
+                                         default   : return "";
+                                    }
+                        default   : return "";
+                    }
+        case 0x0D : //
+                    switch (Code2)
+                    {
+                        case 0x01 : //Picture
+                                    switch (Code3)
+                                    {
+                                        case 0x02 : //Coding characteristics
+                                                    switch (Code4)
+                                                    {
+                                                        case 0x02 : //Compressed coding
+                                                                    switch (Code5)
                                                                     {
-                                                                        case 0x06 : //ProRes
-                                                                                    switch (Code7)
+                                                                        case 0x01 : //MPEG Compression
+                                                                                    switch (Code6)
                                                                                     {
-                                                                                        case 0x01 : return "422 Proxy";
-                                                                                        case 0x02 : return "422 LT";
-                                                                                        case 0x03 : return "422";
-                                                                                        case 0x04 : return "422 HQ";
-                                                                                        case 0x05 : return "4444";
-                                                                                        case 0x06 : return "4444 XQ";
+                                                                                        case 0x20 : //MPEG-4 Visual
+                                                                                                    switch (Code7)
+                                                                                                    {
+                                                                                                        case 0x10 : //
+                                                                                                                    switch (Code8)
+                                                                                                                    {
+                                                                                                                        case 0x01 :
+                                                                                                                        case 0x02 :
+                                                                                                                        case 0x03 :
+                                                                                                                        case 0x04 :
+                                                                                                                                    return Mpeg4v_Profile_Level(B8(11100000)+Code8);
+                                                                                                                        case 0x05 :
+                                                                                                                        case 0x06 :
+                                                                                                                                    return Mpeg4v_Profile_Level(B8(11101011)-5+Code8);
+                                                                                                                        default   : return "";
+                                                                                                                    }
+                                                                                                        default   : return "";
+                                                                                                    }
                                                                                         default   : return "";
                                                                                     }
                                                                         default   : return "";
                                                                     }
-                                                        default   : return "";
+                                                         default   : return "";
                                                     }
                                          default   : return "";
                                     }
-                         default   : return "";
+                        default   : return "";
+                    }
+        case 0x0E : //Private Use
+                    switch (Code2)
+                    {
+                        case 0x21 : //Fraunhofer
+                                    switch (Code3)
+                                    {
+                                        case 0x01 :
+                                                    switch (Code4)
+                                                    {
+                                                        case 0x01 :
+                                                                    switch (Code5)
+                                                                    {
+                                                                        case 0x01 :
+                                                                                    switch (Code7 & 0xF0)
+                                                                                    {
+                                                                                        case 0x10 : return "M0";
+                                                                                        case 0x20 : return "M1";
+                                                                                        case 0x30 : return "M2";
+                                                                                        case 0x40 : return "M3";
+                                                                                        default   : return "";
+                                                                                    }
+                                                                        default   : return "";
+                                                                    }
+                                                         default   : return "";
+                                                    }
+                                         default   : return "";
+                                    }
+                        default   : return "";
                     }
         default   : return "";
     }
@@ -4957,8 +5035,7 @@ void File_Mxf::Read_Buffer_Unsynched()
         Partitions.erase(Partitions.end()-1);
         Partitions_IsCalculatingHeaderByteCount=false;
     }
-    if (Partitions_IsCalculatingSdtiByteCount)
-        Partitions_IsCalculatingSdtiByteCount=false;
+    Partitions_IsCalculatingSdtiByteCount=false;
 
     #if MEDIAINFO_SEEK
         IndexTables_Pos=0;
@@ -6911,7 +6988,7 @@ void File_Mxf::Data_Parse()
         std::map<int16u, int128u>::iterator Primer_Value = Primer_Values.find(Code2); \
         if (Primer_Value != Primer_Values.end()) \
         { \
-            if (false); \
+            if (false) {} \
 
 #define ELEMENT_END() \
         } \
@@ -6923,7 +7000,6 @@ void File_Mxf::Data_Parse()
 #define ELEMENT(_CODE, _CALL) \
     case 0x##_CODE :    { \
                         std::map<int16u, int128u>::iterator Primer_Value=Primer_Values.find(0x##_CODE); \
-                        const char* Temp; \
                         if (Primer_Value!=Primer_Values.end()) { \
                             auto Temp = Mxf_Param_Info((int32u)Primer_Value->second.hi, Primer_Value->second.lo); \
                             Element_Name(Temp ? Temp : Ztring().From_UUID(Code).To_UTF8().c_str()); \

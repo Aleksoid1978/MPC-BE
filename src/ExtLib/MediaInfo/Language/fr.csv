@@ -757,6 +757,9 @@ Genre_188;G-Funk
 Genre_189;Dubstep
 Genre_190;Rock garage
 Genre_191;Psybient
+Geolocation_Permission_Title;Accès aux données de géolocalisations
+Geolocation_Permission_Summary;L'autorisation d'accès aux photos et aux vidéos est nécessaire pour lire les métadonnées de géolocalisation des fichiers multimédias.
+Geolocation_Permission_Help;Pour activer la lecture des métadonnées de géolocalisation, suivez ces étapes dans l'écran suivant :\n\n1. Ouvrez « Autorisations »\n2. Sélectionnez « Photos et vidéos »\n3. Choisissez « Toujours Autoriser ».
 Go to WebSite;Visiter la page Internet de MediaInfo
 Gop_OpenClosed;GOP, Ouvert/Fermé
 Gop_OpenClosed_Closed;Fermé

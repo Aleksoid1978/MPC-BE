@@ -401,6 +401,8 @@ protected :
     std::map<std::string, Ztring>   Infos;
     std::map<std::string, Ztring>   Infos_AudioSpecificConfig;
     bool                            CanFill;
+    bool                            gain_control_data_present_InPacket;
+    bool                            gain_control_data_present_AtLeastOnce;
 
 private :
     void FillInfosHEAACv2(const Ztring& Format_Settings);

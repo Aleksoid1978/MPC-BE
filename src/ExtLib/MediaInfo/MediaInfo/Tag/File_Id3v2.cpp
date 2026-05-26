@@ -576,13 +576,11 @@ void File_Id3v2::Data_Parse()
     if (DataLength!=(int32u)-1)
     {
         int64u TotalLength=4+(int64u)DataLength;
-        if (TotalLength>Element_Size-Unsynch_List.size())
+        if (TotalLength==Element_Size-Unsynch_List.size())
         {
-            Unsynch_List.clear();
-            Skip_XX(Element_Size-Element_Offset,                "Size coherency issue");
-            return;
+            Element_Size=TotalLength;
+            Param_Info1("Incoherent");
         }
-        Element_Size=TotalLength;
     }
     else
         Element_Size-=Unsynch_List.size();
@@ -953,31 +951,19 @@ void File_Id3v2::APIC()
     }
     else
     {
-        int64u Element_Offset_Real=Element_Offset;
-        Get_ISO_8859_1(Element_Size-Element_Offset, Mime,       "MIME_type");
-        Element_Offset=Element_Offset_Real+Mime.size()+1;
+        Get_ISO_8859_1(SizeUpTo0(), Mime,                       "MIME_type");
+        Skip_B1(                                                "Zero");
     }
     Get_B1 (PictureType,                                        "Picture_type"); Element_Info1(Id3v2_PictureType(PictureType));
-    int64u Element_Offset_Real=Element_Offset;
     switch (Encoding)
     {
-        case 0 : Get_ISO_8859_1 (Element_Size-Element_Offset, Description, "Description"); break;
-        case 1 : Get_UTF16      (Element_Size-Element_Offset, Description, "Description"); break;
-        case 2 : Get_UTF16B     (Element_Size-Element_Offset, Description, "Description"); break;
-        case 3 : Get_UTF8       (Element_Size-Element_Offset, Description, "Description"); break;
-        default : ;
+        case 0 : Get_ISO_8859_1 (SizeUpTo0(), Description,      "Description"); break;
+        case 1 : Get_UTF16      (SizeUpTo0(), Description,      "Description"); break;
+        case 2 : Get_UTF16B     (SizeUpTo0(), Description,      "Description"); break;
+        case 3 : Get_UTF8       (SizeUpTo0(), Description,      "Description"); break;
+        default: Skip_XX        (SizeUpTo0(),                   "Description");
     }
-    Element_Offset=Element_Offset_Real;
-    switch (Encoding)
-    {
-        case 0 : Element_Offset+=Description.size()+1; break; //NULL
-        case 1 : Element_Offset+=Description.size()*2+4; break; //UTF-16 BOM + UTF-16 NULL
-        case 2 : Element_Offset+=Description.size()*2+2; break; //UTF-16 NULL
-        case 3 : Element_Offset+=Description.To_UTF8().size()+1; break; //UTF-8 NULL
-        default : ;
-    }
-    if (Element_Offset>Element_Size)
-        return; //There is a problem
+    Skip_B1(                                                    "Zero");
 
     //Filling
     Fill_Name();
@@ -1317,7 +1303,7 @@ void File_Id3v2::Fill_Name()
         case Elements::TSOT : Fill(Stream_General, 0, General_Track_Sort, Element_Value); break;
         case Elements::TSRC : Fill(Stream_General, 0, General_ISRC, Element_Value); break;
         case Elements::TSSE : Fill(Stream_General, 0, General_Encoded_Library, Element_Value); break;
-        case Elements::TSST : Fill(Stream_General, 0, "Set subtitle", Element_Value); break;
+        case Elements::TSST : Fill(Stream_General, 0, General_Part, Element_Value); break;
         case Elements::TXXX : if (Element_Values(0)==__T("AccurateRipResult"))      ;
                          else if (Element_Values(0)==__T("AccurateRipDiscID"))      ;
                          else if (Element_Values(0)==__T("CT_GAPLESS_DATA"))        ;

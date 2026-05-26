@@ -776,7 +776,7 @@ void File_Lxf::Header_Parse()
         Skip_L4(                                                "Zero");
 
     if (Element_Offset<HeaderSize)
-        Skip_XX(Header_Size-Element_Offset,                     "Unknown");
+        Skip_XX(HeaderSize-Element_Offset,                      "Unknown");
 
     //Filling
     Header_Fill_Code(Type, Ztring::ToZtring(Type));

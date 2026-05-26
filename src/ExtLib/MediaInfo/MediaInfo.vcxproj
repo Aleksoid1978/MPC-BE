@@ -110,6 +110,7 @@
     <ClInclude Include="MediaInfo\File__Analyze_Element.h" />
     <ClInclude Include="MediaInfo\File__HasReferences.h" />
     <ClInclude Include="MediaInfo\HashWrapper.h" />
+    <ClInclude Include="MediaInfo\Image\File_AmigaIcon.h" />
     <ClInclude Include="MediaInfo\Image\File_ArriRaw.h" />
     <ClInclude Include="MediaInfo\Image\File_Bpg.h" />
     <ClInclude Include="MediaInfo\Image\File_Dds.h" />
@@ -150,7 +151,9 @@
     <ClInclude Include="MediaInfo\Text\File_TimedText.h" />
     <ClInclude Include="MediaInfo\Text\File_Ttml.h" />
     <ClInclude Include="MediaInfo\Video\File_Aic.h" />
+    <ClInclude Include="MediaInfo\Video\File_Apv.h" />
     <ClInclude Include="MediaInfo\Video\File_Av1.h" />
+    <ClInclude Include="MediaInfo\Video\File_Av2.h" />
     <ClInclude Include="MediaInfo\Video\File_Avs3V.h" />
     <ClInclude Include="MediaInfo\Video\File_Canopus.h" />
     <ClInclude Include="MediaInfo\Video\File_CineForm.h" />
@@ -362,6 +365,7 @@
     <ClCompile Include="MediaInfo\File__HasReferences.cpp" />
     <ClCompile Include="MediaInfo\File__MultipleParsing.cpp" />
     <ClCompile Include="MediaInfo\HashWrapper.cpp" />
+    <ClCompile Include="MediaInfo\Image\File_AmigaIcon.cpp" />
     <ClCompile Include="MediaInfo\Image\File_ArriRaw.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Bmp.cpp" />
     <ClCompile Include="MediaInfo\Image\File_Bpg.cpp" />
@@ -491,7 +495,9 @@
     <ClCompile Include="MediaInfo\Text\File_Teletext.cpp" />
     <ClCompile Include="MediaInfo\Video\File_AfdBarData.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Aic.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Apv.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Av1.cpp" />
+    <ClCompile Include="MediaInfo\Video\File_Av2.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avc_Duplicate.cpp" />
     <ClCompile Include="MediaInfo\Video\File_Avs3V.cpp" />

@@ -69,7 +69,7 @@ void File_GainMap::Data_Parse()
     Get_B1(flags,                                               "flags");
     Get_Flags(flags, 6, use_base_colour_space,                  "use_base_colour_space");
     Get_Flags(flags, 7, is_multichannel,                        "is_multichannel");
-    auto channel_count{ is_multichannel ? 3 : 1 };
+    int channel_count{ is_multichannel ? 3 : 1 };
 
     int32u base_hdr_headroom_numerator, alternate_hdr_headroom_numerator, base_hdr_headroom_denominator{}, alternate_hdr_headroom_denominator{};
     int32s gain_map_min_numerator[3]{}, gain_map_max_numerator[3]{}, base_offset_n[3]{}, alternate_offset_n[3]{};

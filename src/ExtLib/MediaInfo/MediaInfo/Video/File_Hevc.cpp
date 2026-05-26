@@ -44,7 +44,7 @@ extern const char* Hevc_profile_idc(int32u profile_idc)
         case   1 : return "Main";
         case   2 : return "Main 10";
         case   3 : return "Main Still";
-        case   4 : return "Format Range"; // extensions
+        case   4 : return "Format Range"; // extensions, detailed profile computed based on constraint flags
         case   5 : return "High Throughput";
         case   6 : return "Multiview Main";
         case   7 : return "Scalable Main"; // can be "Scalable Main 10" depending on general_max_8bit_constraint_flag
@@ -381,48 +381,72 @@ void File_Hevc::Streams_Fill_Profile(const profile_tier_level_struct& p)
     if (!LegacyStreamDisplay && !Retrieve_Const(Stream_Video, 0, Video_Format_Profile).empty())
         return;
 
-    Ztring Profile;
+    string Profile;
     if (p.profile_space==0)
     {
         if (p.profile_idc)
         {
-            Profile=Ztring().From_UTF8(Hevc_profile_idc(p.profile_idc));
-            int8u Profile_Addition_Bits=0;
+            if (p.profile_idc == 4)
+            {
+                // Determine chroma format prefix
+                if (p.general_max_monochrome_constraint_flag)
+                    Profile = "Monochrome";
+                else {
+                    int8u ChromaIndex;
+                    if (p.general_max_420chroma_constraint_flag)
+                        ChromaIndex = 1;
+                    else if (p.general_max_422chroma_constraint_flag)
+                        ChromaIndex = 2;
+                    else
+                        ChromaIndex = 3;
+                    Profile = Hevc_profile_idc(1);
+                    Profile += ' ';
+                    Profile += Hevc_chroma_format_idc(ChromaIndex);
+                }
+                if (p.general_intra_constraint_flag)
+                {
+                    if (p.general_one_picture_only_constraint_flag)
+                        Profile += " Still Picture";
+                    else
+                        Profile += " Intra";
+                }
+            }
+            else
+            {
+                Profile=Hevc_profile_idc(p.profile_idc);
+            }
             switch (p.profile_idc)
             {
+                case 4 :
                 case 6 :
                 case 7 :
-                    if (!p.general_max_8bit_constraint_flag)
-                    {
-                        if (!p.general_max_10bit_constraint_flag)
-                        {
-                            if (!p.general_max_12bit_constraint_flag)
-                            {
-                                if (!p.general_max_14bit_constraint_flag)
-                                    Profile_Addition_Bits=4;
-                                else
-                                    Profile_Addition_Bits=3;
-                            }
-                            else
-                                Profile_Addition_Bits=2;
-                        }
+                    if (!p.general_max_8bit_constraint_flag) {
+                        // Compute bit depth from constraint flags
+                        int8u BitDepthIndex;
+                        if (p.general_max_10bit_constraint_flag)
+                            BitDepthIndex = 1;
+                        else if (p.general_max_12bit_constraint_flag)
+                            BitDepthIndex = 2;
+                        else if (p.general_max_14bit_constraint_flag)
+                            BitDepthIndex = 3;
                         else
-                            Profile_Addition_Bits=1;
+                            BitDepthIndex = 4;
+                        Profile += ' ';
+                        Profile += to_string(8 + BitDepthIndex * 2);
                     }
-            }
-            if (Profile_Addition_Bits)
-            {
-                Profile+=' ';
-                Profile+=Ztring::ToZtring(8+Profile_Addition_Bits*2);
+                    break;
+                default:
+                    break;
             }
         }
         if (p.level_idc)
         {
             if (p.profile_idc)
-                Profile+=__T('@');
-            Profile+=__T('L')+Ztring().From_Number(((float)p.level_idc)/30, (p.level_idc%10)?1:0);
-            Profile+=__T('@');
-            Profile+=Ztring().From_UTF8(Hevc_tier_flag(p.tier_flag));
+                Profile+='@';
+            Profile += 'L';
+            Profile += Ztring().From_Number(((float)p.level_idc) / 30, (p.level_idc % 10) ? 1 : 0).To_UTF8();
+            Profile += '@';
+            Profile += Hevc_tier_flag(p.tier_flag);
         }
     }
     Fill(Stream_Video, 0, Video_Format_Profile, Profile);
@@ -687,7 +711,7 @@ bool File_Hevc::Demux_UnpacketizeContainer_Test()
             Size+=lengthSizeMinusOne+1;
 
             //Coherency checking
-            if (Size<lengthSizeMinusOne+1+2 || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+lengthSizeMinusOne+1>Buffer_Size))
+            if (Size<(size_t)(lengthSizeMinusOne+1+2) || Buffer_Offset+Size>Buffer_Size || (Buffer_Offset+Size!=Buffer_Size && Buffer_Offset+Size+lengthSizeMinusOne+1>Buffer_Size))
                 Size=Buffer_Size-Buffer_Offset;
             size_t Buffer_Offset_Temp=Buffer_Offset+lengthSizeMinusOne+1;
 
@@ -1821,7 +1845,7 @@ void File_Hevc::video_parameter_set()
         vector<vector<int32u> > LayerSetLayerIdList;
         vector<vector<int32u> > highest_layer_idx_plus1List;
         highest_layer_idx_plus1List.resize(num_add_layer_sets);
-        for (int i = 0; i < num_add_layer_sets; i++)
+        for (int32u i = 0; i < num_add_layer_sets; i++)
         {
             highest_layer_idx_plus1List[i].reserve(NumIndependentLayers);
             highest_layer_idx_plus1List[i].push_back(0); // Unused?
@@ -1832,7 +1856,7 @@ void File_Hevc::video_parameter_set()
                 highest_layer_idx_plus1List[i].push_back(highest_layer_idx_plus1);
             }
         }
-        for (int i = 0; i < num_add_layer_sets; i++)
+        for (int32u i = 0; i < num_add_layer_sets; i++)
         {
             int32u layerNum = 0;
             auto lsIdx = vps_num_layer_sets_minus1 + 1 + i;
@@ -1863,7 +1887,7 @@ void File_Hevc::video_parameter_set()
         Skip_SB(                                                "default_ref_layers_active_flag");
         int32u vps_num_profile_tier_level_minus1;
         Get_UE(vps_num_profile_tier_level_minus1,               "vps_num_profile_tier_level_minus1");
-        for (int i = vps_base_layer_internal_flag ? 2 : 1; i <= vps_num_profile_tier_level_minus1; i++)
+        for (int32u i = vps_base_layer_internal_flag ? 2 : 1; i <= vps_num_profile_tier_level_minus1; i++)
         {
             bool vps_profile_present_flag;
             Get_SB(vps_profile_present_flag,                    "vps_profile_present_flag");
@@ -3163,7 +3187,7 @@ void File_Hevc::sei_message_user_data_registered_itu_t_t35_B5_003C()
 
     switch (itu_t_t35_terminal_provider_oriented_code)
     {
-        case 0x0001: sei_message_user_data_registered_itu_t_t35_B5_003C_0001(); break;
+        case 0x0001: case 0x0003: sei_message_user_data_registered_itu_t_t35_B5_003C_0001(); break;
     }
 }
 
@@ -3844,7 +3868,7 @@ void File_Hevc::slice_segment_header()
     if (first_slice_segment_in_pic_flag && pic_order_cnt_DTS_Ref!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && FrameRate && TemporalReferences_Reserved)
     {
         int64s pic_order_cnt=float64_int64s(int64s(FrameInfo.PTS-pic_order_cnt_DTS_Ref)*FrameRate/1000000000);
-        if (pic_order_cnt>=TemporalReferences.size()/4 || pic_order_cnt<=-((int64s)TemporalReferences.size()/4))
+        if (pic_order_cnt>=(int64s)TemporalReferences.size()/4 || pic_order_cnt<=-((int64s)TemporalReferences.size()/4))
             pic_order_cnt_DTS_Ref=(int64u)-1; // Incoherency in DTS? Disabling compute by DTS, TODO: more generic test (all formats)
     }
     if (first_slice_segment_in_pic_flag && pic_order_cnt_DTS_Ref!=(int64u)-1 && FrameInfo.PTS!=(int64u)-1 && FrameRate && TemporalReferences_Reserved)
@@ -3998,12 +4022,12 @@ void File_Hevc::profile_tier_level(profile_tier_level_struct& p, bool profilePre
         Get_SB (    p.general_max_12bit_constraint_flag,        "general_max_12bit_constraint_flag");
         Get_SB (    p.general_max_10bit_constraint_flag,        "general_max_10bit_constraint_flag");
         Get_SB (    p.general_max_8bit_constraint_flag,         "general_max_8bit_constraint_flag");
-        Skip_SB(                                                "general_max_422chroma_constraint_flag");
-        Skip_SB(                                                "general_max_420chroma_constraint_flag");
-        Skip_SB(                                                "general_max_monochrome_constraint_flag");
-        Skip_SB(                                                "general_intra_constraint_flag");
-        Skip_SB(                                                "general_one_picture_only_constraint_flag");
-        Skip_SB(                                                "general_lower_bit_rate_constraint_flag");
+        Get_SB (    p.general_max_422chroma_constraint_flag,    "general_max_422chroma_constraint_flag");
+        Get_SB (    p.general_max_420chroma_constraint_flag,    "general_max_420chroma_constraint_flag");
+        Get_SB (    p.general_max_monochrome_constraint_flag,   "general_max_monochrome_constraint_flag");
+        Get_SB (    p.general_intra_constraint_flag,            "general_intra_constraint_flag");
+        Get_SB (    p.general_one_picture_only_constraint_flag, "general_one_picture_only_constraint_flag");
+        Get_SB (    p.general_lower_bit_rate_constraint_flag,   "general_lower_bit_rate_constraint_flag");
         Get_SB (    p.general_max_14bit_constraint_flag,        "general_max_14bit_constraint_flag");
         for (int8u constraint_pos=0; constraint_pos<33; constraint_pos++)
             Skip_SB(                                            "general_reserved");

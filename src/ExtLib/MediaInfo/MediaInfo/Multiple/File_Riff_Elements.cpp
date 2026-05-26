@@ -3644,9 +3644,6 @@ struct profile_info
                         ToReturn+=',';
                         ToReturn+=' ';
                     }
-                }
-                if (i>=2)
-                {
                     ToReturn+=profile_names[i];
                     ToReturn+='=';
                 }

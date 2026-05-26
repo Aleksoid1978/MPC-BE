@@ -294,8 +294,11 @@ static Ztring Mpeg4_Language_Apple(int16u Language)
         "jv" // Javanese
     };
 
-    if (Language>94)
-        Language-=(128-94); // Gap in the list
+    if (Language>=95 && Language<128)
+        return Ztring::ToZtring(Language); // Undefined / reserved gap in QuickTime language codes
+
+    if (Language>=128)
+        Language-=(128-95); // Gap in the list
 
     if (Language>=ListSize)
         return Ztring::ToZtring(Language);

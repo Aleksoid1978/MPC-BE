@@ -1317,8 +1317,7 @@ void File_Eia608::Character_Fill(wchar_t Character)
     if (TextMode || !Stream.InBack)
         HasChanged();
 
-    if (!HasContent)
-        HasContent=true;
+    HasContent=true;
 }
 
 //---------------------------------------------------------------------------

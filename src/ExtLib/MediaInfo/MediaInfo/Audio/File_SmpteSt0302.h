@@ -40,6 +40,7 @@ private :
     void Streams_Finish();
 
     //Buffer - Global
+    void Read_Buffer_Unsynched();
     void Read_Buffer_Continue ();
 
     //Temp

@@ -50,7 +50,6 @@ const char* ProRes_Profile_Name(size_t Index)
 }
 size_t ProRes_Profile_Index(const string& ProfileS) // Note: 1-based, 0 means not found
 {
-    size_t Profile;
     auto Pos=find(begin(ProRes_Profile_Names), end(ProRes_Profile_Names), ProfileS);
     if (Pos==end(ProRes_Profile_Names))
         return 0;

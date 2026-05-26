@@ -571,7 +571,7 @@ void File_Pac::Data_Parse()
                             if (Value == '<') {
                                 ItalicBeginFound = true;
                             }
-                            if (Value == '<') {
+                            if (ItalicBeginFound && Value == '>') {
                                 CountOfCharsPerLine -= 2; // < and > are markers of italic
                                 ItalicBeginFound = false;
                             }

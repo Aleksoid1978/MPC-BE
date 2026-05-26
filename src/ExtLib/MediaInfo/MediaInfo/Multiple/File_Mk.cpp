@@ -37,6 +37,9 @@
 #if defined(MEDIAINFO_AV1_YES)
     #include "MediaInfo/Video/File_Av1.h"
 #endif
+#if defined(MEDIAINFO_AV2_YES)
+    #include "MediaInfo/Video/File_Av2.h"
+#endif
 #if defined(MEDIAINFO_AVC_YES)
     #include "MediaInfo/Video/File_Avc.h"
 #endif
@@ -122,6 +125,39 @@ namespace MediaInfoLib
 //***************************************************************************
 // Constants
 //***************************************************************************
+
+//---------------------------------------------------------------------------
+enum service_kind
+{
+    Service_HearingImpaired,
+    Service_VisuallyImpaired,
+    Service_TextDescriptions,
+    Service_Original,
+    Service_Commentary,
+    Service_Max,
+    Service_Default = Service_Max, // They are extra, actually not service
+    Service_Forced,
+};
+
+//---------------------------------------------------------------------------
+const char*  Matroska_ServiceKind[] =
+{
+    "HI",
+    "VI",
+    "TD",
+    "O",
+    "C",
+};
+
+//---------------------------------------------------------------------------
+const char* Matroska_ServiceKind_String[] =
+{
+    "Hearing Impaired",
+    "Visually Impaired",
+    "Text Descriptions",
+    "Original",
+    "Commentary",
+};
 
 //---------------------------------------------------------------------------
 #if MEDIAINFO_TRACE
@@ -238,6 +274,11 @@ namespace Elements
     const int64u Segment_Tracks_TrackEntry_FlagEnabled=0x39;
     const int64u Segment_Tracks_TrackEntry_FlagDefault=0x8;
     const int64u Segment_Tracks_TrackEntry_FlagForced=0x15AA;
+    const int64u Segment_Tracks_TrackEntry_FlagHearingImpaired=0x15AB;
+    const int64u Segment_Tracks_TrackEntry_FlagVisualImpaired=0x15AC;
+    const int64u Segment_Tracks_TrackEntry_FlagTextDescriptions=0x15AD;
+    const int64u Segment_Tracks_TrackEntry_FlagOriginal=0x15AE;
+    const int64u Segment_Tracks_TrackEntry_FlagCommentary=0x15AF;
     const int64u Segment_Tracks_TrackEntry_FlagLacing=0x1C;
     const int64u Segment_Tracks_TrackEntry_MinCache=0x2DE7;
     const int64u Segment_Tracks_TrackEntry_MaxCache=0x2DF8;
@@ -1408,8 +1449,14 @@ void File_Mk::Streams_Finish()
             Fill(Stream_Video, StreamPos_Last, Video_FrameRate, Temp->second.FrameRate, 3);
 
         //Flags
-        Fill(StreamKind_Last, StreamPos_Last, "Default", Temp->second.Default?"Yes":"No");
-        Fill(StreamKind_Last, StreamPos_Last, "Forced", Temp->second.Forced?"Yes":"No");
+        Fill(StreamKind_Last, StreamPos_Last, "Default", Temp->second.ServiceKind[Service_Default]?"Yes":"No");
+        Fill(StreamKind_Last, StreamPos_Last, "Forced", Temp->second.ServiceKind[Service_Forced]?"Yes":"No");
+        for (auto i = 0; i < Service_Max; i++) {
+            if (Temp->second.ServiceKind[i]) {
+                Fill(StreamKind_Last, StreamPos_Last, "ServiceKind", Matroska_ServiceKind[i]);
+                Fill(StreamKind_Last, StreamPos_Last, "ServiceKind/String", Matroska_ServiceKind_String[i]);
+            }
+        }
     }
 
     //Chapters
@@ -1634,7 +1681,22 @@ void File_Mk::Header_Parse()
     if (NameIsValid)
     {
     Get_EB (Name,                                               "Name");
+    auto Element_Offset_Before = Element_Offset;
     Get_EB (Size,                                               "Size");
+    auto Size_Size = Element_Offset - Element_Offset_Before;
+    if ((Size & 0x7F) == 0x7F) {
+        int64u Unlimited_Value = 0;
+        while (Size_Size) {
+            Unlimited_Value <<= 7;
+            Unlimited_Value |= 0x7F;
+            Size_Size--;
+        }
+        if (Size == Unlimited_Value)
+        {
+            Param_Info1("Unlimited");
+            Size = Element_TotalSize_Get() - Element_Offset;
+        }
+    }
 
     //Detection of 0-sized Segment expected to be -1-sized (unlimited)
     if (Name==Elements::Segment && Size==0)
@@ -1891,6 +1953,11 @@ void File_Mk::Data_Parse()
                 ATO2(Segment_Tracks_TrackEntry_FlagEnabled, "FlagEnabled")
                 ATO2(Segment_Tracks_TrackEntry_FlagDefault, "FlagDefault")
                 ATO2(Segment_Tracks_TrackEntry_FlagForced, "FlagForced")
+                ATO2(Segment_Tracks_TrackEntry_FlagHearingImpaired, "FlagHearingImpaired")
+                ATO2(Segment_Tracks_TrackEntry_FlagVisualImpaired, "FlagVisualImpaired")
+                ATO2(Segment_Tracks_TrackEntry_FlagTextDescriptions, "FlagTextDescriptions")
+                ATO2(Segment_Tracks_TrackEntry_FlagOriginal, "FlagOriginal")
+                ATO2(Segment_Tracks_TrackEntry_FlagCommentary, "FlagCommentary")
                 ATO2(Segment_Tracks_TrackEntry_FlagLacing, "FlagLacing")
                 ATO2(Segment_Tracks_TrackEntry_MinCache, "MinCache")
                 ATO2(Segment_Tracks_TrackEntry_MaxCache, "MaxCache")
@@ -2194,7 +2261,7 @@ void File_Mk::Data_Parse()
 
     if (IsParsingSegmentTrack_SeekBackTo && File_Offset+Buffer_Offset+Element_Offset==SegmentTrack_Offset_End) //TODO: implement check at end of an element
     {
-        while (Element_Level>(Element_Offset==Element_Size?2:1))
+        while (Element_Level>(size_t)(Element_Offset==Element_Size?2:1))
             Element_End0();
         GoTo(IsParsingSegmentTrack_SeekBackTo);
         IsParsingSegmentTrack_SeekBackTo=0;
@@ -2637,7 +2704,7 @@ void File_Mk::Segment_Attachments_AttachedFile_FileData()
         #endif //MEDIAINFO_TRACE
 
         //Filling
-        Attachment("Attachment", Ztring().From_UTF8(AttachedFile_FileName));
+        Attachment("Attachment", Ztring().From_UTF8(AttachedFile_FileDescription.empty() ? AttachedFile_FileName : AttachedFile_FileDescription), Ztring(),  Ztring().From_UTF8(AttachedFile_FileMimeType));
 
         #if MEDIAINFO_EVENTS
             {
@@ -3384,6 +3451,7 @@ void File_Mk::Segment_Tags_Tag_SimpleTag_Assign()
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODED_BY")) Segment_Tag_SimpleTag_TagNames[0]=__T("EncodedBy");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER_SETTINGS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library_Settings");
+    if (Segment_Tag_SimpleTag_TagNames[0]==__T("ENCODER_OPTIONS")) Segment_Tag_SimpleTag_TagNames[0]=__T("Encoded_Library_Settings");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("FPS")) Segment_Tag_SimpleTag_TagNames[0].clear(); //Useless
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("GENRE")) Segment_Tag_SimpleTag_TagNames[0]=__T("Genre");
     if (Segment_Tag_SimpleTag_TagNames[0]==__T("HANDLER_NAME"))
@@ -3505,6 +3573,7 @@ void File_Mk::Segment_Tracks_TrackEntry()
     Fill_Flush();
     Fill(StreamKind_Last, StreamPos_Last, "Language", "eng");
     Fill(StreamKind_Last, StreamPos_Last, General_StreamOrder, Stream.size());
+    Stream[(int64u)-1].ServiceKind[Service_Default] = true;
 }
 
 //---------------------------------------------------------------------------
@@ -4122,7 +4191,7 @@ void File_Mk::Segment_Tracks_TrackEntry_FlagDefault()
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
-        Stream[TrackNumber].Default=UInteger?true:false;
+        Stream[TrackNumber].ServiceKind[Service_Default]=UInteger?true:false;
     FILLING_END();
 }
 
@@ -4135,7 +4204,72 @@ void File_Mk::Segment_Tracks_TrackEntry_FlagForced()
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
-        Stream[TrackNumber].Forced=UInteger?true:false;
+        Stream[TrackNumber].ServiceKind[Service_Forced]=UInteger?true:false;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_FlagHearingImpaired()
+{
+    //Parsing
+    int64u UInteger=UInteger_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].ServiceKind[Service_HearingImpaired]=UInteger?true:false;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_FlagVisualImpaired()
+{
+    //Parsing
+    int64u UInteger=UInteger_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].ServiceKind[Service_VisuallyImpaired]=UInteger?true:false;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_FlagTextDescriptions()
+{
+    //Parsing
+    int64u UInteger=UInteger_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].ServiceKind[Service_TextDescriptions]=UInteger?true:false;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_FlagOriginal()
+{
+    //Parsing
+    int64u UInteger=UInteger_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].ServiceKind[Service_Original]=UInteger?true:false;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_FlagCommentary()
+{
+    //Parsing
+    int64u UInteger=UInteger_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        Stream[TrackNumber].ServiceKind[Service_Commentary]=UInteger?true:false;
     FILLING_END();
 }
 
@@ -4887,7 +5021,7 @@ void File_Mk::CodecID_Manage()
     stream& streamItem = Stream[TrackNumber];
 
     //Creating the parser
-    #if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_VC1_YES) || defined(MEDIAINFO_DIRAC_YES) || defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_VP8_YES) || defined(MEDIAINFO_VP9_YES) || defined(MEDIAINFO_OGG_YES) || defined(MEDIAINFO_DTS_YES)
+    #if defined(MEDIAINFO_MPEG4V_YES) || defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_AV2_YES) || defined(MEDIAINFO_AVC_YES) || defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_VC1_YES) || defined(MEDIAINFO_DIRAC_YES) || defined(MEDIAINFO_MPEGV_YES) || defined(MEDIAINFO_VP8_YES) || defined(MEDIAINFO_VP9_YES) || defined(MEDIAINFO_OGG_YES) || defined(MEDIAINFO_DTS_YES)
         const Ztring &Format=MediaInfoLib::Config.CodecID_Get(StreamKind_Last, InfoCodecID_Format_Type, CodecID, InfoCodecID_Format);
     #endif
         if (0);
@@ -4903,6 +5037,15 @@ void File_Mk::CodecID_Manage()
     {
         File_Av1* Parser=new File_Av1;
         Parser->FrameIsAlwaysComplete=true;
+        streamItem.Parser=Parser;
+    }
+    #endif
+    #if defined(MEDIAINFO_AV2_YES)
+    else if (Format==__T("AV2"))
+    {
+        File_Av2* Parser=new File_Av2;
+        Parser->FrameIsAlwaysComplete=true;
+        Parser->IsAnnexB=true;
         streamItem.Parser=Parser;
     }
     #endif

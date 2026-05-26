@@ -341,7 +341,7 @@ void File_Dat::Streams_Finish()
 void File_Dat::Read_Buffer_Unsynched()
 {
     if (Priv) {
-        Priv->Frame_Last = {};
+        Priv->Frame_Last = file_dat_frame();
     }
     FrameInfo = frame_info();
 }
@@ -625,9 +625,9 @@ void File_Dat::Data_Parse()
     FILLING_ELSE();
         if (Priv) {
             if (!Frame_Count) {
-                Priv->Frame_First = {};
+                Priv->Frame_First = file_dat_frame();
             }
-            Priv->Frame_Last = {};
+            Priv->Frame_Last = file_dat_frame();
         }
     FILLING_END();
 }

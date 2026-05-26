@@ -31,6 +31,8 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Video/File_Avs3V.h"
+#define FMT_UNICODE 0
+#include "ThirdParty/fmt/format.h"
 //---------------------------------------------------------------------------
 
 constexpr auto HAVE_HDRVivid_DMI = 1;
@@ -619,33 +621,29 @@ void File_Avs3V::slice()
 // reference_picture_list_set
 void File_Avs3V::reference_picture_list_set(int8u list, int32u rpls)
 {
-    int32u i, j;
+    int32u i;
     bool reference_to_library_enable_flag=false;
     int32u num_of_ref_pic;
 
     if (library_picture_enable_flag)
-        Get_SB(reference_to_library_enable_flag, "reference_to_library_enable_flag");
+        Get_SB(reference_to_library_enable_flag,                "reference_to_library_enable_flag");
 
-    Get_UE(num_of_ref_pic, "num_of_ref_pic");
+    Get_UE(num_of_ref_pic,                                      "num_of_ref_pic");
     for (i = 0; i < num_of_ref_pic; i++) {
         bool library_index_flag = false;
-        char indexStr[16]; sprintf(indexStr, "[%i][%i][%i]", list, rpls, i);
+        string indexStr = fmt::format("[{}][{}][{}]", list, rpls, i);
         if (reference_to_library_enable_flag) {
-            char elName[64]; sprintf(elName, "library_index_flag%s", indexStr);
-            Get_SB(library_index_flag, elName);
+            Get_SB(library_index_flag,                          ("library_index_flag" + indexStr).c_str());
         }
 
         if (library_index_flag) {
-            char elName[64]; sprintf(elName, "referenced_library_picture_index%s", indexStr);
-            Skip_UE(elName);
+            Skip_UE(                                            ("referenced_library_picture_index" + indexStr).c_str());
         }
         else {
             int32u abs_delta_doi;
-            char elName[64]; sprintf(elName, "abs_delta_doi%s", indexStr);
-            Get_UE(abs_delta_doi, elName);
+            Get_UE(abs_delta_doi,                               ("abs_delta_doi" + indexStr).c_str());
             if (abs_delta_doi > 0) {
-                sprintf(elName, "sign_delta_doi%s", indexStr);
-                Skip_SB(elName);
+                Skip_SB(                                        ("sign_delta_doi" + indexStr).c_str());
             }
         }
      }
@@ -661,10 +659,8 @@ void File_Avs3V::weight_quant_matrix()
     for (sizeId = 0; sizeId < 2; sizeId++) {
         WQMSize = 1 << (sizeId + 2);
         for (i = 0; i<WQMSize; i++)
-            for (j=0; j<WQMSize; j++) {
-                char elName[64]; sprintf(elName, "weight_quant_coeff - WeightQuantMatrix%s[%i][%i]", (sizeId == 0 ? "4x4" : "8x8"), i, j);
-                Skip_UE(elName);
-            }    
+            for (j=0; j<WQMSize; j++)
+                Skip_UE(fmt::format(                            "weight_quant_coeff - WeightQuantMatrix{}[{}][{}]", (sizeId == 0 ? "4x4" : "8x8"), i, j).c_str());   
     }
 }
 
@@ -965,13 +961,10 @@ void File_Avs3V::extension_start()
                     int8u num_of_temporal_layers_minus1, i;
                     Get_S1(3, num_of_temporal_layers_minus1,    "num_of_temporal_layers_minus1");
                     for (i=0; i<num_of_temporal_layers_minus1; i++) {
-                        char elName[64]; sprintf(elName,        "temporal_frame_rate_code[%i]", i);
-                        Skip_S1(4, elName);
-                        sprintf(elName,                         "temporal_bit_rate_lower[%i]", i);
-                        Skip_S3(18, elName);
+                        Skip_S1( 4, fmt::format(                "temporal_frame_rate_code[{}]", i).c_str());
+                        Skip_S3(18, fmt::format(                "temporal_bit_rate_lower[{}]", i).c_str());
                         Mark_1();
-                        sprintf(elName,                         "temporal_bit_rate_upper[%i]", i);
-                        Skip_S2(12, elName);
+                        Skip_S2(12, fmt::format(                "temporal_bit_rate_upper[{}]", i).c_str());
                     }
                     BS_End();
                 }
@@ -1025,12 +1018,9 @@ void File_Avs3V::extension_start()
                     //Parsing
                     int8u c;
                     for (c = 0; c<3; c++) {
-                        char idx[64], idy[64]; 
-                        sprintf(idx,                            "display_primaries_x[%i]", c); 
-                        Skip_S2(16, idx);
+                        Skip_S2(16, fmt::format(                "display_primaries_x[{}]", c).c_str());
                         Mark_1();
-                        sprintf(idy,                            "display_primaries_y[%i]", c);
-                        Skip_S2(16, idy);
+                        Skip_S2(16, fmt::format(                "display_primaries_y[{}]", c).c_str());
                         Mark_1();
                     }
                     Skip_S2(16,                                 "white_point_x");
@@ -1096,13 +1086,11 @@ void File_Avs3V::extension_start()
         case 13: //referemce_to_library_picture
                 {
                     int8u crr_lib_number, i=0;
-                    char t[64];
                     //Parsing
                     Get_S1(3, crr_lib_number,                   "crr_lib_number");
                     Mark_1();
                     while (i < crr_lib_number) {
-                        sprintf(t,                              "crr_lib_pid[%d]", i);
-                        Skip_S2(9, t);
+                        Skip_S2(9, fmt::format(                 "crr_lib_pid[{}]", i).c_str());
                         i++;
                         if (i % 2 == 0)
                             Mark_1();

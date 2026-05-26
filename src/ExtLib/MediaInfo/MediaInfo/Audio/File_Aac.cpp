@@ -97,6 +97,7 @@ File_Aac::File_Aac()
     audioMuxVersionA=false;
 
     //Temp - General Audio
+    num_window_groups=0;
     sbr=NULL;
     ps=NULL;
     raw_data_block_Pos=0;
@@ -105,6 +106,7 @@ File_Aac::File_Aac()
 
     //Temp
     CanFill=true;
+    gain_control_data_present_AtLeastOnce=false;
 }
 
 //---------------------------------------------------------------------------
@@ -166,6 +168,11 @@ void File_Aac::Streams_Fill()
         frame_length_Multiplier=2;
     Fill(Stream_Audio, StreamPos_Last, Audio_SamplesPerFrame, frame_length*frame_length_Multiplier);
     }
+    if (gain_control_data_present_AtLeastOnce)
+    {
+        Fill(Stream_Audio, 0, "GainControl_Present", "Yes");
+        Fill_SetOptions(Stream_Audio, 0, "GainControl_Present", "N NTY");
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -199,7 +206,6 @@ void File_Aac::Streams_Update()
 //---------------------------------------------------------------------------
 void File_Aac::Streams_Finish()
 {
-    std::bitset<32> sect_cb_used;
     for (int g = 0; g < num_window_groups; g++)
     {
         for (int8u i = 0; i < num_sec[g]; i++)

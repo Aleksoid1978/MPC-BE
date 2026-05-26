@@ -3152,6 +3152,7 @@ void File_Aac::raw_data_block()
     Element_Begin1("raw_data_block");
     raw_data_block_Pos=0;
     ChannelPos_Temp=0;
+    gain_control_data_present_InPacket=false;
     int8u id_syn_ele=0, id_syn_ele_Previous;
     bool HasEnd=false;
     do
@@ -3208,6 +3209,11 @@ void File_Aac::raw_data_block()
     if (IsSub && Mode==Mode_payload && (!Trusted_Get() || !HasEnd))
         RanOutOfData("AAC");
     Element_End0();
+
+    FILLING_BEGIN()
+        if (!gain_control_data_present_AtLeastOnce && gain_control_data_present_InPacket)
+            gain_control_data_present_AtLeastOnce=true;
+    FILLING_END()
 }
 
 //---------------------------------------------------------------------------
@@ -3487,11 +3493,7 @@ void File_Aac::fill_element(int8u id_syn_ele)
 //---------------------------------------------------------------------------
 void File_Aac::gain_control_data()
 {
-    if (Retrieve_Const(Stream_Audio, 0, "GainControl_Present").empty())
-    {
-        Fill(Stream_Audio, 0, "GainControl_Present", "Yes");
-        Fill_SetOptions(Stream_Audio, 0, "GainControl_Present", "N NTY");
-    }
+    gain_control_data_present_InPacket=true;
 
     int8u max_band, adjust_num, aloc_bits, aloc_bits0;
     int8u wd_max=0;

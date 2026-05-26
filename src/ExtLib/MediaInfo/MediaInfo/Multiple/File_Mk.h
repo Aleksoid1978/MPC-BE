@@ -17,6 +17,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include <bitset>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -163,6 +164,11 @@ private :
     void Segment_Tracks_TrackEntry_FlagEnabled(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_FlagDefault();
     void Segment_Tracks_TrackEntry_FlagForced();
+    void Segment_Tracks_TrackEntry_FlagHearingImpaired();
+    void Segment_Tracks_TrackEntry_FlagVisualImpaired();
+    void Segment_Tracks_TrackEntry_FlagTextDescriptions();
+    void Segment_Tracks_TrackEntry_FlagOriginal();
+    void Segment_Tracks_TrackEntry_FlagCommentary();
     void Segment_Tracks_TrackEntry_FlagLacing(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_MinCache(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_MaxCache(){UInteger_Info();};
@@ -387,8 +393,7 @@ private :
         bool                    Searching_Payload;
         bool                    Searching_TimeStamps;
         bool                    Searching_TimeStamp_Start;
-        bool                    Default;
-        bool                    Forced;
+        std::bitset<8>          ServiceKind;
         int64u                  ContentCompAlgo;
         size_t                  ContentCompSettings_Buffer_Size;
         int8u*                  ContentCompSettings_Buffer;
@@ -423,8 +428,6 @@ private :
             Searching_Payload=true;
             Searching_TimeStamps=false;
             Searching_TimeStamp_Start=false;
-            Default=true;
-            Forced=false;
             ContentCompAlgo=(int32u)-1;
             ContentCompSettings_Buffer_Size=0;
             ContentCompSettings_Buffer=NULL;

@@ -361,6 +361,7 @@ void File_SmpteSt0337::Read_Buffer_Unsynched()
         FrameInfo.DTS=Frame_Count_NotParsedIncluded*1000000000/48000;
     }
 
+    Aligned=false;
     if (Parser)
         Parser->Open_Buffer_Unsynch();
 }
@@ -725,6 +726,7 @@ bool File_SmpteSt0337::Synched_Test()
                 if (Buffer[Buffer_Offset_Temp])
                 {
                     Trusted_IsNot("Bad sync");
+                    Open_Buffer_Unsynch();
                     return true;
                 }
                 Buffer_Offset_Temp++;
@@ -749,6 +751,7 @@ bool File_SmpteSt0337::Synched_Test()
                 if (Buffer[Buffer_Offset_Temp])
                 {
                     Trusted_IsNot("Bad sync");
+                    Open_Buffer_Unsynch();
                     return true;
                 }
                 Buffer_Offset_Temp++;
@@ -773,6 +776,7 @@ bool File_SmpteSt0337::Synched_Test()
                 if (Buffer[Buffer_Offset_Temp])
                 {
                     Trusted_IsNot("Bad sync");
+                    Open_Buffer_Unsynch();
                     return true;
                 }
                 Buffer_Offset_Temp++;
@@ -797,6 +801,7 @@ bool File_SmpteSt0337::Synched_Test()
                 if (Buffer[Buffer_Offset_Temp])
                 {
                     Trusted_IsNot("Bad sync");
+                    Open_Buffer_Unsynch();
                     return true;
                 }
                 Buffer_Offset_Temp++;
@@ -1014,6 +1019,7 @@ void File_SmpteSt0337::Header_Parse()
         if (!IsOK)
         {
             Trusted_IsNot("Bad sync");
+            Open_Buffer_Unsynch();
             Buffer_Offset++;
             return;
         }

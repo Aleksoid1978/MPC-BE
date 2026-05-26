@@ -49,14 +49,14 @@ extern MediaInfo_Config Config;
     } \
 
 #define INTEGRITY_SIZE_ATLEAST(_BYTES) \
-    if (Element_Offset+_BYTES>Element_Size) \
+    if (Element_Offset>Element_Size || _BYTES>Element_Size-Element_Offset) \
     { \
         Trusted_IsNot("Size is wrong"); \
         return; \
     } \
 
 #define INTEGRITY_SIZE_ATLEAST_STRING(_BYTES) \
-    if (Element_Offset+_BYTES>Element_Size) \
+    if (Element_Offset>Element_Size || _BYTES>Element_Size-Element_Offset) \
     { \
         Trusted_IsNot("Size is wrong"); \
         Info.clear(); \
@@ -64,7 +64,7 @@ extern MediaInfo_Config Config;
     } \
 
 #define INTEGRITY_SIZE_ATLEAST_INT(_BYTES) \
-    if (Element_Offset+_BYTES>Element_Size) \
+    if (Element_Offset>Element_Size || _BYTES>Element_Size-Element_Offset) \
     { \
         Trusted_IsNot("Size is wrong"); \
         Info=0; \
@@ -1036,13 +1036,6 @@ void File__Analyze::Get_EB(int64u &Info, const char* Name)
 {
     //Element size
     INTEGRITY_SIZE_ATLEAST_INT(1);
-    if (Buffer[Buffer_Offset+(size_t)Element_Offset]==0xFF)
-    {
-        if (Trace_Activated) Param(Name, "Unlimited");
-        Element_Offset++;
-        Info=Element_TotalSize_Get()-Element_Offset;
-        return;
-    }
     int8u Size=0;
     int32u Size_Mark=0;
     BS_Begin();
@@ -2069,7 +2062,7 @@ void File__Analyze::Skip_XX(int64u Bytes, const char* Name)
 {
     if (Element_Offset+Bytes!=Element_TotalSize_Get()) //Exception for seek to end of the element
     {
-        //INTEGRITY_SIZE_ATLEAST(Bytes);
+        INTEGRITY_SIZE_ATLEAST(Bytes);
     }
     if (Trace_Activated && Bytes) Param(Name, Ztring("(")+Ztring::ToZtring(Bytes)+Ztring(" bytes)"));
     Element_Offset+=Bytes;

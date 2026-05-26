@@ -171,6 +171,7 @@ public :
                 };
                 type        Type;
                 int8u       Value;
+                int8u       Padding[2]; // Pad to 4 bytes
             };
             int8u out_ch_config=(int8u)-1;
             vector<gain> Gains;

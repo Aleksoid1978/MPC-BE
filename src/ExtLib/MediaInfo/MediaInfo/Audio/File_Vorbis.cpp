@@ -135,8 +135,10 @@ void File_Vorbis::Setup()
     {
         Element_Begin1("codebook");
         Get_T4 (24, codebook,                                   "codebook");
-        if (codebook!=0x564342)
+        if (codebook!=0x564342) {
+            BS_End_LE();
             return;
+        }
         Get_BT (16, codebook_dimensions,                        "codebook_dimensions");
         Get_BT (24, codebook_entries,                           "codebook_entries");
         Get_BT (1, ordered,                                     "ordered");
@@ -172,8 +174,10 @@ void File_Vorbis::Setup()
             }
         }
         Get_BT (4, codebook_lookup_type,                        "codebook_lookup_type");
-        if (codebook_lookup_type>2)
+        if (codebook_lookup_type>2) {
+            BS_End_LE();
             return; //Not decodable
+        }
         if (codebook_lookup_type>0)
         {
             int8u codebook_value_bits;

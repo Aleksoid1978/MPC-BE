@@ -776,6 +776,15 @@
     <ClInclude Include="ThirdParty\tinyxml2\tinyxml2.h">
       <Filter>extra\tinyxml2</Filter>
     </ClInclude>
+    <ClInclude Include="MediaInfo\Image\File_AmigaIcon.h">
+      <Filter>Header Files\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_Apv.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
+    <ClInclude Include="MediaInfo\Video\File_Av2.h">
+      <Filter>Header Files\Video</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MediaInfo\File__Analyze.cpp">
@@ -1482,6 +1491,15 @@
     </ClCompile>
     <ClCompile Include="ThirdParty\fmt\format.cc">
       <Filter>extra\fmt</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_Apv.cpp">
+      <Filter>Header Files\Video</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Image\File_AmigaIcon.cpp">
+      <Filter>Source Files\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="MediaInfo\Video\File_Av2.cpp">
+      <Filter>Source Files\Video</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

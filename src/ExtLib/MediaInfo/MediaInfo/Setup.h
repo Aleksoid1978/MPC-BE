@@ -110,9 +110,6 @@
     #if !defined (MEDIAINFO_DVDIF_ANALYZE_NO) && !defined (MEDIAINFO_DVDIF_ANALYZE_YES)
         #define MEDIAINFO_DVDIF_ANALYZE_NO
     #endif
-    #if !defined (MEDIAINFO_MPEGTS_DUPLICATE_NO) && !defined (MEDIAINFO_MPEGTS_DUPLICATE_YES)
-        #define MEDIAINFO_MPEGTS_DUPLICATE_NO
-    #endif
     #if !defined (MEDIAINFO_READTHREAD_NO) && !defined (MEDIAINFO_READTHREAD_YES)
         #define MEDIAINFO_READTHREAD_NO
     #endif
@@ -555,9 +552,6 @@
 #if defined(MEDIAINFO_MPEGTS_YES) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_NO) && !defined(MEDIAINFO_MPEGTS_PESTIMESTAMP_YES)
     #define MEDIAINFO_MPEGTS_PESTIMESTAMP_YES
 #endif
-#if defined(MEDIAINFO_MPEGTS_YES) && !defined(MEDIAINFO_MPEGTS_DUPLICATE_NO) && !defined(MEDIAINFO_MPEGTS_DUPLICATE_YES)
-    #define MEDIAINFO_MPEGTS_DUPLICATE_YES
-#endif
 #if !defined(MEDIAINFO_MULTI_NO) && !defined(MEDIAINFO_MXF_NO) && !defined(MEDIAINFO_MXF_YES)
     #define MEDIAINFO_MXF_YES
 #endif
@@ -624,8 +618,14 @@
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AFDBARDATA_NO) && !defined(MEDIAINFO_AFDBARDATA_YES)
     #define MEDIAINFO_AFDBARDATA_YES
 #endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_APV_NO) && !defined(MEDIAINFO_APV_YES)
+    #define MEDIAINFO_APV_YES
+#endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AV1_NO) && !defined(MEDIAINFO_AV1_YES)
     #define MEDIAINFO_AV1_YES
+#endif
+#if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AV2_NO) && !defined(MEDIAINFO_AV2_YES)
+    #define MEDIAINFO_AV2_YES
 #endif
 #if !defined(MEDIAINFO_VIDEO_NO) && !defined(MEDIAINFO_AVC_NO) && !defined(MEDIAINFO_AVC_YES)
     #define MEDIAINFO_AVC_YES
@@ -917,6 +917,9 @@
 // Image
 #if !defined(MEDIAINFO_IMAGE_NO) && !defined(MEDIAINFO_ARRIRAW_NO) && !defined(MEDIAINFO_ARRIRAW_YES)
     #define MEDIAINFO_ARRIRAW_YES
+#endif
+#if !defined(MEDIAINFO_IMAGE_NO) && !defined(MEDIAINFO_AMIGAICON_NO) && !defined(MEDIAINFO_AMIGAICON_YES)
+    #define MEDIAINFO_AMIGAICON_YES
 #endif
 #if !defined(MEDIAINFO_IMAGE_NO) && !defined(MEDIAINFO_BMP_NO) && !defined(MEDIAINFO_BMP_YES)
     #define MEDIAINFO_BMP_YES

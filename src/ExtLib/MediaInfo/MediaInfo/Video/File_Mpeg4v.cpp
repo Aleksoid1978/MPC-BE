@@ -991,6 +991,8 @@ void File_Mpeg4v::video_object_layer_start()
             break;
         PowerOf2<<=1;
     }
+    if (!time_size)
+        Trusted_IsNot("time_size");
     Mark_1 ();
     TEST_SB_SKIP(                                               "fixed_vop_rate");
         Get_BS (time_size, fixed_vop_time_increment,            "fixed_vop_time_increment"); Param_Info2C((vop_time_increment_resolution), fixed_vop_time_increment*1000/vop_time_increment_resolution, " ms");
@@ -1224,6 +1226,9 @@ void File_Mpeg4v::video_object_layer_start()
         Trusted_IsNot("Problem with width and height!");
 
     FILLING_BEGIN();
+        if (IsSub && !Status[IsAccepted])
+            Accept("MPEG-4 Visual");
+
         //NextCode
         NextCode_Test();
         NextCode_Clear();
@@ -1240,8 +1245,6 @@ void File_Mpeg4v::video_object_layer_start()
 
         //Setting as OK
         video_object_layer_start_IsParsed=true;
-        if (!Status[IsAccepted])
-            Accept("MPEG-4 Visual");
     FILLING_END();
 }
 
@@ -1552,7 +1555,9 @@ void File_Mpeg4v::visual_object_start()
 // Packet "B6"
 void File_Mpeg4v::vop_start()
 {
+    Element_Name("vop_start");
     Element_Info1C( (FrameInfo.DTS!=(int64u)-1), __T("DTS ")+Ztring().Duration_From_Milliseconds(float64_int64s(((float64)FrameInfo.DTS)/1000000)));
+    Element_Info1(Ztring(__T("Frame ") + Ztring::ToZtring(Frame_Count)));
 
     //Counting
     if (File_Offset+Buffer_Offset+Element_Size==File_Size)
@@ -1563,10 +1568,6 @@ void File_Mpeg4v::vop_start()
         Frame_Count_InThisBlock_Max=Frame_Count_InThisBlock;
     if (Frame_Count_NotParsedIncluded!=(int64u)-1)
         Frame_Count_NotParsedIncluded++;
-
-    //Name
-    Element_Name("vop_start");
-    Element_Info1(Ztring(__T("Frame ")+Ztring::ToZtring(Frame_Count)));
 
     //Parsing
     int32u vop_time_increment;
@@ -1663,20 +1664,6 @@ void File_Mpeg4v::vop_start()
     }
     while (modulo_time_base_Continue);
     Mark_1 ();
-
-    FILLING_BEGIN();
-        if (time_size==0)
-        {
-            //Filling only if not already done
-            if (Frame_Count>=Frame_Count_Valid && Count_Get(Stream_Video)==0)
-            {
-                Accept("MPEG-4 Visual");
-                Finish("MPEG-4 Visual");
-            }
-            return;
-        }
-    FILLING_END();
-
     Get_S4 (time_size, vop_time_increment,                      "vop_time_increment"); Param_Info2C((vop_time_increment_resolution), vop_time_increment*1000/vop_time_increment_resolution, " ms");
     Mark_1 ();
     Get_SB (vop_coded,                                          "vop_coded");
@@ -1861,6 +1848,9 @@ void File_Mpeg4v::vop_start()
     }
 
     FILLING_BEGIN();
+        if (!Status[IsAccepted] && Frame_Count>=Frame_Count_Valid)
+            Accept("MPEG-4 Visual");
+
         //Duration
         if (!Mpeg4v_visual_object_type[visual_object_type][0] && vop_time_increment_resolution)
         {

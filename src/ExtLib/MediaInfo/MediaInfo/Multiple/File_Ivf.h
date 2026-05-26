@@ -19,6 +19,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
+#include <memory>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -35,8 +36,15 @@ public :
     int64u Frame_Count_Valid;
 private :
     //Buffer
-    bool FileHeader_Begin();
-    void FileHeader_Parse();
+    bool FileHeader_Begin() override;
+    void FileHeader_Parse() override;
+
+    //Buffer - Per element
+    void Header_Parse() override;
+    void Data_Parse() override;
+
+    //Temp
+    std::unique_ptr<File__Analyze> MI;
 };
 
 } //NameSpace

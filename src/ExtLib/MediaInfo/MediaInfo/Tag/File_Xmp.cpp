@@ -197,7 +197,7 @@ bool File_Xmp::FileHeader_Begin()
         };
 
     tfsxml_string p{}, n{}, v{};
-    auto Result = tfsxml_init(&p, Buffer, Buffer_Size, 0);
+    auto Result = tfsxml_init(&p, Buffer, static_cast<unsigned>(Buffer_Size), 0);
     XML_XMP_START
         XML_ELEMENT_START
         XML_ELEMENT("rdf:Description")
@@ -258,6 +258,32 @@ bool File_Xmp::FileHeader_Begin()
                             XML_ATTRIBUTE("Item:Padding")
                                 GCItem.Padding = Ztring(tfsxml_decode(v).c_str()).To_int32u();
                             XML_ATTRIBUTE("Item:URI")
+                                GCItem.URI = tfsxml_decode(v);
+                            XML_ATTRIBUTE_END
+                            GContainerItems->push_back(GCItem);
+                        XML_ELEMENT_END
+                    XML_ELEMENT_LIST_END
+                    XML_ELEMENT_END
+                }
+            XML_ELEMENT("Container_1_:Directory")
+                if (GContainerItems) {
+                    XML_ELEMENT_START
+                    XML_ELEMENT_LIST("rdf:Seq")
+                        XML_ELEMENT_START
+                        XML_ELEMENT("Container_1_:Item")
+                            gc_item GCItem{};
+                            XML_ATTRIBUTE_START
+                            XML_ATTRIBUTE("Item_1_:Mime")
+                                GCItem.Mime = tfsxml_decode(v);
+                            XML_ATTRIBUTE("Item_1_:Semantic")
+                                GCItem.Semantic = tfsxml_decode(v);
+                            XML_ATTRIBUTE("Item_1_:Length")
+                                GCItem.Length = Ztring(tfsxml_decode(v).c_str()).To_int32u();
+                            XML_ATTRIBUTE("Item_1_:Label")
+                                GCItem.Label = tfsxml_decode(v);
+                            XML_ATTRIBUTE("Item_1_:Padding")
+                                GCItem.Padding = Ztring(tfsxml_decode(v).c_str()).To_int32u();
+                            XML_ATTRIBUTE("Item_1_:URI")
                                 GCItem.URI = tfsxml_decode(v);
                             XML_ATTRIBUTE_END
                             GContainerItems->push_back(GCItem);
@@ -369,7 +395,6 @@ bool File_Xmp::FileHeader_Begin()
         Fill(Stream_General, 0, General_Format_Profile, Profile);
     }
 
-    Finish();
     return true;
 }
 
@@ -527,6 +552,17 @@ void File_Xmp::Iptc4xmpExt(const string& name, const string& value)
         Fill(Stream_General, 0, "DigitalSourceType/String", i < DigitalSourceTypes_size ? DigitalSourceTypes[i].Name : URI.c_str());
         Fill_SetOptions(Stream_General, 0, "DigitalSourceType/String", "Y NTN");
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Xmp::Read_Buffer_Continue()
+{
+#if MEDIAINFO_TRACE
+    if (Trace_Activated && IsSub && !NoTrace) {
+        Skip_UTF8(Element_Size - Element_Offset,                "XMP metadata");
+    }
+#endif
+    Finish();
 }
 
 } //NameSpace

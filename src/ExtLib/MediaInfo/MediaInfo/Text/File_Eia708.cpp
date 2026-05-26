@@ -1488,8 +1488,7 @@ void File_Eia708::Character_Fill(wchar_t Character)
         Window->Minimal.x=x;
     }
 
-    if (!HasContent)
-        HasContent=true;
+    HasContent=true;
     if (!Streams[service_number]->HasContent)
         Streams[service_number]->HasContent=true;
 }
