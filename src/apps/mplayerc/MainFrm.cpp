@@ -14316,13 +14316,15 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			MediaInfoLib::MediaInfo MI;
 			MI.Option(L"ParseSpeed", L"0");
 			if (MI.Open(mi_fn.GetString())) {
+				using namespace MediaInfoLib;
+
 				for (int i = 0; i < 2; i++) {
-					CString strFPS = MI.Get(Stream_Video, 0, L"FrameRate", Info_Text, Info_Name).c_str();
-					if (strFPS.IsEmpty() || _wtof(strFPS) > 200.0) {
-						strFPS = MI.Get(Stream_Video, 0, L"FrameRate_Original", Info_Text, Info_Name).c_str();
+					String strFPS = MI.Get(Stream_Video, 0, L"FrameRate", Info_Text, Info_Name);
+					if (strFPS.empty() || _wtof(strFPS.c_str()) > 200.0) {
+						strFPS = MI.Get(Stream_Video, 0, L"FrameRate_Original", Info_Text, Info_Name);
 					}
-					CString strST = MI.Get(Stream_Video, 0, L"ScanType", Info_Text, Info_Name).c_str();
-					CString strSO = MI.Get(Stream_Video, 0, L"ScanOrder", Info_Text, Info_Name).c_str();
+					String strST = MI.Get(Stream_Video, 0, L"ScanType", Info_Text, Info_Name);
+					String strSO = MI.Get(Stream_Video, 0, L"ScanOrder", Info_Text, Info_Name);
 
 					double nFactor = 1.0;
 
@@ -14333,7 +14335,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 						// double fps for Interlaced video.
 						nFactor = 2.0;
 					}
-					m_dMediaInfoFPS = _wtof(strFPS);
+					m_dMediaInfoFPS = _wtof(strFPS.c_str());
 					if (m_dMediaInfoFPS < 30.0 && nFactor > 1.0) {
 						m_dMediaInfoFPS *= nFactor;
 					}

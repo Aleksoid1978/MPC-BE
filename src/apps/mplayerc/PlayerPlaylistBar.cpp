@@ -518,8 +518,10 @@ POSITION CPlaylist::Append(CPlaylistItem& item, const bool bParseDuration)
 			MediaInfoLib::MediaInfo MI;
 			MI.Option(L"ParseSpeed", L"0");
 			if (MI.Open(fn.GetString())) {
-				CString duration = MI.Get(Stream_General, 0, L"Duration", Info_Text, Info_Name).c_str();
-				if (!duration.IsEmpty() && StrToInt64(duration.GetString(), item.m_duration)) {
+				using namespace MediaInfoLib;
+
+				String duration = MI.Get(Stream_General, 0, L"Duration", Info_Text, Info_Name);
+				if (!duration.empty() && StrToInt64(duration.c_str(), item.m_duration)) {
 					item.m_duration *= 10000LL;
 				}
 			}
