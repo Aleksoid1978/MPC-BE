@@ -426,7 +426,9 @@
     <ClCompile Include="MediaInfo\Text\File_SubRip.cpp" />
     <ClCompile Include="MediaInfo\Text\File_TimedText.cpp" />
     <ClCompile Include="MediaInfo\Text\File_Ttml.cpp" />
-    <ClCompile Include="MediaInfo\TimeCode.cpp" />
+    <ClCompile Include="MediaInfo\TimeCode.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File_Ancillary.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Bdmv.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Cdxa.cpp" />
