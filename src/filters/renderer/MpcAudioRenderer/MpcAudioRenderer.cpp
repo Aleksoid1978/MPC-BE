@@ -47,7 +47,7 @@
 #define OPT_ReleaseDeviceIdle       L"ReleaseDeviceIdle"
 #define OPT_UseCrossFeed            L"CrossFeed"
 #define OPT_DummyChannels           L"DummyChannels"
-#define OPT_PauseWhiteNoise         L"PauseWhiteNoise"
+#define OPT_PauseKeepActive         L"PauseKeepActive"
 // TODO: rename option values
 
 // set to 1(or more) to enable more detail debug log
@@ -209,7 +209,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	, m_nSampleOffset(0)
 	, m_bUseCrossFeed(FALSE)
 	, m_bDummyChannels(FALSE)
-	, m_bPauseWhiteNoise(FALSE)
+	, m_bPauseKeepActive(FALSE)
 	, m_nWhiteNoiseSeed(12345u)
 	, m_bNeedReinitialize(FALSE)
 	, m_bNeedReinitializeFull(FALSE)
@@ -265,8 +265,8 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_DummyChannels, dw)) {
 			m_bDummyChannels = !!dw;
 		}
-		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PauseWhiteNoise, dw)) {
-			m_bPauseWhiteNoise = !!dw;
+		if (ERROR_SUCCESS == key.QueryDWORDValue(OPT_PauseKeepActive, dw)) {
+			m_bPauseKeepActive = !!dw;
 		}
 	}
 #else
@@ -282,7 +282,7 @@ CMpcAudioRenderer::CMpcAudioRenderer(LPUNKNOWN punk, HRESULT *phr)
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.ReadInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
-	profile.ReadInt(OPT_SECTION_AudRend, OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
+	profile.ReadInt(OPT_SECTION_AudRend, OPT_PauseKeepActive, m_bPauseKeepActive);
 #endif
 
 	if (m_DeviceMode != MODE_WASAPI_EXCLUSIVE) {
@@ -701,7 +701,7 @@ DWORD CMpcAudioRenderer::RenderThread()
 
 					DWORD resultResume;
 					for (;;) {
-						if (m_bPauseWhiteNoise && !m_bIsBitstream && !m_bReleaseDeviceIdle && m_pRenderClient) {
+						if (m_bPauseKeepActive && !m_bIsBitstream && !m_bReleaseDeviceIdle && m_pRenderClient) {
 							RenderWasapiBuffer();
 							DWORD waitMs = (m_pWaveFormatExOutput && m_nFramesInBuffer)
 								? (m_nFramesInBuffer * 500u / m_pWaveFormatExOutput->nSamplesPerSec)
@@ -1136,7 +1136,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 		key.SetDWORDValue(OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 		key.SetDWORDValue(OPT_UseCrossFeed, m_bUseCrossFeed);
 		key.SetDWORDValue(OPT_DummyChannels, m_bDummyChannels);
-		key.SetDWORDValue(OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
+		key.SetDWORDValue(OPT_PauseKeepActive, m_bPauseKeepActive);
 	}
 #else
 	CProfile& profile = AfxGetProfile();
@@ -1151,7 +1151,7 @@ STDMETHODIMP CMpcAudioRenderer::Apply()
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_ReleaseDeviceIdle, m_bReleaseDeviceIdle);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_UseCrossFeed, m_bUseCrossFeed);
 	profile.WriteInt(OPT_SECTION_AudRend, OPT_DummyChannels, m_bDummyChannels);
-	profile.WriteInt(OPT_SECTION_AudRend, OPT_PauseWhiteNoise, m_bPauseWhiteNoise);
+	profile.WriteInt(OPT_SECTION_AudRend, OPT_PauseKeepActive, m_bPauseKeepActive);
 #endif
 
 	return S_OK;
@@ -1402,17 +1402,17 @@ STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetDummyChannels()
 	return m_bDummyChannels;
 }
 
-STDMETHODIMP CMpcAudioRenderer::SetPauseWhiteNoise(BOOL bValue)
+STDMETHODIMP CMpcAudioRenderer::SetPauseKeepActive(BOOL bValue)
 {
 	CAutoLock cAutoLock(&m_csProps);
-	m_bPauseWhiteNoise = bValue;
+	m_bPauseKeepActive = bValue;
 	return S_OK;
 }
 
-STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetPauseWhiteNoise()
+STDMETHODIMP_(BOOL) CMpcAudioRenderer::GetPauseKeepActive()
 {
 	CAutoLock cAutoLock(&m_csProps);
-	return m_bPauseWhiteNoise;
+	return m_bPauseKeepActive;
 }
 
 STDMETHODIMP_(float) CMpcAudioRenderer::GetLowLatencyMS()
@@ -3046,7 +3046,7 @@ HRESULT CMpcAudioRenderer::RenderWasapiBuffer()
 		}
 #endif
 		if (pData && numFramesAvailable > 0
-				&& m_bPauseWhiteNoise && !m_bIsBitstream && !m_bReleaseDeviceIdle
+				&& m_bPauseKeepActive && !m_bIsBitstream && !m_bReleaseDeviceIdle
 				&& m_filterState == State_Paused
 				&& m_lVolume > DSBVOLUME_MIN) {
 			FillPauseWhiteNoise(pData, nAvailableBytes);
@@ -3290,7 +3290,7 @@ static VOID CALLBACK TimerCallbackFunc(PVOID lpParameter, BOOLEAN TimerOrWaitFir
 
 void CMpcAudioRenderer::StartReleaseTimer()
 {
-	if (m_bReleaseDeviceIdle && !m_bPauseWhiteNoise && !m_hReleaseTimerHandle) {
+	if (m_bReleaseDeviceIdle && !m_bPauseKeepActive && !m_hReleaseTimerHandle) {
 		std::ignore = CreateTimerQueueTimer(&m_hReleaseTimerHandle,
 											nullptr,
 											TimerCallbackFunc,

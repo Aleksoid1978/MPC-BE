@@ -47,7 +47,7 @@ private :
 	CButton		m_cbReleaseDeviceIdle;
 	CButton		m_cbUseCrossFeed;
 	CButton		m_cbDummyChannels;
-	CButton		m_cbPauseWhiteNoise;
+	CButton		m_cbPauseKeepActive;
 	CButton		m_btnReset;
 
 	CStatic		m_txtSoundDevice;
