@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2023 see Authors.txt
+ * (C) 2010-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,7 +64,7 @@ private :
 		IDC_PP_FREE_DEVICE_INACTIVE,
 		IDC_PP_USE_CROSSFEED,
 		IDC_PP_DUMMY_CHANNELS,
-		IDC_PP_PAUSE_WHITE_NOISE,
+		IDC_PP_PAUSE_KEEP_ACTIVE,
 		IDC_PP_RESET,
 	};
 

@@ -9,8 +9,7 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"
-/////////////////////////////////////////////////////////////////////////////
+#include "afxres.h"/////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3484,11 +3483,13 @@ BEGIN
     IDS_ARS_CHANNELS        "Channels:"
     IDS_ARS_WASAPI_METHOD   "WASAPI method:"
     IDS_ARS_DUMMY_CHANNELS  "Don't fill channels when upmixing"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT 
                             "If possible, the audio will be sent out in its original format.\nOtherwise, the format specified in the system settings will be used."
     IDS_ARS_TIP_ALT_CHECK_FORMAT 
                             "The renderer will try to initialize the device skipping some checks."
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE
+                            "The renderer will send inaudible noise to the device."
 END
 
 STRINGTABLE

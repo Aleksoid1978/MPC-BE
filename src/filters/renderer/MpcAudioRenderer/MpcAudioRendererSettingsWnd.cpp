@@ -1,5 +1,5 @@
 /*
- * (C) 2010-2025 see Authors.txt
+ * (C) 2010-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -97,7 +97,7 @@ bool CMpcAudioRendererSettingsWnd::OnActivate()
 	p.y += h20;
 	m_cbDummyChannels.Create(ResStr(IDS_ARS_DUMMY_CHANNELS), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_DUMMY_CHANNELS);
 	p.y += h20;
-	m_cbPauseWhiteNoise.Create(ResStr(IDS_ARS_PAUSE_WHITE_NOISE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_PAUSE_WHITE_NOISE);
+	m_cbPauseWhiteNoise.Create(ResStr(IDS_ARS_PAUSE_KEEP_ACTIVE), dwStyle | BS_AUTOCHECKBOX | BS_LEFTTEXT, CRect(p, CSize(ScaleX(320), m_fontheight)), this, IDC_PP_PAUSE_KEEP_ACTIVE);
 	p.y += h20;
 	p.x += ScaleX(240);
 	m_btnReset.Create(ResStr(IDS_FILTER_RESET_SETTINGS), dwStyle | BS_MULTILINE, CRect(p, CSize(ScaleX(80), ScaleX(32))), this, IDC_PP_RESET);
@@ -196,7 +196,7 @@ BEGIN_MESSAGE_MAP(CMpcAudioRendererSettingsWnd, CInternalPropertyPageWnd)
 	ON_CBN_SELCHANGE(IDC_PP_WASAPI_MODE, OnClickedWasapiMode)
 	ON_BN_CLICKED(IDC_PP_USE_BITEXACT_OUTPUT, OnClickedBitExact)
 	ON_BN_CLICKED(IDC_PP_FREE_DEVICE_INACTIVE, OnClickedFreeDeviceInactive)
-	ON_BN_CLICKED(IDC_PP_PAUSE_WHITE_NOISE, OnClickedPauseWhiteNoice)
+	ON_BN_CLICKED(IDC_PP_PAUSE_KEEP_ACTIVE, OnClickedPauseWhiteNoice)
 	ON_BN_CLICKED(IDC_PP_RESET, OnBnClickedReset)
 	ON_NOTIFY_EX(TTN_NEEDTEXTW, 0, OnToolTipNotify)
 END_MESSAGE_MAP()
@@ -266,6 +266,9 @@ BOOL CMpcAudioRendererSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRES
 		case IDC_PP_ALT_FORMAT_CHECK:
 			strTipText = ResStr(IDS_ARS_TIP_ALT_CHECK_FORMAT);
 			break;
+		case IDC_PP_PAUSE_KEEP_ACTIVE:
+			strTipText = ResStr(IDS_ARS_TIP_PAUSE_KEEP_ACTIVE);
+			break;		
 		default:
 			return FALSE;
 		}

@@ -3468,9 +3468,10 @@ BEGIN
     IDS_ARS_CHANNELS        "Канали:"
     IDS_ARS_WASAPI_METHOD   "Метод роботи WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Don't fill channels when upmixing"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Якщо можливо, аудіо буде передане в оригінальному форматі.\nВ іншому випадку, буде використаний формат, вказаний в системних налаштуваннях."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Рендерер спробує ініціалізувати пристрій пропускаючи деякі перевірки."
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
 END
 
 STRINGTABLE

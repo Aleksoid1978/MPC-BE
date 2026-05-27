@@ -3468,9 +3468,10 @@ BEGIN
     IDS_ARS_CHANNELS        "Csatornák:"
     IDS_ARS_WASAPI_METHOD   "WASAPI módszer:"
     IDS_ARS_DUMMY_CHANNELS  "Ne töltsön csatornákat felkeverés közben"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Ha lehetséges, a hang eredeti formátumban kerül kiküldésre.\nEllenkező esetben a rendszerbeállításokban megadott formátumot kell használni."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "A megjelenítő megpróbálja inicializálni az eszközt, kihagyva néhány ellenőrzést."
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused (inaudible noise)"
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
 END
 
 STRINGTABLE
