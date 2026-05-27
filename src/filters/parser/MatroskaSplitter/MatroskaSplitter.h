@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -33,8 +33,6 @@
 #define MatroskaSplitterName L"MPC Matroska Splitter"
 #define MatroskaSourceName   L"MPC Matroska Source"
 
-using namespace MatroskaReader;
-
 class CMatroskaSplitterOutputPin
 	: public CBaseSplitterOutputPin
 	, public CSubtitleStatus
@@ -59,16 +57,16 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	class CMatroskaPacket : public CPacket
 	{
 	public:
-		std::unique_ptr<BlockGroup> bg;
+		std::unique_ptr<MatroskaReader::BlockGroup> bg;
 	};
 
-	void SetupChapters(LPCSTR lng, ChapterAtom* parent, int level = 0);
+	void SetupChapters(LPCSTR lng, MatroskaReader::ChapterAtom* parent, int level = 0);
 	void InstallFonts();
 	void SendVorbisHeaderSample();
 
-	std::unique_ptr<CMatroskaNode> m_pSegment;
-	std::unique_ptr<CMatroskaNode> m_pCluster;
-	std::unique_ptr<CMatroskaNode> m_pBlock;
+	std::unique_ptr<MatroskaReader::CMatroskaNode> m_pSegment;
+	std::unique_ptr<MatroskaReader::CMatroskaNode> m_pCluster;
+	std::unique_ptr<MatroskaReader::CMatroskaNode> m_pBlock;
 
 	REFERENCE_TIME m_Cluster_seek_rt;
 	UINT64 m_Cluster_seek_pos;
@@ -96,21 +94,20 @@ class __declspec(uuid("149D2E01-C32E-4939-80F6-C07B81015A7A"))
 	CCritSec m_csProps;
 	bool m_bLoadEmbeddedFonts, m_bCalcDuration, m_bReindex;
 
-protected:
-	std::unique_ptr<CMatroskaFile> m_pFile;
+	std::unique_ptr<MatroskaReader::CMatroskaFile> m_pFile;
 
-	bool ReadFirtsBlock(std::vector<byte>& pData, TrackEntry* pTE);
+	bool ReadFirtsBlock(std::vector<byte>& pData, MatroskaReader::TrackEntry* pTE);
 	HRESULT CreateOutputs(IAsyncReader* pAsyncReader);
 
-	std::map<DWORD, TrackEntry*> m_pTrackEntryMap;
-	std::vector<TrackEntry* > m_pOrderedTrackArray;
-	TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
+	std::map<DWORD, MatroskaReader::TrackEntry*> m_pTrackEntryMap;
+	std::vector<MatroskaReader::TrackEntry* > m_pOrderedTrackArray;
+	MatroskaReader::TrackEntry* GetTrackEntryAt(UINT aTrackIdx);
 
 	bool DemuxInit();
 	void DemuxSeek(REFERENCE_TIME rt);
 	bool DemuxLoop();
 
-	HRESULT DeliverMatroskaPacket(TrackEntry* pTE, std::unique_ptr<CMatroskaPacket> p);
+	HRESULT DeliverMatroskaPacket(MatroskaReader::TrackEntry* pTE, std::unique_ptr<CMatroskaPacket> p);
 	HRESULT DeliverMatroskaPacket(std::unique_ptr<CMatroskaPacket> p, REFERENCE_TIME rtBlockDuration = 0);
 
 public:

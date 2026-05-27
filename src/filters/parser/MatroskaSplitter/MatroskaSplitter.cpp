@@ -102,6 +102,8 @@ CFilterApp theApp;
 
 #endif
 
+using namespace MatroskaReader;
+
 //
 // CMatroskaSplitterFilter
 //
