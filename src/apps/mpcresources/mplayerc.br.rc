@@ -3471,7 +3471,7 @@ BEGIN
     IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Se possível, o áudio será enviado em seu formato original.\nCaso contrário, o formato especificado nas configurações do sistema será usado."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "O renderizador tentará inicializar o dispositivo pulando algumas verificações."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
 
 STRINGTABLE

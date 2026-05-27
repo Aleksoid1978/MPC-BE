@@ -3469,7 +3469,7 @@ BEGIN
     IDS_ARS_PAUSE_KEEP_ACTIVE   "暂停时保持音频设备处于活跃状态"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "如果可能的话，音频将以其原始格式发送。\n否则，将使用系统设置中指定的格式"
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "渲染器将尝试跳过一些检查来初始化设备"
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
 
 STRINGTABLE

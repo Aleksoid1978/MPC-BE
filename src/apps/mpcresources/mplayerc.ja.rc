@@ -3469,7 +3469,7 @@ BEGIN
     IDS_ARS_PAUSE_KEEP_ACTIVE   "一時停止中オーディオ デバイスを維持する"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "可能であれば、音声は元の形式で送信されます。\nそれ以外の場合は、システム設定で指定された形式が使用されます。"
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "レンダラーは、いくつかの確認をスキップしてデバイスを初期化しようとします。"
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
 
 STRINGTABLE

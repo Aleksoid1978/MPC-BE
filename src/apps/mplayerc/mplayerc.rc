@@ -3489,7 +3489,7 @@ BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT 
                             "The renderer will try to initialize the device skipping some checks."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE
-                            "The renderer will send inaudible noise to the device."
+                            "The renderer will send inaudible noise to the audio device."
 END
 
 STRINGTABLE

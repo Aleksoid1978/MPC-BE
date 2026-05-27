@@ -3469,7 +3469,7 @@ BEGIN
     IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "إذا أمكن، سيتم إرسال الصوت بتنسيقه الأصلي.\nوإلا، سيتم استخدام التنسيق المحدد في إعدادات النظام."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "سيحاول محرك التقديم تهيئة الجهاز مع تخطي بعض الفحوصات."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
 
 STRINGTABLE
