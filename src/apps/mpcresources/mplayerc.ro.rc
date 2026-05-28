@@ -202,10 +202,10 @@ BEGIN
     LTEXT           "Introdu adresa unui fișier video sau audio (de pe Internet sau din calculatorul tău) și playerul îl va deschide pentru tine.",IDC_STATIC,35,5,213,25
     LTEXT           "Deschide:",IDC_STATIC2,10,32,90,8
     COMBOBOX        IDC_COMBO1,10,42,188,65,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,200,41,50,14
+    PUSHBUTTON      "Răsfoiește...",IDC_BUTTON1,200,41,50,14
     LTEXT           "Dublajul:",IDC_STATIC1,10,58,90,8
     COMBOBOX        IDC_COMBO2,10,68,188,20,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Răsfoire...",IDC_BUTTON2,200,67,50,14
+    PUSHBUTTON      "Răsfoiește...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
     PUSHBUTTON      "Anulează",IDCANCEL,200,94,50,14
     CONTROL         "Adaugă-l în lista de redare (playlist) fără să-l deschizi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
@@ -729,7 +729,7 @@ CAPTION "Alege un filtru"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | WS_TABSTOP,5,5,275,154,WS_EX_CLIENTEDGE
-    PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,5,163,60,14
+    PUSHBUTTON      "Răsfoiește...",IDC_BUTTON1,5,163,60,14
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
     PUSHBUTTON      "Anulează",IDCANCEL,230,163,50,14
 END
@@ -879,7 +879,7 @@ BEGIN
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_ARROWKEYS | UDS_HORZ | WS_GROUP,64,205,36,13
     RTEXT           "",IDC_AUTHOR,100,207,190,8
     EDITTEXT        IDC_LOGOFILENAME,64,222,173,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Răsfoire...",IDC_BUTTON2,241,222,50,13
+    PUSHBUTTON      "Răsfoiește...",IDC_BUTTON2,241,222,50,13
 END
 
 IDD_PPAGEVIDEO DIALOGEX 0, 0, 296, 264
@@ -984,7 +984,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,73,284,1
     CONTROL         "Afișează paginile din:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,77,285,9
     EDITTEXT        IDC_EDIT2,15,89,167,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Răsfoire...",IDC_BUTTON1,186,89,50,14
+    PUSHBUTTON      "Răsfoiește...",IDC_BUTTON1,186,89,50,14
     PUSHBUTTON      "Lansează...",IDC_BUTTON2,240,89,50,14
     LTEXT           "Pagina implicită:",IDC_STATIC,5,107,285,8
     EDITTEXT        IDC_EDIT9,15,119,275,14,ES_AUTOHSCROLL
@@ -2815,13 +2815,13 @@ BEGIN
     IDS_APPLY               "Se aplică"
     IDS_CLEAR               "Goleşte"
     IDS_CANCEL              "Anulează"
-    IDS_TEXTFILE_ENC        "Codare (Codificare):"
+    IDS_TEXTFILE_ENC        "Codarea (Codificarea):"
     IDS_SAVE_FILE           "Se salvează fișierul"
     IDS_VOLUME_OSD_MUTE     "Volumul: %d%% [Mut]"
     IDS_COPY_TO_CLIPBOARD   "Copiază în clipboard"
     IDS_AUDIO_LEVEL         "Nivelul (%d):"
     IDS_AUDIO_RELEASETIME   "Timpul de eliberare (%d):"
-    IDS_AUDIO_GAIN          "Zgomot (%+.1f (de) dB):"
+    IDS_AUDIO_GAIN          "Zgomotul (%+.1f (de) dB):"
     IDS_SAVING_THUMBNAIL    "Se salvează miniaturile"
     IDS_SEEKBEGIN           "Sari la început"
 END
@@ -2891,7 +2891,7 @@ STRINGTABLE
 BEGIN
     IDS_AG_MENU_AUDIOLANG   "Meniul limbilor audio"
     IDS_AG_MENU_SUBTITLELANG "Meniul limbilor subtitrărilor"
-    IDS_AG_MENU_JUMPTO      "Meniul Sari la..."
+    IDS_AG_MENU_JUMPTO      "Meniul pentru Sari la..."
     IDS_AG_MENU_AFTERPLAYBACK "Meniul de după lista de redare (playlist)"
     IDS_AG_RESET_STATS      "Resetează statisticile randorului de sincronizare (Sync)"
     IDS_VIEW_BORDERLESS     "Ascunde marginile\tCtrl+0"
@@ -2994,7 +2994,7 @@ BEGIN
     IDS_AG_BOSS_KEY         "Tasta Şef (Tasta Boss)"
     IDS_AG_MENU_PLAYER_S    "Meniul playerului (scurt)"
     IDS_AG_MENU_PLAYER_L    "Meniul playerului (lung)"
-    IDS_AG_MENU_FILTERS     "Meniul Filtre"
+    IDS_AG_MENU_FILTERS     "Meniul pentru Filtre"
     IDS_AG_OPTIONS          "Opțiuni"
     IDS_AG_NEXT_AUDIO       "Următorul fișier audio"
     IDS_AG_PREV_AUDIO       "Fișierul audio precedent"
@@ -3048,7 +3048,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_FAVORITES_QUICKADD  "Adaugă comanda rapidă (scurtătura) la favorite"
-    IDS_AG_MENU_FAVORITES   "Meniul Favorite"
+    IDS_AG_MENU_FAVORITES   "Meniul pentru Favorite"
     IDS_DVB_CHANNEL_NUMBER  "N"
     IDS_DVB_CHANNEL_NAME    "Nume"
     IDS_DVB_CHANNEL_FREQUENCY "Frecvență"
@@ -3129,7 +3129,7 @@ BEGIN
     IDS_MAINFRM_139         "Întârzierea subtitrărilor: %ld (de) ms"
     IDS_AG_TITLE2           "Titlul: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Rânduri:"
-    IDS_THUMB_COLNUMBER     "Coloane:"
+    IDS_THUMB_COLNUMBER     "Coloanele:"
     IDS_THUMB_IMAGE_WIDTH   "Lățimea imaginii:"
     IDS_PPSDB_URLCORRECT    "URL-ul pare să fie corect!"
     IDS_PPSDB_PROTOCOLERR   "Nepotrivire a versiunii protocolului, te rugăm să actualizezi playerul sau alege o altă adresă!"
@@ -3453,8 +3453,8 @@ BEGIN
     IDS_ARS_CROSSFEED       "Activează alimentarea încrucișată stereo (pentru căști)"
     IDS_ARS_DEVICE_PERIOD   "Memoria tampon a dispozitivului (Bufferul dispozitivului):"
     IDS_ARS_ALT_CHECK_FORMAT "Verificare alternativă a formatului suportat"
-    IDS_ARS_STATUS          "Stare"
-    IDS_ARS_DEVICE          "Dispozitiv:"
+    IDS_ARS_STATUS          "Starea"
+    IDS_ARS_DEVICE          "Dispozitivul:"
     IDS_ARS_MODE            "Modul:"
     IDS_ARS_INPUT           "Intrare"
     IDS_ARS_OUTPUT          "Ieșire"
@@ -3463,14 +3463,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_ARS_SAMPLERATE      "Rată de eșantionare:"
-    IDS_ARS_CHANNELS        "Canale:"
+    IDS_ARS_SAMPLERATE      "Rata de eșantionare:"
+    IDS_ARS_CHANNELS        "Canalele:"
     IDS_ARS_WASAPI_METHOD   "Metoda WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Nu umple canalele când mixezi (amesteci)"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE   "Menține dispozitivul audio activ atunci când este întrerupt"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Dacă este posibil, sunetul va fi trimis în formatul original.\nAltfel, va fi folosit formatul specificat în setările de sistem."
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Randorul va încerca să inițializeze dispozitivul sărind peste unele verificări."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Randorul va trimite zgomot inaudibil către dispozitivul audio."
 END
 
 STRINGTABLE
@@ -3632,7 +3632,7 @@ BEGIN
     IDS_MFMT_WAV            "WAV (Waveform Audio File Format / Format fișier audio în formă de undă)"
     IDS_MFMT_WMA            "Fișier audio Windows Media (Windows Media Audio)"
     IDS_MFMT_WAVPACK        "WavPack"
-    IDS_MFMT_OPUS           "Codec audio Opus"
+    IDS_MFMT_OPUS           "Codecul audio Opus"
     IDS_MFMT_SPEEX          "Speex"
     IDS_MFMT_MLP            "Fișier audio MLP (Meridian Lossless Packing / Împachetare fără pierderi Meridian) (MLP Audio)"
     IDS_MFMT_DVDAUDIO       "DVD-Audio"
@@ -3876,8 +3876,8 @@ END
 STRINGTABLE
 BEGIN
     IDS_MOUSE_CLICK_MIDDLE  "Clic din mijloc"
-    IDS_MOUSE_CLICK_X1      "Clic X1"
-    IDS_MOUSE_CLICK_X2      "Clic X2"
+    IDS_MOUSE_CLICK_X1      "Clic pe butonul lateral 1 (Clic X1)"
+    IDS_MOUSE_CLICK_X2      "Clic pe butonul lateral 2 (Clic X2)"
     IDS_MOUSE_WHEEL_UP      "Rotița în sus"
     IDS_MOUSE_WHEEL_DOWN    "Rotița în jos"
     IDS_MOUSE_WHEEL_LEFT    "Rotița în stânga"
