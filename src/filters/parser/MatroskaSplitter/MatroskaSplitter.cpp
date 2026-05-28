@@ -374,6 +374,9 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					memset(mt.Format(), 0, mt.FormatLength());
 					memcpy(&pvih->bmiHeader, pTE->CodecPrivate.data(), pTE->CodecPrivate.size());
 
+					mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
+					pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
+
 					switch (pvih->bmiHeader.biCompression) {
 					case BI_RGB:
 					case BI_BITFIELDS:
@@ -393,6 +396,7 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FCC('v210'):
 						mt.subtype = MEDIASUBTYPE_v210;
 						pvih->bmiHeader.biBitCount = 20; // fix incorrect bitdepth (ffmpeg bug)
+						pvih->bmiHeader.biSizeImage = ALIGN((pvih->bmiHeader.biWidth + 5) / 6 * 16, 128) * std::abs(pvih->bmiHeader.biHeight);
 						mt.SetTemporalCompression(FALSE);
 						break;
 					case FCC('MPNG'):
@@ -402,34 +406,28 @@ HRESULT CMatroskaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 					case FCC('y408'):
 						mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 						break;
-					default:
-						mt.subtype = FOURCCMap(pvih->bmiHeader.biCompression);
+					case FCC('H264'):
+					case FCC('h264'):
+						m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
+						break;
+					case FCC('HM10'):
+					case FCC('HEVC'):
+						{
+							std::vector<BYTE> pData;
+							if (ReadFirtsBlock(pData, pTE.get())) {
+								CBaseSplitterFileEx::hevchdr h;
+								CMediaType mt2;
+								if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
+									mt = mt2;
+								}
+							}
+						}
+						break;
 					}
 
-					// fix frame size
-					if (pvih->bmiHeader.biCompression == FCC('v210')) {
-						pvih->bmiHeader.biSizeImage = ALIGN((pvih->bmiHeader.biWidth + 5) / 6 * 16, 128) * std::abs(pvih->bmiHeader.biHeight);
-					} else {
-						pvih->bmiHeader.biSizeImage = DIBSIZE(pvih->bmiHeader);
-					}
 					mt.SetSampleSize(pvih->bmiHeader.biSizeImage);
 
 					mts.push_back(mt);
-
-					if (mt.subtype == MEDIASUBTYPE_HM10) {
-						std::vector<BYTE> pData;
-						if (ReadFirtsBlock(pData, pTE.get())) {
-							CBaseSplitterFileEx::hevchdr h;
-							CMediaType mt2;
-							if (m_pFile->CBaseSplitterFileEx::Read(h, pData, &mt2)) {
-								mts.insert(mts.cbegin(), mt2);
-							}
-						}
-					}
-
-					if (mt.subtype == MEDIASUBTYPE_H264 || mt.subtype == MEDIASUBTYPE_h264) {
-						m_dtsonly = (pTE->CodecPrivate.empty() || pTE->CodecPrivate.data()[0] != 1);
-					}
 				}
 				else if (CodecID == "V_MPEG4/ISO/AVC") {
 					if (pTE->CodecPrivate.size() > 9) {
