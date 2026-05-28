@@ -426,6 +426,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// building a special media type
 			switch (pbmi->biCompression) {
 				case FCC('HM10'):
+				case FCC('HEVC'):
 					{
 						CBaseSplitterFileEx::hevchdr h;
 						ParseHeader(h, m_pFile.get(), s, mts, AvgTimePerFrame, headerAspect);
