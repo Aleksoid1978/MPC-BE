@@ -3470,8 +3470,8 @@ BEGIN
     IDS_ARS_DUMMY_CHANNELS  "Upmix yaparken kanalları doldurma"
     IDS_ARS_PAUSE_KEEP_ACTIVE   "Duraklatıldığında ses aygıtını etkin tut"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Mümkünse, ses orijinal biçiminde gönderilecektir.\nAksi takdirde sistem ayarlarında belirtilen biçim kullanılacaktır."
-    IDS_ARS_TIP_ALT_CHECK_FORMAT  "İşleyici, bazı kontrolleri atlayarak cihazı başlatmaya çalışacaktır."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_ALT_CHECK_FORMAT  "İşleyici, bazı kontrolleri atlayarak aygıtı başlatmaya çalışacaktır."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "İşleyici, ses aygıtına duyulmayan bir gürültü gönderecektir."
 END
 
 STRINGTABLE
