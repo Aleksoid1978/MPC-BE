@@ -1,5 +1,5 @@
 /*
- * (C) 2023-2024 see Authors.txt
+ * (C) 2023-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -29,6 +29,7 @@ class CFileItem
 {
 	CStringW m_fpath;
 	CStringW m_title;
+	CStringA m_urlext;
 	ChaptersList m_chapters;
 
 	REFERENCE_TIME m_duration = 0;
@@ -95,6 +96,15 @@ public:
 		return m_title;
 	};
 
+	void SetUrlExt(const CHAR* urlext) {
+		ASSERT(::PathIsURLW(m_fpath));
+		m_urlext = urlext;
+	}
+
+	const CStringA& GetUrlExt() const {
+		return m_urlext;
+	};
+
 	// Chapters
 	template<class... Args>
 	void AddChapter(Args&&... args) {
@@ -128,6 +138,7 @@ class CExtraFileItem
 	CStringW m_fpath;
 	CStringW m_title;
 	CStringA m_lang;
+	CStringA m_urlext;
 
 public:
 	CExtraFileItem() = default;
@@ -156,10 +167,6 @@ public:
 		return m_fpath;
 	}
 
-	void SetPath(const CStringW& fpath) {
-		m_fpath = fpath;
-	}
-
 	const CStringW& GetPath() const {
 		return m_fpath;
 	};
@@ -168,17 +175,21 @@ public:
 		return m_fpath.IsEmpty();
 	};
 
-	// Title
-	void SetTitle(const CStringW& title) {
-		m_title = title;
-	}
-
 	const CStringW& GetTitle() const {
 		return m_title;
 	};
 
 	const CStringA& GetLang() const {
 		return m_lang;
+	};
+
+	void SetUrlExt(const CHAR* urlext) {
+		ASSERT(::PathIsURLW(m_fpath));
+		m_urlext = urlext;
+	}
+
+	const CStringA& GetUrlExt() const {
+		return m_urlext;
 	};
 };
 
