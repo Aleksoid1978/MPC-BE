@@ -441,7 +441,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Activează meniul întunecat",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Folosește efectul fundalului estompat (ptr. Windows 10 și versiunile mai noi)",IDC_CHECK7,
+    CONTROL         "Folosește efectul fundalului estompat (pentru Windows 10 și versiunile mai noi)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
@@ -499,7 +499,7 @@ BEGIN
     GROUPBOX        "Dimensiunea ferestrei la pornire",IDC_STATIC,5,5,286,67
     CONTROL         "Mărimea standard a ferestrei",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
     CONTROL         "Reține ultima dimensiune a ferestrei",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
-    CONTROL         "Setează mărime fereastră specif.",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
+    CONTROL         "Setează mărimea ferestrei specif.",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
     CONTROL         "Setează zona video specificată",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
     EDITTEXT        IDC_EDIT1,133,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     CTEXT           "×",IDC_STATIC,162,45,8,8
@@ -2694,7 +2694,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_VOLUME_MUTE          "Mut\nMut"
+    ID_VOLUME_MUTE          "Pune pe mut\nPune pe mut"
     ID_VOLUME_MUTE_OFF      "Activează sunetul\nActivează sunetul"
     ID_VOLUME_MUTE_DISABLED "Fără sunet (Silențios)\nFără sunet (Silențios)"
 END
@@ -2904,8 +2904,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "Micșorează rata"
     IDS_AG_RESET_RATE       "Resetează rata"
-    IDS_AG_AUDIODELAY_PLUS  "Întârziere audio cu +10ms"
-    IDS_AG_AUDIODELAY_MINUS "Întârziere audio cu -10ms"
+    IDS_AG_AUDIODELAY_PLUS  "Întârziere audio cu +10 ms"
+    IDS_AG_AUDIODELAY_MINUS "Întârziere audio cu -10 ms"
     IDS_AG_JUMP_FORWARD_1   "Sari înainte (puțin)"
     IDS_AG_JUMP_BACKWARD_1  "Sari înapoi (puțin)"
     IDS_AG_JUMP_FORWARD_2   "Sari înainte (mediu)"
@@ -3039,7 +3039,7 @@ BEGIN
     IDS_PPAGEWEBSERVER_0    "Selectarea directorului"
     IDS_AG_DEFAULT          "Implicit"
     IDS_AG_DEFAULT_L        "implicite"
-    IDS_AG_AUTO             "Auto(mat)"
+    IDS_AG_AUTO             "Automat (Auto)"
     IDS_AG_RECOMMENDED      "recomandat"
     IDS_AG_NOTRECOMMENDED   "nerecomandat"
     IDS_AG_ADVANCED         "Avansat"
@@ -3369,7 +3369,7 @@ BEGIN
     IDS_MPADEC_STEREO       "Stereo"
     IDS_MPADEC_SPDIF        "Trece prin (S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "Codifică în AC-3"
-    IDS_MPADEC_AV_SYNC      "Corecție pentru sinronizarea audio-video (A/V Sync)"
+    IDS_MPADEC_AV_SYNC      "Corecție pentru sincronizarea audio-video (A/V Sync)"
     IDS_MPADEC_STATUS       "Stare"
     IDS_MPADEC_NOTACTIVE    "Decodorul nu este activ."
 END
@@ -3377,7 +3377,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_VDF_SETTINGS        "Setări pentru video (Setări pentru videoclipuri)"
-    IDS_VDF_AUTO            "Auto(mat)"
+    IDS_VDF_AUTO            "Automat (Auto)"
     IDS_VDF_THREADNUMBER    "Numărul firelor de decodare (de decodificare)"
     IDS_VDF_SKIPBFRAMES     "Sari peste cadrele B"
 END
