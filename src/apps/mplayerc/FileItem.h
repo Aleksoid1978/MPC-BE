@@ -29,7 +29,6 @@ class CFileItem
 {
 	CStringW m_fpath;
 	CStringW m_title;
-	CStringA m_urlext;
 	ChaptersList m_chapters;
 
 	REFERENCE_TIME m_duration = 0;
@@ -96,15 +95,6 @@ public:
 		return m_title;
 	};
 
-	void SetUrlExt(const CHAR* urlext) {
-		ASSERT(::PathIsURLW(m_fpath));
-		m_urlext = urlext;
-	}
-
-	const CStringA& GetUrlExt() const {
-		return m_urlext;
-	};
-
 	// Chapters
 	template<class... Args>
 	void AddChapter(Args&&... args) {
@@ -138,7 +128,6 @@ class CExtraFileItem
 	CStringW m_fpath;
 	CStringW m_title;
 	CStringA m_lang;
-	CStringA m_urlext;
 
 public:
 	CExtraFileItem() = default;
@@ -181,15 +170,6 @@ public:
 
 	const CStringA& GetLang() const {
 		return m_lang;
-	};
-
-	void SetUrlExt(const CHAR* urlext) {
-		ASSERT(::PathIsURLW(m_fpath));
-		m_urlext = urlext;
-	}
-
-	const CStringA& GetUrlExt() const {
-		return m_urlext;
 	};
 };
 
