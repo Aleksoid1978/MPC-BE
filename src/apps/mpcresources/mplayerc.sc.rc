@@ -3046,6 +3046,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "作者未知。如果是您制作了此标志请联系我们！"
+    IDS_NO_MORE_MEDIA       "在当前的文件夹中没有更多的媒体文件。"
+    IDS_FIRST_IN_FOLDER     "当前文件已是文件夹内第一个。"
+    IDS_LAST_IN_FOLDER      "当前文件已是文件夹内最后一个。"
+    IDS_MERGING_FILES       "合并文件..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "快速添加至收藏夹"
     IDS_AG_MENU_FAVORITES   "收藏夹菜单"
     IDS_DVB_CHANNEL_NUMBER  "编号"
@@ -3466,8 +3489,12 @@ BEGIN
     IDS_ARS_CHANNELS        "声道:"
     IDS_ARS_WASAPI_METHOD   "WASAPI 驱动方法:"
     IDS_ARS_DUMMY_CHANNELS  "上混时不要填充声道"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "暂停时保持音频设备处于活跃状态"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "暂停时保持音频设备处于活跃状态"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "如果可能的话，音频将以其原始格式发送。\n否则，将使用系统设置中指定的格式"
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "渲染器将尝试跳过一些检查来初始化设备"
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "渲染器将向音频设备发送人耳听不到的噪声"
 END
@@ -3520,28 +3547,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "调谐扫描"
     IDS_SUBTITLES_ERROR     "字幕未加载或渲染模式不支持。"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "作者未知。如果是您制作了此标志请联系我们！"
-    IDS_NO_MORE_MEDIA       "在当前的文件夹中没有更多的媒体文件。"
-    IDS_FIRST_IN_FOLDER     "当前文件已是文件夹内第一个。"
-    IDS_LAST_IN_FOLDER      "当前文件已是文件夹内最后一个。"
-    IDS_MERGING_FILES       "合并文件..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

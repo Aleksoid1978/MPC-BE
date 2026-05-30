@@ -3048,6 +3048,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "ч"
+    IDS_UNIT_TIME_M         "м"
+    IDS_UNIT_TIME_S         "с"
+    IDS_UNIT_SIZE_KB        "КБ"
+    IDS_UNIT_SIZE_MB        "МБ"
+    IDS_UNIT_SIZE_GB        "ГБ"
+    IDS_UNIT_SPEED_KB_S     "КБ/с"
+    IDS_UNIT_SPEED_MB_S     "МБ/с"
+    IDS_UNIT_SPEED_GB_S     "ГБ/с"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Свяжитесь c разработчиком, если это ваш логотип!"
+    IDS_NO_MORE_MEDIA       "Воспроизведение медиа-файлов из каталога закончено"
+    IDS_FIRST_IN_FOLDER     "Загружен первый файл в каталоге"
+    IDS_LAST_IN_FOLDER      "Загружен последний файл в каталоге"
+    IDS_MERGING_FILES       "Объединение файлов..."
+    IDS_MERGE_USING_FFMPEG  "Объединить файлы с помощью FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Быстро добавить в закладки"
     IDS_AG_MENU_FAVORITES   "Меню Закладки"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3468,8 +3491,12 @@ BEGIN
     IDS_ARS_CHANNELS        "Каналы:"
     IDS_ARS_WASAPI_METHOD   "Метод работы WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Не заполнять каналы при апмиксе"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Удерживать устройство активным на паузе"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Удерживать устройство активным на паузе"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "По возможности звук будет отправлен в исходном формате.\nИначе будет использоваться формат, указанный в настройках системы."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Рендерер попробует инициализировать устройство, пропуская некоторые проверки."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Рендерер будет посылать неслышимый шум на аудио устройство."
 END
@@ -3522,28 +3549,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Настройка тюнера"
     IDS_SUBTITLES_ERROR     "Субтитры не загружены либо неподдерживаемый видеорендерер."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Свяжитесь c разработчиком, если это ваш логотип!"
-    IDS_NO_MORE_MEDIA       "Воспроизведение медиа-файлов из каталога закончено"
-    IDS_FIRST_IN_FOLDER     "Загружен первый файл в каталоге"
-    IDS_LAST_IN_FOLDER      "Загружен последний файл в каталоге"
-    IDS_MERGING_FILES       "Объединение файлов..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "ч"
-    IDS_UNIT_TIME_M         "м"
-    IDS_UNIT_TIME_S         "с"
-    IDS_UNIT_SIZE_KB        "КБ"
-    IDS_UNIT_SIZE_MB        "МБ"
-    IDS_UNIT_SIZE_GB        "ГБ"
-    IDS_UNIT_SPEED_KB_S     "КБ/с"
-    IDS_UNIT_SPEED_MB_S     "МБ/с"
-    IDS_UNIT_SPEED_GB_S     "ГБ/с"
 END
 
 STRINGTABLE

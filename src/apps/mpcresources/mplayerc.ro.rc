@@ -3047,6 +3047,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h (o)"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB (KO)"
+    IDS_UNIT_SIZE_MB        "MB (MO)"
+    IDS_UNIT_SIZE_GB        "GB (GO)"
+    IDS_UNIT_SPEED_KB_S     "KB/s (KO/s)"
+    IDS_UNIT_SPEED_MB_S     "MB/s (MO/s)"
+    IDS_UNIT_SPEED_GB_S     "GB/s (GO/s)"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Autor necunoscut. Dacă ai făcut acest logo (această siglă), contactează-ne!"
+    IDS_NO_MORE_MEDIA       "Nu mai există fișiere media în dosarul (folderul) actual."
+    IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar (din folder)."
+    IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar (din folder)."
+    IDS_MERGING_FILES       "Se unesc fișierele..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Adaugă comanda rapidă (scurtătura) la favorite"
     IDS_AG_MENU_FAVORITES   "Meniul pentru Favorite"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3467,8 +3490,12 @@ BEGIN
     IDS_ARS_CHANNELS        "Canalele:"
     IDS_ARS_WASAPI_METHOD   "Metoda WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Nu umple canalele când mixezi (amesteci)"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Menține dispozitivul audio activ atunci când este întrerupt"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Menține dispozitivul audio activ atunci când este întrerupt"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Dacă este posibil, sunetul va fi trimis în formatul original.\nAltfel, va fi folosit formatul specificat în setările de sistem."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Randorul va încerca să inițializeze dispozitivul sărind peste unele verificări."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Randorul va trimite zgomot inaudibil către dispozitivul audio."
 END
@@ -3521,28 +3548,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Scanează tuner-ul (Caută canale)"
     IDS_SUBTITLES_ERROR     "Subtitrările nu sunt încărcate sau randorul nu este suportat."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Autor necunoscut. Dacă ai făcut acest logo (această siglă), contactează-ne!"
-    IDS_NO_MORE_MEDIA       "Nu mai există fișiere media în dosarul (folderul) actual."
-    IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar (din folder)."
-    IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar (din folder)."
-    IDS_MERGING_FILES       "Se unesc fișierele..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h (o)"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB (KO)"
-    IDS_UNIT_SIZE_MB        "MB (MO)"
-    IDS_UNIT_SIZE_GB        "GB (GO)"
-    IDS_UNIT_SPEED_KB_S     "KB/s (KO/s)"
-    IDS_UNIT_SPEED_MB_S     "MB/s (MO/s)"
-    IDS_UNIT_SPEED_GB_S     "GB/s (GO/s)"
 END
 
 STRINGTABLE

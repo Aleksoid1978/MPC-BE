@@ -9,7 +9,8 @@
 //
 // Generated from the TEXTINCLUDE 2 resource.
 //
-#include "afxres.h"/////////////////////////////////////////////////////////////////////////////
+#include "afxres.h"
+/////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
@@ -3061,6 +3062,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Author unknown. Contact me if you made this logo!"
+    IDS_NO_MORE_MEDIA       "No more media in the current folder."
+    IDS_FIRST_IN_FOLDER     "The first file in the folder is loaded now."
+    IDS_LAST_IN_FOLDER      "The last file in the folder is loaded now."
+    IDS_MERGING_FILES       "Merging files..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Quick add favorite"
     IDS_AG_MENU_FAVORITES   "Favorites menu"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3483,12 +3507,16 @@ BEGIN
     IDS_ARS_CHANNELS        "Channels:"
     IDS_ARS_WASAPI_METHOD   "WASAPI method:"
     IDS_ARS_DUMMY_CHANNELS  "Don't fill channels when upmixing"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT 
                             "If possible, the audio will be sent out in its original format.\nOtherwise, the format specified in the system settings will be used."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT 
                             "The renderer will try to initialize the device skipping some checks."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE 
                             "The renderer will send inaudible noise to the audio device."
 END
 
@@ -3540,28 +3568,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Tuner scan"
     IDS_SUBTITLES_ERROR     "Subtitles are not loaded or unsupported renderer."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Author unknown. Contact me if you made this logo!"
-    IDS_NO_MORE_MEDIA       "No more media in the current folder."
-    IDS_FIRST_IN_FOLDER     "The first file in the folder is loaded now."
-    IDS_LAST_IN_FOLDER      "The last file in the folder is loaded now."
-    IDS_MERGING_FILES       "Merging files..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

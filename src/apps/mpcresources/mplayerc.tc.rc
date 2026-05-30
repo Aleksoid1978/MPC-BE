@@ -3046,6 +3046,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "小時"
+    IDS_UNIT_TIME_M         "分鐘"
+    IDS_UNIT_TIME_S         "秒"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "作者不詳。如果此標誌是由您製作，請聯絡我！"
+    IDS_NO_MORE_MEDIA       "目前的資料夾內已無更多媒體檔案。"
+    IDS_FIRST_IN_FOLDER     "現已載入資料夾內的第一個檔案。"
+    IDS_LAST_IN_FOLDER      "現已載入資料夾內的最後一個檔案"
+    IDS_MERGING_FILES       "合併檔案中…"
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "快速新增我的最愛"
     IDS_AG_MENU_FAVORITES   "我的最愛選單"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3466,8 +3489,12 @@ BEGIN
     IDS_ARS_CHANNELS        "聲道："
     IDS_ARS_WASAPI_METHOD   "WASAPI 傳輸形式："
     IDS_ARS_DUMMY_CHANNELS  "升混時不填充聲道"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "盡量以原始格式輸出音訊。\n如不相容，將會跟隨系統設定中所指定的格式。"
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "譜製器將嘗試在初始化裝置時省略部份檢查。"
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
@@ -3520,28 +3547,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "調諧器掃描"
     IDS_SUBTITLES_ERROR     "字幕未載入或是未支援的繪製器。"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "作者不詳。如果此標誌是由您製作，請聯絡我！"
-    IDS_NO_MORE_MEDIA       "目前的資料夾內已無更多媒體檔案。"
-    IDS_FIRST_IN_FOLDER     "現已載入資料夾內的第一個檔案。"
-    IDS_LAST_IN_FOLDER      "現已載入資料夾內的最後一個檔案"
-    IDS_MERGING_FILES       "合併檔案中…"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "小時"
-    IDS_UNIT_TIME_M         "分鐘"
-    IDS_UNIT_TIME_S         "秒"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

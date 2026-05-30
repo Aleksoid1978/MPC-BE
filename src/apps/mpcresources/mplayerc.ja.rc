@@ -3046,6 +3046,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "作者不明。このロゴを作成された方はお知らせください!"
+    IDS_NO_MORE_MEDIA       "現在のフォルダーにはこれ以上メディアがありません。"
+    IDS_FIRST_IN_FOLDER     "フォルダー内の最初のファイルが現在読み込まれています。"
+    IDS_LAST_IN_FOLDER      "フォルダー内の最後のファイルが現在読み込まれています。"
+    IDS_MERGING_FILES       "ファイルを結合しています..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "お気に入りにクイック追加"
     IDS_AG_MENU_FAVORITES   "お気に入りメニュー"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3466,8 +3489,12 @@ BEGIN
     IDS_ARS_CHANNELS        "チャンネル:"
     IDS_ARS_WASAPI_METHOD   "WASAPI メソッド:"
     IDS_ARS_DUMMY_CHANNELS  "アップミックス時にチャンネルを埋めない"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "一時停止中オーディオ デバイスを維持する"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "一時停止中オーディオ デバイスを維持する"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "可能であれば、音声は元の形式で送信されます。\nそれ以外の場合は、システム設定で指定された形式が使用されます。"
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "レンダラーは、いくつかの確認をスキップしてデバイスを初期化しようとします。"
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
@@ -3520,28 +3547,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "チューナー調整"
     IDS_SUBTITLES_ERROR     "字幕が読み込まれていないか、レンダラーがサポートされていません。"
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "作者不明。このロゴを作成された方はお知らせください!"
-    IDS_NO_MORE_MEDIA       "現在のフォルダーにはこれ以上メディアがありません。"
-    IDS_FIRST_IN_FOLDER     "フォルダー内の最初のファイルが現在読み込まれています。"
-    IDS_LAST_IN_FOLDER      "フォルダー内の最後のファイルが現在読み込まれています。"
-    IDS_MERGING_FILES       "ファイルを結合しています..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

@@ -3048,6 +3048,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "Std."
+    IDS_UNIT_TIME_M         "Min."
+    IDS_UNIT_TIME_S         "Sek."
+    IDS_UNIT_SIZE_KB        "kB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "kB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Verfasser unbekannt. Bei Infos mich bitte kontaktieren!"
+    IDS_NO_MORE_MEDIA       "Keine weiteren abspielbaren Medien im aktuellen Ordner."
+    IDS_FIRST_IN_FOLDER     "Das ist die erste Datei im Ordner"
+    IDS_LAST_IN_FOLDER      "Das ist die letzte Datei im Ordner"
+    IDS_MERGING_FILES       "Dateien werden zusammengeführt..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Zu Favoriten schnell hinzufügen"
     IDS_AG_MENU_FAVORITES   "Favoriten"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3468,8 +3491,12 @@ BEGIN
     IDS_ARS_CHANNELS        "Kanäle:"
     IDS_ARS_WASAPI_METHOD   "WASAPI-Datenmodus:"
     IDS_ARS_DUMMY_CHANNELS  "Beim Upmixen keine Kanäle füllen"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Audiogerät bei Pause aktiv halten"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Audiogerät bei Pause aktiv halten"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Wenn möglich, wird das Audio im Originalformat gesendet.\nAndernfalls wird das in den Systemeinstellungen angegebene Format verwendet."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Der Renderer versucht, das Gerät zu initialisieren und überspringt dabei einige Prüfungen."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Der Renderer sendet unhörbares Rauschen an das Audiogerät."
 END
@@ -3522,28 +3549,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Frequenzbereich scannen"
     IDS_SUBTITLES_ERROR     "Keine Untertitel geladen, oder nicht unterstütztes Format."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Verfasser unbekannt. Bei Infos mich bitte kontaktieren!"
-    IDS_NO_MORE_MEDIA       "Keine weiteren abspielbaren Medien im aktuellen Ordner."
-    IDS_FIRST_IN_FOLDER     "Das ist die erste Datei im Ordner"
-    IDS_LAST_IN_FOLDER      "Das ist die letzte Datei im Ordner"
-    IDS_MERGING_FILES       "Dateien werden zusammengeführt..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "Std."
-    IDS_UNIT_TIME_M         "Min."
-    IDS_UNIT_TIME_S         "Sek."
-    IDS_UNIT_SIZE_KB        "kB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "kB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

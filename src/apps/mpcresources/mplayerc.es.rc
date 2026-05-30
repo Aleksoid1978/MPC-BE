@@ -3048,6 +3048,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "KB"
+    IDS_UNIT_SIZE_MB        "MB"
+    IDS_UNIT_SIZE_GB        "GB"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Autor desconocido. Contáctame si hiciste este logo!"
+    IDS_NO_MORE_MEDIA       "No hay más medios en la carpeta actual."
+    IDS_FIRST_IN_FOLDER     "El primer archivo de la carpeta es cargado ahora."
+    IDS_LAST_IN_FOLDER      "El último archivo de la carpeta es cargado ahora."
+    IDS_MERGING_FILES       "Uniendo archivos..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Agregar Favorito rápido"
     IDS_AG_MENU_FAVORITES   "Menú Favoritos"
     IDS_DVB_CHANNEL_NUMBER  "N"
@@ -3468,8 +3491,12 @@ BEGIN
     IDS_ARS_CHANNELS        "Canales:"
     IDS_ARS_WASAPI_METHOD   "Método WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "No llena los canales al mezclar"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Si es posible, el audio se enviará en su formato original.\nDe lo contrario, se usará el formato especificado en la configuración del sistema."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "El renderizador intentará inicializar el dispositivo omitiendo algunas comprobaciones."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
@@ -3522,28 +3549,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Sintonización"
     IDS_SUBTITLES_ERROR     "Subtítulos no cargados o renderizador no soportado."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Autor desconocido. Contáctame si hiciste este logo!"
-    IDS_NO_MORE_MEDIA       "No hay más medios en la carpeta actual."
-    IDS_FIRST_IN_FOLDER     "El primer archivo de la carpeta es cargado ahora."
-    IDS_LAST_IN_FOLDER      "El último archivo de la carpeta es cargado ahora."
-    IDS_MERGING_FILES       "Uniendo archivos..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "KB"
-    IDS_UNIT_SIZE_MB        "MB"
-    IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/s"
-    IDS_UNIT_SPEED_MB_S     "MB/s"
-    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE

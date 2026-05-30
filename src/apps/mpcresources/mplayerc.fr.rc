@@ -3048,6 +3048,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "h"
+    IDS_UNIT_TIME_M         "m"
+    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_SIZE_KB        "Ko"
+    IDS_UNIT_SIZE_MB        "Mo"
+    IDS_UNIT_SIZE_GB        "Go"
+    IDS_UNIT_SPEED_KB_S     "Ko/s"
+    IDS_UNIT_SPEED_MB_S     "Mo/s"
+    IDS_UNIT_SPEED_GB_S     "Go/s"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "Auteur inconnu. Contactez-moi si vous avez créé ce logo !"
+    IDS_NO_MORE_MEDIA       "Plus de media dans le dossier courant."
+    IDS_FIRST_IN_FOLDER     "Le 1er fichier dans le dossier est déjà chargé."
+    IDS_LAST_IN_FOLDER      "Le dernier fichier dans le dossier est déjà chargé."
+    IDS_MERGING_FILES       "Fusion de fichiers..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "Ajout rapide aux favoris"
     IDS_AG_MENU_FAVORITES   "Menu des favoris"
     IDS_DVB_CHANNEL_NUMBER  "N°"
@@ -3468,8 +3491,12 @@ BEGIN
     IDS_ARS_CHANNELS        "Canaux :"
     IDS_ARS_WASAPI_METHOD   "WASAPI méthode :"
     IDS_ARS_DUMMY_CHANNELS  "Ne pas remplir les canaux lors du mixage"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Si possible, l'audio sera envoyé dans son format d'origine.\nSinon, le format spécifié dans les paramètres système sera utilisé."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Le moteur de rendu tentera d'initialiser le périphérique en ignorant certaines vérifications."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
@@ -3522,28 +3549,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "Recherche des chaînes"
     IDS_SUBTITLES_ERROR     "Sous-titres non chargés ou mode de rendu non supporté."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "Auteur inconnu. Contactez-moi si vous avez créé ce logo !"
-    IDS_NO_MORE_MEDIA       "Plus de media dans le dossier courant."
-    IDS_FIRST_IN_FOLDER     "Le 1er fichier dans le dossier est déjà chargé."
-    IDS_LAST_IN_FOLDER      "Le dernier fichier dans le dossier est déjà chargé."
-    IDS_MERGING_FILES       "Fusion de fichiers..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
-    IDS_UNIT_SIZE_KB        "Ko"
-    IDS_UNIT_SIZE_MB        "Mo"
-    IDS_UNIT_SIZE_GB        "Go"
-    IDS_UNIT_SPEED_KB_S     "Ko/s"
-    IDS_UNIT_SPEED_MB_S     "Mo/s"
-    IDS_UNIT_SPEED_GB_S     "Go/s"
 END
 
 STRINGTABLE

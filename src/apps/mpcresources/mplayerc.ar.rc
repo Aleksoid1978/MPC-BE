@@ -3046,6 +3046,29 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_UNIT_TIME_H         "س"
+    IDS_UNIT_TIME_M         "د"
+    IDS_UNIT_TIME_S         "ث"
+    IDS_UNIT_SIZE_KB        "ك.ب"
+    IDS_UNIT_SIZE_MB        "م.ب"
+    IDS_UNIT_SIZE_GB        "ج.ب"
+    IDS_UNIT_SPEED_KB_S     "ك.ب/ث"
+    IDS_UNIT_SPEED_MB_S     "م.ب/ث"
+    IDS_UNIT_SPEED_GB_S     "ج.ب/ث"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_LOGO_AUTHOR         "مؤلف غير معروف. اتصل بي إذا كنت من أنشأ هذا الشعار!"
+    IDS_NO_MORE_MEDIA       "لا يوجد المزيد من الوسائط في المجلد الحالي."
+    IDS_FIRST_IN_FOLDER     "الملف الأول في المجلد محمل بالفعل."
+    IDS_LAST_IN_FOLDER      "الملف الأخير في المجلد محمل بالفعل."
+    IDS_MERGING_FILES       "دمج الملفات..."
+    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+END
+
+STRINGTABLE
+BEGIN
     IDS_FAVORITES_QUICKADD  "إضافة سريعة إلى المفضلة"
     IDS_AG_MENU_FAVORITES   "قائمة المفضلة"
     IDS_DVB_CHANNEL_NUMBER  "رقم"
@@ -3466,8 +3489,12 @@ BEGIN
     IDS_ARS_CHANNELS        "القنوات:"
     IDS_ARS_WASAPI_METHOD   "طريقة WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "عدم ملء القنوات أثناء الخلط"
-    IDS_ARS_PAUSE_KEEP_ACTIVE   "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "إذا أمكن، سيتم إرسال الصوت بتنسيقه الأصلي.\nوإلا، سيتم استخدام التنسيق المحدد في إعدادات النظام."
+END
+
+STRINGTABLE
+BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "سيحاول محرك التقديم تهيئة الجهاز مع تخطي بعض الفحوصات."
     IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
 END
@@ -3520,28 +3547,6 @@ STRINGTABLE
 BEGIN
     IDS_NAVIGATE_TUNERSCAN  "بحث عن القنوات"
     IDS_SUBTITLES_ERROR     "لم يتم تحميل الترجمات أو وضع العرض غير مدعوم."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_LOGO_AUTHOR         "مؤلف غير معروف. اتصل بي إذا كنت من أنشأ هذا الشعار!"
-    IDS_NO_MORE_MEDIA       "لا يوجد المزيد من الوسائط في المجلد الحالي."
-    IDS_FIRST_IN_FOLDER     "الملف الأول في المجلد محمل بالفعل."
-    IDS_LAST_IN_FOLDER      "الملف الأخير في المجلد محمل بالفعل."
-    IDS_MERGING_FILES       "دمج الملفات..."
-END
-
-STRINGTABLE
-BEGIN
-    IDS_UNIT_TIME_H         "س"
-    IDS_UNIT_TIME_M         "د"
-    IDS_UNIT_TIME_S         "ث"
-    IDS_UNIT_SIZE_KB        "ك.ب"
-    IDS_UNIT_SIZE_MB        "م.ب"
-    IDS_UNIT_SIZE_GB        "ج.ب"
-    IDS_UNIT_SPEED_KB_S     "ك.ب/ث"
-    IDS_UNIT_SPEED_MB_S     "م.ب/ث"
-    IDS_UNIT_SPEED_GB_S     "ج.ب/ث"
 END
 
 STRINGTABLE
