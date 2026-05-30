@@ -225,7 +225,8 @@ static int magy_decode_slice10(AVCodecContext *avctx, void *tdata,
                 s->llviddsp.add_left_pred_int16(dst, dst, max, width, 0);
                 dst += stride;
             }
-            lefttop = left = dst[0];
+            if (1 + interlaced < height)
+                lefttop = left = dst[0];
             for (k = 1 + interlaced; k < height; k++) {
                 magicyuv_median_pred16(dst, dst - fake_stride, dst, width, &left, &lefttop, max);
                 lefttop = left = dst[0];
@@ -553,6 +554,13 @@ static int magy_decode_frame(AVCodecContext *avctx, AVFrame *p,
                "invalid slice height: %d\n", s->slice_height);
         return AVERROR_INVALIDDATA;
     }
+    if (s->vshift[1] && (s->slice_height & ((1 << s->vshift[1]) - 1))) {
+        av_log(avctx, AV_LOG_ERROR,
+               "slice_height %d is not aligned to chroma vertical "
+               "subsampling (must be a multiple of %d)\n",
+               s->slice_height, 1 << s->vshift[1]);
+        return AVERROR_INVALIDDATA;
+    }
 
     bytestream2_skipu(&gb, 4);
 
@@ -563,11 +571,11 @@ static int magy_decode_frame(AVCodecContext *avctx, AVFrame *p,
         return AVERROR_INVALIDDATA;
     }
 
+    if ((s->slice_height >> s->vshift[1]) <= s->interlaced) {
+        av_log(avctx, AV_LOG_ERROR, "impossible slice height\n");
+        return AVERROR_INVALIDDATA;
+    }
     if (s->interlaced) {
-        if ((s->slice_height >> s->vshift[1]) < 2) {
-            av_log(avctx, AV_LOG_ERROR, "impossible slice height\n");
-            return AVERROR_INVALIDDATA;
-        }
         if ((avctx->coded_height % s->slice_height) && ((avctx->coded_height % s->slice_height) >> s->vshift[1]) < 2) {
             av_log(avctx, AV_LOG_ERROR, "impossible height\n");
             return AVERROR_INVALIDDATA;
