@@ -3054,9 +3054,9 @@ BEGIN
     IDS_UNIT_SIZE_KB        "KB"
     IDS_UNIT_SIZE_MB        "MB"
     IDS_UNIT_SIZE_GB        "GB"
-    IDS_UNIT_SPEED_KB_S     "KB/mp"
-    IDS_UNIT_SPEED_MB_S     "MB/mp"
-    IDS_UNIT_SPEED_GB_S     "GB/mp"
+    IDS_UNIT_SPEED_KB_S     "KB/s"
+    IDS_UNIT_SPEED_MB_S     "MB/s"
+    IDS_UNIT_SPEED_GB_S     "GB/s"
 END
 
 STRINGTABLE
