@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2025 see Authors.txt
+ * (C) 2017-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,6 +39,7 @@ protected:
 public:
 	// Returns pointer to the data.
 	auto* Data() { return m_data.get(); }
+	const auto* Data() const { return m_data.get(); }
 
 	// Returns the number of elements.
 	auto Size() const { return m_size; }
