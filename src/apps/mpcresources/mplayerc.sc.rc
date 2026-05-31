@@ -3064,7 +3064,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "当前文件已是文件夹内第一个。"
     IDS_LAST_IN_FOLDER      "当前文件已是文件夹内最后一个。"
     IDS_MERGING_FILES       "合并文件..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "用 FFmpeg 合并文件"
 END
 
 STRINGTABLE

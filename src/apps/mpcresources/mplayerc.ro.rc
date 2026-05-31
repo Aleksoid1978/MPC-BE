@@ -3065,7 +3065,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Acum este încărcat primul fișier din dosar (din folder)."
     IDS_LAST_IN_FOLDER      "Acum este încărcat ultimul fișier din dosar (din folder)."
     IDS_MERGING_FILES       "Se unesc fișierele..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "Unește fișierele folosind FFmpeg"
 END
 
 STRINGTABLE
@@ -3240,7 +3240,7 @@ BEGIN
     IDS_MAINFRM_91          "Tipul de fișiere e necunoscut"
     IDS_MAINFRM_92          "Fluxul nu e acceptat"
     IDS_MAINFRM_93          "Directorul DVD-ului nu poate fi găsit"
-    IDS_MAINFRM_94          "Filtrul navigatorului DVD-ului (DVD Navigator) nu poate fi creat"
+    IDS_MAINFRM_94          "Filtrul pentru navigatorul de DVD-uri (DVD Navigator) nu poate fi creat"
     IDS_AG_FAILED           "Eșuat"
     IDS_MAINFRM_96          "Filtrul pentru captură video nu poate fi creat"
     IDS_MAINFRM_98          "Niciun filtru de captură"

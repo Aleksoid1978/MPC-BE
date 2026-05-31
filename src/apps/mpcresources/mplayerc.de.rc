@@ -2905,8 +2905,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "Geschwindigkeit verringern"
     IDS_AG_RESET_RATE       "Geschwindigkeit zurücksetzen"
-    IDS_AG_AUDIODELAY_PLUS  "Audioverzögerung (+10ms)"
-    IDS_AG_AUDIODELAY_MINUS "Audioverzögerung (-10ms)"
+    IDS_AG_AUDIODELAY_PLUS  "Audioverzögerung (+10 ms)"
+    IDS_AG_AUDIODELAY_MINUS "Audioverzögerung (-10 ms)"
     IDS_AG_JUMP_FORWARD_1   "Sprung: Vorwärts (klein)"
     IDS_AG_JUMP_BACKWARD_1  "Sprung: Rückwärts (klein)"
     IDS_AG_JUMP_FORWARD_2   "Sprung: Vorwärts (mittel)"
@@ -3066,7 +3066,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Das ist die erste Datei im Ordner"
     IDS_LAST_IN_FOLDER      "Das ist die letzte Datei im Ordner"
     IDS_MERGING_FILES       "Dateien werden zusammengeführt..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "Dateien mit FFmpeg zusammenführen"
 END
 
 STRINGTABLE
