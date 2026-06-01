@@ -3064,7 +3064,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "フォルダー内の最初のファイルが現在読み込まれています。"
     IDS_LAST_IN_FOLDER      "フォルダー内の最後のファイルが現在読み込まれています。"
     IDS_MERGING_FILES       "ファイルを結合しています..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "FFmpeg を使用してファイルを結合する"
 END
 
 STRINGTABLE

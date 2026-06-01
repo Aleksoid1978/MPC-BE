@@ -3066,7 +3066,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Klasördeki ilk dosya yüklendi."
     IDS_LAST_IN_FOLDER      "Klasördeki son dosya yüklendi."
     IDS_MERGING_FILES       "Dosyalar birleştiriliyor..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "FFmpeg kullanarak dosyaları birleştir"
 END
 
 STRINGTABLE
