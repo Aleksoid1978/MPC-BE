@@ -3064,7 +3064,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "폴더 내의 첫 번째 파일을 불러왔습니다."
     IDS_LAST_IN_FOLDER      "폴더 내의 마지막 파일을 불러왔습니다."
     IDS_MERGING_FILES       "파일 병합..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "FFmpeg을 사용하여 파일 병합"
 END
 
 STRINGTABLE
