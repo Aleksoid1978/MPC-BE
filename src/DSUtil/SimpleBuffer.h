@@ -37,6 +37,13 @@ protected:
 	size_t m_size = 0;
 
 public:
+	CSimpleBlock() = default;
+	CSimpleBlock(const CSimpleBlock& simpleBlock)
+	{
+		SetSize(simpleBlock.m_size);
+		memcpy(this->m_data.get(), simpleBlock.m_data.get(), simpleBlock.m_size);
+	}
+
 	// Returns pointer to the data.
 	auto* Data() { return m_data.get(); }
 	const auto* Data() const { return m_data.get(); }
