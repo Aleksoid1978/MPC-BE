@@ -2481,10 +2481,10 @@ BEGIN
     IDS_SUBRESYNC_CLN_TIME  "Tempo"
     IDS_SUBRESYNC_CLN_END   "Fine"
     IDS_SUBRESYNC_CLN_PREVIEW "Anteprima"
-    IDS_SUBRESYNC_CLN_VOB_ID "Vob ID"
+    IDS_SUBRESYNC_CLN_VOB_ID "ID Vob"
     IDS_SUBRESYNC_CLN_CELL_ID "ID cella"
     IDS_SUBRESYNC_CLN_FORCED "Forzato"
-    IDS_SUBRESYNC_CLN_TEXT  "Text"
+    IDS_SUBRESYNC_CLN_TEXT  "Testo"
     IDS_SUBRESYNC_CLN_STYLE "Stile"
     IDS_SUBRESYNC_CLN_FONT  "Font"
 END
@@ -2718,7 +2718,7 @@ BEGIN
     IDS_FAVORITES_ADD       "&Aggiungi a preferiti..."
     IDS_FAVORITES_ORGANIZE  "&Organizza preferiti..."
     IDS_CONTROLS_CLOSING    "Chiusura..."
-    IDS_CONTROLS_PLAYING    "Riproduzione"
+    IDS_CONTROLS_PLAYING    "In riproduzione"
     IDS_CONTROLS_PAUSED     "In pausa"
 END
 
@@ -2750,9 +2750,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CONTROLS_STOPPED    "Fermato"
+    IDS_CONTROLS_STOPPED    "Interrotto"
     IDS_CONTROLS_BUFFERING  "Buffering... (%d%%)"
-    IDS_CONTROLS_CAPTURING  "Catturare..."
+    IDS_CONTROLS_CAPTURING  "Acquisizione..."
     IDS_CONTROLS_OPENING    "Apertura..."
     IDS_CONTROLS_CLOSED     "Chiuso"
     IDS_SUBTITLES_OPTIONS   "&Opzioni..."
@@ -3066,7 +3066,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Il primo file nella cartella è ora caricato."
     IDS_LAST_IN_FOLDER      "L'ultimo file nella cartella è ora caricato."
     IDS_MERGING_FILES       "Unione file..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "Unisci i file usando FFmpeg"
 END
 
 STRINGTABLE
@@ -3324,7 +3324,7 @@ BEGIN
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tAvvia la riproduzione dal titolo T, posizione hh:mm:ss"
     IDS_CMD_CD              "/cd\tCarica tutte le tracce di un cd audio o (s)vcd, ""nome_percorso"" indica il percorso dell'unità (opzionale)"
     IDS_CMD_OPEN            "/open\tApri il file, non avviare automaticamente la riproduzione"
-    IDS_CMD_PLAY            "/play\tInizia la riproduzione del file all'avvio del lettore.	"
+    IDS_CMD_PLAY            "/play\tInizia la riproduzione del file all'avvio del lettore"
     IDS_CMD_CLOSE           "/close\tChiudi il lettore dopo la riproduzione (funziona solo quando utilizzato con /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tSpegni il sistema operativo dopo la riproduzione"
     IDS_CMD_FULLSCREEN      "/fullscreen\tAvvia in modalità a schermo intero"
@@ -3492,13 +3492,13 @@ BEGIN
     IDS_ARS_WASAPI_METHOD   "Metodo WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Non riempire i canali durante l'upmix"
     IDS_ARS_PAUSE_KEEP_ACTIVE "Mantieni il dispositivo audio attivo quando in pausa"
-    IDS_ARS_TIP_BITEXACT_OUTPUT  "Se possibile, l'audio verrà inviato nel suo formato originale.\nAltrimenti verrà utilizzato il formato specificato nelle impostazioni di sistema."
+    IDS_ARS_TIP_BITEXACT_OUTPUT  "Se possibile, l'audio verrà inviato nel suo formato originale.\nIn caso contrario verrà usato il formato specificato nelle impostazioni di sistema."
 END
 
 STRINGTABLE
 BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Il renderer tenterà di inizializzare il dispositivo saltando alcuni controlli."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Il renderer invierà un rumore impercettibile al dispositivo audio."
 END
 
 STRINGTABLE
