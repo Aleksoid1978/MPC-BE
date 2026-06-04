@@ -3496,7 +3496,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "レンダラーは、いくつかの確認をスキップしてデバイスを初期化しようとします。"
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "レンダラーはオーディオ デバイスに聞こえないノイズを送信します。"
 END
 
 STRINGTABLE
