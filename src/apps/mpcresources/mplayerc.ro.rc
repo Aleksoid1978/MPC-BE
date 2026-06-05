@@ -2694,7 +2694,7 @@ END
 
 STRINGTABLE
 BEGIN
-    ID_VOLUME_MUTE          "Pune pe mut\nPune pe mut"
+    ID_VOLUME_MUTE          "Pune pe mut (Pune fără sonor)\nPune pe mut (Pune fără sonor)"
     ID_VOLUME_MUTE_OFF      "Activează sunetul\nActivează sunetul"
     ID_VOLUME_MUTE_DISABLED "Fără sunet (Silențios)\nFără sunet (Silențios)"
 END
@@ -3427,10 +3427,10 @@ BEGIN
     IDS_VDF_SCANTYPE_BOTTOM "Mai întâi, câmpul de jos"
     IDS_VDF_SCANTYPE_PROGRESSIVE "Progresiv"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Formate de ieșire"
-    IDS_VDF_COLOR_PRESET    "Presetare:"
+    IDS_VDF_COLOR_PRESET    "Presetarea:"
     IDS_VDF_COLOR_STANDARD  "Standard:"
     IDS_VDF_COLOR_CONVERT_TO_RGB "Convertește în RGB"
-    IDS_VDF_COLOR_RGB_LEVELS "Niveluri de ieșire a RGB-ului:"
+    IDS_VDF_COLOR_RGB_LEVELS "Nivelurile de ieșire a RGB-ului:"
 END
 
 STRINGTABLE
