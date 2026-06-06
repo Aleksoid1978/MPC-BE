@@ -43,6 +43,11 @@ public:
 		SetSize(simpleBlock.m_size);
 		memcpy(this->m_data.get(), simpleBlock.m_data.get(), simpleBlock.m_size);
 	}
+	CSimpleBlock& operator=(const CSimpleBlock& simpleBlock)
+	{
+		SetSize(simpleBlock.m_size);
+		memcpy(this->m_data.get(), simpleBlock.m_data.get(), simpleBlock.m_size);
+	}
 
 	// Returns pointer to the data.
 	auto* Data() { return m_data.get(); }
