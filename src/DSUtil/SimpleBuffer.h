@@ -47,6 +47,7 @@ public:
 	{
 		SetSize(simpleBlock.m_size);
 		memcpy(this->m_data.get(), simpleBlock.m_data.get(), simpleBlock.m_size);
+		return *this;
 	}
 
 	// Returns pointer to the data.
