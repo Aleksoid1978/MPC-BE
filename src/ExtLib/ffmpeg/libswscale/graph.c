@@ -487,6 +487,7 @@ static int init_legacy_subpass(SwsGraph *graph, SwsContext *sws,
                                 setup_legacy_swscale, sws, free_legacy_swscale, &pass);
     if (ret < 0)
         return ret;
+    pass->backend = SWS_BACKEND_LEGACY;
 
     /**
      * For slice threading, we need to create sub contexts, similar to how
@@ -548,6 +549,9 @@ static int add_legacy_sws_pass(SwsGraph *graph, const SwsFormat *src,
 {
     int ret, warned = 0;
     SwsContext *const ctx = graph->ctx;
+    const SwsBackend backend = ff_sws_enabled_backends(ctx);
+    if (!(backend & SWS_BACKEND_LEGACY))
+        return AVERROR(ENOTSUP);
     if (src->hw_format != AV_PIX_FMT_NONE || dst->hw_format != AV_PIX_FMT_NONE)
         return AVERROR(ENOTSUP);
 
@@ -618,22 +622,25 @@ static int add_legacy_sws_pass(SwsGraph *graph, const SwsFormat *src,
  * Format conversion and scaling *
  *********************************/
 
-#if CONFIG_UNSTABLE
-static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
-                            const SwsFormat *dst, SwsPass *input,
-                            SwsPass **output)
+static int add_ops_convert_pass(SwsGraph *graph, const SwsFormat *src,
+                                const SwsFormat *dst, SwsPass *input,
+                                SwsPass **output)
 {
+#if CONFIG_UNSTABLE
     SwsContext *ctx = graph->ctx;
-    int ret = AVERROR(ENOTSUP);
 
-    /* Mark the entire new ops infrastructure as experimental for now */
-    if (!(ctx->flags & SWS_UNSTABLE))
-        goto fail;
+    /* Preemptively skip the ops list generation if the backend was
+     * constrained to the legacy implementation only. This would
+     * normally also fail in ff_sws_compile_pass() with the same
+     * error, but this way saves a bit of unnecessary overhead */
+    const SwsBackend backends = ff_sws_enabled_backends(ctx);
+    if (backends == SWS_BACKEND_LEGACY)
+        return AVERROR(ENOTSUP);
 
     SwsOpList *ops;
-    ret = ff_sws_op_list_generate(ctx, src, dst, &ops, &graph->incomplete);
+    int ret = ff_sws_op_list_generate(ctx, src, dst, &ops, &graph->incomplete);
     if (ret < 0)
-        goto fail;
+        return ret;
 
     av_log(ctx, AV_LOG_VERBOSE, "Conversion pass for %s -> %s:\n",
            av_get_pix_fmt_name(src->format), av_get_pix_fmt_name(dst->format));
@@ -641,22 +648,33 @@ static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
     av_log(ctx, AV_LOG_DEBUG, "Unoptimized operation list:\n");
     ff_sws_op_list_print(ctx, AV_LOG_DEBUG, AV_LOG_TRACE, ops);
 
-    ret = ff_sws_compile_pass(graph, NULL, &ops, SWS_OP_FLAG_OPTIMIZE, input, output);
-    if (ret < 0)
-        goto fail;
+    return ff_sws_compile_pass(graph, NULL, &ops, SWS_OP_FLAG_OPTIMIZE, input, output);
+#else
+    return AVERROR(ENOTSUP);
+#endif
+}
 
-    ret = 0;
-    /* fall through */
+static int add_convert_pass(SwsGraph *graph, const SwsFormat *src,
+                            const SwsFormat *dst, SwsPass *input,
+                            SwsPass **output)
+{
+    SwsContext *ctx = graph->ctx;
+    int ret;
 
-fail:
-    if (ret == AVERROR(ENOTSUP))
-        return add_legacy_sws_pass(graph, src, dst, input, output);
+    if (ctx->flags & SWS_UNSTABLE) {
+        /* Prefer unstable ops backend over legacy backend */
+        ret = add_ops_convert_pass(graph, src, dst, input, output);
+        if (ret == AVERROR(ENOTSUP))
+            ret = add_legacy_sws_pass(graph, src, dst, input, output);
+    } else {
+        /* Prefer legacy backend for stability reasons */
+        ret = add_legacy_sws_pass(graph, src, dst, input, output);
+        if (ret == AVERROR(ENOTSUP))
+            ret = add_ops_convert_pass(graph, src, dst, input, output);
+    }
+
     return ret;
 }
-#else
-#define add_convert_pass add_legacy_sws_pass
-#endif
-
 
 /**************************
  * Gamut and tone mapping *
@@ -846,6 +864,7 @@ int ff_sws_graph_init(SwsGraph *graph, SwsContext *ctx, const SwsFormat *dst,
 
     /* Resolve output buffers for all intermediate passes */
     for (int i = 0; i < graph->num_passes; i++) {
+        graph->backend |= graph->passes[i]->backend;
         ret = pass_alloc_output(graph->passes[i]->input);
         if (ret < 0)
             goto error;
@@ -908,6 +927,7 @@ static int opts_equal(const SwsContext *c1, const SwsContext *c2)
            c1->intent        == c2->intent        &&
            c1->scaler        == c2->scaler        &&
            c1->scaler_sub    == c2->scaler_sub    &&
+           c1->backends      == c2->backends      &&
            !memcmp(c1->scaler_params, c2->scaler_params, sizeof(c1->scaler_params));
 
 }

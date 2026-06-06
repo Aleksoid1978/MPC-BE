@@ -111,6 +111,9 @@ typedef struct SwsCompiledOp {
      */
     bool opaque;
 
+    /* Set by ff_sws_ops_compile(), informative */
+    const struct SwsOpBackend *backend;
+
     /* Execution parameters for all functions */
     int slice_align; /* slice height alignment */
     int cpu_flags;   /* active set of CPU flags (informative) */
@@ -129,6 +132,7 @@ void ff_sws_compiled_op_unref(SwsCompiledOp *comp);
 
 typedef struct SwsOpBackend {
     const char *name; /* Descriptive name for this backend */
+    SwsBackend flags; /* Set of SWS_BACKEND_* */
 
     /**
      * Compile an operation list to an implementation chain. May modify `ops`

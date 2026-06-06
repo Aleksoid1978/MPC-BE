@@ -78,7 +78,7 @@ Updated Korean translation (by Hackjjang).
 
 Updated libraries:
 	dav1d 1.5.3-6-g04b69f9;
-	ffmpeg n8.2-dev-1407-g80405d3ceb;
+	ffmpeg n8.2-dev-1568-gb355200263;
 	libpng git-v1.6.55-9-g7d52a8087;
 	Little-CMS git-lcms2.18-26-gf739cda;
 	MediaInfo git-v26.05-38-g702c9b7fd;

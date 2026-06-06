@@ -320,6 +320,7 @@ SRCS_LC = \
 	libavcodec/intrax8.c \
 	libavcodec/intrax8dsp.c \
 	libavcodec/ituh263dec.c \
+	libavcodec/itut35.c \
 	libavcodec/ivi.c \
 	libavcodec/ivi_dsp.c \
 	libavcodec/jpeg2000.c \
