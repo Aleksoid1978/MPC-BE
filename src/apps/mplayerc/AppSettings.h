@@ -756,6 +756,7 @@ public:
 	int				nUpdaterDelay;
 	time_t			tUpdaterLastCheck;
 	CStringW		strFFmpegExePath;
+	bool			bFFmpegMerge;
 
 	// MENUS
 	// View
