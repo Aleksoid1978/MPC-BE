@@ -61,8 +61,12 @@ struct MediaSideDataHDRContentLightLevel
 };
 #pragma pack(pop)
 
+// old version without the two identification fields
 // {183ED511-8910-4262-88F6-4946BC799C84}
-DEFINE_GUID(IID_MediaSideDataHDR10Plus, 0x183ed511, 0x8910, 0x4262, 0x88, 0xf6, 0x49, 0x46, 0xbc, 0x79, 0x9c, 0x84);
+DEFINE_GUID([[deprecated]] IID_MediaSideDataHDR10PlusOld, 0x183ed511, 0x8910, 0x4262, 0x88, 0xf6, 0x49, 0x46, 0xbc, 0x79, 0x9c, 0x84);
+
+// {6FF47D98-3EF9-4335-A65E-E71880C15BD9}
+DEFINE_GUID(IID_MediaSideDataHDR10Plus, 0x6ff47d98, 0x3ef9, 0x4335, 0xa6, 0x5e, 0xe7, 0x18, 0x80, 0xc1, 0x5b, 0xd9);
 
 #pragma pack(push, 1)
 // HDR10+ metadata according to SMPTE 2094-40
@@ -71,6 +75,10 @@ DEFINE_GUID(IID_MediaSideDataHDR10Plus, 0x183ed511, 0x8910, 0x4262, 0x88, 0xf6, 
 // All pixel values are kept as-is, rational values are normalized as double-precision floating point
 struct MediaSideDataHDR10Plus
 {
+    // spec identification
+    unsigned int itu_t_t35_country_code;
+    unsigned int application_version;
+
     // number of windows (1-3)
     unsigned int num_windows;
 
@@ -131,7 +139,7 @@ struct MediaSideDataHDR10Plus
 DEFINE_GUID(IID_MediaSideDataDOVIRPU, 0xbae40e6c, 0x5b93, 0x4170, 0x90, 0xcc, 0x5d, 0x5f, 0x2, 0xa2, 0x96, 0x38);
 
 // {277EE779-13F4-434E-BDEC-3D6F8C0E15D2}
-DEFINE_GUID(IID_MediaSideDataDOVIMetadata, 0x277ee779, 0x13f4, 0x434e, 0xbd, 0xec, 0x3d, 0x6f, 0x8c, 0xe, 0x15, 0xd2);
+DEFINE_GUID([[deprecated]] IID_MediaSideDataDOVIMetadata, 0x277ee779, 0x13f4, 0x434e, 0xbd, 0xec, 0x3d, 0x6f, 0x8c, 0xe, 0x15, 0xd2);
 
 // {F1949F1C-7474-4F0F-B110-FB734C08851D}
 DEFINE_GUID(IID_MediaSideDataDOVIMetadataV2, 0xf1949f1c, 0x7474, 0x4f0f, 0xb1, 0x10, 0xfb, 0x73, 0x4c, 0x8, 0x85, 0x1d);
@@ -235,7 +243,7 @@ struct MediaSideDataDOVIMetadata
         uint16_t source_diagonal;
     } ColorMetadata;
 
-#define LAV_DOVI_MAX_EXTENSIONS 32
+    #define LAV_DOVI_MAX_EXTENSIONS 32
     struct
     {
         uint8_t level;

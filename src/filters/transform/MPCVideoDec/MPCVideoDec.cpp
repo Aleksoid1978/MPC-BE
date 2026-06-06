@@ -1490,10 +1490,6 @@ bool CMPCVideoDecFilter::AddFrameSideData(IMediaSample* pSample, AVFrame* pFrame
 #undef RPU_MAP
 #undef RPU_COLOR
 
-			hr = pMediaSideData->SetSideData(IID_MediaSideDataDOVIMetadata,
-											 reinterpret_cast<const BYTE*>(&hdr),
-											 offsetof(MediaSideDataDOVIMetadata, Extensions));
-
 			int LAVExtIdx = 0;
 			for (int i = 0; i < metadata->num_ext_blocks; i++)
 			{
