@@ -66,7 +66,7 @@ YouTube
 Различные исправления интерфейса.
 
 Инсталлятор
-Обновлен MPC Video Renderer 0.10.1.
+Обновлен MPC Video Renderer 0.10.3.
 Обновлен MPC Script Source 0.2.17.
 Добавлен MPC Image Source 0.3.4.
 
