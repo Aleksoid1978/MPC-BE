@@ -527,12 +527,12 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 			h.crc = (WORD)BitRead(16);
 		}
 
-		if (h.channel_index < 8) {
-			static const BYTE channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
-			h.channels = channels[h.channel_index];
-		}
+		h.adts_header_size = (h.fcrc == 0 ? 9 : 7);
 
-		if (pmt && h.channel_index == 0 && h.profile == 2 && !h.no_raw_data_blocks_in_frame && len > (h.fcrc == 0 ? 9 : 7)) { // AAC LC only
+		static const BYTE channels[8] = { 0, 1, 2, 3, 4, 5, 6, 8 };
+		h.channels = channels[h.channel_index];
+
+		if (pmt && h.channel_index == 0 && h.profile == 2 && !h.no_raw_data_blocks_in_frame && len > h.adts_header_size) { // AAC LC only
 			const __int64 adts_header_end = GetPos();
 			const BYTE element_type = BitRead(3);
 			if (element_type == 0x05) { // program config element
@@ -555,7 +555,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 			Seek(adts_header_end);
 		}
 
-		if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= (h.fcrc == 0 ? 9 : 7) || h.channel_index >= 8) {
+		if (h.layer != 0 || h.freq > 12 || h.aac_frame_length <= h.adts_header_size) {
 			AGAIN_OR_EXIT
 		}
 
@@ -564,7 +564,7 @@ bool CBaseSplitterFileEx::Read(aachdr& h, int len, CMediaType* pmt, bool find_sy
 
 	static int freq[] = { 96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000, 7350 };
 	h.Samplerate = freq[h.freq];
-	h.FrameSize = h.aac_frame_length - (h.fcrc == 0 ? 9 : 7);
+	h.FrameSize = h.aac_frame_length - h.adts_header_size;
 	h.FrameSamples = 1024; // ok?
 	h.rtDuration = 10000000i64 * h.FrameSamples / h.Samplerate;
 
