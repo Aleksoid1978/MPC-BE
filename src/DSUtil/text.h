@@ -194,24 +194,24 @@ T& FastTrim(T& str)
 	return FastTrimRight(str).TrimLeft();
 }
 
-inline bool StartsWith(const CStringA& str, const char* prefix, int pos = 0)
+inline bool StartsWith(const char* str, const char* prefix, int pos = 0)
 {
-	return strncmp(str.GetString() + pos, prefix, std::char_traits<char>::length(prefix)) == 0;
+	return strncmp(str + pos, prefix, std::char_traits<char>::length(prefix)) == 0;
 }
 
-inline bool StartsWith(const CStringW& str, const wchar_t* prefix, int pos = 0)
+inline bool StartsWith(const wchar_t* str, const wchar_t* prefix, int pos = 0)
 {
-	return wcsncmp(str.GetString() + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
+	return wcsncmp(str + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
 }
 
-inline bool StartsWithNoCase(const CStringA& str, const char* prefix, int pos = 0)
+inline bool StartsWithNoCase(const char* str, const char* prefix, int pos = 0)
 {
-	return _strnicmp(str.GetString() + pos, prefix, std::char_traits<char>::length(prefix)) == 0;
+	return _strnicmp(str + pos, prefix, std::char_traits<char>::length(prefix)) == 0;
 }
 
-inline bool StartsWithNoCase(const CStringW& str, const wchar_t* prefix, int pos = 0)
+inline bool StartsWithNoCase(const wchar_t* str, const wchar_t* prefix, int pos = 0)
 {
-	return _wcsnicmp(str.GetString() + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
+	return _wcsnicmp(str + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
 }
 
 inline bool EndsWith(const CStringA& str, const char* suffix)
