@@ -168,20 +168,19 @@ namespace Youtube
 		}
 	};
 
-	struct YoutubePlaylistItem {
-		CString url, title;
+	struct YoutubeUrllistItem {
+		CStringW url;
+		CStringW title;
 		REFERENCE_TIME duration = 0;
+		const YoutubeProfile* profile = nullptr;
 
-		YoutubePlaylistItem() = default;
-		YoutubePlaylistItem(const CString& _url, const CString& _title, const REFERENCE_TIME _duration = 0)
+		YoutubeUrllistItem() = default;
+		YoutubeUrllistItem(const CString& _url, const CString& _title, const REFERENCE_TIME _duration = 0)
 			: url(_url)
 			, title(_title)
 			, duration(_duration) {};
 	};
 
-	struct YoutubeUrllistItem : YoutubePlaylistItem {
-		const YoutubeProfile* profile;
-	};
 	typedef std::vector<YoutubeUrllistItem> YoutubeUrllist;
 
 	const YoutubeProfile* GetProfile(int iTag);
