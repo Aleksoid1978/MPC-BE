@@ -20457,19 +20457,14 @@ REFTIME CMainFrame::GetAvgTimePerFrame(BOOL bUsePCAP/* = TRUE*/) const
 BOOL CMainFrame::OpenYoutubePlaylist(const CString& url, BOOL bOnlyParse/* = FALSE*/)
 {
 	if (AfxGetAppSettings().bYoutubeLoadPlaylist && Youtube::CheckPlaylist(url)) {
-		Youtube::YoutubePlaylist youtubePlaylist;
+		CFileItemList youtubePlaylist;
 		int idx_CurrentPlay = 0;
 		if (Youtube::Parse_Playlist(url, youtubePlaylist, idx_CurrentPlay)) {
 			if (!bOnlyParse) {
 				m_wndPlaylistBar.Empty();
 			}
 
-			CFileItemList fis;
-			for (const auto& item : youtubePlaylist) {
-				CFileItem fi(item.url, item.title, item.duration);
-				fis.emplace_back(fi);
-			}
-			m_wndPlaylistBar.Append(fis);
+			m_wndPlaylistBar.Append(youtubePlaylist);
 
 			if (!bOnlyParse) {
 				m_wndPlaylistBar.SetSelIdx(idx_CurrentPlay, true);

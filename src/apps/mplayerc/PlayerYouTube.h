@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2025 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -178,7 +178,6 @@ namespace Youtube
 			, title(_title)
 			, duration(_duration) {};
 	};
-	typedef std::vector<YoutubePlaylistItem> YoutubePlaylist;
 
 	struct YoutubeUrllistItem : YoutubePlaylistItem {
 		const YoutubeProfile* profile;
@@ -203,7 +202,7 @@ namespace Youtube
 		OpenFileData* pOFD,
 		CStringW& errorMessage
 	);
-	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay);
+	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool Parse_URL(CString url, YoutubeFields& y_fields);
 	bool Parse_URL(CString url, CString& title, REFERENCE_TIME& duration);

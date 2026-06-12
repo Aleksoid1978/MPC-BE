@@ -1542,7 +1542,7 @@ namespace Youtube
 		return pOFD->fi.Valid();
 	}
 
-	bool Parse_Playlist(CString url, YoutubePlaylist& youtubePlaylist, int& idx_CurrentPlay)
+	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay)
 	{
 		idx_CurrentPlay = 0;
 		youtubePlaylist.clear();
@@ -1672,8 +1672,8 @@ namespace Youtube
 										}
 
 										CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-										auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
-											return item.url == url;
+										auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const CFileItem& item) {
+											return item.GetPath() == url;
 										});
 										if (it == youtubePlaylist.cend()) {
 											lastvideoId = videoId;
@@ -1770,8 +1770,8 @@ namespace Youtube
 
 					if (!videoId.IsEmpty()) {
 						CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-						auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const YoutubePlaylistItem& item) {
-							return item.url == url;
+						auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const CFileItem& item) {
+							return item.GetPath() == url;
 						});
 						if (it == youtubePlaylist.cend()) {
 							lastvideoId = videoId;
