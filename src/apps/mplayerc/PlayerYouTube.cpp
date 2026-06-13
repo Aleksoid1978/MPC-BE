@@ -1630,58 +1630,43 @@ namespace Youtube
 
 					rapidjson::Document json;
 					if (!json.Parse(jsonEntry).HasParseError()) {
-						auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents/0/playlistVideoListRenderer/contents");
-						if (!contents) {
-							contents = GetValueByPointer(json, "/contents/twoColumnWatchNextResults/playlist/playlist/contents");
-						}
+						auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents");
 
 						CString lastvideoId;
 						auto ParseJsonObject = [&](const auto& object) {
-							CString videoId;
-							getJsonValue(object, "videoId", videoId);
+							CString contentId;
+							getJsonValue(object, "contentId", contentId);
+							if (!contentId.IsEmpty()) {
+								if (auto content = GetValueByPointer(object, "/metadata/lockupMetadataViewModel/title/content"); content && content->IsString()) {
+									CString title = UTF8ToWStr(content->GetString());
+									CString url;
+									url.Format(L"https://www.youtube.com/watch?v=%s", contentId.GetString());
 
-							if (!videoId.IsEmpty()) {
-								if (auto title = GetJsonObject(object, "title")) {
-									CString simpleText;
-									if (!getJsonValue(*title, "simpleText", simpleText)) {
-										auto text = GetValueByPointer(*title, "/runs/0/text");
-										if (text && text->IsString()) {
-											simpleText = UTF8ToWStr(text->GetString());
-										}
-									}
-									if (!simpleText.IsEmpty()) {
+									auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const CFileItem& item) {
+										return item.GetPath() == url;
+									});
+									if (it == youtubePlaylist.cend()) {
+										lastvideoId = contentId;
+
 										REFERENCE_TIME duration = 0;
-										CString lengthSeconds;
-										if (getJsonValue(object, "lengthSeconds", lengthSeconds)) {
-											duration = UNITS * _wtoi(lengthSeconds);
-										} else if (auto lengthText = GetJsonObject(object, "lengthText")) {
-											CString simpleText;
-											if (getJsonValue(*lengthText, "simpleText", simpleText)) {
-												int t1 = 0;
-												int t2 = 0;
-												int t3 = 0;
+										if (auto durationText = GetValueByPointer(object, "/contentImage/thumbnailViewModel/overlays/0/thumbnailBottomOverlayViewModel/badges/0/thumbnailBadgeViewModel/text"); durationText && durationText->IsString()) {
+											int t1 = 0;
+											int t2 = 0;
+											int t3 = 0;
 
-												if (const auto ret = swscanf_s(simpleText.GetString(), L"%02d:%02d:%02d", &t1, &t2, &t3)) {
-													if (ret == 3) {
-														duration = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
-													} else if (ret == 2) {
-														duration = ((60LL * t1) + t2) * UNITS;
-													}
+											if (const auto ret = sscanf_s(durationText->GetString(), "%02d:%02d:%02d", &t1, &t2, &t3)) {
+												if (ret == 3) {
+													duration = (((60LL * t1) + t2) * 60LL + t3) * UNITS;
+												} else if (ret == 2) {
+													duration = ((60LL * t1) + t2) * UNITS;
 												}
 											}
 										}
 
-										CString url; url.Format(L"https://www.youtube.com/watch?v=%s", videoId);
-										auto it = std::find_if(youtubePlaylist.cbegin(), youtubePlaylist.cend(), [&url](const CFileItem& item) {
-											return item.GetPath() == url;
-										});
-										if (it == youtubePlaylist.cend()) {
-											lastvideoId = videoId;
-											youtubePlaylist.emplace_back(url, simpleText, duration);
+										youtubePlaylist.emplace_back(url, title, duration);
 
-											if (videoId == videoIdCurrent) {
-												idx_CurrentPlay = youtubePlaylist.size() - 1;
-											}
+										if (contentId == videoIdCurrent) {
+											idx_CurrentPlay = youtubePlaylist.size() - 1;
 										}
 									}
 								}
@@ -1689,11 +1674,11 @@ namespace Youtube
 						};
 
 						if (contents && contents->IsArray()) {
-							for (const auto& item : contents->GetArray()) {
-								if (auto playlistPanelVideoRenderer = GetJsonObject(item, "playlistPanelVideoRenderer")) {
-									ParseJsonObject(*playlistPanelVideoRenderer);
-								} else if (auto playlistVideoRenderer = GetJsonObject(item, "playlistVideoRenderer")) {
-									ParseJsonObject(*playlistVideoRenderer);
+							if (contents && contents->IsArray()) {
+								for (const auto& item : contents->GetArray()) {
+									if (auto lockupViewModel = GetJsonObject(item, "lockupViewModel")) {
+										ParseJsonObject(*lockupViewModel);
+									}
 								}
 							}
 						}
