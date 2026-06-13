@@ -442,7 +442,7 @@ namespace Youtube
 		}
 	}
 
-	static bool ParseMetadata(const CString& videoId, YoutubeFields& y_fields)
+	static bool ParseMetadataLocal(const CString& videoId, YoutubeFields& y_fields)
 	{
 		if (!videoId.IsEmpty()) {
 #if !USE_GOOGLE_API
@@ -1440,7 +1440,7 @@ namespace Youtube
 
 		const auto bParseMetadata = ParseResponseJson(player_response_jsonDocument, y_fields);
 		if (!bParseMetadata) {
-			ParseMetadata(videoId, y_fields);
+			ParseMetadataLocal(videoId, y_fields);
 		}
 
 		if (final_item->profile->type == Youtube::y_audio) {
@@ -1875,7 +1875,7 @@ namespace Youtube
 		return false;
 	}
 
-	bool Parse_URL(CString url, YoutubeFields& y_fields)
+	bool ParseMetadata(CString url, YoutubeFields& y_fields)
 	{
 		bool bRet = false;
 
@@ -1883,44 +1883,7 @@ namespace Youtube
 			HandleURL(url);
 			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
-			bRet = ParseMetadata(videoId, y_fields);
-		}
-
-		return bRet;
-	}
-
-	bool Parse_URL(CString url, CString& title, REFERENCE_TIME& duration)
-	{
-		bool bRet = false;
-
-		if (CheckURL(url)) {
-			HandleURL(url);
-			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
-
-			if (auto ytcfg = ExtractYtcfg(videoId); !ytcfg.IsEmpty()) {
-				rapidjson::Document json;
-				if (!json.Parse(ytcfg).HasParseError()) {
-					if (auto embedded_player_response = GetValueByPointer(json, "/PLAYER_VARS/embedded_player_response"); embedded_player_response && embedded_player_response->IsString()) {
-						auto str = UrlDecode(embedded_player_response->GetString());
-						if (!json.Parse(str).HasParseError()) {
-							if (auto thumbnailPreviewRenderer = GetValueByPointer(json, "/embedPreview/thumbnailPreviewRenderer"); thumbnailPreviewRenderer && thumbnailPreviewRenderer->IsObject()) {
-								if (auto title_runs = GetValueByPointer(*thumbnailPreviewRenderer, "/title/runs"); title_runs && title_runs->IsArray()) {
-									auto array = title_runs->GetArray();
-									if (!array.Empty()) {
-										getJsonValue(array[0], "text", title);
-										bRet = true;
-									}
-								}
-
-								CStringA videoDurationSeconds;
-								if (getJsonValue(*thumbnailPreviewRenderer, "videoDurationSeconds", videoDurationSeconds)) {
-									duration = atoi(videoDurationSeconds.GetString()) * UNITS;
-								}
-							}
-						}
-					}
-				}
-			}
+			bRet = ParseMetadataLocal(videoId, y_fields);
 		}
 
 		return bRet;

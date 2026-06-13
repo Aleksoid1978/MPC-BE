@@ -1219,12 +1219,10 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 	if (pli.m_auds.empty() && s.bPlaylistDetermineDuration) {
 		// Get the title and duration of a YouTube video.
 		// If you have network problems, the player may freeze for 10 seconds.
-		if (!Youtube::Parse_URL(pli.m_fi, pli.m_label, pli.m_duration)) {
-			Youtube::YoutubeFields y_fields;
-			if (Youtube::Parse_URL(pli.m_fi, y_fields)) {
-				pli.m_label = y_fields.title;
-				pli.m_duration = y_fields.duration;
-			}
+		Youtube::YoutubeFields y_fields;
+		if (Youtube::ParseMetadata(pli.m_fi, y_fields)) {
+			pli.m_label = y_fields.title;
+			pli.m_duration = y_fields.duration;
 		}
 	}
 
