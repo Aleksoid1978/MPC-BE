@@ -1213,8 +1213,10 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 		}
 	}
 
+	const CAppSettings& s = AfxGetAppSettings();
+
 	pli.AutoLoadFiles();
-	if (pli.m_auds.empty()) {
+	if (pli.m_auds.empty() && s.bPlaylistDetermineDuration) {
 		if (!Youtube::Parse_URL(pli.m_fi, pli.m_label, pli.m_duration)) {
 			Youtube::YoutubeFields y_fields;
 			if (Youtube::Parse_URL(pli.m_fi, y_fields)) {
@@ -1235,7 +1237,7 @@ void CPlayerPlaylistBar::AddItem(std::list<CString>& fns, CSubtitleItemList* sub
 		pli.m_autolabel = true;
 	}
 
-	curPlayList.Append(pli, AfxGetAppSettings().bPlaylistDetermineDuration);
+	curPlayList.Append(pli, s.bPlaylistDetermineDuration);
 }
 
 static bool SearchFiles(CString path, std::list<CString>& sl, bool bSingleElement)
