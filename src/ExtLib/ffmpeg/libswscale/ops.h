@@ -29,19 +29,7 @@
 
 #include "graph.h"
 #include "filters.h"
-
-typedef enum SwsPixelType {
-    SWS_PIXEL_NONE = 0,
-    SWS_PIXEL_U8,
-    SWS_PIXEL_U16,
-    SWS_PIXEL_U32,
-    SWS_PIXEL_F32,
-    SWS_PIXEL_TYPE_NB
-} SwsPixelType;
-
-const char *ff_sws_pixel_type_name(SwsPixelType type);
-int ff_sws_pixel_type_size(SwsPixelType type) av_const;
-bool ff_sws_pixel_type_is_int(SwsPixelType type) av_const;
+#include "uops.h"
 
 typedef enum SwsOpType {
     SWS_OP_INVALID = 0,
@@ -78,24 +66,6 @@ typedef enum SwsOpType {
 
 const char *ff_sws_op_type_name(SwsOpType op);
 
-/**
- * Bit-mask of components. Exact meaning depends on the usage context.
- */
-typedef uint8_t SwsCompMask;
-enum {
-    SWS_COMP_NONE = 0,
-    SWS_COMP_ALL  = 0xF,
-#define SWS_COMP(X) (1 << (X))
-#define SWS_COMP_TEST(mask, X) (!!((mask) & SWS_COMP(X)))
-#define SWS_COMP_INV(mask) ((mask) ^ SWS_COMP_ALL)
-#define SWS_COMP_ELEMS(N) ((1 << (N)) - 1)
-#define SWS_COMP_MASK(X, Y, Z, W)   \
-    (((X) ? SWS_COMP(0) : 0) |      \
-     ((Y) ? SWS_COMP(1) : 0) |      \
-     ((Z) ? SWS_COMP(2) : 0) |      \
-     ((W) ? SWS_COMP(3) : 0))
-};
-
 /* Compute SwsCompMask from values with denominator != 0 */
 SwsCompMask ff_sws_comp_mask_q4(const AVRational q[4]);
 
@@ -114,6 +84,20 @@ typedef struct SwsComps {
     AVRational min[4], max[4];
 } SwsComps;
 
+typedef enum SwsReadWriteMode {
+    /**
+     * Note: 1-component reads are either SWS_RW_PLANAR or SWS_RW_PACKED,
+     * depending on the underlying interpretation. If multiple components are
+     * packed into one element (e.g. rgb10a2 -> u16), they are marked as
+     * SWS_RW_PACKED. Otherwise (e.g. gray16le), they are SWS_RW_PLANAR.
+     *
+     * This is a purely semantic/informative difference; the underlying code
+     * treats 1-components reads/writes the same regardless of mode.
+     */
+    SWS_RW_PLANAR,  /* one plane per component */
+    SWS_RW_PACKED,  /* all components on a single plane */
+} SwsReadWriteMode;
+
 typedef struct SwsReadWriteOp {
     /**
      * Examples:
@@ -123,9 +107,9 @@ typedef struct SwsReadWriteOp {
      *   monow     = 1x u8 (frac 3)
      *   rgb4      = 1x u8 (frac 1)
      */
+    SwsReadWriteMode mode; /* how data is laid out in memory */
     uint8_t elems; /* number of elements (of type `op.type`) to read/write */
     uint8_t frac;  /* fractional pixel step factor (log2) */
-    bool packed;   /* read multiple elements from a single plane */
 
     /**
      * Filter kernel to apply to each plane while sampling. Currently, only
@@ -134,8 +118,11 @@ typedef struct SwsReadWriteOp {
      * Note: As with SWS_OP_FILTER_*, if a filter kernel is in use, the read
      * operation will always output floating point values.
      */
-    SwsOpType filter;         /* some value of SWS_OP_FILTER_* */
-    SwsFilterWeights *kernel; /* (refstruct) */
+    struct {
+        SwsOpType op;               /* some value of SWS_OP_FILTER_* */
+        SwsFilterWeights *kernel;   /* (refstruct) */
+        SwsPixelType type;          /* pixel type to store result as */
+    } filter;
 } SwsReadWriteOp;
 
 typedef struct SwsPackOp {
@@ -233,6 +220,7 @@ uint32_t ff_sws_linear_mask(SwsLinearOp);
 
 typedef struct SwsFilterOp {
     SwsFilterWeights *kernel; /* filter kernel (refstruct) */
+    SwsPixelType type;        /* pixel type to store result as */
 } SwsFilterOp;
 
 typedef struct SwsOp {
@@ -266,6 +254,11 @@ typedef struct SwsOp {
 
 /* Compute SwsCompMask from a mask of needed components */
 SwsCompMask ff_sws_comp_mask_needed(const SwsOp *op);
+
+/**
+ * Return the number of planes involved in a read/write operation.
+ */
+int ff_sws_rw_op_planes(const SwsOp *op);
 
 /**
  * Describe an operation in human-readable form.
@@ -382,26 +375,9 @@ enum SwsOpCompileFlags {
  * @return 0 on success, the return value if cb() < 0, or a negative error code
  *
  * @note `ops` belongs to ff_sws_enum_op_lists(), but may be mutated by `cb`.
- * @see ff_sws_enum_ops()
  */
 int ff_sws_enum_op_lists(SwsContext *ctx, void *opaque,
                          enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt,
                          int (*cb)(SwsContext *ctx, void *opaque, SwsOpList *ops));
-
-/**
- * Helper function to enumerate over all possible operations, under the current
- * set of options in `ctx`, and run the given callback on each operation.
- *
- * @param src_fmt If set (not AV_PIX_FMT_NONE), constrain the source format
- * @param dst_fmt If set (not AV_PIX_FMT_NONE), constrain the destination format
- * @return 0 on success, the return value if cb() < 0, or a negative error code
- *
- * @note May contain duplicates. `op` belongs to ff_sws_enum_ops(), but may be
- *       mutated by `cb`.
- * @see ff_sws_num_op_lists()
- */
-int ff_sws_enum_ops(SwsContext *ctx, void *opaque,
-                    enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt,
-                    int (*cb)(SwsContext *ctx, void *opaque, SwsOp *op));
 
 #endif
