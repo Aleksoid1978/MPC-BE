@@ -214,6 +214,26 @@ inline bool StartsWithNoCase(const wchar_t* str, const wchar_t* prefix, int pos 
 	return _wcsnicmp(str + pos, prefix, std::char_traits<wchar_t>::length(prefix)) == 0;
 }
 
+inline bool StartsWithStep(const char*& str, const char* prefix)
+{
+	const size_t len = std::char_traits<char>::length(prefix);
+	if (strncmp(str, prefix, len) == 0) {
+		str += len;
+		return true;
+	}
+	return false;
+}
+
+inline bool StartsWithStep(const wchar_t*& str, const wchar_t* prefix)
+{
+	const size_t len = std::char_traits<wchar_t>::length(prefix);
+	if (wcsncmp(str, prefix, len) == 0) {
+		str += len;
+		return true;
+	}
+	return false;
+}
+
 inline bool EndsWith(const CStringA& str, const char* suffix)
 {
 	const size_t len = std::char_traits<char>::length(suffix);
