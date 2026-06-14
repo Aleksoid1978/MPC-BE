@@ -1928,6 +1928,8 @@ HRESULT CMpcAudioRenderer::CreateAudioClient(const BOOL bForceUseDefaultDevice/*
 HRESULT CMpcAudioRenderer::CheckAudioClient(const WAVEFORMATEX *pWaveFormatEx)
 {
 	CAutoLock cAutoLock(&m_csCheck);
+	CAutoLock cRenderLock(&m_csRender);
+
 	DLog(L"CMpcAudioRenderer::CheckAudioClient()");
 
 	BOOL bForceUseDefaultDevice = FALSE;
@@ -1948,8 +1950,6 @@ again:
 	};
 
 	auto ReleaseAudio = [this](const bool bFull = false) {
-		m_csRender.Unlock();
-
 		m_pSyncClock->UnSlave();
 
 		PauseRendererThread();
@@ -1963,8 +1963,6 @@ again:
 			SAFE_RELEASE(m_pMMDevice);
 		}
 	};
-
-	CAutoLock cRenderLock(&m_csRender);
 
 	BOOL bInitNeed = TRUE;
 	// Compare the existing WAVEFORMATEX with the one provided
