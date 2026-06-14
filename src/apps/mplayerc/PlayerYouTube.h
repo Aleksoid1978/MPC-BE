@@ -192,18 +192,7 @@ namespace Youtube
 	bool CheckURL(CString url);
 	bool CheckPlaylist(CString url);
 
-	bool Parse_URL(
-		CStringW url,           // input parameter
-		REFERENCE_TIME rtStart, // input parameter
-		YoutubeFields& y_fields,
-		YoutubeUrllist& youtubeUrllist,
-		YoutubeUrllist& youtubeAudioUrllist,
-		OpenFileData* pOFD,
-		CStringW& errorMessage
-	);
 	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay);
 
 	bool ParseMetadata(CString url, YoutubeFields& y_fields);
-
-	const YoutubeUrllistItem* GetAudioUrl(const YoutubeProfile* vprofile, const YoutubeUrllist& youtubeAudioUrllist);
 }
