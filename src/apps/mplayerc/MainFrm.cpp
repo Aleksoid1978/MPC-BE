@@ -20365,7 +20365,7 @@ BOOL CMainFrame::OpenYoutubePlaylist(const CString& url, BOOL bOnlyParse/* = FAL
 	if (s.bYdlLoadPlaylist) {
 		CFileItemList playlist;
 		int idx_CurrentPlay = 0;
-		if (s.bYutubePlaylistParser && Youtube::CheckPlaylist(url)) {
+		if (s.bYutubePlaylistParser && Youtube::CheckYtPlaylistURL(url)) {
 			Youtube::Parse_Playlist(url, playlist, idx_CurrentPlay);
 		}
 		else if (YT_DLP::CheckPlaylistURL(url)) {

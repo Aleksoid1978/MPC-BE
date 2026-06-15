@@ -126,20 +126,44 @@ namespace Youtube
 		return false;
 	}
 
-	bool CheckPlaylist(CString url)
+	bool CheckYtPlaylistURL(CString url)
 	{
 		url.MakeLower();
 
-		if (url.Find(YOUTUBE_PL_URL) != -1
-				|| url.Find(YOUTUBE_USER_URL) != -1
-				|| url.Find(YOUTUBE_CHANNEL_URL) != -1
-				|| url.Find(YOUTUBE_USER_SHORT_URL) != -1
-				|| url.Find(YOUTUBE_URL_LIBRARY) != -1
-				|| (url.Find(YOUTUBE_URL) != -1 && url.Find(L"&list=") != -1)
-				|| (url.Find(YOUTUBE_URL_A) != -1 && url.Find(L"/watch_videos?video_ids") != -1)
-				|| ((url.Find(YOUTUBE_URL_V) != -1 || url.Find(YOUTUBE_URL_EMBED) != -1
-					 || url.Find(YOUTU_BE_URL) != -1 || url.Find(YOUTUBE_URL_SHORTS) != -1) && url.Find(L"list=") != -1)) {
-			return true;
+		LPCWSTR s = url.GetString();
+		StartsWithStep(s, L"https://");
+		StartsWithStep(s, L"www.");
+
+		if (StartsWithStep(s, L"youtube.com/")) {
+			if (StartsWith(s, L"playlist?")
+				|| StartsWith(s, L"user/")
+				|| StartsWith(s, L"channel/")
+				|| StartsWith(s, L"c/")
+				|| StartsWith(s, L"@")
+				) {
+				return true;
+			}
+
+			if (StartsWithStep(s, L"watch?")) {
+				if (wcsstr(s, L"&list=")) {
+					return true;
+				}
+			}
+			else if (StartsWithStep(s, L"attribution_link?")) {
+				if (wcsstr(s, L"/watch_videos?video_ids")) {
+					return true;
+				}
+			}
+			else if (StartsWithStep(s, L"v/") || StartsWithStep(s, L"embed/") || StartsWithStep(s, L"shorts/")) {
+				if (wcsstr(s, L"list=")) {
+					return true;
+				}
+			}
+		}
+		else if (StartsWithStep(s, L"youtu.be/")) {
+			if (wcsstr(s, L"list=")) {
+				return true;
+			}
 		}
 
 		return false;
@@ -507,7 +531,7 @@ namespace Youtube
 	{
 		idx_CurrentPlay = 0;
 		youtubePlaylist.clear();
-		if (CheckPlaylist(url)) {
+		if (CheckYtPlaylistURL(url)) {
 #if !USE_GOOGLE_API
 			HandleURL(url);
 

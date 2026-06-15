@@ -50,7 +50,7 @@ namespace Youtube
 	};
 
 	bool CheckYtVideoURL(CString url);
-	bool CheckPlaylist(CString url);
+	bool CheckYtPlaylistURL(CString url);
 
 	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay);
 
