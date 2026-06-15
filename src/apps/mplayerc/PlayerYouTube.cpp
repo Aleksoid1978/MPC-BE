@@ -98,19 +98,29 @@ namespace Youtube
 		return {};
 	}
 
-	bool CheckURL(CString url)
+	bool CheckYtVideoURL(CString url)
 	{
 		url.MakeLower();
 
-		if (url.Find(YOUTUBE_URL) != -1
-				|| url.Find(YOUTUBE_URL_A) != -1
-				|| url.Find(YOUTUBE_URL_V) != -1
-				|| url.Find(YOUTUBE_URL_EMBED) != -1
-				|| url.Find(YOUTUBE_URL_SHORTS) != -1
-				|| url.Find(YOUTUBE_URL_CLIP) != -1
-				|| url.Find(YOUTUBE_URL_LIVE) != -1
-				|| url.Find(YOUTU_BE_URL) != -1) {
+		LPCWSTR s = url.GetString();
+		StartsWithStep(s, L"https://");
+		StartsWithStep(s, L"www.");
+
+		if (StartsWith(s, L"youtu.be/")) {
 			return true;
+		}
+
+		if (StartsWithStep(s, L"youtube.com/")) {
+			if (StartsWith(s, L"watch?")
+				|| StartsWith(s, L"attribution_link?")
+				|| StartsWith(s, L"v/")
+				|| StartsWith(s, L"embed/")
+				|| StartsWith(s, L"shorts/")
+				|| StartsWith(s, L"clip/")
+				|| StartsWith(s, L"live/")
+				) {
+				return true;
+			}
 		}
 
 		return false;
@@ -830,7 +840,7 @@ namespace Youtube
 	{
 		bool bRet = false;
 
-		if (CheckURL(url)) {
+		if (CheckYtVideoURL(url)) {
 			HandleURL(url);
 			const CString videoId = RegExpParse(url.GetString(), videoIdRegExp);
 
