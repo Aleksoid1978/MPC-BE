@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 10		"首选音频格式:"
 12		"首选音轨语言:"
 14		"加载播放列表"
-16		"Use the built-in YouTube playlist parser"
+16		"使用内置的 YouTube 播放列表解析器"
 18		"yt-dlp"
 19		"可执行的文件:"
 21		"选择最大码率"
