@@ -65,28 +65,6 @@ namespace Youtube
 
 	constexpr LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
 
-	const YoutubeProfile* GetProfile(int iTag)
-	{
-		for (const auto& profile : YProfiles) {
-			if (iTag == profile.iTag) {
-				return &profile;
-			}
-		}
-
-		return nullptr;
-	}
-
-	const YoutubeProfile* GetAudioProfile(int iTag)
-	{
-		for (const auto& profile : YAudioProfiles) {
-			if (iTag == profile.iTag) {
-				return &profile;
-			}
-		}
-
-		return nullptr;
-	}
-
 	static bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
 	{
 		if (a->format != b->format) {
@@ -106,11 +84,6 @@ namespace Youtube
 		}
 
 		return (a->hdr > b->hdr);
-	}
-
-	bool CompareUrllistItem(const YoutubeUrllistItem& a, const YoutubeUrllistItem& b)
-	{
-		return CompareProfile(a.profile, b.profile);
 	}
 
 	static CString FixHtmlSymbols(CString inStr)
@@ -550,137 +523,6 @@ namespace Youtube
 	static CStringW strYoutubeAudioLang = L"en";
 
 	static std::map<CString, CString> youtubeSignatureCache;
-
-	const YoutubeUrllistItem* SelectVideoStream(YoutubeUrllist& youtubeUrllist)
-	{
-		const YoutubeUrllistItem* final_item = nullptr;
-
-		for (;;) {
-			if (youtubeUrllist.empty()) {
-				DLog(L"Youtube::Parse_URL() : no output video format found");
-
-				return nullptr;
-			}
-
-			int k_mp4 = -1;
-			int k_webm = -1;
-			int k_av1 = -1;
-			for (int i = 0; i < (int)youtubeUrllist.size(); i++) {
-				const auto& format = youtubeUrllist[i].profile->format;
-				if (k_mp4 < 0 && format == y_mp4_avc) {
-					k_mp4 = i;
-				}
-				else if (k_webm < 0 && format == y_webm_vp9) {
-					k_webm = i;
-				}
-				else if (k_av1 < 0 && format == y_mp4_av1) {
-					k_av1 = i;
-				}
-			}
-
-			size_t k = 0;
-			if (YoutubeFormat.vfmt == y_mp4_avc) {
-				k = (k_mp4 >= 0) ? k_mp4 : (k_webm >= 0) ? k_webm : 0;
-			}
-			else if (YoutubeFormat.vfmt == y_webm_vp9) {
-				k = (k_webm >= 0) ? k_webm : (k_mp4 >= 0) ? k_mp4 : 0;
-			}
-			else if (YoutubeFormat.vfmt == y_mp4_av1) {
-				k = (k_av1 >= 0) ? k_av1 : (k_webm >= 0) ? k_webm : 0;
-			}
-			final_item = &youtubeUrllist[k];
-
-			for (size_t i = k + 1; i < youtubeUrllist.size(); i++) {
-				const auto profile = youtubeUrllist[i].profile;
-
-				if (final_item->profile->format == profile->format) {
-					if (profile->quality == final_item->profile->quality) {
-						if (profile->fps60 != YoutubeFormat.fps60) {
-							// same resolution as that of the previous, but not suitable fps
-							continue;
-						}
-						if (profile->hdr != YoutubeFormat.hdr) {
-							// same resolution as that of the previous, but not suitable HDR
-							continue;
-						}
-					}
-
-					if (profile->quality < final_item->profile->quality && final_item->profile->quality <= YoutubeFormat.res) {
-						break;
-					}
-
-					final_item = &youtubeUrllist[i];
-				}
-			}
-
-			const auto& url = final_item->url;
-			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(url, http::connectTimeout))) {
-				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
-				auto it = std::find_if(youtubeUrllist.cbegin(), youtubeUrllist.cend(),
-					[&url](const YoutubeUrllistItem& item) { return item.url == url; });
-				youtubeUrllist.erase(it);
-				final_item = nullptr;
-
-				continue;
-			}
-
-			break;
-		}
-
-		return final_item;
-	}
-
-
-	const YoutubeUrllistItem* SelectAudioStream(YoutubeUrllist& youtubeAudioUrllist)
-	{
-		const YoutubeUrllistItem* final_item = nullptr;
-
-		for (;;) {
-			if (youtubeAudioUrllist.empty()) {
-				DLog(L"Youtube::Parse_URL() : no output audio format found");
-
-				return nullptr;
-			}
-
-			int k_aac = -1;
-			int k_opus = -1;
-			for (int i = 0; i < (int)youtubeAudioUrllist.size(); i++) {
-				const auto& format = youtubeAudioUrllist[i].profile->format;
-				if (k_aac < 0 && format == y_mp4_aac) {
-					k_aac = i;
-				}
-				else if (k_opus < 0 && format == y_webm_opus) {
-					k_opus = i;
-				}
-			}
-
-			size_t k = 0;
-			if (YoutubeFormat.afmt == y_mp4_aac) {
-				k = (k_aac >= 0) ? k_aac : (k_opus >= 0) ? k_opus : 0;
-			}
-			else if (YoutubeFormat.afmt == y_webm_opus) {
-				k = (k_opus >= 0) ? k_opus : (k_aac >= 0) ? k_aac : 0;
-			}
-			final_item = &youtubeAudioUrllist[k];
-
-			const auto& url = final_item->url;
-			CHTTPAsync HTTPAsync;
-			if (FAILED(HTTPAsync.Connect(url, http::connectTimeout))) {
-				DLog(L"Youtube::Parse_URL() : failed to connect \"%s\", skip", url.GetString());
-				auto it = std::find_if(youtubeAudioUrllist.cbegin(), youtubeAudioUrllist.cend(),
-					[&url](const YoutubeUrllistItem& item) { return item.url == url; });
-				youtubeAudioUrllist.erase(it);
-				final_item = nullptr;
-
-				continue;
-			}
-
-			break;
-		}
-
-		return final_item;
-	}
 
 	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay)
 	{
