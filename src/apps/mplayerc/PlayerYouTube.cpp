@@ -65,27 +65,6 @@ namespace Youtube
 
 	constexpr LPCWSTR videoIdRegExp = L"(?:v|video_ids)=([-a-zA-Z0-9_]+)";
 
-	static bool CompareProfile(const YoutubeProfile* a, const YoutubeProfile* b)
-	{
-		if (a->format != b->format) {
-			return (a->format < b->format);
-		}
-
-		if (a->quality != b->quality) {
-			return (a->quality > b->quality);
-		}
-
-		if (a->fps60 != b->fps60) {
-			return (a->fps60 > b->fps60);
-		}
-
-		if (a->type != b->type) {
-			return (a->type < b->type);
-		}
-
-		return (a->hdr > b->hdr);
-	}
-
 	static CString FixHtmlSymbols(CString inStr)
 	{
 		inStr.Replace(L"&quot;", L"\"");
@@ -511,16 +490,6 @@ namespace Youtube
 		funcSWAP,
 		funcLAST
 	};
-
-	static struct {
-		int  vfmt  = y_webm_vp9;
-		int  res   = 720;
-		bool fps60 = false;
-		bool hdr   = false;
-		int  afmt  = y_webm_opus;
-	} YoutubeFormat;
-
-	static CStringW strYoutubeAudioLang = L"en";
 
 	static std::map<CString, CString> youtubeSignatureCache;
 
