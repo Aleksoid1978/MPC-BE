@@ -97,7 +97,7 @@ public:
 	};
 
 	static LPCWSTR CheckVideoURL(CStringW url);
-	static bool YT_DLP::CheckPlaylistURL(CString url);
+	static bool YT_DLP::CheckNonYtPlaylistURL(CString url);
 
 	static bool Parse_Playlist(const CStringW& url, CFileItemList& playlist, int& idx_CurrentPlay);
 

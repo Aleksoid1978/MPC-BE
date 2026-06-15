@@ -405,7 +405,7 @@ LPCWSTR YT_DLP::CheckVideoURL(CStringW url)
 	return nullptr;
 }
 
-bool YT_DLP::CheckPlaylistURL(CString url)
+bool YT_DLP::CheckNonYtPlaylistURL(CString url)
 {
 	url.MakeLower();
 
@@ -413,44 +413,13 @@ bool YT_DLP::CheckPlaylistURL(CString url)
 	StartsWithStep(s, L"https://");
 	StartsWithStep(s, L"www.");
 
-	if (StartsWithStep(s, L"youtube.com/")) {
-		if (StartsWith(s, L"playlist?")
-			|| StartsWith(s, L"user/")
-			|| StartsWith(s, L"channel/")
-			|| StartsWith(s, L"c/")
-			|| StartsWith(s, L"@")
-			) {
-			return true;
-		}
-
-		if (StartsWithStep(s, L"watch?")) {
-			if (wcsstr(s, L"&list=")) {
-				return true;
-			}
-		}
-		else if (StartsWithStep(s, L"attribution_link?")) {
-			if (wcsstr(s, L"/watch_videos?video_ids")) {
-				return true;
-			}
-		}
-		else if (StartsWithStep(s, L"v/") || StartsWithStep(s, L"embed/") || StartsWithStep(s, L"shorts/")) {
-			if (wcsstr(s, L"list=")) {
-				return true;
-			}
-		}
-	}
-	else if (StartsWithStep(s, L"youtu.be/")) {
-		if (wcsstr(s, L"list=")) {
-			return true;
-		}
-	}
-	else if (StartsWith(s, L"vkvideo.ru/playlist/")) {
+	if (StartsWith(s, L"vkvideo.ru/playlist/")) {
 		return true;
 	}
-	else if (StartsWith(s, L"rutube.ru/plst/")) {
+	if (StartsWith(s, L"rutube.ru/plst/")) {
 		return true;
 	}
-	else if (StartsWith(s, L"dzen.ru/suite/")) {
+	if (StartsWith(s, L"dzen.ru/suite/")) {
 		return true;
 	}
 
