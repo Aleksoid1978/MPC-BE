@@ -1507,7 +1507,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
 	strYdlAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_PLAYLIST, bYdlLoadPlaylist);
-	//profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
+	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
 
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
@@ -2004,7 +2004,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHBITRATE, bYdlHighBitrate);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_PLAYLIST, bYdlLoadPlaylist);
-	//profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
+	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
 
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);

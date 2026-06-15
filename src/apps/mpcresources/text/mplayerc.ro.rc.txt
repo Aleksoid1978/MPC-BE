@@ -603,19 +603,20 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Fixează la marginile desktop-ului (biroului)"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 27
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 5		"Formatul video preferat:"
 8		"50/60 fps"
 9		"HDR"
 10		"Formatul audio preferat:"
 12		"Limba preferată pentru pistă:"
 14		"Încarcă lista de redare (playlist-ul)"
-16		"yt-dlp"
-17		"Fișierul executabil:"
-19		"Selectează rata de biți maximă"
-20		"Adresa AceStream:"
-22		"Adresa MatriX (TorrServer):"
-25		"Agentul de utilizator:"
+16		"Use the built-in YouTube playlist parser"
+18		"yt-dlp"
+19		"Fișierul executabil:"
+21		"Selectează rata de biți maximă"
+22		"Adresa AceStream:"
+24		"Adresa MatriX (TorrServer):"
+27		"Agentul de utilizator:"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9

@@ -40,7 +40,7 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_CHECK6, m_chkYDLEnable);
+	DDX_Control(pDX, IDC_CHECK1, m_chkYDLEnable);
 	DDX_Control(pDX, IDC_COMBO5, m_cbYDLExePath);
 
 	DDX_Control(pDX, IDC_COMBO1, m_cbVideoCodec);
@@ -49,9 +49,10 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CHECK4, m_chkHdr);
 	DDX_Control(pDX, IDC_COMBO3, m_cbAudioCodec);
 	DDX_Control(pDX, IDC_COMBO4, m_cbAudioLang);
-	DDX_Control(pDX, IDC_CHECK1, m_chkLoadPlaylist);
-
 	DDX_Control(pDX, IDC_CHECK5, m_chkHighBitrate);
+	DDX_Control(pDX, IDC_CHECK6, m_chkLoadPlaylist);
+	DDX_Control(pDX, IDC_CHECK7, m_chkIntYtPlaylistParser);
+
 	DDX_Control(pDX, IDC_EDIT1,  m_edAceStreamAddress);
 	DDX_Control(pDX, IDC_EDIT2,  m_edTorrServerAddress);
 	DDX_Control(pDX, IDC_EDIT3,  m_edUserAgent);
@@ -59,7 +60,8 @@ void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK3, OnCheck60fps)
-	ON_COMMAND(IDC_CHECK6, OnCheckYDLEnable)
+	ON_COMMAND(IDC_CHECK6, OnCheckLoadPlaylist)
+	ON_COMMAND(IDC_CHECK1, OnCheckYDLEnable)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -130,8 +132,9 @@ BOOL CPPageYoutube::OnInitDialog()
 	}
 
 	m_chkLoadPlaylist.SetCheck(s.bYdlLoadPlaylist);
+	m_chkIntYtPlaylistParser.SetCheck(s.bYutubePlaylistParser);
 
-	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
+	CorrectCWndWidth(GetDlgItem(IDC_CHECK1));
 
 	OnCheck60fps();
 
@@ -190,8 +193,9 @@ BOOL CPPageYoutube::OnApply()
 	} else {
 		s.strYdlAudioLang.Empty();
 	}
-	s.bYdlHighBitrate = !!m_chkHighBitrate.GetCheck();
-	s.bYdlLoadPlaylist = !!m_chkLoadPlaylist.GetCheck();
+	s.bYdlHighBitrate       = !!m_chkHighBitrate.GetCheck();
+	s.bYdlLoadPlaylist      = !!m_chkLoadPlaylist.GetCheck();
+	s.bYutubePlaylistParser = !!m_chkIntYtPlaylistParser.GetCheck();
 
 	CleanPath(s.strYdlExePath);
 
@@ -225,6 +229,17 @@ void CPPageYoutube::OnCheck60fps()
 	SetModified();
 }
 
+void CPPageYoutube::OnCheckLoadPlaylist()
+{
+	if (m_chkLoadPlaylist.GetCheck()) {
+		m_chkIntYtPlaylistParser.EnableWindow(TRUE);
+	}  else {
+		m_chkIntYtPlaylistParser.EnableWindow(FALSE);
+	}
+
+	SetModified();
+}
+
 void CPPageYoutube::OnCheckYDLEnable()
 {
 	const BOOL bEnable = m_chkYDLEnable.GetCheck();
@@ -234,16 +249,18 @@ void CPPageYoutube::OnCheckYDLEnable()
 	m_cbMaxHeight.EnableWindow(bEnable);
 	m_chkHighFps.EnableWindow(bEnable);
 	m_chkHdr.EnableWindow(bEnable);
-
-	if (bEnable) {
-		OnCheck60fps();
-	}
 	GetDlgItem(IDC_STATIC3)->EnableWindow(bEnable);
 	m_cbAudioCodec.EnableWindow(bEnable);
 	GetDlgItem(IDC_STATIC4)->EnableWindow(bEnable);
 	m_cbAudioLang.EnableWindow(bEnable);
-
 	m_chkHighBitrate.EnableWindow(bEnable);
+	m_chkLoadPlaylist.EnableWindow(bEnable);
+	m_chkIntYtPlaylistParser.EnableWindow(bEnable);
+
+	if (bEnable) {
+		OnCheck60fps();
+		OnCheckLoadPlaylist();
+	}
 
 	SetModified();
 }

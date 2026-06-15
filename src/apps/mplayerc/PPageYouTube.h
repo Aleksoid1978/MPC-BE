@@ -38,8 +38,9 @@ private:
 	CButton   m_chkHdr;
 	CComboBox m_cbAudioCodec;
 	CComboBox m_cbAudioLang;
-	CButton   m_chkLoadPlaylist;
 	CButton   m_chkHighBitrate;
+	CButton   m_chkLoadPlaylist;
+	CButton   m_chkIntYtPlaylistParser;
 
 	CEdit m_edAceStreamAddress;
 	CEdit m_edTorrServerAddress;
@@ -83,6 +84,7 @@ public:
 	enum { IDD = IDD_PPAGEYOUTUBE };
 
 	afx_msg void OnCheck60fps();
+	afx_msg void OnCheckLoadPlaylist();
 	afx_msg void OnCheckYDLEnable();
 
 	static CStringW GetDefaultLanguageCode();
