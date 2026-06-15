@@ -848,7 +848,7 @@ public:
 	bool			bYdlHighBitrate;
 	CStringW		strYdlAudioLang;
 	bool			bYdlLoadPlaylist;
-	bool			bYutubePlaylistParser;
+	bool			bYoutubePlaylistParser;
 
 	CStringW		strAceStreamAddress;
 	CStringW		strTorrServerAddress;

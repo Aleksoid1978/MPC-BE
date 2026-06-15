@@ -809,7 +809,7 @@ void CAppSettings::ResetSettings()
 	bYdlHighBitrate  = false;
 	strYdlAudioLang  = CPPageYoutube::GetDefaultLanguageCode();
 	bYdlLoadPlaylist = false;
-	bYutubePlaylistParser = true;
+	bYoutubePlaylistParser = true;
 
 	strAceStreamAddress = L"http://127.0.0.1:6878/ace/getstream?id=%s";
 	strTorrServerAddress = L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u";
@@ -1507,7 +1507,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
 	strYdlAudioLang.Trim();
 	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YDL_PLAYLIST, bYdlLoadPlaylist);
-	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
+	profile.ReadBool(IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYoutubePlaylistParser);
 
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.ReadString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);
@@ -2004,7 +2004,7 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_HIGHBITRATE, bYdlHighBitrate);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_YDL_AUDIOLANGUAGE, strYdlAudioLang);
 	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YDL_PLAYLIST, bYdlLoadPlaylist);
-	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYutubePlaylistParser);
+	profile.WriteBool  (IDS_R_ONLINESERVICES, IDS_RS_YOUTUBE_PLAYLIST_PARSER, bYoutubePlaylistParser);
 
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_ACESTREAM_ADDRESS, strAceStreamAddress);
 	profile.WriteString(IDS_R_ONLINESERVICES, IDS_RS_TORRSERVER_ADDRESS, strTorrServerAddress);

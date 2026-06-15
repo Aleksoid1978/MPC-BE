@@ -132,7 +132,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	}
 
 	m_chkLoadPlaylist.SetCheck(s.bYdlLoadPlaylist);
-	m_chkIntYtPlaylistParser.SetCheck(s.bYutubePlaylistParser);
+	m_chkIntYtPlaylistParser.SetCheck(s.bYoutubePlaylistParser);
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK1));
 
@@ -195,7 +195,7 @@ BOOL CPPageYoutube::OnApply()
 	}
 	s.bYdlHighBitrate       = !!m_chkHighBitrate.GetCheck();
 	s.bYdlLoadPlaylist      = !!m_chkLoadPlaylist.GetCheck();
-	s.bYutubePlaylistParser = !!m_chkIntYtPlaylistParser.GetCheck();
+	s.bYoutubePlaylistParser = !!m_chkIntYtPlaylistParser.GetCheck();
 
 	CleanPath(s.strYdlExePath);
 
