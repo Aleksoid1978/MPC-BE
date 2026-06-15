@@ -517,16 +517,6 @@ namespace Youtube
 		return false;
 	}
 
-	enum youtubeFuncType {
-		funcNONE = -1,
-		funcDELETE,
-		funcREVERSE,
-		funcSWAP,
-		funcLAST
-	};
-
-	static std::map<CString, CString> youtubeSignatureCache;
-
 	bool Parse_Playlist(CString url, CFileItemList& youtubePlaylist, int& idx_CurrentPlay)
 	{
 		idx_CurrentPlay = 0;
@@ -616,6 +606,9 @@ namespace Youtube
 					rapidjson::Document json;
 					if (!json.Parse(jsonEntry).HasParseError()) {
 						auto contents = GetValueByPointer(json, "/contents/twoColumnBrowseResultsRenderer/tabs/0/tabRenderer/content/sectionListRenderer/contents/0/itemSectionRenderer/contents");
+						if (!contents) {
+							contents = GetValueByPointer(json, "/contents/twoColumnWatchNextResults/secondaryResults/secondaryResults/results/0/itemSectionRenderer/contents");
+						}
 
 						CString lastvideoId;
 						auto ParseJsonObject = [&](const auto& object) {
