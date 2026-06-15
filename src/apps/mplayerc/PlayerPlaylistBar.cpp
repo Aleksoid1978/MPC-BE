@@ -35,6 +35,7 @@
 #include <ExtLib/ui/coolsb/coolscroll.h>
 #include "./Controls/MenuEx.h"
 #include "TorrentInfo.h"
+#include "PlayerYouTube.h"
 
 #define ID_PLSMENU_ADD_PLAYLIST    2001
 #define ID_PLSMENU_ADD_EXPLORER    2002
@@ -59,7 +60,7 @@ static CStringW MakePath(CStringW path)
 		return path;
 	}
 
-	if (::PathIsURLW(path) || Youtube::CheckURL(path)) { // skip URLs
+	if (::PathIsURLW(path) || YT_DLP::CheckVideoURL(path)) { // skip URLs
 		return path;
 	}
 
@@ -1370,7 +1371,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 
 	ResolveLinkFiles(fns);
 
-	if (bCheck && !Youtube::CheckURL(fns.front())) {
+	if (bCheck && !YT_DLP::CheckVideoURL(fns.front())) {
 		std::list<CString> sl;
 		if (SearchFiles(fns.front(), sl, m_bSingleElement)) {
 			bool bDVD_BD = false;
@@ -1397,6 +1398,8 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		const CString fn = fns.front();
 		Content::Online::Clear(fn);
 
+		const CString ct;
+		/*
 		std::list<CString> redir;
 		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.empty()) {
@@ -1406,6 +1409,7 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			}
 			return;
 		}
+		*/
 
 		if (m_pMainFrame->IsBDStartFile(fn) || m_pMainFrame->IsBDPlsFile(fn)) {
 			AddItem(fns, subs);

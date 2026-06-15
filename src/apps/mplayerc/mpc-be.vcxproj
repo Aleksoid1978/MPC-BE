@@ -120,7 +120,7 @@
     <ClCompile Include="PlayerCaptureDialog.cpp" />
     <ClCompile Include="PlayerFlyBar.cpp" />
     <ClCompile Include="PlayerYouTube.cpp" />
-    <ClCompile Include="PlayerYouTubeDL.cpp" />
+    <ClCompile Include="PlayerYtDlp.cpp" />
     <ClCompile Include="PlaylistNameDlg.cpp" />
     <ClCompile Include="PPageColor.cpp" />
     <ClCompile Include="PPageFiltersPriority.cpp" />
@@ -256,7 +256,7 @@
     <ClInclude Include="PlayerCaptureDialog.h" />
     <ClInclude Include="PlayerFlyBar.h" />
     <ClInclude Include="PlayerYouTube.h" />
-    <ClInclude Include="PlayerYouTubeDL.h" />
+    <ClInclude Include="PlayerYtDlp.h" />
     <ClInclude Include="PlaylistNameDlg.h" />
     <ClInclude Include="PPageColor.h" />
     <ClInclude Include="PPageFiltersPriority.h" />

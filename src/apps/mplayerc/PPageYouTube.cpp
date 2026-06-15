@@ -20,7 +20,7 @@
 
 #include "stdafx.h"
 #include "PPageYoutube.h"
-#include "PlayerYouTubeDL.h"
+#include "PlayerYtDlp.h"
 #include "DSUtil/Filehandle.h"
 #include "DSUtil/HTTPAsync.h"
 
@@ -69,7 +69,6 @@ BOOL CPPageYoutube::OnInitDialog()
 	__super::OnInitDialog();
 
 	SetCursor(m_hWnd, IDC_COMBO1, IDC_HAND);
-	m_chkYDLEnable.SetWindowTextW(L"yt-dlp. IN DEVELOPMENT, use MPC-BE 1.8.9.136 or older"); // TODO
 	CorrectCWndWidth(&m_chkYDLEnable);
 
 	const CAppSettings& s = AfxGetAppSettings();
@@ -80,11 +79,12 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_cbVideoCodec.SetCurSel(s.iYdlVcodec);
 
 	for (const auto& h : s_CommonVideoHeights) {
-		if (h == 0) {
-			continue; // TODO use ResStr(IDS_AUDIO_ONLY)
-		}
 		CString str;
-		str.Format(L"%d", h);
+		if (h == 0) {
+			str = ResStr(IDS_AUDIO_ONLY);
+		} else {
+			str.Format(L"%d", h);
+		}
 		AddStringData(m_cbMaxHeight, str, h);
 	}
 	SelectByItemData(m_cbMaxHeight, s.iYdlMaxHeight);
@@ -129,7 +129,7 @@ BOOL CPPageYoutube::OnInitDialog()
 		m_cbAudioLang.SetCurSel(0);
 	}
 
-	m_chkLoadPlaylist.SetCheck(s.bYoutubeLoadPlaylist);
+	m_chkLoadPlaylist.SetCheck(s.bYdlLoadPlaylist);
 
 	CorrectCWndWidth(GetDlgItem(IDC_CHECK2));
 
@@ -161,10 +161,10 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	OnCheckYDLEnable();
 
-	// TODO
-	m_cbVideoCodec.EnableWindow(FALSE);
-	m_chkHighFps.EnableWindow(FALSE);
-	m_cbAudioCodec.EnableWindow(FALSE);
+#if 1 // TODO yt-dlp
+	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
+	m_cbAudioLang.ShowWindow(SW_HIDE);
+#endif
 
 	UpdateData(FALSE);
 
@@ -191,8 +191,7 @@ BOOL CPPageYoutube::OnApply()
 		s.strYdlAudioLang.Empty();
 	}
 	s.bYdlHighBitrate = !!m_chkHighBitrate.GetCheck();
-
-	s.bYoutubeLoadPlaylist	= !!m_chkLoadPlaylist.GetCheck();
+	s.bYdlLoadPlaylist = !!m_chkLoadPlaylist.GetCheck();
 
 	CleanPath(s.strYdlExePath);
 

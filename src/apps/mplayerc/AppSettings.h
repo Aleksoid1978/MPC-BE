@@ -220,7 +220,7 @@ enum : int {
 	PLAYBACKWND_FITSCREENLARGER,
 };
 
-inline static const std::vector<int> s_CommonVideoHeights = { 0, 240, 360, 480, 720, 1080, 1440, 2160, 2880, 4320 };
+inline static const std::vector<int> s_CommonVideoHeights = { 4320, 2880, 2160, 1080, 1440, 720, 480, 360, 0 };
 
 struct ShaderC {
 	CString   label;
@@ -837,10 +837,7 @@ public:
 
 	CString			strLastOpenFilterDir;
 
-	// youtube
-	bool			bYoutubeLoadPlaylist;
-	int				iYoutubeTagSelected = 0; // not saved
-
+	// yt-dlp
 	bool			bYdlEnable;
 	CStringW		strYdlExePath;
 	int				iYdlVcodec;
@@ -850,6 +847,8 @@ public:
 	bool			bYdlHDR;
 	bool			bYdlHighBitrate;
 	CStringW		strYdlAudioLang;
+	bool			bYdlLoadPlaylist;
+	bool			bYutubePlaylistParser;
 
 	CStringW		strAceStreamAddress;
 	CStringW		strTorrServerAddress;

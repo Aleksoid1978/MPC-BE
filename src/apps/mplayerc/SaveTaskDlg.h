@@ -1,5 +1,5 @@
 /*
- * (C) 2023-2025 see Authors.txt
+ * (C) 2023-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,25 +28,29 @@
 class CSaveTaskDlg : public CTaskDialog
 {
 	DECLARE_DYNAMIC(CSaveTaskDlg)
-public:
+private:
 	struct SaveItem_t {
 		char type = 0;
 		CStringW path; // file path or url
 		CStringW title;
 		CStringA lang;
+		CStringA ext;
+		CStringW dstPath;
+
 		SaveItem_t(const char _type, const CStringW& _path,
-			const CStringW& _title, const CStringA& _lang)
+			const CStringW& _title, const CStringA& _lang,
+			const CStringA& _ext)
 			: type(_type)
 			, path(_path)
 			, title(_title)
 			, lang(_lang)
+			, ext(_ext)
 		{}
 	};
 
-private:
-	const std::vector<SaveItem_t> m_saveItems;
-	std::vector<CStringW> m_dstPaths;
+	std::vector<SaveItem_t> m_saveItems;
 	CStringW m_ffmpegPath;
+	CStringW m_mergedFile;
 	int m_iSubLangDefault = -1;
 
 	HICON m_hIcon = nullptr;
@@ -55,12 +59,7 @@ private:
 	CComQIPtr<IMediaControl> m_pMC;
 	CComQIPtr<IMediaSeeking> m_pMS;
 
-	enum protocol {
-		PROTOCOL_NONE,
-		PROTOCOL_UDP,
-		PROTOCOL_HTTP,
-	};
-	protocol m_protocol = protocol::PROTOCOL_NONE;
+	bool m_bProtocolUDP = false;
 
 	struct {
 		struct {
@@ -103,7 +102,7 @@ private:
 	int m_iPrevState = -1;
 
 	void SaveUDP();
-	void SaveHTTP(const int iSubLangDefault);
+	void SaveHTTP();
 	HRESULT DownloadHTTP(const CStringW url, const CStringW filepath);
 
 	SOCKET m_UdpSocket = INVALID_SOCKET;
@@ -111,7 +110,7 @@ private:
 	sockaddr_in m_addr = {};
 
 public:
-	CSaveTaskDlg(const std::list<SaveItem_t>& saveItems, const CStringW& dstPath, HRESULT& hr);
+	CSaveTaskDlg(const CStringW& srcPath, const CStringW& dstPath, const YT_DLP& ytdlp, HRESULT& hr);
 
 	void SetFFmpegPath(const CStringW& ffmpegpath);
 	void SetLangDefault(const CStringA& langDefault);

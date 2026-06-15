@@ -198,7 +198,7 @@
     <ClCompile Include="PlayerYouTube.cpp">
       <Filter>Online</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerYouTubeDL.cpp">
+    <ClCompile Include="PlayerYtDlp.cpp">
       <Filter>Online</Filter>
     </ClCompile>
     <ClCompile Include="PlayerFlyBar.cpp">
@@ -668,7 +668,7 @@
     <ClInclude Include="PlayerYouTube.h">
       <Filter>Online</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerYouTubeDL.h">
+    <ClInclude Include="PlayerYtDlp.h">
       <Filter>Online</Filter>
     </ClInclude>
     <ClInclude Include="PlayerFlyBar.h">

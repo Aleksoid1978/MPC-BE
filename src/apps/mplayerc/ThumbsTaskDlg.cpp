@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -262,7 +262,7 @@ void CThumbsTaskDlg::SaveThumbnails(LPCWSTR thumbpath)
 			ar.Format(L"(%d:%d)", dar.cx, dar.cy);
 		}
 
-		CStringW filename = m_pMainFrm->GetAltFileName(); // YouTube
+		CStringW filename = m_pMainFrm->m_YtDlp.GetFilename();
 		CStringW filesize;
 
 		if (filename.IsEmpty()) {
