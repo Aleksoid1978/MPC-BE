@@ -1,5 +1,5 @@
 @ECHO OFF
-REM (C) 2009-2025 see Authors.txt
+REM (C) 2009-2026 see Authors.txt
 REM
 REM This file is part of MPC-BE.
 REM
@@ -62,6 +62,7 @@ FOR %%A IN (%ARG%) DO (
   IF /I "%%A" == "Release"    SET "BUILDCFG=Release"    & SET /A ARGBC+=1
   IF /I "%%A" == "VS2019"     SET "COMPILER=VS2019"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "VS2022"     SET "COMPILER=VS2022"     & SET /A ARGCOMP+=1
+  IF /I "%%A" == "VS2026"     SET "COMPILER=VS2026"     & SET /A ARGCOMP+=1
   IF /I "%%A" == "Packages"   SET "PACKAGES=True"       & SET /A ARGPA+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Installer"  SET "INSTALLER=True"      & SET /A ARGIN+=1 & SET /A ARGCL+=1 & SET /A ARGD+=1 & SET /A ARGF+=1 & SET /A ARGM+=1
   IF /I "%%A" == "Zip"        SET "ZIP=True"            & SET /A ARGZI+=1 & SET /A ARGCL+=1 & SET /A ARGM+=1
@@ -109,6 +110,8 @@ IF /I "%COMPILER%" == "VS2019" (
   SET "PARAMS=%PARAMS% -version [16.0,17.0)"
 ) ELSE IF /I "%COMPILER%" == "VS2022" (
   SET "PARAMS=%PARAMS% -version [17.0,18.0)"
+) ELSE IF /I "%COMPILER%" == "VS2026" (
+  SET "PARAMS=%PARAMS% -version [18.0,19.0)"
 ) ELSE (
   SET "PARAMS=%PARAMS% -latest"
 )
