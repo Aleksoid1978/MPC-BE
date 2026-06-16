@@ -1398,8 +1398,6 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 		const CString fn = fns.front();
 		Content::Online::Clear(fn);
 
-		const CString ct;
-		/*
 		std::list<CString> redir;
 		const CString ct = Content::GetType(fn, &redir);
 		if (!redir.empty()) {
@@ -1409,7 +1407,6 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			}
 			return;
 		}
-		*/
 
 		if (m_pMainFrame->IsBDStartFile(fn) || m_pMainFrame->IsBDPlsFile(fn)) {
 			AddItem(fns, subs);
