@@ -297,6 +297,16 @@ void CPPageYoutube::OnBnClickedDefault()
 	m_edAceStreamAddress.SetWindowTextW(L"http://127.0.0.1:6878/ace/getstream?id=%s");
 	m_edTorrServerAddress.SetWindowTextW(L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u");
 
+	CStringW ydl_path;
+	m_cbYDLExePath.GetWindowTextW(ydl_path);
+	if (ydl_path != L"yt-dlp.exe") {
+		// reset m_cbYDLExePath only if the path is not found
+		ydl_path = GetFullExePath(ydl_path, true);
+		if (ydl_path.IsEmpty()) {
+			m_cbYDLExePath.SelectString(0, L"yt-dlp.exe");
+		}
+	}
+
 	OnCheckYDLEnable();
 
 	Invalidate();
