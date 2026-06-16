@@ -1952,7 +1952,10 @@ again:
 	auto ReleaseAudio = [this](const bool bFull = false) {
 		m_pSyncClock->UnSlave();
 
+		m_csRender.Unlock();
 		PauseRendererThread();
+		m_csRender.Lock();
+
 		m_bIsAudioClientStarted = false;
 
 		SAFE_RELEASE(m_pRenderClient);
