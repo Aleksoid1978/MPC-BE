@@ -36,6 +36,20 @@ CPPageYoutube::~CPPageYoutube()
 {
 }
 
+CStringW CPPageYoutube::GetDefaultLanguageCode()
+{
+	auto defaultUIlcid = MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT);
+	for (auto code : m_langcodes) {
+		auto lcid = LocaleNameToLCID(code, 0);
+		if (lcid == defaultUIlcid) {
+			return code;
+		}
+	}
+
+	// default language
+	return L"en";
+}
+
 void CPPageYoutube::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
@@ -62,6 +76,7 @@ BEGIN_MESSAGE_MAP(CPPageYoutube, CPPageBase)
 	ON_COMMAND(IDC_CHECK3, OnCheck60fps)
 	ON_COMMAND(IDC_CHECK6, OnCheckLoadPlaylist)
 	ON_COMMAND(IDC_CHECK1, OnCheckYDLEnable)
+	ON_BN_CLICKED(IDC_BUTTON3, OnBnClickedDefault)
 END_MESSAGE_MAP()
 
 // CPPageYoutube message handlers
@@ -265,16 +280,25 @@ void CPPageYoutube::OnCheckYDLEnable()
 	SetModified();
 }
 
-CStringW CPPageYoutube::GetDefaultLanguageCode()
+void CPPageYoutube::OnBnClickedDefault()
 {
-	auto defaultUIlcid = MAKELCID(GetUserDefaultUILanguage(), SORT_DEFAULT);
-	for (auto code : m_langcodes) {
-		auto lcid = LocaleNameToLCID(code, 0);
-		if (lcid == defaultUIlcid) {
-			return code;
-		}
-	}
+	m_chkYDLEnable.SetCheck(BST_UNCHECKED);
+	
+	m_cbVideoCodec.SetCurSel(YT_DLP::vcodec_vp9);
+	SelectByItemData(m_cbMaxHeight, 720);
+	m_chkHighFps.SetCheck(BST_UNCHECKED);
+	m_chkHdr.SetCheck(BST_UNCHECKED);;
+	m_cbAudioCodec.SetCurSel(YT_DLP::acodec_opus);
+	m_cbAudioLang.SetCurSel(0);
+	m_chkHighBitrate.SetCheck(BST_UNCHECKED);
+	m_chkLoadPlaylist.SetCheck(BST_UNCHECKED);
+	m_chkIntYtPlaylistParser.SetCheck(BST_UNCHECKED);
 
-	// default language
-	return L"en";
+	m_edAceStreamAddress.SetWindowTextW(L"http://127.0.0.1:6878/ace/getstream?id=%s");
+	m_edTorrServerAddress.SetWindowTextW(L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u");
+
+	OnCheckYDLEnable();
+
+	Invalidate();
+	SetModified();
 }

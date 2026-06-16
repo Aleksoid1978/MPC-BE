@@ -82,11 +82,6 @@ public:
 	virtual ~CPPageYoutube();
 
 	enum { IDD = IDD_PPAGEYOUTUBE };
-
-	afx_msg void OnCheck60fps();
-	afx_msg void OnCheckLoadPlaylist();
-	afx_msg void OnCheckYDLEnable();
-
 	static CStringW GetDefaultLanguageCode();
 
 protected:
@@ -95,4 +90,10 @@ protected:
 	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()
+
+public:
+	afx_msg void OnCheck60fps();
+	afx_msg void OnCheckLoadPlaylist();
+	afx_msg void OnCheckYDLEnable();
+	afx_msg void OnBnClickedDefault();
 };

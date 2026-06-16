@@ -603,7 +603,7 @@ BEGIN DIALOGEX IDD_PPAGEWINDOWSIZE LINES 28
 27		"Придържане към краищата на екрана"
 END
 
-BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
+BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 5		"Предпочитан формат видео:"
 8		"50/60 fps"
 9		"HDR"
@@ -617,6 +617,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 22		"AceStream адрес:"
 24		"MatriX (TorrServer) адрес:"
 27		"Потребителски агент:"
+29		"По подразбиране"
 END
 
 BEGIN DIALOGEX IDD_SAVEIMAGEDIALOGTEMPL LINES 9
