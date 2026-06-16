@@ -937,7 +937,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Încarcă lista de redare (playlist-ul)",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,145
-    CONTROL         "Use the built-in YouTube playlist parser",IDC_CHECK7,
+    CONTROL         "Utilizează analizorul integrat pentru liste de redare YouTube",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,137,206,10
     CONTROL         "yt-dlp",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Fișierul executabil:",IDC_STATIC,10,17,104,8
@@ -3554,7 +3554,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_INTERLACED          "împletit"
+    IDS_INTERLACED          "întrețesut (împletit)"
     IDS_HZ                  "Hz"
     IDS_FRONT_LEFT          "Față stânga"
     IDS_FRONT_RIGHT         "Față dreapta"
@@ -3772,12 +3772,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_BDA_ERROR_CREATE_TUNER "Tunerul nu  poate fi creat."
-    IDS_BDA_ERROR_CREATE_RECEIVER "Receptorul nu poate fi creat."
+    IDS_BDA_ERROR_CREATE_TUNER "Nu s-a putut crea tunerul."
+    IDS_BDA_ERROR_CREATE_RECEIVER "Nu s-a putut crea receptorul."
     IDS_BDA_ERROR_CONNECT_NW_TUNER  "Rețeaua și tunerul nu pot fi conectate."
-    IDS_BDA_ERROR_CONNECT_TUNER_REC  "Tunerul și receptorul nu pot fi conectate."
+    IDS_BDA_ERROR_CONNECT_TUNER_REC  "Nu s-au putut conecta tunerul și receptorul."
     IDS_BDA_ERROR_CONNECT_TUNER "Tunerul nu poate fi conectat."
-    IDS_BDA_ERROR_DEMULTIPLEXER "Demultiplexorul nu poate fi creat."
+    IDS_BDA_ERROR_DEMULTIPLEXER "Nu s-a putut crea demultiplexorul."
     IDS_GOTO_ERROR_PARSING_TIME "Eroare la analizarea timpului introdus!"
     IDS_GOTO_ERROR_PARSING_TEXT "Eroare la analizarea textului introdus!"
     IDS_GOTO_ERROR_PARSING_FPS "Eroare la analizarea ratei de cadre introduse!"
