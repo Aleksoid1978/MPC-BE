@@ -390,7 +390,7 @@ LPCWSTR YT_DLP::CheckVideoURL(CStringW url)
 		return nullptr;
 	}
 
-	if (StartsWith(s, L"vkvideo.ru/video-")) {
+	if (StartsWith(s, L"vkvideo.ru/video-") || StartsWith(s, L"vk.com/video-")) {
 		return L"VK \u0412\u0438\u0434\u0435\u043e";
 	}
 
