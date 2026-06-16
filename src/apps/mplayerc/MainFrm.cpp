@@ -3015,6 +3015,22 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				m_wndInfoBar.SetLine(ResStr(IDS_INFOBAR_SUBTITLES), Subtitles);
 			}
 		break;
+		case TIMER_MOUSE_LEFT_LONGPRESS_SPEED: {
+			KillTimer(TIMER_MOUSE_LEFT_LONGPRESS_SPEED);
+			if (m_bLeftLongPressSpeedCandidate) {
+				m_bLeftLongPressSpeedCandidate = false;
+				if ((GetKeyState(VK_LBUTTON) & 0x8000) && IsLeftLongPressSpeedAvailable(0)) {
+					int nRate = AfxGetAppSettings().nMouseLongPressLeftSpeedRate;
+					if (nRate != 2 && nRate != 4 && nRate != 8 && nRate != 12 && nRate != 16) {
+						nRate = 4;
+					}
+					m_leftLongPressSpeedPreviousRate = m_PlaybackRate;
+					m_bLeftLongPressSpeedActive = true;
+					SetPlayingRate((double)nRate);
+				}
+			}
+		}
+		break;
 		case TIMER_STATUSERASER: {
 			KillTimer(TIMER_STATUSERASER);
 			m_playingmsg.Empty();
@@ -3736,6 +3752,57 @@ BOOL CMainFrame::MouseMessage(UINT id, UINT nFlags, CPoint point)
 	return FALSE;
 }
 
+bool CMainFrame::IsLeftLongPressSpeedAvailable(UINT nFlags) const
+{
+	const CAppSettings& s = AfxGetAppSettings();
+	if (!s.bMouseLongPressLeftSpeed || m_eMediaLoadState != MLS_LOADED || m_bIsLiveOnline) {
+		return false;
+	}
+
+	if (GetPlaybackMode() != PM_FILE && GetPlaybackMode() != PM_DVD) {
+		return false;
+	}
+
+	return !(nFlags & (MK_CONTROL | MK_SHIFT | MK_RBUTTON | MK_MBUTTON | MK_XBUTTON1 | MK_XBUTTON2));
+}
+
+void CMainFrame::BeginLeftLongPressSpeed(UINT nFlags, CPoint point)
+{
+	CancelLeftLongPressSpeed(false);
+	m_bLeftLongPressSpeedDelayedClick = false;
+
+	if (!IsLeftLongPressSpeedAvailable(nFlags)) {
+		return;
+	}
+
+	m_bLeftLongPressSpeedCandidate = true;
+	m_leftLongPressSpeedPoint = point;
+
+	int nDelay = AfxGetAppSettings().nMouseLongPressLeftSpeedDelay;
+	if (nDelay < 250 || nDelay > 500) {
+		nDelay = 300;
+	}
+	SetTimer(TIMER_MOUSE_LEFT_LONGPRESS_SPEED, nDelay, nullptr);
+}
+
+bool CMainFrame::CancelLeftLongPressSpeed(bool bRestoreRate)
+{
+	const bool bWasActive = m_bLeftLongPressSpeedActive;
+
+	if (m_bLeftLongPressSpeedCandidate) {
+		KillTimer(TIMER_MOUSE_LEFT_LONGPRESS_SPEED);
+	}
+
+	m_bLeftLongPressSpeedCandidate = false;
+	m_bLeftLongPressSpeedActive = false;
+
+	if (bWasActive && bRestoreRate) {
+		SetPlayingRate(m_leftLongPressSpeedPreviousRate);
+	}
+
+	return bWasActive;
+}
+
 void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonDown(nFlags, point)) {
@@ -3756,11 +3823,16 @@ void CMainFrame::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 
 	m_bLeftMouseDown = TRUE;
+	BeginLeftLongPressSpeed(nFlags, point);
 
 	if (m_bFullScreen || CursorOnD3DFullScreenWindow()) {
 		if (AssignedMouseToCmd(MOUSE_CLICK_LEFT, 0)) {
-			m_bLeftMouseDownFullScreen = TRUE;
-			MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
+			if (m_bLeftLongPressSpeedCandidate) {
+				m_bLeftLongPressSpeedDelayedClick = true;
+			} else {
+				m_bLeftMouseDownFullScreen = TRUE;
+				MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
+			}
 		}
 		return;
 	}
@@ -3778,7 +3850,14 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	m_bWaitingRButtonUp = false;
 
+	const bool bLongPressSpeedConsumed = CancelLeftLongPressSpeed(true);
+	const bool bDelayedLeftClick = m_bLeftLongPressSpeedDelayedClick;
+	m_bLeftLongPressSpeedDelayedClick = false;
+
 	if (m_bIsMPCVRExclusiveMode && m_OSD.OnLButtonUp(nFlags, point)) {
+		if (bLongPressSpeedConsumed) {
+			m_bLeftMouseDown = FALSE;
+		}
 		return;
 	}
 
@@ -3796,7 +3875,20 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 		return;
 	}
 
+	if (bDelayedLeftClick) {
+		m_bLeftMouseDown = FALSE;
+		if (!bLongPressSpeedConsumed) {
+			MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
+		}
+		return;
+	}
+
 	if (!m_bLeftMouseDown) {
+		return;
+	}
+
+	if (bLongPressSpeedConsumed) {
+		m_bLeftMouseDown = FALSE;
 		return;
 	}
 
@@ -3810,6 +3902,9 @@ void CMainFrame::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
+
 	if (m_bLeftMouseDown) {
 		MouseMessage(MOUSE_CLICK_LEFT, nFlags, point);
 		m_bLeftMouseDown = FALSE;
@@ -3822,6 +3917,8 @@ void CMainFrame::OnLButtonDblClk(UINT nFlags, CPoint point)
 
 void CMainFrame::OnMButtonDown(UINT nFlags, CPoint point)
 {
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
 	SendMessageW(WM_CANCELMODE);
 	__super::OnMButtonDown(nFlags, point);
 }
@@ -3837,6 +3934,8 @@ void CMainFrame::OnMButtonUp(UINT nFlags, CPoint point)
 
 void CMainFrame::OnRButtonDown(UINT nFlags, CPoint point)
 {
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
 	m_bWaitingRButtonUp = true;
 
 	__super::OnRButtonDown(nFlags, point);
@@ -3858,6 +3957,8 @@ void CMainFrame::OnRButtonUp(UINT nFlags, CPoint point)
 
 LRESULT CMainFrame::OnXButtonDown(WPARAM wParam, LPARAM lParam)
 {
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
 	SendMessageW(WM_CANCELMODE);
 	return FALSE;
 }
@@ -3874,6 +3975,8 @@ LRESULT CMainFrame::OnXButtonUp(WPARAM wParam, LPARAM lParam)
 BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
 	m_bWaitingRButtonUp = false;
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
 
 	if (m_wndPreView.IsWindowVisible()) {
 
@@ -3900,6 +4003,8 @@ BOOL CMainFrame::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 void CMainFrame::OnMouseHWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	m_bWaitingRButtonUp = false;
+	CancelLeftLongPressSpeed(true);
+	m_bLeftLongPressSpeedDelayedClick = false;
 
 	if (zDelta) {
 		ScreenToClient(&pt);
@@ -3924,6 +4029,12 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 		return DiffDelta(a.x, b.x, ::GetSystemMetrics(SM_CXDRAG)) || DiffDelta(a.y, b.y, ::GetSystemMetrics(SM_CYDRAG));
 	};
+
+	if ((m_bLeftLongPressSpeedCandidate || m_bLeftLongPressSpeedActive) && DragDetect(m_leftLongPressSpeedPoint, point)) {
+		CancelLeftLongPressSpeed(true);
+		m_bLeftLongPressSpeedDelayedClick = false;
+		m_bLeftMouseDown = FALSE;
+	}
 
 	if (m_bBeginCapture && DragDetect(m_beginCapturePoint, point)) {
 		m_bBeginCapture = false;
@@ -7892,7 +8003,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 			}
 
 			CString info;
-			info.Format(L"Rotation: %d°", rotation);
+			info.Format(L"Rotation: %d\x00B0", rotation);
 			SendStatusMessage(info, 3000);
 		}
 	}

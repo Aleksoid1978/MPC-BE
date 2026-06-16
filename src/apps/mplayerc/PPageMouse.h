@@ -32,9 +32,12 @@ class CPPageMouse : public CPPageBase
 	CComboBox m_cmbLeftButtonClick;
 	CComboBox m_cmbLeftButtonDblClick;
 	CComboBox m_cmbRightButtonClick;
+	CComboBox m_cmbMouseLongPressLeftSpeedRate;
+	CComboBox m_cmbMouseLongPressLeftSpeedDelay;
 
 	CButton m_chkMouseLeftClickOpenRecent;
 	CButton m_chkMouseEasyMove;
+	CButton m_chkMouseLongPressLeftSpeed;
 
 	CPlayerListCtrl m_list;
 	enum {
@@ -125,6 +128,9 @@ protected:
 
 public:
 	afx_msg void OnLeftClickChange();
+	afx_msg void OnLongPressLeftSpeedChange();
+	afx_msg void OnLongPressLeftSpeedRateChange();
+	afx_msg void OnLongPressLeftSpeedDelayChange();
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
