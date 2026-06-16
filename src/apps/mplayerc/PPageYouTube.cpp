@@ -296,6 +296,7 @@ void CPPageYoutube::OnBnClickedDefault()
 
 	m_edAceStreamAddress.SetWindowTextW(L"http://127.0.0.1:6878/ace/getstream?id=%s");
 	m_edTorrServerAddress.SetWindowTextW(L"http://127.0.0.1:8090/stream/fname?link=%s&index=1&m3u");
+	m_edUserAgent.SetWindowTextW(L"Mozilla/5.0");
 
 	CStringW ydl_path;
 	m_cbYDLExePath.GetWindowTextW(ydl_path);
