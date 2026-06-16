@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 29
 10		"Előnyben részesített hangformátum:"
 12		"Előnyben részesített hangsáv nyelve:"
 14		"Lejátszási lista betöltése"
-16		"Use the built-in YouTube playlist parser"
+16		"Használja a beépített YouTube lejátszási lista elemzőt"
 18		"yt-dlp"
 19		"Futtatható fájl:"
 21		"Válassza ki a maximális bitrátát"
