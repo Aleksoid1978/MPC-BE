@@ -426,7 +426,7 @@ bool YT_DLP::CheckNonYtPlaylistURL(CString url)
 	return false;
 }
 
-bool YT_DLP::Parse_Playlist(const CStringW& url, CFileItemList& playlist, int& idx_CurrentPlay)
+bool YT_DLP::Parse_Playlist(const CStringW& pls_url, CFileItemList& playlist, int& idx_CurrentPlay)
 {
 	// get a copy of the settings
 
@@ -440,7 +440,7 @@ bool YT_DLP::Parse_Playlist(const CStringW& url, CFileItemList& playlist, int& i
 	// run yt-dlp.exe
 
 	CStringA buf_out;
-	bool ok = RunYtDlp(ydl_path, L"--flat-playlist --dump-single-json", url, buf_out);
+	bool ok = RunYtDlp(ydl_path, L"--flat-playlist --dump-single-json", pls_url, buf_out);
 	if (!ok) {
 		return false;
 	}
@@ -457,10 +457,22 @@ bool YT_DLP::Parse_Playlist(const CStringW& url, CFileItemList& playlist, int& i
 		return false;
 	}
 
+	playlist.clear();
+	idx_CurrentPlay = -1;
+
 	for (const auto& entry : entries->GetArray()) {
 		CStringW url;
 		if (!getJsonValue(entry, "url", url)) {
 			continue;
+		}
+
+		if (idx_CurrentPlay < 0) {
+			CStringW id;
+			if (getJsonValue(entry, "id", id)) {
+				if (pls_url.Find(id) > 0) {
+					idx_CurrentPlay = (int)playlist.size();
+				}
+			}
 		}
 
 		CStringW title;
@@ -471,7 +483,14 @@ bool YT_DLP::Parse_Playlist(const CStringW& url, CFileItemList& playlist, int& i
 		playlist.emplace_back(url, title, UNITS * duration);
 	}
 
-	return playlist.size() > 0;
+	if (playlist.size()) {
+		if (idx_CurrentPlay < 0) {
+			idx_CurrentPlay = 0;
+		}
+		return true;
+	}
+
+	return false;
 }
 
 bool YT_DLP::SetFormats(const rapidjson::Document& doc)
