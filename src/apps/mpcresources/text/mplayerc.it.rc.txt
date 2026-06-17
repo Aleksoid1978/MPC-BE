@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 10		"Formato audio preferito:"
 12		"Lingua preferita per la traccia audio:"
 14		"Carica playlist"
-16		"Use the built-in YouTube playlist parser"
+16		"Usa parser integrato per playlist di YouTube"
 18		"yt-dlp"
 19		"File eseguibile:"
 21		"Seleziona bitrate massimo"
