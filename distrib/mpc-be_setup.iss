@@ -70,7 +70,7 @@
 #endif
 #define mpcvr_desc     = "MPC Video Renderer 0.10.3"
 #define mpcscriptsrc_desc = "MPC Script Source 0.2.17"
-#define mpcimagesrc_desc = "MPC Image Source 0.3.4"
+#define mpcimagesrc_desc = "MPC Image Source 0.3.6"
 
 [Setup]
 #ifdef Win32Build
