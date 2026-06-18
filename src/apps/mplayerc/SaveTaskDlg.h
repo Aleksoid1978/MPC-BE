@@ -32,22 +32,22 @@ private:
 	struct SaveItem_t {
 		char type = 0;
 		CStringW path; // file path or url
-		CStringW title;
 		CStringA lang;
 		CStringA ext;
 		CStringW dstPath;
 
 		SaveItem_t(const char _type, const CStringW& _path,
-			const CStringW& _title, const CStringA& _lang,
-			const CStringA& _ext)
+			const CStringA& _lang, const CStringA& _ext,
+			const CStringW& _dstPath)
 			: type(_type)
 			, path(_path)
-			, title(_title)
 			, lang(_lang)
 			, ext(_ext)
+			, dstPath(_dstPath)
 		{}
 	};
 
+	CStringW m_title;
 	std::vector<SaveItem_t> m_saveItems;
 	CStringW m_ffmpegPath;
 	CStringW m_mergedFile;

@@ -59,17 +59,16 @@ CSaveTaskDlg::CSaveTaskDlg(const CStringW& srcPath, const CStringW& dstPath, con
 	}
 
 	if (ytdlp.GetFilesCount()) {
+		m_title = ytdlp.mTitle;
 		CStringW mergedFileExt = GetFileExt(dstPath).MakeLower();
 
 		if (auto pVFormat = ytdlp.GetVFormat()) {
-			m_saveItems.emplace_back('v', pVFormat->url, ytdlp.mTitle, pVFormat->language, pVFormat->ext);
-			m_saveItems.back().dstPath = dstPath;
+			m_saveItems.emplace_back('v', pVFormat->url, pVFormat->language, pVFormat->ext, dstPath);
 		}
 
 		if (auto pAFormat = ytdlp.GetAFormat()) {
 			if (m_saveItems.empty()) {
-				m_saveItems.emplace_back('a', pAFormat->url, ytdlp.mTitle, pAFormat->language, pAFormat->ext);
-				m_saveItems.back().dstPath = dstPath;
+				m_saveItems.emplace_back('a', pAFormat->url, pAFormat->language, pAFormat->ext, dstPath);
 			}
 			else {
 				CStringW savePath = GetRemoveFileExt(dstPath);
@@ -80,8 +79,7 @@ CSaveTaskDlg::CSaveTaskDlg(const CStringW& srcPath, const CStringW& dstPath, con
 				if (pAFormat->ext.GetLength()) {
 					savePath.AppendFormat(L".%hs", pAFormat->ext.GetString());
 				}
-				m_saveItems.emplace_back('a', pAFormat->url, "", pAFormat->language, pAFormat->ext);
-				m_saveItems.back().dstPath = savePath;
+				m_saveItems.emplace_back('a', pAFormat->url, pAFormat->language, pAFormat->ext, savePath);
 
 				if (pAFormat->codec != YT_DLP::acodec_opus && mergedFileExt == L".webm") {
 					mergedFileExt = L".mkv";
@@ -105,8 +103,7 @@ CSaveTaskDlg::CSaveTaskDlg(const CStringW& srcPath, const CStringW& dstPath, con
 					if (sub.ext.GetLength()) {
 						savePath.AppendFormat(L".%hs", sub.ext.GetString());
 					}
-					m_saveItems.emplace_back('s', sub.url, sub.name, sub.language, sub.ext);
-					m_saveItems.back().dstPath = savePath;
+					m_saveItems.emplace_back('s', sub.url, sub.language, sub.ext, savePath);
 				}
 				break;
 			}
@@ -114,8 +111,7 @@ CSaveTaskDlg::CSaveTaskDlg(const CStringW& srcPath, const CStringW& dstPath, con
 				if (auto pThumb = ytdlp.GetThumbnail()) {
 					CStringW savePath = GetRemoveFileExt(dstPath);
 					savePath.AppendFormat(L".%hs", pThumb->ext.GetString());
-					m_saveItems.emplace_back('t', pThumb->url, "", "", pThumb->ext);
-					m_saveItems.back().dstPath = savePath;
+					m_saveItems.emplace_back('t', pThumb->url, "", pThumb->ext, savePath);
 				}
 				break;
 			}
@@ -454,10 +450,10 @@ void CSaveTaskDlg::SaveHTTP()
 
 			if (item.type == 't' && finalext == L"mka") {
 				strArgs.AppendFormat(LR"( -attach "%s")", m_saveItems[i].dstPath);
-				if (item.title == L".jpg") {
+				if (item.ext == "jpg") {
 					metadata.Append(L" -metadata:s:t mimetype=image/jpeg -metadata:s:t:0 filename=cover.jpg");
 				}
-				else if (item.title == L".webp") {
+				else if (item.ext == "webp") {
 					metadata.Append(L" -metadata:s:t mimetype=image/webp -metadata:s:t:0 filename=cover.webp");
 				}
 			}
@@ -470,11 +466,6 @@ void CSaveTaskDlg::SaveHTTP()
 				LPCSTR lang = ISO6391To6392(item.lang);
 				if (lang[0]) {
 					metadata.AppendFormat(LR"( -metadata:s:s:%u language="%hs")", isub, lang);
-				}
-				if (item.title.GetLength()) {
-					if (item.title != ISO6391ToLanguage(item.lang)) {
-						metadata.AppendFormat(LR"( -metadata:s:s:%u title="%s")", isub, item.title);
-					}
 				}
 				isub++;
 			}
@@ -629,7 +620,9 @@ HRESULT CSaveTaskDlg::OnTimer(_In_ long lTime)
 			m_SaveStats.Reset();
 		}
 		else if (iProgress == PROGRESS_MERGING) {
-			SetMainInstruction(m_saveItems.front().title);
+			CStringW displayPath = m_mergedFile;
+			EllipsisPath(displayPath, 100);
+			SetMainInstruction(displayPath);
 			SetContent(ResStr(IDS_MERGING_FILES));
 		}
 		m_iPrevState = iProgress;
