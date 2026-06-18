@@ -445,6 +445,10 @@ void CSaveTaskDlg::SaveHTTP()
 		CStringW metadata;
 		unsigned isub = 0;
 
+		if (m_title.GetLength()) {
+			metadata.AppendFormat(LR"( -metadata title="%s")", m_title);
+		}
+
 		for (unsigned i = 0; i < m_saveItems.size(); ++i) {
 			const auto& item = m_saveItems[i];
 
@@ -498,6 +502,11 @@ void CSaveTaskDlg::SaveHTTP()
 
 		if (ShellExecuteExW(&execinfo)) {
 			WaitForSingleObject(execinfo.hProcess, INFINITE);
+#ifdef _DEBUG
+			DWORD exitcode;
+			GetExitCodeProcess(execinfo.hProcess, &exitcode);
+			DLogIf(exitcode, L"CSaveTaskDlg::SaveHTTP : Merging files failed!");
+#endif
 			CloseHandle(execinfo.hProcess);
 		}
 
