@@ -1458,7 +1458,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 								if (subset_sps_present) continue;
 								subset_sps_present++;
 								idx = 1;
-							} else if (nalu_type == NALU_TYPE_PPS) {
+							} else {
 								if (pps_present) continue;
 								pps_present++;
 								idx = 2;
@@ -1483,7 +1483,7 @@ bool CBaseSplitterFileEx::Read(avchdr& h, std::vector<BYTE>& pData, CMediaType* 
 							if (IS_SPS(nalu_type)) {
 								if (sps_present) continue;
 								sps_present++;
-							} else if (nalu_type == NALU_TYPE_PPS) {
+							} else {
 								if (pps_present) continue;
 								pps_present++;
 							}
@@ -1632,7 +1632,7 @@ bool CBaseSplitterFileEx::Read(hevchdr& h, std::vector<BYTE>& pData, CMediaType*
 							} else if (nalu_type == NALU_TYPE_HEVC_SPS) {
 								if (sps_present) continue;
 								sps_present++;
-							} else if (nalu_type == NALU_TYPE_HEVC_PPS) {
+							} else {
 								if (pps_present) continue;
 								pps_present++;
 							}
