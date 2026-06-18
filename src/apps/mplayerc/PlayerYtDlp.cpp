@@ -504,9 +504,6 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 	int   value_int = 0;
 	float value_float = 0.0f;
 
-	bool vcodec_defined = false;
-	bool acodec_defined = false;
-
 	bool hls_vcodec_defined = false;
 	bool hls_acodec_defined = false;
 
@@ -569,11 +566,13 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 			}
 
 			yt_vformat_t vformat;
+			if (!getJsonValue(format, "height", vformat.height)) {
+				continue;
+			}
+
 			vformat.id = format_id;
 			vformat.protocol = protocol;
 			vformat.url = url;
-
-			getJsonValue(format, "height", vformat.height);
 
 			if (getJsonValue(format, "vcodec", value_str)) {
 				if (StartsWith(value_str, "avc1") || value_str == "h264") {
@@ -586,12 +585,8 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 					vformat.codec = vcodec_av1;
 				}
 
-				if (vformat.codec >= 0) {
-					if (vformat.protocol == protocol_hls) {
-						hls_vcodec_defined = true;
-					} else {
-						vcodec_defined = true;
-					}
+				if (vformat.codec >= 0 && vformat.protocol == protocol_hls) {
+					hls_vcodec_defined  = true;
 				}
 			}
 
@@ -632,12 +627,8 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 			aformat.url = url;
 
 			aformat.codec = GetAudioCodec(format);
-			if (aformat.codec >= 0) {
-				if (aformat.protocol == protocol_hls) {
-					hls_acodec_defined = true;
-				} else {
-					acodec_defined = true;
-				}
+			if (aformat.codec >= 0 && aformat.protocol == protocol_hls) {
+				hls_acodec_defined  = true;
 			}
 
 			getJsonValue(format, "tbr", aformat.bitrate);
@@ -661,18 +652,16 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 		|| (mVideoFormats.empty() && hlsVideoFormats.size());
 
 	if (useHLS) {
-		mVideoFormats = std::move(hlsVideoFormats);
-		vcodec_defined = hls_vcodec_defined;
-		mAudioFormats = std::move(hlsAudioFormats);
-		acodec_defined = hls_acodec_defined;
-	}
+		// If some codecs are identified, then remove formats with unknown codecs.
+		if (hls_vcodec_defined) {
+			hlsVideoFormats.erase(std::remove_if(hlsVideoFormats.begin(), hlsVideoFormats.end(), [](yt_vformat_t v) { return v.codec == vcodec_unknoun; }), hlsVideoFormats.end());
+		}
+		if (hls_acodec_defined) {
+			hlsAudioFormats.erase(std::remove_if(hlsAudioFormats.begin(), hlsAudioFormats.end(), [](yt_aformat_t a) { return a.codec == acodec_unknoun; }), hlsAudioFormats.end());
+		}
 
-	// If some codecs are identified, then remove formats with unknown codecs.
-	if (vcodec_defined) {
-		mVideoFormats.erase(std::remove_if(mVideoFormats.begin(), mVideoFormats.end(), [](yt_vformat_t v) { return v.codec == vcodec_unknoun; }), mVideoFormats.end());
-	}
-	if (acodec_defined) {
-		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [](yt_aformat_t a) { return a.codec == acodec_unknoun; }), mAudioFormats.end());
+		mVideoFormats = std::move(hlsVideoFormats);
+		mAudioFormats = std::move(hlsAudioFormats);
 	}
 
 	std::sort(mVideoFormats.begin(), mVideoFormats.end(), [](const yt_vformat_t& a, const yt_vformat_t& b) {
