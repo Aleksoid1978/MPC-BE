@@ -936,32 +936,40 @@ bool YT_DLP::SelectStreams()
 			auto vfmt_http = mVideoFormats[idx_http];
 			auto vfmt_dash = mVideoFormats[idx_dash];
 
-			if (vfmt_http.height > vfmt_dash.height) {
-				mIdxVideo = (vfmt_http.height <= maxHeight) ? idx_http : idx_dash;
+			if (vfmt_http.codec == vcodec && vfmt_dash.codec != vcodec) {
+				mIdxVideo = idx_http;
 			}
-			else if (vfmt_dash.height > vfmt_http.height) {
-				mIdxVideo = (vfmt_dash.height <= maxHeight) ? idx_dash : idx_http;
+			else if (vfmt_dash.codec == vcodec && vfmt_http.codec != vcodec) {
+				mIdxVideo = idx_dash;
 			}
 			else {
-				if (vfmt_http.fps > vfmt_dash.fps) {
-					mIdxVideo = bHighFps ? idx_http : idx_dash;
+				if (vfmt_http.height > vfmt_dash.height) {
+					mIdxVideo = (vfmt_http.height <= maxHeight) ? idx_http : idx_dash;
 				}
-				else if (vfmt_dash.fps > vfmt_http.fps) {
-					mIdxVideo = bHighFps ? idx_dash : idx_http;
+				else if (vfmt_dash.height > vfmt_http.height) {
+					mIdxVideo = (vfmt_dash.height <= maxHeight) ? idx_dash : idx_http;
 				}
 				else {
-					if (vfmt_http.hdr > vfmt_dash.hdr) {
-						mIdxVideo = bHDR ? idx_http : idx_dash;
+					if (vfmt_http.fps > vfmt_dash.fps) {
+						mIdxVideo = bHighFps ? idx_http : idx_dash;
 					}
-					else if (vfmt_dash.hdr > vfmt_http.hdr) {
-						mIdxVideo = bHDR ? idx_dash : idx_http;
+					else if (vfmt_dash.fps > vfmt_http.fps) {
+						mIdxVideo = bHighFps ? idx_dash : idx_http;
 					}
 					else {
-						// If other parameters are the same, we prefer "http."
-						mIdxVideo = idx_http;
-						// PS: We're not comparing the bitrate, because "http"
-						// may be slightly larger due to the included audio track.
-						// Also, remember that bHighBitrate worked earlier.
+						if (vfmt_http.hdr > vfmt_dash.hdr) {
+							mIdxVideo = bHDR ? idx_http : idx_dash;
+						}
+						else if (vfmt_dash.hdr > vfmt_http.hdr) {
+							mIdxVideo = bHDR ? idx_dash : idx_http;
+						}
+						else {
+							// If other parameters are the same, we prefer "http."
+							mIdxVideo = idx_http;
+							// PS: We're not comparing the bitrate, because "http"
+							// may be slightly larger due to the included audio track.
+							// Also, remember that bHighBitrate worked earlier.
+						}
 					}
 				}
 			}
