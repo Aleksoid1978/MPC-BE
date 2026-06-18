@@ -21,8 +21,6 @@
 
 #include "stdafx.h"
 
-#define ENABLE_CHECK_CONNECT 1
-
 #include "MainFrm.h"
 #include <afxglobals.h>
 #include <..\src\mfc\afximpl.h>
@@ -12314,14 +12312,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 		const auto ext = GetFileExt(url).MakeLower();
 
 		bool ok = (ext != L".m3u" && ext != L".m3u8");
-#if ENABLE_CHECK_CONNECT
 		if (ok) {
 			ok = Content::Online::CheckConnect(url);
 		}
-#endif
 
 		if (ok) {
-#if ENABLE_CHECK_CONNECT
 			CString online_hdr;
 			Content::Online::GetHeader(url, online_hdr);
 			if (!online_hdr.IsEmpty()) {
@@ -12343,9 +12338,6 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 				}
 
 				if (bIsHtml) {
-#else
-			{	{
-#endif
 					m_bYoutubeOpening = true;
 					CString ytdl_mesage;
 					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYdlExePath));
@@ -12427,12 +12419,11 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 		HRESULT hr = S_OK;
 
-#if ENABLE_CHECK_CONNECT
 		if (!Content::Online::CheckConnect(fn)) {
 			DLog(L"CMainFrame::OpenFile: Connection failed to %s", fn);
 			hr = VFW_E_NOT_FOUND;
 		}
-#endif
+
 		CString online_hdr;
 		Content::Online::GetHeader(fn, online_hdr);
 		if (online_hdr.Find(L"StreamBuffRe") == -1) {
