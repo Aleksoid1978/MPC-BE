@@ -14130,6 +14130,11 @@ void CMainFrame::CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDD
 	if (pFileData) {
 		auto& fpath = pFileData->fi.GetPath();
 
+		if (::PathIsURLW(fpath)) {
+			m_bNeedAutoChangeMonitorMode = true;
+			return;
+		}
+
 		int i = fpath.Find(L":\\");
 		if (i > 0) {
 			CString drive = fpath.Left(i + 2);
@@ -14281,6 +14286,8 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 
 	m_bWasPausedOnMinimizedVideo = false;
 
+	CheckMediaInfoFps(pFileData, pDVDData);
+
 	if (pFileData) {
 		auto& path = pFileData->fi.GetPath();
 		if (::PathIsURLW(path)) {
@@ -14289,8 +14296,6 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			}
 		}
 		else {
-			CheckMediaInfoFps(pFileData, pDVDData);
-
 			// load fonts from 'fonts' folder
 			if (pFileData) {
 				const CString path = GetFolderPath(pFileData->fi) + L"\\fonts\\";
