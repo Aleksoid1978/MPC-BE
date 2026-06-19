@@ -14297,26 +14297,24 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 		}
 		else {
 			// load fonts from 'fonts' folder
-			if (pFileData) {
-				const CString path = GetFolderPath(pFileData->fi) + L"\\fonts\\";
+			const CString fontDir = GetFolderPath(pFileData->fi) + L"\\fonts\\";
 
-				if (::PathIsDirectoryW(path)) {
-					WIN32_FIND_DATAW fd = { 0 };
-					HANDLE hFind = FindFirstFileW(path + L"*.ttf", &fd);
-					if (hFind != INVALID_HANDLE_VALUE) {
-						do {
-							m_FontInstaller.InstallFontFile(path + fd.cFileName);
-						} while (FindNextFileW(hFind, &fd));
-						FindClose(hFind);
-					}
+			if (::PathIsDirectoryW(fontDir)) {
+				WIN32_FIND_DATAW fd = { 0 };
+				HANDLE hFind = FindFirstFileW(fontDir + L"*.ttf", &fd);
+				if (hFind != INVALID_HANDLE_VALUE) {
+					do {
+						m_FontInstaller.InstallFontFile(fontDir + fd.cFileName);
+					} while (FindNextFileW(hFind, &fd));
+					FindClose(hFind);
+				}
 
-					hFind = FindFirstFileW(path + L"*.otf", &fd);
-					if (hFind != INVALID_HANDLE_VALUE) {
-						do {
-							m_FontInstaller.InstallFontFile(path + fd.cFileName);
-						} while (FindNextFileW(hFind, &fd));
-						FindClose(hFind);
-					}
+				hFind = FindFirstFileW(fontDir + L"*.otf", &fd);
+				if (hFind != INVALID_HANDLE_VALUE) {
+					do {
+						m_FontInstaller.InstallFontFile(fontDir + fd.cFileName);
+					} while (FindNextFileW(hFind, &fd));
+					FindClose(hFind);
 				}
 			}
 		}
