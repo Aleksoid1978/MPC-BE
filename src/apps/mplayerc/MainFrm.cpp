@@ -14030,7 +14030,7 @@ void CMainFrame::CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDD
 		(s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || m_bFullScreen || s.fLaunchfullscreen))
 		|| s.fullScreenModes.bEnabled == 2;
 
-	if (fsmode) {
+	if (!fsmode) {
 		return;
 	}
 
