@@ -526,6 +526,7 @@ private:
 	bool m_bOpening = false;
 
 	void CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDData* pDVDData);
+	CStringW CheckOpenYtDlp(OpenFileData& ofd);
 
 	// Operations
 	bool OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD);
@@ -535,7 +536,7 @@ private:
 	CWnd *GetModalParent() { return this; }
 
 	CString OpenCreateGraphObject(OpenMediaData* pOMD);
-	CString OpenFile(OpenFileData* pOFD);
+	CString OpenFile(OpenFileData* pOFD, const CStringW& youtubeUrl);
 	CString OpenDVD(OpenDVDData* pODD);
 	CString OpenCapture(OpenDeviceData* pODD);
 	HRESULT OpenBDAGraph();

@@ -12274,7 +12274,7 @@ HRESULT CMainFrame::PreviewWindowShow(REFERENCE_TIME rtCur2)
 	return hr;
 }
 
-CString CMainFrame::OpenFile(OpenFileData* pOFD)
+CString CMainFrame::OpenFile(OpenFileData* pOFD, const CStringW& youtubeUrl)
 {
 	if (!pOFD->fi.Valid()) {
 		return ResStr(IDS_MAINFRM_81);
@@ -12282,99 +12282,8 @@ CString CMainFrame::OpenFile(OpenFileData* pOFD)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	CString youtubeUrl;
-	CString youtubeErrorMessage;
-
-	http::userAgent = s.strUserAgent;
-
-	if (m_YtDlp.GetFormatsCount())
-	{
-		youtubeUrl = pOFD->fi.GetPath();
-		if (m_YtDlp.mUserAgent.GetLength()) {
-			http::userAgent = m_YtDlp.mUserAgent;
-		}
-		Content::Online::Disconnect(youtubeUrl);
-
-		if (m_YtDlp.FillOFD(*pOFD)) {
-			pOFD->subs = m_lastOMD->subs;
-			m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
-			m_wndPlaylistBar.SetCurLabel(m_YtDlp.mTitle);
-		}
-	}
-
-	if (s.bYdlEnable
-			&& m_pGB->ShouldOperationContinue() == S_OK
-			&& youtubeUrl.IsEmpty()
-			&& pOFD->auds.empty()
-			&& ::PathIsURLW(pOFD->fi)) {
-
-		auto url = pOFD->fi.GetPath();
-		const auto ext = GetFileExt(url).MakeLower();
-
-		bool ok = (ext != L".m3u" && ext != L".m3u8");
-		if (ok) {
-			ok = Content::Online::CheckConnect(url);
-		}
-
-		if (ok) {
-			CString online_hdr;
-			Content::Online::GetHeader(url, online_hdr);
-			if (!online_hdr.IsEmpty()) {
-				online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
-				std::list<CString> params;
-				Explode(online_hdr, params, L'\n');
-				bool bIsHtml = false;
-
-				for (const auto& param : params) {
-					int k = param.Find(L':');
-					if (k > 0) {
-						const CString key = param.Left(k).Trim().MakeLower();
-						const CString value = param.Mid(k).MakeLower();
-						if (key == L"content-type") {
-							bIsHtml = (value.Find(L"text/html") != -1);
-							break;
-						}
-					}
-				}
-
-				if (bIsHtml) {
-					m_bYoutubeOpening = true;
-					CString ytdl_mesage;
-					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYdlExePath));
-					SetStatusMessage(ytdl_mesage);
-
-					ok = m_YtDlp.Parse_URL(url);
-					if (ok) {
-						OpenFileData OFD;
-						ok = m_YtDlp.FillOFD(OFD);
-						if (ok && m_pGB->ShouldOperationContinue() == S_OK) {
-							youtubeUrl = url;
-							if (m_YtDlp.mUserAgent.GetLength()) {
-								http::userAgent = m_YtDlp.mUserAgent;
-							}
-							Content::Online::Disconnect(url);
-
-							*pOFD = OFD;
-							m_PlaybackInfo.RenderedPath = pOFD->fi.GetPath();
-							m_wndPlaylistBar.SetCurLabel(m_YtDlp.mTitle);
-						}
-						else {
-							m_YtDlp.Clear();
-						}
-					}
-				}
-			}
-		}
-	}
-
-	m_bYoutubeOpening = false;
-
 	if (m_pGB->ShouldOperationContinue() != S_OK) {
 		return ResStr(IDS_MAINFRM_82);
-	}
-
-	if (youtubeUrl.IsEmpty() && !youtubeErrorMessage.IsEmpty()) {
-		return youtubeErrorMessage;
 	}
 
 	UpdatePlayerStatus();
@@ -14258,6 +14167,94 @@ void CMainFrame::CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDD
 	}
 }
 
+CStringW CMainFrame::CheckOpenYtDlp(OpenFileData& ofd)
+{
+	const CAppSettings& s = AfxGetAppSettings();
+
+	CStringW youtubeUrl;
+
+	http::userAgent = s.strUserAgent;
+
+	if (m_YtDlp.GetFormatsCount())
+	{
+		youtubeUrl = ofd.fi.GetPath();
+		if (m_YtDlp.mUserAgent.GetLength()) {
+			http::userAgent = m_YtDlp.mUserAgent;
+		}
+		Content::Online::Disconnect(youtubeUrl);
+
+		if (m_YtDlp.FillOFD(ofd)) {
+			ofd.subs = m_lastOMD->subs;
+			m_PlaybackInfo.RenderedPath = ofd.fi.GetPath();
+			m_wndPlaylistBar.SetCurLabel(m_YtDlp.mTitle);
+		}
+	}
+
+	if (s.bYdlEnable && youtubeUrl.IsEmpty() && ofd.auds.empty() && ::PathIsURLW(ofd.fi)) {
+		auto url = ofd.fi.GetPath();
+		const auto ext = GetFileExt(url).MakeLower();
+
+		bool ok = (ext != L".m3u" && ext != L".m3u8");
+		if (ok) {
+			ok = Content::Online::CheckConnect(url);
+		}
+
+		if (ok) {
+			CString online_hdr;
+			Content::Online::GetHeader(url, online_hdr);
+			if (!online_hdr.IsEmpty()) {
+				online_hdr.Trim(L"\r\n "); online_hdr.Replace(L"\r", L"");
+				std::list<CString> params;
+				Explode(online_hdr, params, L'\n');
+				bool bIsHtml = false;
+
+				for (const auto& param : params) {
+					int k = param.Find(L':');
+					if (k > 0) {
+						const CString key = param.Left(k).Trim().MakeLower();
+						const CString value = param.Mid(k).MakeLower();
+						if (key == L"content-type") {
+							bIsHtml = (value.Find(L"text/html") != -1);
+							break;
+						}
+					}
+				}
+
+				if (bIsHtml) {
+					m_bYoutubeOpening = true;
+					CString ytdl_mesage;
+					ytdl_mesage.Format(ResStr(IDS_CALLING_YOUTUBEDL), GetFileName(s.strYdlExePath));
+					SetStatusMessage(ytdl_mesage);
+
+					ok = m_YtDlp.Parse_URL(url);
+					if (ok) {
+						OpenFileData OFD;
+						ok = m_YtDlp.FillOFD(OFD);
+						if (ok) {
+							youtubeUrl = url;
+							if (m_YtDlp.mUserAgent.GetLength()) {
+								http::userAgent = m_YtDlp.mUserAgent;
+							}
+							Content::Online::Disconnect(url);
+
+							ofd = OFD;
+							m_PlaybackInfo.RenderedPath = ofd.fi.GetPath();
+							m_wndPlaylistBar.SetCurLabel(m_YtDlp.mTitle);
+						}
+						else {
+							m_YtDlp.Clear();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	m_bYoutubeOpening = false;
+
+	return youtubeUrl;
+}
+
 #define BREAK(msg) {err = msg; break;}
 bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 {
@@ -14297,7 +14294,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 		}
 		else {
 			// load fonts from 'fonts' folder
-			const CString fontDir = GetFolderPath(pFileData->fi) + L"\\fonts\\";
+			const CStringW fontDir = GetFolderPath(pFileData->fi) + L"\\fonts\\";
 
 			if (::PathIsDirectoryW(fontDir)) {
 				WIN32_FIND_DATAW fd = { 0 };
@@ -14329,8 +14326,13 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 	}
 
 	CString err, aborted(ResStr(IDS_AG_ABORTED));
+	CStringW youtubeUrl;
 
 	BeginWaitCursor();
+
+	if (pFileData) {
+		youtubeUrl = CheckOpenYtDlp(*pFileData);
+	}
 
 	for (;;) {
 		if (m_fOpeningAborted) {
@@ -14347,7 +14349,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 		}
 
 		if (pFileData) {
-			err = OpenFile(pFileData);
+			err = OpenFile(pFileData, youtubeUrl);
 			if (!err.IsEmpty()) {
 				break;
 			}
