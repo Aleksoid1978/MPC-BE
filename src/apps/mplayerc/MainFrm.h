@@ -525,6 +525,8 @@ private:
 
 	bool m_bOpening = false;
 
+	void CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDData* pDVDData);
+
 	// Operations
 	bool OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD);
 	void CloseMediaPrivate();

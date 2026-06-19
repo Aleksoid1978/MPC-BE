@@ -14110,6 +14110,149 @@ void __stdcall MadVRExclusiveModeCallback(LPVOID context, int event)
 	pFrame->FlyBarSetPos();
 }
 
+void CMainFrame::CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDData* pDVDData)
+{
+	m_dMediaInfoFPS = 0.0;
+	m_bNeedAutoChangeMonitorMode = false;
+
+	const CAppSettings& s = AfxGetAppSettings();
+
+	const bool fsmode =
+		(s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || m_bFullScreen || s.fLaunchfullscreen))
+		|| s.fullScreenModes.bEnabled == 2;
+
+	if (fsmode) {
+		return;
+	}
+
+	CStringW mi_fn;
+
+	if (pFileData) {
+		auto& fpath = pFileData->fi.GetPath();
+
+		int i = fpath.Find(L":\\");
+		if (i > 0) {
+			CString drive = fpath.Left(i + 2);
+			UINT type = GetDriveTypeW(drive);
+			std::list<CString> sl;
+			if (type == DRIVE_REMOVABLE || (type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio)) {
+				int ret = IDRETRY;
+				while (ret == IDRETRY) {
+					WIN32_FIND_DATAW findFileData;
+					HANDLE h = FindFirstFileW(fpath, &findFileData);
+					if (h != INVALID_HANDLE_VALUE) {
+						FindClose(h);
+						ret = IDOK;
+					}
+					else {
+						CString msg;
+						msg.Format(ResStr(IDS_MAINFRM_114), fpath);
+						ret = AfxMessageBox(msg, MB_RETRYCANCEL);
+					}
+				}
+
+				if (ret != IDOK) {
+					ASSERT(FALSE);
+					return;
+				}
+			}
+		}
+		mi_fn = fpath;
+
+		CString ext = GetFileExt(mi_fn);
+		// BD
+		if (ext == L".mpls") {
+			CHdmvClipInfo ClipInfo;
+			CHdmvClipInfo::CPlaylist CurPlaylist;
+			REFERENCE_TIME rtDuration;
+			if (SUCCEEDED(ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist)) && !CurPlaylist.empty()) {
+				mi_fn = CurPlaylist.begin()->m_strFileName;
+			}
+		}
+		else if (ext == L".IFO") {
+			// DVD structure
+			CString sVOB = mi_fn;
+
+			for (int i = 1; i < 10; i++) {
+				sVOB = mi_fn;
+				CString vob;
+				vob.Format(L"%d.VOB", i);
+				sVOB.Replace(L"0.IFO", vob);
+
+				if (::PathFileExistsW(sVOB)) {
+					mi_fn = sVOB;
+					break;
+				}
+			}
+		}
+	}
+	else if (pDVDData) {
+		mi_fn = pDVDData->path;
+		CString ext = GetFileExt(mi_fn);
+		if (ext.IsEmpty()) {
+			if (mi_fn.Right(10) == L"\\VIDEO_TS\\") {
+				mi_fn = mi_fn + L"VTS_01_1.VOB";
+			} else {
+				mi_fn = mi_fn + L"\\VIDEO_TS\\VTS_01_1.VOB";
+			}
+		} else if (ext == L".IFO") {
+			mi_fn = GetFolderPath(mi_fn) + L"\\VTS_01_1.VOB";
+		}
+	} 
+	else {
+		return;
+	}
+
+	// Get FPS
+	MediaInfoLib::MediaInfo MI;
+	MI.Option(L"ParseSpeed", L"0");
+	if (MI.Open(mi_fn.GetString())) {
+		using namespace MediaInfoLib;
+
+		for (int i = 0; i < 2; i++) {
+			String strFPS = MI.Get(Stream_Video, 0, L"FrameRate", Info_Text, Info_Name);
+			if (strFPS.empty() || _wtof(strFPS.c_str()) > 200.0) {
+				strFPS = MI.Get(Stream_Video, 0, L"FrameRate_Original", Info_Text, Info_Name);
+			}
+			String strST = MI.Get(Stream_Video, 0, L"ScanType", Info_Text, Info_Name);
+			String strSO = MI.Get(Stream_Video, 0, L"ScanOrder", Info_Text, Info_Name);
+
+			double nFactor = 1.0;
+
+			// 2:3 pulldown
+			if (strFPS == L"29.970" && (strSO == L"2:3 Pulldown" || (strST == L"Progressive" && (strSO == L"TFF" || strSO == L"BFF" || strSO == L"2:3 Pulldown")))) {
+				strFPS = L"23.976";
+			}
+			else if (strST == L"Interlaced" || strST == L"MBAFF") {
+				// double fps for Interlaced video.
+				nFactor = 2.0;
+			}
+			m_dMediaInfoFPS = _wtof(strFPS.c_str());
+			if (m_dMediaInfoFPS < 30.0 && nFactor > 1.0) {
+				m_dMediaInfoFPS *= nFactor;
+			}
+
+			if (m_dMediaInfoFPS > 0.9) {
+				break;
+			}
+
+			MI.Close();
+			MI.Option(L"ParseSpeed", L"0.5");
+			if (!MI.Open(mi_fn.GetString())) {
+				break;
+			}
+		}
+
+		AutoChangeMonitorMode();
+
+		if (s.fLaunchfullscreen && !IsD3DFullScreenMode() && !m_bFullScreen && !m_bAudioOnly) {
+			ToggleFullscreen(true, true);
+		}
+	} else {
+		m_bNeedAutoChangeMonitorMode = true;
+	}
+}
+
 #define BREAK(msg) {err = msg; break;}
 bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 {
@@ -14140,8 +14283,37 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 
 	if (pFileData) {
 		auto& path = pFileData->fi.GetPath();
-		if (::PathIsURLW(path) && path.Find(L"://") <= 0) {
-			pFileData->fi = L"http://" + path;
+		if (::PathIsURLW(path)) {
+			if (path.Find(L"://") <= 0) {
+				pFileData->fi = L"http://" + path;
+			}
+		}
+		else {
+			CheckMediaInfoFps(pFileData, pDVDData);
+
+			// load fonts from 'fonts' folder
+			if (pFileData) {
+				const CString path = GetFolderPath(pFileData->fi) + L"\\fonts\\";
+
+				if (::PathIsDirectoryW(path)) {
+					WIN32_FIND_DATAW fd = { 0 };
+					HANDLE hFind = FindFirstFileW(path + L"*.ttf", &fd);
+					if (hFind != INVALID_HANDLE_VALUE) {
+						do {
+							m_FontInstaller.InstallFontFile(path + fd.cFileName);
+						} while (FindNextFileW(hFind, &fd));
+						FindClose(hFind);
+					}
+
+					hFind = FindFirstFileW(path + L"*.otf", &fd);
+					if (hFind != INVALID_HANDLE_VALUE) {
+						do {
+							m_FontInstaller.InstallFontFile(path + fd.cFileName);
+						} while (FindNextFileW(hFind, &fd));
+						FindClose(hFind);
+					}
+				}
+			}
 		}
 		DLog(L"--> CMainFrame::OpenMediaPrivate() - pFileData->fns:");
 		DLog(L"    %s", pFileData->fi.GetPath());
@@ -14150,167 +14322,6 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 		for (const auto& aud : pFileData->auds) {
 			DLog(L"--> CMainFrame::OpenMediaPrivate() - pFileData->auds[%d]:", index++);
 			DLog(L"    %s", aud.GetPath());
-		}
-	}
-
-	CString mi_fn;
-	for (;;) {
-		if (pFileData) {
-			if (!pFileData->fi.Valid()) {
-				ASSERT(FALSE);
-				break;
-			}
-
-			CString fn = pFileData->fi;
-
-			int i = fn.Find(L":\\");
-			if (i > 0) {
-				CString drive = fn.Left(i+2);
-				UINT type = GetDriveTypeW(drive);
-				std::list<CString> sl;
-				if (type == DRIVE_REMOVABLE || (type == DRIVE_CDROM && GetCDROMType(drive[0], sl) != CDROM_Audio)) {
-					int ret = IDRETRY;
-					while (ret == IDRETRY) {
-						WIN32_FIND_DATAW findFileData;
-						HANDLE h = FindFirstFileW(fn, &findFileData);
-						if (h != INVALID_HANDLE_VALUE) {
-							FindClose(h);
-							ret = IDOK;
-						} else {
-							CString msg;
-							msg.Format(ResStr(IDS_MAINFRM_114), fn);
-							ret = AfxMessageBox(msg, MB_RETRYCANCEL);
-						}
-					}
-
-					if (ret != IDOK) {
-						ASSERT(FALSE);
-						break;
-					}
-				}
-			}
-			mi_fn = fn;
-		}
-
-		m_dMediaInfoFPS	= 0.0;
-		m_bNeedAutoChangeMonitorMode = false;
-
-		if ((s.fullScreenModes.bEnabled == 1 && (IsD3DFullScreenMode() || m_bFullScreen || s.fLaunchfullscreen))
-				|| s.fullScreenModes.bEnabled == 2) {
-			// DVD
-			if (pDVDData) {
-				mi_fn = pDVDData->path;
-				CString ext = GetFileExt(mi_fn);
-				if (ext.IsEmpty()) {
-					if (mi_fn.Right(10) == L"\\VIDEO_TS\\") {
-						mi_fn = mi_fn + L"VTS_01_1.VOB";
-					} else {
-						mi_fn = mi_fn + L"\\VIDEO_TS\\VTS_01_1.VOB";
-					}
-				} else if (ext == L".IFO") {
-					mi_fn = GetFolderPath(mi_fn) + L"\\VTS_01_1.VOB";
-				}
-			} else {
-				CString ext = GetFileExt(mi_fn);
-				// BD
-				if (ext == L".mpls") {
-					CHdmvClipInfo ClipInfo;
-					CHdmvClipInfo::CPlaylist CurPlaylist;
-					REFERENCE_TIME rtDuration;
-					if (SUCCEEDED(ClipInfo.ReadPlaylist(mi_fn, rtDuration, CurPlaylist)) && !CurPlaylist.empty()) {
-						mi_fn = CurPlaylist.begin()->m_strFileName;
-					}
-				} else if (ext == L".IFO") {
-					// DVD structure
-					CString sVOB = mi_fn;
-
-					for (int i = 1; i < 10; i++) {
-						sVOB = mi_fn;
-						CString vob;
-						vob.Format(L"%d.VOB", i);
-						sVOB.Replace(L"0.IFO", vob);
-
-						if (::PathFileExistsW(sVOB)) {
-							mi_fn = sVOB;
-							break;
-						}
-					}
-				}
-			}
-
-			// Get FPS
-			MediaInfoLib::MediaInfo MI;
-			MI.Option(L"ParseSpeed", L"0");
-			if (MI.Open(mi_fn.GetString())) {
-				using namespace MediaInfoLib;
-
-				for (int i = 0; i < 2; i++) {
-					String strFPS = MI.Get(Stream_Video, 0, L"FrameRate", Info_Text, Info_Name);
-					if (strFPS.empty() || _wtof(strFPS.c_str()) > 200.0) {
-						strFPS = MI.Get(Stream_Video, 0, L"FrameRate_Original", Info_Text, Info_Name);
-					}
-					String strST = MI.Get(Stream_Video, 0, L"ScanType", Info_Text, Info_Name);
-					String strSO = MI.Get(Stream_Video, 0, L"ScanOrder", Info_Text, Info_Name);
-
-					double nFactor = 1.0;
-
-					// 2:3 pulldown
-					if (strFPS == L"29.970" && (strSO == L"2:3 Pulldown" || (strST == L"Progressive" && (strSO == L"TFF" || strSO == L"BFF" || strSO == L"2:3 Pulldown")))) {
-						strFPS = L"23.976";
-					} else if (strST == L"Interlaced" || strST == L"MBAFF") {
-						// double fps for Interlaced video.
-						nFactor = 2.0;
-					}
-					m_dMediaInfoFPS = _wtof(strFPS.c_str());
-					if (m_dMediaInfoFPS < 30.0 && nFactor > 1.0) {
-						m_dMediaInfoFPS *= nFactor;
-					}
-
-					if (m_dMediaInfoFPS > 0.9) {
-						break;
-					}
-
-					MI.Close();
-					MI.Option(L"ParseSpeed", L"0.5");
-					if (!MI.Open(mi_fn.GetString())) {
-						break;
-					}
-				}
-
-				AutoChangeMonitorMode();
-
-				if (s.fLaunchfullscreen && !IsD3DFullScreenMode() && !m_bFullScreen && !m_bAudioOnly ) {
-					ToggleFullscreen(true, true);
-				}
-			} else {
-				m_bNeedAutoChangeMonitorMode = true;
-			}
-		}
-
-		break;
-	}
-
-	// load fonts from 'fonts' folder
-	if (pFileData) {
-		const CString path =  GetFolderPath(pFileData->fi) + L"\\fonts\\";
-
-		if (::PathIsDirectoryW(path)) {
-			WIN32_FIND_DATAW fd = { 0 };
-			HANDLE hFind = FindFirstFileW(path + L"*.ttf", &fd);
-			if (hFind != INVALID_HANDLE_VALUE) {
-				do {
-					m_FontInstaller.InstallFontFile(path + fd.cFileName);
-				} while (FindNextFileW(hFind, &fd));
-				FindClose(hFind);
-			}
-
-			hFind = FindFirstFileW(path + L"*.otf", &fd);
-			if (hFind != INVALID_HANDLE_VALUE) {
-				do {
-					m_FontInstaller.InstallFontFile(path + fd.cFileName);
-				} while (FindNextFileW(hFind, &fd));
-				FindClose(hFind);
-			}
 		}
 	}
 
