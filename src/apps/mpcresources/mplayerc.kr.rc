@@ -3499,7 +3499,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "렌더러는 일부 검사를 건너뛰고 장치 초기화를 시도합니다."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "렌더러는 음향 장치로 비가역 소음을 보냅니다."
 END
 
 STRINGTABLE
