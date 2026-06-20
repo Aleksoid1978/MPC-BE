@@ -32,6 +32,15 @@ public:
 		return *m_pInstance;
 	}
 
+	// Explicitly release the singleton while dxgi.dll is still guaranteed to be
+	// loaded (e.g. from the last filter instance's destructor). Without this,
+	// the unique_ptr's static destructor runs during process shutdown, after
+	// dxgi.dll may already have unloaded/torn down, crashing on exit.
+	inline static void ReleaseInstance()
+	{
+		m_pInstance.reset();
+	}
+
 	IDXGIFactory1* GetFactory() const;
 
 protected:
