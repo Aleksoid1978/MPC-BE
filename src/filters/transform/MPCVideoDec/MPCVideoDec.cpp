@@ -3618,12 +3618,33 @@ HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE *buffer, int buflen)
 		size = (buflen + AV_INPUT_BUFFER_PADDING_SIZE) + (buflen + AV_INPUT_BUFFER_PADDING_SIZE) / 16 + 32;
 	}
 
+	// The DXVA2/D3D11 hwaccel path (e.g. dxva2_hevc_decode_slice) keeps a raw
+	// pointer into the packet data alive past this call, from decode_slice()
+	// until the frame's end_frame()/GPU submission completes, instead of
+	// copying or refcounting it. buffer here points into m_pFFBuffer, a single
+	// shared buffer that ParseInternal() reuses (and may av_fast_realloc to a
+	// new address) on every subsequent call. If that reuse happens before a
+	// prior frame's GPU submission finishes, the hwaccel reads through a
+	// dangling/overwritten pointer - observed as a memcpy access violation in
+	// ff_dxva2_commit_buffer, most often when switching to a higher-resolution
+	// (e.g. 8K) channel adds enough extra latency for the reuse to win the race.
+	// Force a real copy on the hwaccel path so each packet owns independent
+	// memory; software decode can keep aliasing buffer since avcodec_send_packet
+	// there doesn't retain it past the call.
+	const bool bForceOwnBufferForHwaccel = (size <= buflen) && (UseDXVA2() || UseD3D11());
+	if (bForceOwnBufferForHwaccel) {
+		size = buflen + AV_INPUT_BUFFER_PADDING_SIZE;
+	}
+
 	if (size > buflen) {
 		if (av_new_packet(m_pPacket, size) < 0) {
 			return E_OUTOFMEMORY;
 		}
 		memcpy(m_pPacket->data, buffer, buflen);
 		memset(m_pPacket->data + buflen, 0, size - buflen);
+		if (bForceOwnBufferForHwaccel) {
+			m_pPacket->size = buflen;
+		}
 	} else {
 		m_pPacket->data = const_cast<uint8_t*>(buffer);
 		m_pPacket->size = buflen;
