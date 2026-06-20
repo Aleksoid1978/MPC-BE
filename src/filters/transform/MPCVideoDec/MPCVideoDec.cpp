@@ -1261,6 +1261,12 @@ CMPCVideoDecFilter::~CMPCVideoDecFilter()
 {
 	Cleanup();
 	m_pD3D11Decoder.reset();
+
+	// Release the process-wide DXGI factory singleton here, while dxgi.dll is
+	// still guaranteed to be loaded. Leaving it to its static destructor means
+	// it can run during DLL_PROCESS_DETACH, after dxgi.dll's own resources may
+	// already be torn down, which crashes on process exit.
+	CDXGIFactory1::ReleaseInstance();
 }
 
 void CMPCVideoDecFilter::DetectVideoCard(HWND hWnd)
