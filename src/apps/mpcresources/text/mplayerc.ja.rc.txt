@@ -610,7 +610,7 @@ BEGIN DIALOGEX IDD_PPAGEYOUTUBE LINES 30
 10		"お好みの音声形式:"
 12		"お好みの音声トラック言語:"
 14		"プレイリストを読み込む"
-16		"Use the built-in YouTube playlist parser"
+16		"内蔵の YouTube プレイリスト解析機能を使用する"
 18		"yt-dlp"
 19		"実行可能ファイル:"
 21		"最大ビットレートを選択する"

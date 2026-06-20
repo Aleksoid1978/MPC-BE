@@ -937,7 +937,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "プレイリストを読み込む",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,145
-    CONTROL         "Use the built-in YouTube playlist parser",IDC_CHECK7,
+    CONTROL         "内蔵の YouTube プレイリスト解析機能を使用する",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,137,206,10
     CONTROL         "yt-dlp",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "実行可能ファイル:",IDC_STATIC,10,17,104,8
