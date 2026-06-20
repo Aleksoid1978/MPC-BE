@@ -2047,6 +2047,49 @@ bool CPlayerPlaylistBar::ParseASXPlayList(CString fn)
 	return (curPlayList.GetCount() > c);
 }
 
+bool CPlayerPlaylistBar::ParseDplPlayList(CString fn)
+{
+	Content::Online::Disconnect(fn);
+
+	CTextFile f(CP_UTF8, CP_ACP, false);
+	if (!f.Open(fn)) {
+		return false;
+	}
+
+	CStringW str;
+	if (!f.ReadString(str) || str != "DAUMPLAYLIST") {
+		return false;
+	}
+
+	CStringW base = GetFolderPath(fn);
+	INT_PTR c = curPlayList.GetCount();
+
+	const std::wregex entrylineRegex(L"(\\d+)*([a-z]+)*(.+)");
+	UINT cur_idx = 0;
+
+
+	while (f.ReadString(str)) {
+		FastTrim(str);
+		if (str.IsEmpty()) {
+			continue;
+		}
+
+		std::wcmatch match;
+		if (std::regex_match(str.GetString(), match, entrylineRegex) && match.size() == 2) {
+			CStringW path(match[2].first, match[2].length());
+
+			UINT idx = 0;
+			CStringW title;
+			std::wcmatch match;
+
+		}
+
+		CPlaylistItem pli;
+	}
+
+	return (curPlayList.GetCount() > c);
+}
+
 void CPlayerPlaylistBar::Refresh()
 {
 	SetupList();

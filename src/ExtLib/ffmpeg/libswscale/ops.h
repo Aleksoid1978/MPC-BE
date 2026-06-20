@@ -146,7 +146,7 @@ typedef struct SwsSwizzleOp {
 } SwsSwizzleOp;
 
 #define SWS_SWIZZLE(X,Y,Z,W) ((SwsSwizzleOp) { .in = {X, Y, Z, W} })
-SwsCompMask ff_sws_comp_mask_swizzle(SwsCompMask mask, SwsSwizzleOp swiz);
+void ff_sws_comp_mask_swizzle(SwsCompMask *mask, const SwsSwizzleOp *swiz);
 
 typedef struct SwsShiftOp {
     uint8_t amount; /* number of bits to shift */
@@ -216,7 +216,7 @@ enum {
 };
 
 /* Helper function to compute the correct mask */
-uint32_t ff_sws_linear_mask(SwsLinearOp);
+uint32_t ff_sws_linear_mask(const SwsLinearOp *c);
 
 typedef struct SwsFilterOp {
     SwsFilterWeights *kernel; /* filter kernel (refstruct) */

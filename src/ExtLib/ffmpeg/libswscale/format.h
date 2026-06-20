@@ -77,6 +77,7 @@ static inline void ff_color_update_dynamic(SwsColor *dst, const SwsColor *src)
 typedef struct SwsFormat {
     int width, height;
     int interlaced;
+    int field;
     enum AVPixelFormat format;
     enum AVPixelFormat hw_format;
     enum AVColorRange range;
@@ -120,23 +121,18 @@ static inline int ff_color_equal(const SwsColor *c1, const SwsColor *c2)
             ff_prim_equal(&c1->gamut, &c2->gamut);
 }
 
-/* Tests only the static components of a colorspace, ignoring dimensions and per-frame data */
-static inline int ff_props_equal(const SwsFormat *fmt1, const SwsFormat *fmt2)
-{
-    return fmt1->interlaced == fmt2->interlaced &&
-           fmt1->format     == fmt2->format     &&
-           fmt1->range      == fmt2->range      &&
-           fmt1->csp        == fmt2->csp        &&
-           fmt1->loc        == fmt2->loc        &&
-           ff_color_equal(&fmt1->color, &fmt2->color);
-}
-
 /* Tests only the static components of a colorspace, ignoring per-frame data */
 static inline int ff_fmt_equal(const SwsFormat *fmt1, const SwsFormat *fmt2)
 {
     return fmt1->width      == fmt2->width      &&
            fmt1->height     == fmt2->height     &&
-           ff_props_equal(fmt1, fmt2);
+           fmt1->interlaced == fmt2->interlaced &&
+           fmt1->field      == fmt2->field      &&
+           fmt1->format     == fmt2->format     &&
+           fmt1->range      == fmt2->range      &&
+           fmt1->csp        == fmt2->csp        &&
+           fmt1->loc        == fmt2->loc        &&
+           ff_color_equal(&fmt1->color, &fmt2->color);
 }
 
 static inline int ff_fmt_align(enum AVPixelFormat fmt)
@@ -174,8 +170,8 @@ typedef enum SwsPixelType SwsPixelType;
  *
  * Returns 0 on success, or a negative error code on failure.
  */
-int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt);
-int ff_sws_encode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt);
+int ff_sws_decode_pixfmt(SwsOpList *ops, const SwsFormat *fmt);
+int ff_sws_encode_pixfmt(SwsOpList *ops, const SwsFormat *fmt);
 
 /**
  * Append a set of operations for transforming decoded pixel values to/from

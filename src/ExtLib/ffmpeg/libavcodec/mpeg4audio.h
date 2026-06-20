@@ -39,6 +39,7 @@ typedef struct MPEG4AudioConfig {
     int channels;
     int ps;  ///< -1 implicit, 1 presence
     int frame_length_short;
+    int frame_length; ///< derived value
     // ==> Start patch MPC
     int pce;
     // ==> End patch MPC

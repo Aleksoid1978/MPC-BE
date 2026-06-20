@@ -329,7 +329,9 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
 
     side = av_frame_get_side_data(frame, AV_FRAME_DATA_SKIP_SAMPLES);
     if (side && side->size >= 10) {
-        avci->skip_samples = AV_RL32(side->data);
+        int skip_samples = AV_RL32(side->data);
+        if (skip_samples)
+            avci->skip_samples = skip_samples;
         avci->skip_samples = FFMAX(0, avci->skip_samples);
         discard_padding = AV_RL32(side->data + 4);
         av_log(avctx, AV_LOG_DEBUG, "skip %d / discard %d samples due to side data\n",
@@ -2362,6 +2364,8 @@ av_cold void ff_decode_flush_buffers(AVCodecContext *avctx)
     av_packet_unref(avci->last_pkt_props);
     av_packet_unref(avci->in_pkt);
 
+    dc->pts_correction_num_faulty_pts =
+    dc->pts_correction_num_faulty_dts = 0;
     dc->pts_correction_last_pts =
     dc->pts_correction_last_dts = INT64_MIN;
 

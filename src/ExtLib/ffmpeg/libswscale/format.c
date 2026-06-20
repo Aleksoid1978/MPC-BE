@@ -388,6 +388,7 @@ SwsFormat ff_fmt_from_frame(const AVFrame *frame, int field)
     if (frame->flags & AV_FRAME_FLAG_INTERLACED) {
         fmt.height = (fmt.height + (field == FIELD_TOP)) >> 1;
         fmt.interlaced = 1;
+        fmt.field = field;
     }
 
     /* Set luminance and gamut information */
@@ -939,14 +940,15 @@ static int test_format_ops(enum AVPixelFormat format, int output)
     return ret == 0;
 }
 
-static SwsSwizzleOp swizzle_inv(SwsSwizzleOp swiz) {
+static void swizzle_inv(SwsSwizzleOp *swiz)
+{
     /* Input[x] =: Output[swizzle.x] */
-    unsigned out[4];
-    out[swiz.x] = 0;
-    out[swiz.y] = 1;
-    out[swiz.z] = 2;
-    out[swiz.w] = 3;
-    return (SwsSwizzleOp) {{ .x = out[0], out[1], out[2], out[3] }};
+    unsigned tmp[4];
+    tmp[swiz->x] = 0;
+    tmp[swiz->y] = 1;
+    tmp[swiz->z] = 2;
+    tmp[swiz->w] = 3;
+    *swiz = (SwsSwizzleOp) {{ .x = tmp[0], tmp[1], tmp[2], tmp[3] }};
 }
 
 /**
@@ -957,11 +959,10 @@ static SwsSwizzleOp swizzle_inv(SwsSwizzleOp swiz) {
  * it will end up getting pushed towards the output or optimized away entirely
  * by the optimization pass.
  */
-static SwsClearOp fmt_clear(enum AVPixelFormat fmt)
+static SwsClearOp fmt_clear(const SwsFormat *fmt)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
-    const bool has_chroma = desc->nb_components >= 3;
-    const bool has_alpha  = desc->flags & AV_PIX_FMT_FLAG_ALPHA;
+    const bool has_chroma = fmt->desc->nb_components >= 3;
+    const bool has_alpha  = fmt->desc->flags & AV_PIX_FMT_FLAG_ALPHA;
 
     SwsClearOp c = {0};
     if (!has_chroma) {
@@ -983,9 +984,9 @@ static SwsClearOp fmt_clear(enum AVPixelFormat fmt)
 #  define NATIVE_ENDIAN_FLAG 0
 #endif
 
-int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
+int ff_sws_decode_pixfmt(SwsOpList *ops, const SwsFormat *fmt)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
+    const AVPixFmtDescriptor *desc = fmt->desc;
     SwsPixelType pixel_type, raw_type;
     SwsReadWriteOp rw_op;
     SwsSwizzleOp swizzle;
@@ -993,10 +994,10 @@ int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
     SwsComps *comps = &ops->comps_src;
     SwsShiftOp shift;
 
-    RET(fmt_analyze(fmt, &rw_op, &unpack, &swizzle, &shift,
+    RET(fmt_analyze(fmt->format, &rw_op, &unpack, &swizzle, &shift,
                     &pixel_type, &raw_type));
 
-    swizzle = swizzle_inv(swizzle);
+    swizzle_inv(&swizzle);
 
     /* Set baseline pixel content flags */
     const int integer = ff_sws_pixel_type_is_int(raw_type);
@@ -1072,16 +1073,16 @@ int ff_sws_decode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
     return 0;
 }
 
-int ff_sws_encode_pixfmt(SwsOpList *ops, enum AVPixelFormat fmt)
+int ff_sws_encode_pixfmt(SwsOpList *ops, const SwsFormat *fmt)
 {
-    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(fmt);
+    const AVPixFmtDescriptor *desc = fmt->desc;
     SwsPixelType pixel_type, raw_type;
     SwsReadWriteOp rw_op;
     SwsSwizzleOp swizzle;
     SwsPackOp pack;
     SwsShiftOp shift;
 
-    RET(fmt_analyze(fmt, &rw_op, &pack, &swizzle, &shift,
+    RET(fmt_analyze(fmt->format, &rw_op, &pack, &swizzle, &shift,
                     &pixel_type, &raw_type));
 
     if (shift.amount) {
@@ -1203,7 +1204,7 @@ static SwsLinearOp fmt_encode_range(const SwsFormat *fmt, bool *incomplete)
         c.m[0][0] = av_neg_q(c.m[0][0]);
     }
 
-    c.mask = ff_sws_linear_mask(c);
+    c.mask = ff_sws_linear_mask(&c);
     return c;
 }
 
@@ -1222,7 +1223,7 @@ static SwsLinearOp fmt_decode_range(const SwsFormat *fmt, bool *incomplete)
     if (!(fmt->desc->flags & AV_PIX_FMT_FLAG_ALPHA))
         c.m[3][4] = Q1;
 
-    c.mask = ff_sws_linear_mask(c);
+    c.mask = ff_sws_linear_mask(&c);
     return c;
 }
 
@@ -1388,7 +1389,7 @@ linear_mat3(const AVRational m00, const AVRational m01, const AVRational m02,
         {  Q0,  Q0,  Q0, Q1, Q0 },
     }};
 
-    c.mask = ff_sws_linear_mask(c);
+    c.mask = ff_sws_linear_mask(&c);
     return c;
 }
 
@@ -1679,7 +1680,7 @@ int ff_sws_op_list_generate(SwsContext *ctx, const SwsFormat *src,
     ops->dst = *dst;
 
     const SwsPixelType type = SWS_PIXEL_F32;
-    int ret = ff_sws_decode_pixfmt(ops, src->format);
+    int ret = ff_sws_decode_pixfmt(ops, src);
     if (ret < 0)
         goto fail;
     ret = ff_sws_decode_colors(ctx, type, ops, src, incomplete);
@@ -1691,7 +1692,7 @@ int ff_sws_op_list_generate(SwsContext *ctx, const SwsFormat *src,
     ret = ff_sws_encode_colors(ctx, type, ops, src, dst, incomplete);
     if (ret < 0)
         goto fail;
-    ret = ff_sws_encode_pixfmt(ops, dst->format);
+    ret = ff_sws_encode_pixfmt(ops, dst);
     if (ret < 0)
         goto fail;
 
