@@ -3608,7 +3608,7 @@ static inline BOOL GOPFound(BYTE *buf, int len)
 	return FALSE;
 }
 
-HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE *buffer, int buflen)
+HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE* buffer, int buflen)
 {
 	av_packet_unref(m_pPacket);
 
@@ -3618,15 +3618,17 @@ HRESULT CMPCVideoDecFilter::FillAVPacket(const BYTE *buffer, int buflen)
 		size = (buflen + AV_INPUT_BUFFER_PADDING_SIZE) + (buflen + AV_INPUT_BUFFER_PADDING_SIZE) / 16 + 32;
 	}
 
-	if (size > buflen) {
+	if (!m_pParser && size == buflen) {
+		m_pPacket->data = const_cast<uint8_t*>(buffer);
+		m_pPacket->size = buflen;
+	} else {
 		if (av_new_packet(m_pPacket, size) < 0) {
 			return E_OUTOFMEMORY;
 		}
 		memcpy(m_pPacket->data, buffer, buflen);
-		memset(m_pPacket->data + buflen, 0, size - buflen);
-	} else {
-		m_pPacket->data = const_cast<uint8_t*>(buffer);
-		m_pPacket->size = buflen;
+		if (size > buflen) {
+			memset(m_pPacket->data + buflen, 0, size - buflen);
+		}
 	}
 
 	return S_OK;
