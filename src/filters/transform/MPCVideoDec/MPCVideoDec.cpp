@@ -4122,10 +4122,38 @@ HRESULT CMPCVideoDecFilter::ChangeOutputMediaFormat(int nType)
 
 		IPin* pPin = m_pOutput->GetConnected();
 		if (IsVideoRenderer(GetFilterFromPin(pPin))) {
-			hr = NotifyEvent(EC_DISPLAY_CHANGED, (LONG_PTR)pPin, 0);
-			if (S_OK != hr) {
-				hr = E_FAIL;
+			// EC_DISPLAY_CHANGED is meant for a presenter/renderer to announce that
+			// *it* just reset its D3D device (see SyncRenderer.cpp's OnResetDevice()
+			// and EVRAllocatorPresenter.cpp, both literally quoting MS docs: "Presenter
+			// should send this message" after ResetDevice()). Using it here to mean
+			// "the decoder's output format changed" is a different thing entirely, and
+			// quartz.dll's default filter graph manager reacts to it by automatically
+			// Stop()-ing (and restarting) the whole graph on its own worker thread -
+			// confirmed via logging that this is exactly what was forcing
+			// CompleteConnect(PINDIR_OUTPUT)/PostConnect() to run again ~100ms later,
+			// recreating the D3D11 device a 2nd/3rd time within under a second at
+			// startup. That device churn is the root cause of a separate bug (D3D11
+			// startup/renderer-switch sometimes showing no video - GPU resource cleanup
+			// from rapid device recreation can leave a freshly (re)committed allocator's
+			// buffer creation failing for several seconds). Send the new media type the
+			// same in-place way ReconnectOutput() already does for resolution changes -
+			// CD3D11Decoder::DeliverFrame() already checks m_bSendMediaType and carries
+			// it on the next delivered sample - instead of forcing a connection-level
+			// reconnect via EC_DISPLAY_CHANGED.
+			int nNumber;
+			VFormatDesc* pFormats;
+			GetOutputFormats(nNumber, &pFormats);
+			bool bSent = false;
+			for (int i = 0; i < nNumber * 2; i++) {
+				CMediaType mt;
+				if (SUCCEEDED(GetMediaType(i, &mt)) && pPin->QueryAccept(&mt) == S_OK) {
+					m_pOutput->SetMediaType(&mt);
+					m_bSendMediaType = true;
+					bSent = true;
+					break;
+				}
 			}
+			hr = bSent ? S_OK : E_FAIL;
 		} else {
 			int nNumber;
 			VFormatDesc* pFormats;
