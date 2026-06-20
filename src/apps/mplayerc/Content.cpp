@@ -83,6 +83,8 @@ namespace Content {
 			ct = kBDMVPlaylistType;
 		} else if (ext == L".cue") {
 			ct = kCUEPlaylistType;
+		} else if (ext == L".dpl") {
+			ct = kDPLPlaylistType;
 		} else if (ext == L".swf") {
 			ct = kFLASHType;
 		}

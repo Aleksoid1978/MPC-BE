@@ -33,13 +33,15 @@ namespace Content {
 	constexpr static auto kCUEPlaylistType     = L"application/x-cue-metadata";
 	constexpr static auto kASXPlaylistType     = L"video/x-ms-asf";
 	constexpr static auto kBDMVPlaylistType    = L"application/x-bdmv-playlist";
+	constexpr static auto kPLSPlaylistType     = L"audio/x-scpls";
+	constexpr static auto kXSPFPlaylistType    = L"application/xspf+xml";
+	constexpr static auto kDPLPlaylistType     = L"application/x-dpl";
+
 	constexpr static auto kFLASHType           = L"application/x-shockwave-flash";
 	constexpr static auto kWPLPlaylistType     = L"application/vnd.ms-wpl";
 	constexpr static auto kQTPlayerType        = L"application/x-quicktimeplayer";
 	constexpr static auto kQTVideoType         = L"video/quicktime";
 	constexpr static auto kRealAudioType       = L"audio/x-pn-realaudio";
-	constexpr static auto kPLSPlaylistType     = L"audio/x-scpls";
-	constexpr static auto kXSPFPlaylistType    = L"application/xspf+xml";
 	constexpr static auto kASFVideoType        = L"video/x-ms-wmv";
 
 	namespace Online {

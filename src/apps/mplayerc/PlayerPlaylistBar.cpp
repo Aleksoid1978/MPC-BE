@@ -1436,6 +1436,10 @@ void CPlayerPlaylistBar::ParsePlayList(std::list<CString>& fns, CSubtitleItemLis
 			if (ParseASXPlayList(fn)) {
 				return;
 			}
+		} else if (ct == Content::kDPLPlaylistType) {
+			if (ParseDplPlayList(fn)) {
+				return;
+			}
 		}
 	}
 
@@ -2049,8 +2053,6 @@ bool CPlayerPlaylistBar::ParseASXPlayList(CString fn)
 
 bool CPlayerPlaylistBar::ParseDplPlayList(CString fn)
 {
-	Content::Online::Disconnect(fn);
-
 	CTextFile f(CP_UTF8, CP_ACP, false);
 	if (!f.Open(fn)) {
 		return false;
@@ -2064,9 +2066,19 @@ bool CPlayerPlaylistBar::ParseDplPlayList(CString fn)
 	CStringW base = GetFolderPath(fn);
 	INT_PTR c = curPlayList.GetCount();
 
-	const std::wregex entrylineRegex(L"(\\d+)*([a-z]+)*(.+)");
-	UINT cur_idx = 0;
+	auto submatch_compare = [](const std::wcsub_match submatch, const wchar_t* str)
+		{
+			const size_t len = std::char_traits<wchar_t>::length(str);
+			if (len == (size_t)submatch.length() && wcsncmp(submatch.first, str, len) == 0) {
+				return true;
+			}
+			return false;
+		};
 
+	const std::wregex entrylineRegex(L"(\\d+)\\*([a-z]+)\\*(.+)");
+	UINT cur_idx = 0;
+	CStringW path;
+	CStringW title;
 
 	while (f.ReadString(str)) {
 		FastTrim(str);
@@ -2075,16 +2087,34 @@ bool CPlayerPlaylistBar::ParseDplPlayList(CString fn)
 		}
 
 		std::wcmatch match;
-		if (std::regex_match(str.GetString(), match, entrylineRegex) && match.size() == 2) {
-			CStringW path(match[2].first, match[2].length());
-
-			UINT idx = 0;
-			CStringW title;
-			std::wcmatch match;
-
+		if (std::regex_match(str.GetString(), match, entrylineRegex) && match.size() == 4) {
+			UINT idx;
+			if (StrToUInt32(match[1].first, idx)) {
+				if (idx != cur_idx) {
+					if (path.GetLength()) {
+						CPlaylistItem pli;
+						pli.m_fi = path;
+						pli.m_label = title;
+						curPlayList.Append(pli, false);
+					}
+					path.Empty();
+					title.Empty();
+					cur_idx = idx;
+				}
+				if (submatch_compare(match[2], L"file")) {
+					path.SetString(match[3].first, match[3].length());
+				}
+				else if (submatch_compare(match[2], L"title")) {
+					title.SetString(match[3].first, match[3].length());
+				}
+			}
 		}
-
+	}
+	if (path.GetLength()) {
 		CPlaylistItem pli;
+		pli.m_fi = path;
+		pli.m_label = title;
+		curPlayList.Append(pli, false);
 	}
 
 	return (curPlayList.GetCount() > c);
