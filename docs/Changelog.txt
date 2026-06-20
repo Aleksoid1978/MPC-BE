@@ -2,6 +2,9 @@
 
 1.8.9.x dev
 =============================
+Splitters
+Fixed crashes in some situations.
+
 AudioSplitter
 Added support for the RF64 format.
 Fixed reading of channel layout for some WavPack files.
@@ -34,6 +37,7 @@ RGB32 format will be output as a top-down bitmap by default.
 Added support for the "IID_MediaSideDataDOVIMetadataV2" interface.
 Removed support for the deprecated "IID_MediaSideDataDOVIMetadata" interface.
 Fixed retrieving the name of the video adapter when using NVDEC.
+Fixed crashes in some situations.
 
 MPC Video Converter
 Added support for AYUV video format.
