@@ -42,6 +42,7 @@ MpcAudioRenderer
 Improved input format validation.
 Optimized retrieval of supported formats for exclusive mode.
 Added the "Keep audio device active when paused" setting.
+Fixed crashes and freezes in various situations.
 
 Subtitles
 Added the ability to open the properties of an external subtitle renderer in the "Subtitles" settings panel.
@@ -63,6 +64,9 @@ Fixed a rare crash when using the "/slave" key.
 Fixed a crash when getting a list of fonts for OSD.
 Added the ability to load an external audio file using hotkeys.
 Fixed opening a network path starting with \\?\UNC\.
+The "Determine duration when adding" playlist setting now works for YouTube video URLs.
+The "Online media services" settings panel has been redesigned.
+Added a "Merge files using FFmpeg" option to the file saving dialog. This option is activated when playing multiple streams obtained using yt-dlp.
 Various interface fixes.
 
 Installer
