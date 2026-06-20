@@ -494,7 +494,16 @@ CBaseVideoInputPin::CBaseVideoInputPin(LPCWSTR pObjectName, CBaseVideoFilter* pF
 
 CBaseVideoInputPin::~CBaseVideoInputPin()
 {
-	delete m_pAllocator;
+	// m_pAllocator is a COM object (CMemAllocator/CUnknown) that may still be
+	// held by other owners (the base CBaseInputPin::m_pAllocator slot set up
+	// in GetAllocator()'s caller, and potentially the connected output pin).
+	// Releasing instead of deleting avoids freeing it out from under a
+	// reference another pin still holds, which previously caused a
+	// use-after-free crash in CBaseAllocator::Decommit() during filter graph
+	// teardown.
+	if (m_pAllocator) {
+		m_pAllocator->Release();
+	}
 }
 
 STDMETHODIMP CBaseVideoInputPin::GetAllocator(IMemAllocator** ppAllocator)
