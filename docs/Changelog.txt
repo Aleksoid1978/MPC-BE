@@ -66,7 +66,7 @@ Fixed opening a network path starting with \\?\UNC\.
 Various interface fixes.
 
 Installer
-Updated MPC Video Renderer 0.10.3.
+Updated MPC Video Renderer 0.10.5.
 Updated MPC Script Source 0.2.17.
 Added MPC Image Source 0.3.6.
 
