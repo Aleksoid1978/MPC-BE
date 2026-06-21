@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -56,28 +56,28 @@ jobs:
         shell: pwsh
 
       - name: Upload Installer x64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "Installer x64" 
           path: _bin/Packages/**/MPC-BE*.x64-installer.zip
           compression-level: 0
 
       - name: Upload Zip x64
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "Zip x64" 
           path: _bin/Packages/**/MPC-BE*.x64.7z
           compression-level: 0
 
       - name: Upload Installer x86
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "Installer x86" 
           path: _bin/Packages/**/MPC-BE*.x86-installer.zip
           compression-level: 0
 
       - name: Upload Zip x86
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: "Zip x86" 
           path: _bin/Packages/**/MPC-BE*.x86.7z
