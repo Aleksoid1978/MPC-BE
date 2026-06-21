@@ -786,7 +786,7 @@ void YT_DLP::SetInfo(const rapidjson::Document& doc)
 	// user-agent
 	if (auto http_headers = GetJsonObject(doc, "http_headers")) {
 		getJsonValue(*http_headers, "User-Agent", mUserAgent);
-		DLogIf(mUserAgent.GetLength(), L"User-Agent: ", mUserAgent);
+		DLogIf(mUserAgent.GetLength(), L"User-Agent: %s", mUserAgent.GetString());
 	}
 
 	CStringA liveStatus;
