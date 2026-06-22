@@ -800,7 +800,7 @@ void CAppSettings::ResetSettings()
 	strLastOpenFilterDir.Empty();
 
 	bYdlEnable       = false;
-	strYdlExePath    = L"yt-dlp.exe";
+	strYdlExePath    = DEFAULT_YTDLP_EXE;
 	iYdlVcodec       = YT_DLP::vcodec_vp9;
 	iYdlAcodec       = YT_DLP::acodec_opus;
 	iYdlMaxHeight    = 720;

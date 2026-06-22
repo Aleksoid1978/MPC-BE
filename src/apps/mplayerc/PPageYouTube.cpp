@@ -157,8 +157,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	was_added = false;
 	LPCWSTR ydl_filenames[] = {
-			L"yt-dlp.exe",
-			L"yt-dlp_min.exe",
+		DEFAULT_YTDLP_EXE,
 	};
 	for (auto& ydl_filename : ydl_filenames) {
 		m_cbYDLExePath.AddString(ydl_filename);
@@ -300,11 +299,11 @@ void CPPageYoutube::OnBnClickedDefault()
 
 	CStringW ydl_path;
 	m_cbYDLExePath.GetWindowTextW(ydl_path);
-	if (ydl_path != L"yt-dlp.exe") {
+	if (ydl_path != DEFAULT_YTDLP_EXE) {
 		// reset m_cbYDLExePath only if the path is not found
 		ydl_path = GetFullExePath(ydl_path, true);
 		if (ydl_path.IsEmpty()) {
-			m_cbYDLExePath.SelectString(0, L"yt-dlp.exe");
+			m_cbYDLExePath.SelectString(0, DEFAULT_YTDLP_EXE);
 		}
 	}
 

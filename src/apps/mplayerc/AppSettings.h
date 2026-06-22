@@ -174,6 +174,12 @@ enum MCE_RAW_INPUT {
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000
 
+#ifdef _WIN64
+	#define DEFAULT_YTDLP_EXE L"yt-dlp.exe"
+#else
+	#define DEFAULT_YTDLP_EXE L"yt-dlp_x86.exe"
+#endif
+
 enum dvstype {
 	DVS_HALF,
 	DVS_NORMAL,
