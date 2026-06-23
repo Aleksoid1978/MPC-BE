@@ -43,7 +43,7 @@ struct VFormatDesc {
 		return (subtype == fmt.subtype && fourcc == fmt.fourcc);
 	}
 
-	WORD GetBihBitCount() const { 
+	WORD GetBihBitCount() const {
 		WORD bitCount = packsize * 8;
 		if (planes > 1) {
 			if (cmodel == Cm_YUV420) {

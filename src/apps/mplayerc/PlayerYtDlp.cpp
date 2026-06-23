@@ -1256,7 +1256,7 @@ UINT YT_DLP::GetFilesCount() const
 	}
 	count += mSubtitles.size();
 
-	return count;	
+	return count;
 }
 
 const YT_DLP::yt_vformat_t* YT_DLP::GetVFormat() const

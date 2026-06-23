@@ -268,7 +268,7 @@ BOOL CMpcAudioRendererSettingsWnd::OnToolTipNotify(UINT id, NMHDR * pNMHDR, LRES
 			break;
 		case IDC_PP_PAUSE_KEEP_ACTIVE:
 			strTipText = ResStr(IDS_ARS_TIP_PAUSE_KEEP_ACTIVE);
-			break;		
+			break;
 		default:
 			return FALSE;
 		}

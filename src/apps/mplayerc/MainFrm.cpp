@@ -14112,7 +14112,7 @@ void CMainFrame::CheckMediaInfoFps(const OpenFileData* pFileData, const OpenDVDD
 		} else if (ext == L".IFO") {
 			mi_fn = GetFolderPath(mi_fn) + L"\\VTS_01_1.VOB";
 		}
-	} 
+	}
 	else {
 		return;
 	}

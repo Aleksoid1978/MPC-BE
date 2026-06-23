@@ -282,7 +282,7 @@ void CPPageYoutube::OnCheckYDLEnable()
 void CPPageYoutube::OnBnClickedDefault()
 {
 	m_chkYDLEnable.SetCheck(BST_UNCHECKED);
-	
+
 	m_cbVideoCodec.SetCurSel(YT_DLP::vcodec_vp9);
 	SelectByItemData(m_cbMaxHeight, 720);
 	m_chkHighFps.SetCheck(BST_UNCHECKED);
