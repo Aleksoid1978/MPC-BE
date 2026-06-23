@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2025 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,7 +52,6 @@ enum ColorSystem_t {
 
 struct PixelFormatDesc {
 	WICPixelFormatGUID wicpfguid = GUID_NULL;
-	const wchar_t*     str       = nullptr;
 	int                cdepth    = 0;
 	int                depth     = 0;
 	ColorSystem_t      cstype    = CS_RGB;
@@ -62,32 +61,32 @@ struct PixelFormatDesc {
 static const PixelFormatDesc s_UnknownPixelFormatDesc = {};
 
 static const PixelFormatDesc s_PixelFormatDescs[] = {
-	{ GUID_WICPixelFormat1bppIndexed, L"1bppIndexed",  8,  1, CS_IDX,  1 },
-	{ GUID_WICPixelFormat2bppIndexed, L"2bppIndexed",  8,  2, CS_IDX,  1 },
-	{ GUID_WICPixelFormat4bppIndexed, L"4bppIndexed",  8,  4, CS_IDX,  1 },
-	{ GUID_WICPixelFormat8bppIndexed, L"8bppIndexed",  8,  8, CS_IDX,  1 },
-	{ GUID_WICPixelFormatBlackWhite , L"BlackWhite",   1,  1, CS_GRAY, 0 },
-	{ GUID_WICPixelFormat2bppGray,    L"2bppGray",     2,  2, CS_GRAY, 0 },
-	{ GUID_WICPixelFormat4bppGray,    L"4bppGray",     4,  4, CS_GRAY, 0 },
-	{ GUID_WICPixelFormat8bppGray,    L"8bppGray",     8,  8, CS_GRAY, 0 },
-	{ GUID_WICPixelFormat16bppBGR555, L"16bppBGR555",  5, 16, CS_RGB,  0 },
-	{ GUID_WICPixelFormat16bppBGR565, L"16bppBGR565",  6, 16, CS_RGB,  0 },
-	{ GUID_WICPixelFormat16bppGray,   L"16bppGray",   16, 16, CS_GRAY, 0 },
-	{ GUID_WICPixelFormat24bppBGR,    L"24bppBGR",     8, 24, CS_RGB,  0 },
-	{ GUID_WICPixelFormat24bppRGB,    L"24bppRGB",     8, 24, CS_RGB,  0 },
-	{ GUID_WICPixelFormat32bppBGR,    L"32bppBGR",     8, 32, CS_RGB,  0 },
-	{ GUID_WICPixelFormat32bppBGRA,   L"32bppBGRA",    8, 32, CS_RGB,  1 },
-	{ GUID_WICPixelFormat32bppPBGRA,  L"32bppPBGRA",   8, 32, CS_RGB,  2 },
-	{ GUID_WICPixelFormat32bppRGB,    L"32bppRGB",     8, 32, CS_RGB,  0 },
-	{ GUID_WICPixelFormat32bppRGBA,   L"32bppRGBA",    8, 32, CS_RGB,  1 },
-	{ GUID_WICPixelFormat32bppPRGBA,  L"32bppPRGBA",   8, 32, CS_RGB,  2 },
-	{ GUID_WICPixelFormat48bppRGB,    L"48bppRGB",    16, 48, CS_RGB,  0 },
-	{ GUID_WICPixelFormat48bppBGR,    L"48bppBGR",    16, 48, CS_RGB,  0 },
-	{ GUID_WICPixelFormat64bppRGB,    L"64bppRGB",    16, 64, CS_RGB,  0 },
-	{ GUID_WICPixelFormat64bppRGBA,   L"64bppRGBA",   16, 64, CS_RGB,  1 },
-	{ GUID_WICPixelFormat64bppBGRA,   L"64bppBGRA",   16, 64, CS_RGB,  1 },
-	{ GUID_WICPixelFormat64bppPRGBA,  L"64bppPRGBA",  16, 64, CS_RGB,  2 },
-	{ GUID_WICPixelFormat64bppPBGRA,  L"64bppPBGRA",  16, 64, CS_RGB,  2 },
+	{ GUID_WICPixelFormat1bppIndexed,  8,  1, CS_IDX,  1 },
+	{ GUID_WICPixelFormat2bppIndexed,  8,  2, CS_IDX,  1 },
+	{ GUID_WICPixelFormat4bppIndexed,  8,  4, CS_IDX,  1 },
+	{ GUID_WICPixelFormat8bppIndexed,  8,  8, CS_IDX,  1 },
+	{ GUID_WICPixelFormatBlackWhite ,  1,  1, CS_GRAY, 0 },
+	{ GUID_WICPixelFormat2bppGray,     2,  2, CS_GRAY, 0 },
+	{ GUID_WICPixelFormat4bppGray,     4,  4, CS_GRAY, 0 },
+	{ GUID_WICPixelFormat8bppGray,     8,  8, CS_GRAY, 0 },
+	{ GUID_WICPixelFormat16bppBGR555,  5, 16, CS_RGB,  0 },
+	{ GUID_WICPixelFormat16bppBGR565,  6, 16, CS_RGB,  0 },
+	{ GUID_WICPixelFormat16bppGray,   16, 16, CS_GRAY, 0 },
+	{ GUID_WICPixelFormat24bppBGR,     8, 24, CS_RGB,  0 },
+	{ GUID_WICPixelFormat24bppRGB,     8, 24, CS_RGB,  0 },
+	{ GUID_WICPixelFormat32bppBGR,     8, 32, CS_RGB,  0 },
+	{ GUID_WICPixelFormat32bppBGRA,    8, 32, CS_RGB,  1 },
+	{ GUID_WICPixelFormat32bppPBGRA,   8, 32, CS_RGB,  2 },
+	{ GUID_WICPixelFormat32bppRGB,     8, 32, CS_RGB,  0 },
+	{ GUID_WICPixelFormat32bppRGBA,    8, 32, CS_RGB,  1 },
+	{ GUID_WICPixelFormat32bppPRGBA,   8, 32, CS_RGB,  2 },
+	{ GUID_WICPixelFormat48bppRGB,    16, 48, CS_RGB,  0 },
+	{ GUID_WICPixelFormat48bppBGR,    16, 48, CS_RGB,  0 },
+	{ GUID_WICPixelFormat64bppRGB,    16, 64, CS_RGB,  0 },
+	{ GUID_WICPixelFormat64bppRGBA,   16, 64, CS_RGB,  1 },
+	{ GUID_WICPixelFormat64bppBGRA,   16, 64, CS_RGB,  1 },
+	{ GUID_WICPixelFormat64bppPRGBA,  16, 64, CS_RGB,  2 },
+	{ GUID_WICPixelFormat64bppPBGRA,  16, 64, CS_RGB,  2 },
 };
 
 static const PixelFormatDesc* GetPixelFormatDesc(const WICPixelFormatGUID guid)
