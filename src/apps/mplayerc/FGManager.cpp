@@ -1293,6 +1293,9 @@ STDMETHODIMP CFGManager::RenderFile(LPCWSTR lpcwstrFileName, LPCWSTR lpcwstrPlay
 				deadends.emplace_back(std::move(de));
 			}
 		} else if (hr == E_ABORT) {
+			// After calling Abort(), m_bOpeningAborted is true and AddSourceFilterInternal returns E_ABORT.
+			// m_deadends is no longer needed and must be cleared, otherwise CMediaTypesDlg will freeze the player interface.
+			m_deadends.clear(); 
 			m_bOpeningAborted = false;
 			return hr;
 		}
