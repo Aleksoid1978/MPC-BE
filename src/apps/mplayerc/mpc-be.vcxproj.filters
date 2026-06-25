@@ -49,6 +49,9 @@
     <Filter Include="Player Config">
       <UniqueIdentifier>{c2fa522d-09a4-4187-b8c5-3e1896202b28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player FileInfo">
+      <UniqueIdentifier>{434af89c-4660-42e7-9485-41811f4fb4d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="filters\ChaptersSouce.cpp">
@@ -103,21 +106,6 @@
       <Filter>Player Options</Filter>
     </ClCompile>
     <ClCompile Include="PPageExternalFilters.cpp">
-      <Filter>Player Options</Filter>
-    </ClCompile>
-    <ClCompile Include="PPageFileInfoClip.cpp">
-      <Filter>Player Options</Filter>
-    </ClCompile>
-    <ClCompile Include="PPageFileInfoDetails.cpp">
-      <Filter>Player Options</Filter>
-    </ClCompile>
-    <ClCompile Include="PPageFileInfoRes.cpp">
-      <Filter>Player Options</Filter>
-    </ClCompile>
-    <ClCompile Include="PPageFileInfoSheet.cpp">
-      <Filter>Player Options</Filter>
-    </ClCompile>
-    <ClCompile Include="PPageFileMediaInfo.cpp">
       <Filter>Player Options</Filter>
     </ClCompile>
     <ClCompile Include="PPageFiltersPriority.cpp">
@@ -438,6 +426,21 @@
     <ClCompile Include="SaveFFmpegDialog.cpp">
       <Filter>Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="PPageFileInfoClip.cpp">
+      <Filter>Player FileInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="PPageFileInfoDetails.cpp">
+      <Filter>Player FileInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="PPageFileInfoRes.cpp">
+      <Filter>Player FileInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="PPageFileInfoSheet.cpp">
+      <Filter>Player FileInfo</Filter>
+    </ClCompile>
+    <ClCompile Include="PPageFileMediaInfo.cpp">
+      <Filter>Player FileInfo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DVBChannel.h">
@@ -573,21 +576,6 @@
       <Filter>Player Options</Filter>
     </ClInclude>
     <ClInclude Include="PPageExternalFilters.h">
-      <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileInfoClip.h">
-      <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileInfoDetails.h">
-      <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileInfoRes.h">
-      <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileInfoSheet.h">
-      <Filter>Player Options</Filter>
-    </ClInclude>
-    <ClInclude Include="PPageFileMediaInfo.h">
       <Filter>Player Options</Filter>
     </ClInclude>
     <ClInclude Include="PPageFiltersPriority.h">
@@ -856,6 +844,21 @@
     </ClInclude>
     <ClInclude Include="SaveFFmpegDialog.h">
       <Filter>Dialogs</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageFileInfoClip.h">
+      <Filter>Player FileInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageFileInfoDetails.h">
+      <Filter>Player FileInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageFileInfoRes.h">
+      <Filter>Player FileInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageFileInfoSheet.h">
+      <Filter>Player FileInfo</Filter>
+    </ClInclude>
+    <ClInclude Include="PPageFileMediaInfo.h">
+      <Filter>Player FileInfo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

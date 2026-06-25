@@ -28,7 +28,7 @@
 
 // CMediaTypesDlg dialog
 
-class CMediaTypesDlg : public CResizableDialog
+class CMediaTypesDlg final : public CResizableDialog
 {
 	//	DECLARE_DYNAMIC(CMediaTypesDlg)
 

@@ -1341,6 +1341,8 @@ STDMETHODIMP CFGManager::SetLogFile(DWORD_PTR hFile)
 
 STDMETHODIMP CFGManager::Abort()
 {
+	DLog("CFGManager::Abort()");
+
 	if (!m_pUnkInner) {
 		return E_UNEXPECTED;
 	}

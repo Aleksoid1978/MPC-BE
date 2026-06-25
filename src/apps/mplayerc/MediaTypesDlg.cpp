@@ -53,6 +53,8 @@ END_MESSAGE_MAP()
 
 BOOL CMediaTypesDlg::OnInitDialog()
 {
+	DLog("CMediaTypesDlg::OnInitDialog()");
+
 	__super::OnInitDialog();
 
 	std::list<CStringW> path;
