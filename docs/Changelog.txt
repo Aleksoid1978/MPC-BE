@@ -71,6 +71,8 @@ Fixed opening a network path starting with \\?\UNC\.
 The "Determine duration when adding" playlist setting now works for YouTube video URLs.
 The "Online media services" settings panel has been redesigned.
 Added a "Merge files using FFmpeg" option to the file saving dialog. This option is activated when playing multiple streams obtained using yt-dlp.
+Added loading of local .dpl playlists ("DAUMPLAYLIST").
+Fixed a hang when the user closes the player during the URL opening process.
 Various interface fixes.
 
 Installer
@@ -87,6 +89,7 @@ Updated German translation (by Klaus1189).
 Updated Chinese (Simplified) translation (by wushantao).
 Updated Italian translation (by mapi68).
 Updated Korean translation (by Hackjjang).
+Updated Chinese (Traditional) (by udfbe).
 
 Updated libraries:
 	dav1d 1.5.3-6-g04b69f9;
