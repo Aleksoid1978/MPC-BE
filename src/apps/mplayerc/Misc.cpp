@@ -156,17 +156,16 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 		}
 	}
 
-	WCHAR buff[MAX_PATH] = {};
-	if (fn.GetLength() < std::size(buff) && ::PathFileExistsW(fn)) {
-		wcscpy_s(buff, fn);
-
+	if (::PathFileExistsW(fn)) {
 		SHFILEINFO sfi = {};
-		if (SUCCEEDED(SHGetFileInfoW(buff, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) | SHGFI_ICON)) && sfi.hIcon) {
+		// SHGetFileInfoW supports long paths
+		if (SUCCEEDED(SHGetFileInfoW(fn, 0, &sfi, sizeof(sfi), (fSmall ? SHGFI_SMALLICON : SHGFI_LARGEICON) | SHGFI_ICON)) && sfi.hIcon) {
 			return sfi.hIcon;
 		}
 	}
 
 	do {
+		WCHAR buff[MAX_PATH] = {};
 		CRegKey key;
 		ULONG len;
 
