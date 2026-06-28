@@ -1,0 +1,5 @@
+Available languages for Windows
+https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/available-language-packs-for-windows
+
+Primary language identifier and a sub-language identifier (MAKELANGID)
+https://learn.microsoft.com/en-us/previous-versions/ms942105(v=msdn.10)
