@@ -115,7 +115,6 @@ static const struct {
     // opaque format cannot be accessed directly.
     { DXGI_FORMAT_420_OPAQUE,   AV_PIX_FMT_YUV420P },
 // ==> Start patch MPC
-    { DXGI_FORMAT_P016,         AV_PIX_FMT_P016      },
     { DXGI_FORMAT_P016,         AV_PIX_FMT_YUV420P12 },
     { DXGI_FORMAT_P010,         AV_PIX_FMT_YUV420P12 },
     { DXGI_FORMAT_YUY2,         AV_PIX_FMT_YUV422P   },
