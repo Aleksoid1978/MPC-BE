@@ -647,14 +647,6 @@ typedef struct AVPacket {
     AVRational time_base;
 } AVPacket;
 
-#if FF_API_INIT_PACKET
-attribute_deprecated
-typedef struct AVPacketList {
-    AVPacket pkt;
-    struct AVPacketList *next;
-} AVPacketList;
-#endif
-
 #define AV_PKT_FLAG_KEY     0x0001 ///< The packet contains a keyframe
 #define AV_PKT_FLAG_CORRUPT 0x0002 ///< The packet content is corrupted
 /**
@@ -832,7 +824,7 @@ uint8_t* av_packet_get_side_data(const AVPacket *pkt, enum AVPacketSideDataType 
  * @param size pointer to store the size of the returned data
  * @return pointer to data if successful, NULL otherwise
  */
-uint8_t *av_packet_pack_dictionary(AVDictionary *dict, size_t *size);
+uint8_t *av_packet_pack_dictionary(const AVDictionary *dict, size_t *size);
 /**
  * Unpack a dictionary from side_data.
  *

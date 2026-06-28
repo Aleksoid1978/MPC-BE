@@ -40,6 +40,8 @@
 * libavutil/hwcontext_d3d12va.h
 * libavutil/hwcontext_dxva2.c
 
+* libswscale/format.c 
+
 ======
 The following files are available only in MPC-BE (compared with ffmpeg):
 

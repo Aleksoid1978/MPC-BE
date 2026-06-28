@@ -555,7 +555,6 @@ FFMPEG_CODECS ffCodecs[] = {
 
 	// uncompressed video
 	{ &MEDIASUBTYPE_v210, AV_CODEC_ID_V210, VDEC_UNCOMPRESSED, HWCodec_None },
-	{ &MEDIASUBTYPE_V410, AV_CODEC_ID_V410, VDEC_UNCOMPRESSED, HWCodec_None },
 	{ &MEDIASUBTYPE_r210, AV_CODEC_ID_R210, VDEC_UNCOMPRESSED, HWCodec_None },
 	{ &MEDIASUBTYPE_R10g, AV_CODEC_ID_R10K, VDEC_UNCOMPRESSED, HWCodec_None },
 	{ &MEDIASUBTYPE_R10k, AV_CODEC_ID_R10K, VDEC_UNCOMPRESSED, HWCodec_None },
@@ -944,7 +943,6 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 const AMOVIESETUP_MEDIATYPE sudPinTypesInUncompressed[] = {
 	// uncompressed video
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_v210 }, // YUV 4:2:2 10-bit
-	{ &MEDIATYPE_Video, &MEDIASUBTYPE_V410 }, // YUV 4:4:4 10-bit
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_r210 }, // RGB30
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10g }, // RGB30
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_R10k }, // RGB30
@@ -1776,7 +1774,6 @@ int CMPCVideoDecFilter::FindCodec(const CMediaType* mtIn, BOOL bForced/* = FALSE
 					m_bUseFFmpeg = (m_nActiveCodecs & CODEC_CINEFORM) != 0;
 					break;
 				case AV_CODEC_ID_V210:
-				case AV_CODEC_ID_V410:
 				case AV_CODEC_ID_R210:
 				case AV_CODEC_ID_R10K:
 				case AV_CODEC_ID_RAWVIDEO:

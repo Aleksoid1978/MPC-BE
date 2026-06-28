@@ -27,16 +27,12 @@
  * Libavfilter version macros
  */
 
-#define LIBAVFILTER_VERSION_MAJOR  11
+#define LIBAVFILTER_VERSION_MAJOR  12
 
 /**
  * FF_API_* defines may be placed below to indicate public API that will be
  * dropped at a future version bump. The defines themselves are not part of
  * the public API and may change, break or disappear at any time.
  */
-
-#define FF_API_BUFFERSINK_OPTS (LIBAVFILTER_VERSION_MAJOR < 12)
-#define FF_API_CONTEXT_PUBLIC  (LIBAVFILTER_VERSION_MAJOR < 12)
-#define FF_API_LIBNPP_SUPPORT  (LIBAVFILTER_VERSION_MAJOR < 12)
 
 #endif /* AVFILTER_VERSION_MAJOR_H */

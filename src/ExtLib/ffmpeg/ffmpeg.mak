@@ -524,7 +524,6 @@ SRCS_LC_B = \
 	libavcodec/utvideodsp.c \
 	libavcodec/utils.c \
 	libavcodec/v210dec.c \
-	libavcodec/v410dec.c \
 	libavcodec/vc1.c \
 	libavcodec/vc1_block.c \
 	libavcodec/vc1_loopfilter.c \

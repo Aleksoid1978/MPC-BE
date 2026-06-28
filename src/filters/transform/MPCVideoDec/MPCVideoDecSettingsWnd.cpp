@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -673,7 +673,7 @@ static const struct {
 	{CODEC_WMV,			L"WMV1/2/3"},
 	{CODEC_XVID,		L"Xvid/MPEG-4"},
 	{CODEC_REALV,		L"Real Video"},
-	{CODEC_UNCOMPRESSED,L"Uncompressed video (v210, V410, Y8, I420, ...)"},
+	{CODEC_UNCOMPRESSED,L"Uncompressed video (v210, Y8, I420, ...)"},
 };
 
 bool CMPCVideoDecCodecWnd::OnActivate()

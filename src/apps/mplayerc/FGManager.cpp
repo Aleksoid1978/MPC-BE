@@ -2644,7 +2644,6 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 				(video[VDEC_UNCOMPRESSED] || IsPreview) ? MPCVideoConvName : LowMerit(MPCVideoConvName),
 				(video[VDEC_UNCOMPRESSED] || IsPreview) ? (MERIT64_PREFERRED - 0x100) : MERIT64_DO_USE); // merit of video converter must be lower than merit of video renderers
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_v210);
-	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_V410);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_r210);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_R10g);
 	pFGF->AddType(MEDIATYPE_Video, MEDIASUBTYPE_R10k);

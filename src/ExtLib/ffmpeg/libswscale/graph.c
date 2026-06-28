@@ -229,6 +229,22 @@ fail:
     return ret;
 }
 
+void ff_sws_pass_link_output(SwsPass *dst, const SwsPass *src)
+{
+    if (!dst || !src || dst == src)
+        return;
+
+    av_assert0(dst->format == src->format);
+    SwsPassBuffer *keep = src->output, *drop = dst->output;
+
+    av_assert1(keep->width  == drop->width);
+    av_assert1(keep->height == drop->height);
+    keep->width_align = FFMAX(keep->width_align, drop->width_align);
+    keep->width_pad   = FFMAX(keep->width_pad,   drop->width_pad);
+
+    av_refstruct_replace(&dst->output, src->output);
+}
+
 static void frame_shift(const SwsFrame *f, const int y, uint8_t *data[4])
 {
     for (int i = 0; i < 4; i++) {
@@ -373,49 +389,6 @@ static void run_legacy_swscale(const SwsFrame *out, const SwsFrame *in,
 
     ff_swscale(c, (const uint8_t *const *) in->data, in->linesize, 0,
                sws->src_h, out_data, out->linesize, y, h);
-}
-
-static void get_chroma_pos(SwsGraph *graph, int *h_chr_pos, int *v_chr_pos,
-                           const SwsFormat *fmt)
-{
-    enum AVChromaLocation chroma_loc = fmt->loc;
-    const int sub_x = fmt->desc->log2_chroma_w;
-    const int sub_y = fmt->desc->log2_chroma_h;
-    int x_pos, y_pos;
-
-    /* Explicitly default to center siting for compatibility with swscale */
-    if (chroma_loc == AVCHROMA_LOC_UNSPECIFIED) {
-        chroma_loc = AVCHROMA_LOC_CENTER;
-        graph->incomplete |= sub_x || sub_y;
-    }
-
-    /* av_chroma_location_enum_to_pos() always gives us values in the range from
-     * 0 to 256, but we need to adjust this to the true value range of the
-     * subsampling grid, which may be larger for h/v_sub > 1 */
-    av_chroma_location_enum_to_pos(&x_pos, &y_pos, chroma_loc);
-    x_pos *= (1 << sub_x) - 1;
-    y_pos *= (1 << sub_y) - 1;
-
-    /* Fix vertical chroma position for interlaced frames */
-    if (sub_y && fmt->interlaced) {
-        /* When vertically subsampling, chroma samples are effectively only
-         * placed next to even rows. To access them from the odd field, we need
-         * to account for this shift by offsetting the distance of one luma row.
-         *
-         * For 4x vertical subsampling (v_sub == 2), they are only placed
-         * next to every *other* even row, so we need to shift by three luma
-         * rows to get to the chroma sample. */
-        if (fmt->field == FIELD_BOTTOM)
-            y_pos += (256 << sub_y) - 256;
-
-        /* Luma row distance is doubled for fields, so halve offsets */
-        y_pos >>= 1;
-    }
-
-    /* Explicitly strip chroma offsets when not subsampling, because it
-     * interferes with the operation of flags like SWS_FULL_CHR_H_INP */
-    *h_chr_pos = sub_x ? x_pos : -513;
-    *v_chr_pos = sub_y ? y_pos : -513;
 }
 
 static void legacy_chr_pos(SwsGraph *graph, int *chr_pos, int override, int *warned)
@@ -582,8 +555,8 @@ static int add_legacy_sws_pass(SwsGraph *graph, const SwsFormat *src,
     sws->dst_h      = dst->height;
     sws->dst_format = dst->format;
     sws->dst_range  = dst->range == AVCOL_RANGE_JPEG;
-    get_chroma_pos(graph, &sws->src_h_chr_pos, &sws->src_v_chr_pos, src);
-    get_chroma_pos(graph, &sws->dst_h_chr_pos, &sws->dst_v_chr_pos, dst);
+    ff_sws_chroma_pos(src, &graph->incomplete, &sws->src_h_chr_pos, &sws->src_v_chr_pos);
+    ff_sws_chroma_pos(dst, &graph->incomplete, &sws->dst_h_chr_pos, &sws->dst_v_chr_pos);
 
     graph->incomplete |= src->range == AVCOL_RANGE_UNSPECIFIED;
     graph->incomplete |= dst->range == AVCOL_RANGE_UNSPECIFIED;
@@ -593,6 +566,17 @@ static int add_legacy_sws_pass(SwsGraph *graph, const SwsFormat *src,
     legacy_chr_pos(graph, &sws->src_v_chr_pos, ctx->src_v_chr_pos, &warned);
     legacy_chr_pos(graph, &sws->dst_h_chr_pos, ctx->dst_h_chr_pos, &warned);
     legacy_chr_pos(graph, &sws->dst_v_chr_pos, ctx->dst_v_chr_pos, &warned);
+
+    /* Explicitly strip chroma offsets when not subsampling, because it
+     * interferes with the operation of flags like SWS_FULL_CHR_H_INP */
+    if (!src->desc->log2_chroma_w)
+        sws->src_h_chr_pos = -513;
+    if (!src->desc->log2_chroma_h)
+        sws->src_v_chr_pos = -513;
+    if (!dst->desc->log2_chroma_w)
+        sws->dst_h_chr_pos = -513;
+    if (!dst->desc->log2_chroma_h)
+        sws->dst_v_chr_pos = -513;
 
     for (int i = 0; i < SWS_NUM_SCALER_PARAMS; i++)
         sws->scaler_params[i] = ctx->scaler_params[i];
@@ -655,7 +639,8 @@ static int add_ops_convert_pass(SwsGraph *graph, const SwsFormat *src,
     av_log(ctx, AV_LOG_DEBUG, "Unoptimized operation list:\n");
     ff_sws_op_list_print(ctx, AV_LOG_DEBUG, AV_LOG_TRACE, ops);
 
-    return ff_sws_compile_pass(graph, NULL, &ops, SWS_OP_FLAG_OPTIMIZE, input, output);
+    const int flags = SWS_OP_FLAG_OPTIMIZE | SWS_OP_FLAG_SPLIT_MEMCPY;
+    return ff_sws_compile_pass(graph, NULL, &ops, flags, input, output);
 #else
     return AVERROR(ENOTSUP);
 #endif

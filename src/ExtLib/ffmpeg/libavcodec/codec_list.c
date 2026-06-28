@@ -69,7 +69,6 @@ static const FFCodec * const codec_list[] = {
     &ff_tscc2_decoder,
     &ff_utvideo_decoder,
     &ff_v210_decoder,
-    &ff_v410_decoder,
     &ff_vc1_decoder,
     &ff_vc1image_decoder,
     &ff_vmnc_decoder,

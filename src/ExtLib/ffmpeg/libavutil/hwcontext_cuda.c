@@ -47,8 +47,10 @@ static const enum AVPixelFormat supported_formats[] = {
     AV_PIX_FMT_YUVA420P,
     AV_PIX_FMT_YUV444P,
     AV_PIX_FMT_P010,
+    AV_PIX_FMT_P012,
     AV_PIX_FMT_P016,
     AV_PIX_FMT_P210,
+    AV_PIX_FMT_P212,
     AV_PIX_FMT_P216,
     AV_PIX_FMT_YUV422P,
     AV_PIX_FMT_YUV420P10,
@@ -259,7 +261,7 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             .srcPitch      = src->linesize[i],
             .dstPitch      = dst->linesize[i],
             .WidthInBytes  = FFMIN(src->linesize[i], dst->linesize[i]),
-            .Height        = src->height >> ((i == 0 || i == 3) ? 0 : priv->shift_height),
+            .Height        = AV_CEIL_RSHIFT(src->height, ((i == 0 || i == 3) ? 0 : priv->shift_height)),
         };
 
         if (src->hw_frames_ctx) {
