@@ -60,6 +60,7 @@ my %LANG_EXEPTIONS = (
 	'sv' => 'sv',
 	'tr' => 'tr',
 	'ua' => 'uk',
+	'vi' => 'vi',
 );
 
 my $MEDIA_INFO_LANG_FILE = 'IDB_MEDIAINFO_LANGUAGE  FILE                    "..\\\\..\\\\ExtLib\\\\MediaInfo\\\\Language\\\\%s.csv"';

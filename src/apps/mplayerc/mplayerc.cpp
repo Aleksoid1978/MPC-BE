@@ -78,8 +78,9 @@ const LanguageResource CMPlayerCApp::languageResources[] = {
 	{ID_LANGUAGE_SPANISH,				1034,	L"Spanish",					L"es",	L"spa"},
 	{ID_LANGUAGE_TURKISH,				1055,	L"Turkish",					L"tr",	L"tur"},
 	{ID_LANGUAGE_UKRAINIAN,				1058,	L"Ukrainian",				L"ua",	L"ukr"},
+	{ID_LANGUAGE_VIETNAMESE,			1066,	L"Vietnamese",				L"vi",	L"vie"},
 };
-// LANGIDs: https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
+// LANGIDs: https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/available-language-packs-for-windows
 
 const size_t CMPlayerCApp::languageResourcesCount = std::size(CMPlayerCApp::languageResources);
 

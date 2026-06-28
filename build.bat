@@ -322,7 +322,7 @@ EXIT /B
 FOR %%A IN ("Arabic" "Armenian" "Basque" "Belarusian" "Bulgarian" "Catalan" "Chinese Simplified"
  "Chinese Traditional" "Czech" "Croatian" "Dutch" "French" "German" "Greek" "Hebrew" "Hungarian"
  "Italian" "Japanese" "Korean" "Polish" "Portuguese" "Romanian" "Russian" "Slovak" "Slovenian" "Spanish"
- "Swedish" "Turkish" "Ukrainian"
+ "Swedish" "Turkish" "Ukrainian" "Vietnamese"
 ) DO (
  TITLE Compiling mpcresources - %%~A^|%1...
  MSBuild.exe mpcresources.sln %MSBUILD_SWITCHES%^
