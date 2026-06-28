@@ -2636,6 +2636,8 @@ void CPlayerPlaylistBar::SetCurLabel(const CString& label)
 			if (pos) {
 				auto& pli = m_pls[i]->GetAt(pos);
 				pli.m_label = label;
+				pli.m_autolabel = false;
+
 				if (i == m_nCurPlayListIndex) {
 					auto index = FindItem(pos);
 					if (index >= 0) {
