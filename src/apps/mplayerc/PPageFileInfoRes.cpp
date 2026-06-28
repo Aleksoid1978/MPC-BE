@@ -156,7 +156,7 @@ BOOL CPPageFileInfoRes::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	m_hIcon = LoadIconW(m_fullfn, false);
+	m_hIcon = LoadFileIcon(m_fullfn, false);
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
 	}

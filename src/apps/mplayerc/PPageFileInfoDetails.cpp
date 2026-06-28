@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -198,7 +198,7 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	m_hIcon = LoadIconW(m_fn, false);
+	m_hIcon = LoadFileIcon(m_fn, false);
 	if (m_hIcon) {
 		m_icon.SetIcon(m_hIcon);
 	}

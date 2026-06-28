@@ -134,7 +134,7 @@ CString GetLastErrorMsg(LPWSTR lpszFunction, DWORD dw/* = GetLastError()*/)
 	return ret;
 }
 
-HICON LoadIcon(const CString& fn, bool fSmall)
+HICON LoadFileIcon(const CStringW& fn, bool fSmall)
 {
 	if (fn.IsEmpty()) {
 		return nullptr;
