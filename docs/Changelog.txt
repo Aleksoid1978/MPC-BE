@@ -2,6 +2,10 @@
 
 1.9.0.x dev
 =============================
+Player
+Fixed remembering the title of the entry in the playlist for URLs processed by yt-dlp.
+Fixed getting icon for file properties window when path length is 260 or more characters.
+
 Added Vietnamese translation (by vuanhvu11982-afk).
 
 Updated libraries:
