@@ -157,7 +157,7 @@ HICON LoadIcon(const CString& fn, bool fSmall)
 	}
 
 	WCHAR buff[MAX_PATH] = {};
-	if (fn.GetLength() <= MAX_PATH && ::PathFileExistsW(fn)) {
+	if (fn.GetLength() < std::size(buff) && ::PathFileExistsW(fn)) {
 		wcscpy_s(buff, fn);
 
 		SHFILEINFO sfi = {};
