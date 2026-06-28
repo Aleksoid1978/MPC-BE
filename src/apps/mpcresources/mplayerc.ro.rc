@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Implicite",IDC_BUTTON1,158,17,56,14
     CONTROL         "Nu folosi „căutarea în dosar (în folder)” pentru comenzile (controalele) „Sari înapoi/înainte” atunci când este numai un element în lista de redare (în playlist)",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Ascunde automat indicatorul în timpul redării în modul fereastră",IDC_CHECK5,

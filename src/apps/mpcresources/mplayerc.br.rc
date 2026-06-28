@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Padrão",IDC_BUTTON1,158,17,56,14
     CONTROL         "Não usar 'buscar na pasta' nos comandos 'Voltar/avançar' quando houver apenas um item na lista de reprodução",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Impedir de MINIMIZAR quando em tela cheia no monitor não padrão",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Auto-ocultar o ponteiro durante a reprodução no modo em janela",IDC_CHECK5,

@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Standaard",IDC_BUTTON1,158,17,56,14
     CONTROL         "Zoek NIET op andere bestanden in dezelfde map bij het gebruik van ""Vorige/Volgende"" als er alleen een item in afspeellijst staat.",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus",IDC_CHECK5,

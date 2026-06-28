@@ -1096,7 +1096,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Mặc định",IDC_BUTTON1,158,17,56,14
     CONTROL         "Vô hiệu hóa 'tìm kiếm trong thư mục' trên 'Trước/Sau' khi danh sách phát chỉ có một mục",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Ngăn chặn THU NHỎ khi Toàn màn hình trên màn hình không mặc định",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Tự động ẩn con trỏ trong khi phát ở chế độ cửa sổ",IDC_CHECK5,

@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Default",IDC_BUTTON1,158,17,56,14
     CONTROL         "Ne koristi 'traženje u mapi' uz naredbe 'Preskoči natrag/naprijed' uz samo jedan predmet na playlisti",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Spriječi MINIMIZIRANJE kada je postavljen puni zaslon na nepodrazumijevanom monitoru",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Auto-skrivanje pokazivača tijekom pregleda u uokvirenom modu",IDC_CHECK5,

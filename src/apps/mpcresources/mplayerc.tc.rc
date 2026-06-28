@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "預設值",IDC_BUTTON1,158,17,56,14
     CONTROL         "播放清單只有一個項目時，不要於「上一段/下一段」按鈕連結其他位於同一資料夾的檔案",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "避免於非預設顯示器全螢幕時最小化",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "視窗模式播放時自動隱藏滑鼠游標",IDC_CHECK5,

@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "기본값",IDC_BUTTON1,158,17,56,14
     CONTROL         "재생 목록에 파일 하나만 있다면 '앞/뒤 탐색' 시에 '폴더 내에서 찾기' 사용 안 함",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "전체 화면 시, 최소화 방지",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "창 모드에서 재생하는 동안 포인터 자동 숨기기",IDC_CHECK5,

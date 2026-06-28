@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Predefinito",IDC_BUTTON1,158,17,56,14
     CONTROL         "Non usare la funzione 'cerca nella cartella' nei comandi 'Salta avanti/indietro' quando è presente un solo elemento in playlist",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Evita riduzione a icona quando è a tutto schermo su monitor non predefinito",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Nascondi automaticamente il puntatore durante la riproduzione in modalità finestra",IDC_CHECK5,

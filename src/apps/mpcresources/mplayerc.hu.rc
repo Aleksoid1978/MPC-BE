@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Alapértelmezett",IDC_BUTTON1,158,17,56,14
     CONTROL         "A 'keresés a mappában' letiltása az 'Előző/Következő' gombnál, amikor a lejátszási listában csak egy elem van",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "A mutató automatikus elrejtése ablakos lejátszás közben",IDC_CHECK5,

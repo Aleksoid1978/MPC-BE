@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Domyślne",IDC_BUTTON1,158,17,56,14
     CONTROL         "Nie używaj 'szukaj w folderze' oraz komend 'Przejdź do tyłu / do przodu', gdy jest tylko jedna pozycja na liście odtwarzania",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Zapobiegaj minimalizacji w trybie pełnoekranowym na dodatkowych ekranach",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Autoukrywanie kursora podczas odtwarzania w trybie okienkowym",IDC_CHECK5,

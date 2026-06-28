@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "افتراضي",IDC_BUTTON1,158,17,56,14
     CONTROL         "عدم استخدام ""البحث في المجلد"" لأوامر ""التراجع/التقدم"" عندما يكون هناك عنصر واحد فقط في قائمة التشغيل",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "منع التصغير في ملء الشاشة على شاشة غير الافتراضية",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "إخفاء المؤشر تلقائياً أثناء التشغيل في وضع النافذة",IDC_CHECK5,

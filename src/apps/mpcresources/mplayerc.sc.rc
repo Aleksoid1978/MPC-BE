@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "默认",IDC_BUTTON1,158,17,56,14
     CONTROL         "在播放列表中仅有一个项目时禁用 ""向前/后跳转"" 后打开文件中的下一个/上一个文件",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "在非默认显示器上全屏时防止播放器被最小化",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "在窗口模式下播放时自动隐藏鼠标指针",IDC_CHECK5,

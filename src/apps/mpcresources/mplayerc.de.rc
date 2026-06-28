@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Zurücksetzen",IDC_BUTTON1,158,17,56,14
     CONTROL         "Bei nur einem Eintrag in der Wiedergabeliste keine weiteren Medien im Ordner durch 'Rückwärts springen | Vorherige Datei' / 'Vorwärts springen | Nächste Datei' öffnen",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken",IDC_CHECK5,

@@ -1097,7 +1097,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Типово",IDC_BUTTON1,158,17,56,14
     CONTROL         "Не використовувати перехід по файлам при виконанні команд 'Крок назад/вперед' коли лише один файл у плейлисті",IDC_CHECK7,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,280,18
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
     CONTROL         "Заблокувати ЗГОРТАННЯ, якщо повноекранний режим на іншому моніторі",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Приховувати курсор при відтворенні у віконному режимі",IDC_CHECK5,
