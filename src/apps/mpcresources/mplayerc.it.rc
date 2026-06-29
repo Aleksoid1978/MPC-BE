@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Evita riduzione a icona quando è a tutto schermo su monitor non predefinito",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Nascondi automaticamente il puntatore durante la riproduzione in modalità finestra",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Mostra zero ore nella barra di stato e OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Non mostrare 000xx.mpls più breve di",IDC_STATIC,7,99,150,8

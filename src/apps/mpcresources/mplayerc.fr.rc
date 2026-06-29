@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Empêcher de MINIMISER en plein écran sur un moniteur autre que celui par défaut",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Masquer automatiquement le pointeur pendant la lecture en mode fenêtré",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Ne pas afficher les 000xx.mpls plus courts que",IDC_STATIC,7,99,150,8

@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Minimieren des Fensters auf sekundärem Anzeigegerät bei Vollbild verhindern",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Während der Wiedergabe im Fenstermodus den Mauszeiger automatisch verstecken",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Führende Null-Stunden in der Statusleiste und im OSD anzeigen",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Keine 000xx.mpls anzeigen, die kürzer sind als",IDC_STATIC,7,99,150,8

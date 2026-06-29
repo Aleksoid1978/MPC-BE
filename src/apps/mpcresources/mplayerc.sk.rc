@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Zabrániť MINIMALIZOVAŤ pri zobrazení na celú obrazovku na inom ako predvolenom monitore",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Automaticky skryť ukazovateľ počas prehrávania v režime okna",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Zobraziť nula hodín v stavovom riadku a OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Nezobrazovať 000xx.mpls kratší ako",IDC_STATIC,7,99,150,8

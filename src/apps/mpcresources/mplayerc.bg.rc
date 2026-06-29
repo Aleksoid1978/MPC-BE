@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Без минимизиране на прозореца на допълнителен дисплей в режим цял екран",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Скриване на курсора при възпроизвеждане в прозорец",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Показване на нула часа в лентата на състоянието и OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Не показвайте 000xx.mpls по-кратък от",IDC_STATIC,7,99,150,8

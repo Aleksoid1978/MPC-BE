@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Evitar el MINIMIZADO en Pantalla Completa en un monitor no predeterminado",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Ocultar automáticamente el puntero durante la reproducción en modo ventana",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Mostrar cero horas en barra de estado y OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "No mostrar 000xx.mpls de menos de",IDC_STATIC,7,99,150,8

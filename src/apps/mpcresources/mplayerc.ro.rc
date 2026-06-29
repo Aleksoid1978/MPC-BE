@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Previne minimizarea playerului din ecran complet pe un monitor care nu este implicit",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Ascunde automat indicatorul în timpul redării în modul fereastră",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Afișează zero ore în bara de stare și în OSD (On Screen Display / Afișare pe ecran)",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Nu afișa fișierul 000xx.mpls dacă e mai scurt de",IDC_STATIC,7,99,150,8

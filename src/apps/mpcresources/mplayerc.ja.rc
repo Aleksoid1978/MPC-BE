@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "既定のモニター以外では全画面表示で 最小化 を禁止する",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "ウィンドウ モードで再生中にポインターを自動で隠す",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "ステータス バーと OSD にゼロ時間を表示する",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "指定した時間より短い 000xx.mpls を表示しない:",IDC_STATIC,7,99,150,8

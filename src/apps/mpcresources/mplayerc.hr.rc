@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Spriječi MINIMIZIRANJE kada je postavljen puni zaslon na nepodrazumijevanom monitoru",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Auto-skrivanje pokazivača tijekom pregleda u uokvirenom modu",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Ne pokazuj 000xx.mpls kraće od",IDC_STATIC,7,99,150,8

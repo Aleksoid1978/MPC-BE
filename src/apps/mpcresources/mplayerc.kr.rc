@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "전체 화면 시, 최소화 방지",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "창 모드에서 재생하는 동안 포인터 자동 숨기기",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "상태 표시줄 및 OSD에 개시 시간 표시",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "다음 시간보다 짧은 000xx.mpls를 표시하지 않음",IDC_STATIC,7,99,150,8

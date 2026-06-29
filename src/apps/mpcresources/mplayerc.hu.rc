@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Megakadályozza a Kis méretet, amikor a Teljes képernyő nem az alap monitoron van",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "A mutató automatikus elrejtése ablakos lejátszás közben",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Nulla óra megjelenítése az állapotsorban és az OSD-n",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Ne mutasd ha 000xx.mpls rövidebb",IDC_STATIC,7,99,150,8

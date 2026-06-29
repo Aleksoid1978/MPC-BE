@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Не сворачивать окно на дополнительном дисплее в полноэкранном режиме",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Скрывать курсор при воспроизведении в окне",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Показывать нулевые часы в статусной строке и OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Не показывать 000xx.mpls короче, чем",IDC_STATIC,7,99,150,8

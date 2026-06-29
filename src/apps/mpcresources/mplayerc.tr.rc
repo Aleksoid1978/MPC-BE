@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Varsayılan olmayan monitörde Tam Ekran olduğunda SİMGE DURUMUNA'yı engelle",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Pencere modunda oynatma sırasında işaretçiyi otomatik gizle",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Durum çubuğunda ve OSD'de sıfır saati göster",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Bu süreden daha kısa 000xx.mpls gösterme:",IDC_STATIC,7,99,150,8

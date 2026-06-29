@@ -1100,7 +1100,7 @@ BEGIN
     CONTROL         "Prevent from MINIMIZE when Fullscreen on non default monitor",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Auto-hide the pointer during playback in windowed mode",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Show zero hours in status bar and OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Do not show 000xx.mpls shorter than",IDC_STATIC,7,99,150,8

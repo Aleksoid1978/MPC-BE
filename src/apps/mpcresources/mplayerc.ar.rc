@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "منع التصغير في ملء الشاشة على شاشة غير الافتراضية",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "إخفاء المؤشر تلقائياً أثناء التشغيل في وضع النافذة",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "إظهار الساعات الصفرية في شريط الحالة وOSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "عدم إظهار ملفات 000xx.mpls الأقصر من",IDC_STATIC,7,99,150,8

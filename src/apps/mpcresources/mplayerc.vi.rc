@@ -1100,7 +1100,7 @@ BEGIN
     CONTROL         "Ngăn chặn THU NHỎ khi Toàn màn hình trên màn hình không mặc định",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Tự động ẩn con trỏ trong khi phát ở chế độ cửa sổ",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Hiển thị số giờ trong thanh trạng thái và OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Không hiển thị 000xx.mpls ngắn hơn",IDC_STATIC,7,99,150,8

@@ -1101,7 +1101,7 @@ BEGIN
     CONTROL         "Minimaliseren vermijden in geval van volledig scherm op niet-primair scherm",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Verberg automatisch de muisaanwijzer tijdens het afspelen in de venstermodus",IDC_CHECK5,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,280,9
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
     CONTROL         "Toon het uurcijfer altijd op de statusbalk en het OSD, zelfs als het nul is",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Toon 000xx.mpls niet, die korter zijn dan",IDC_STATIC,7,99,150,8
