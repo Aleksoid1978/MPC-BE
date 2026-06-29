@@ -341,7 +341,7 @@ BEGIN
     LTEXT           "Стъпка на скоростта:",IDC_STATIC,10,95,108,8
     COMBOBOX        IDC_COMBOSPEEDSTEP,120,92,60,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "%",IDC_STATIC3,183,95,8,8
-    CONTROL         "Без нулиране(забавяне) на скоростта за сесията",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,175,9
+    CONTROL         "Без нулиране(забавяне) на скоростта за сесията",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,109,178,9
     GROUPBOX        "",IDC_STATIC,137,9,154,56
     CONTROL         "Приоритет за трековете",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,142,8,120,9
     LTEXT           "Субтитри:",IDC_STATIC,142,23,44,8
