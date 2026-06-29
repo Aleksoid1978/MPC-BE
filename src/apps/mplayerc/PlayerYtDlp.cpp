@@ -578,7 +578,7 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 				if (StartsWith(value_str, "avc1") || value_str == "h264") {
 					vformat.codec = vcodec_h264;
 				}
-				else if (StartsWith(value_str, "vp9")) {
+				else if (StartsWith(value_str, "vp09") || value_str == "vp9") {
 					vformat.codec = vcodec_vp9;
 				}
 				else if (StartsWith(value_str, "av01")) {
