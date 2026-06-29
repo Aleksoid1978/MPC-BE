@@ -523,7 +523,11 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 		}
 
 		if (getJsonValue(format, "protocol", value_str)) {
-			if (StartsWith(value_str, "http")) {
+			if (value_str == "http_dash_segments") {
+				// not supported
+				continue;
+			}
+			else if (StartsWith(value_str, "http")) {
 				if (StartsWith(format_id, "dash")) {
 					protocol = protocol_dash;
 				} else if (getJsonValue(format, "container", value_str) && EndsWith(value_str, "_dash")) {
