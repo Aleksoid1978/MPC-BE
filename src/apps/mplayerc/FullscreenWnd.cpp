@@ -71,7 +71,7 @@ void CFullscreenWnd::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (m_pMainFrame) {
 		if (!(m_pMainFrame->IsD3DFullScreenMode() && m_pMainFrame->m_OSD.OnLButtonUp(nFlags, point))) {
-			m_pMainFrame->PostMessageW(WM_RBUTTONDOWN, nFlags, MAKELPARAM(point.x, point.y));
+			m_pMainFrame->PostMessageW(WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y));
 		}
 		return;
 	}

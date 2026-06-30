@@ -656,6 +656,9 @@ void CAppSettings::ResetSettings()
 	MouseWheelRight     = { 0, 0, 0, 0 };
 	bMouseLeftClickOpenRecent = false;
 	bMouseEasyMove      = true;
+	bMouseLongPressLeftSpeed = true;
+	nMouseLongPressLeftSpeedRate = 4;
+	nMouseLongPressLeftSpeedDelay = 300;
 
 	bUseDarkTheme = true;
 	nThemeBrightness = 15;
@@ -1246,6 +1249,12 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	}
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
+	profile.ReadBool(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED, bMouseLongPressLeftSpeed);
+	profile.ReadInt(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED_RATE, nMouseLongPressLeftSpeedRate, 2, 16);
+	if (nMouseLongPressLeftSpeedRate != 2 && nMouseLongPressLeftSpeedRate != 4 && nMouseLongPressLeftSpeedRate != 8 && nMouseLongPressLeftSpeedRate != 12 && nMouseLongPressLeftSpeedRate != 16) {
+		nMouseLongPressLeftSpeedRate = 4;
+	}
+	profile.ReadInt(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED_DELAY, nMouseLongPressLeftSpeedDelay, 250, 500);
 
 	// OSD
 	profile.ReadUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
@@ -1876,6 +1885,9 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_MOUSE, IDS_RS_MOUSE_WHEEL_RIGHT, str);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_BTN_LEFT_OPENRECENT, bMouseLeftClickOpenRecent);
 	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_EASYMOVE, bMouseEasyMove);
+	profile.WriteBool(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED, bMouseLongPressLeftSpeed);
+	profile.WriteInt(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED_RATE, nMouseLongPressLeftSpeedRate);
+	profile.WriteInt(IDS_R_MOUSE, IDS_RS_MOUSE_LONGPRESS_LEFT_SPEED_DELAY, nMouseLongPressLeftSpeedDelay);
 
 	// OSD
 	profile.WriteUInt(IDS_R_OSD, IDS_RS_SHOWOSD, ShowOSD.value);
