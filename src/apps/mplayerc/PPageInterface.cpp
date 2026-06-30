@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,7 @@ BOOL CPPageInterface::OnInitDialog()
 	m_nThemeGreen			= m_nThemeGreen_Old			= s.nThemeGreen;
 	m_nThemeBlue			= m_nThemeBlue_Old			= s.nThemeBlue;
 	m_chkDarkMenu.SetCheck(s.bDarkMenu);
-	m_chkDarkMenuBlurBehind.SetCheck(s.bDarkMenuBlurBehind);
+	//m_chkDarkMenuBlurBehind.SetCheck(s.bDarkMenuBlurBehind);
 	m_chkDarkTitle.SetCheck(s.bDarkTitle);
 
 	m_ThemeBrightnessCtrl.SetRange	(0, 100, TRUE);
@@ -135,9 +135,10 @@ BOOL CPPageInterface::OnInitDialog()
 		m_chkDarkTitle.EnableWindow(FALSE);
 	}
 
-	if (!SysVersion::IsWin10orLater()) {
-		m_chkDarkMenuBlurBehind.EnableWindow(FALSE);
-	}
+//	if (!SysVersion::IsWin10orLater()) {
+//		m_chkDarkMenuBlurBehind.EnableWindow(FALSE);
+//	}
+	m_chkDarkMenuBlurBehind.ShowWindow(SW_HIDE);
 
 	UpdateData(FALSE);
 
@@ -169,7 +170,7 @@ BOOL CPPageInterface::OnApply()
 		::PostMessageW(pFrame->m_hWnd,         WM_SIZE, s.nLastWindowType, MAKELPARAM(s.szLastWindowSize.cx, s.szLastWindowSize.cy));
 	}
 	s.bDarkMenu = !!m_chkDarkMenu.GetCheck();
-	s.bDarkMenuBlurBehind = !!m_chkDarkMenuBlurBehind.GetCheck();
+	//s.bDarkMenuBlurBehind = !!m_chkDarkMenuBlurBehind.GetCheck();
 	s.bDarkTitle = !!m_chkDarkTitle.GetCheck();
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
@@ -322,9 +323,9 @@ void CPPageInterface::OnUpdateCheck3(CCmdUI* pCmdUI)
 	GetDlgItem(IDC_STATIC8)->EnableWindow(bUseDarkTheme);
 	GetDlgItem(IDC_CONTROLS_SIZE_COMBO)->EnableWindow(bUseDarkTheme);
 	m_chkDarkMenu.EnableWindow(bUseDarkTheme);
-	if (SysVersion::IsWin10orLater()) {
-		m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
-	}
+//	if (SysVersion::IsWin10orLater()) {
+//		m_chkDarkMenuBlurBehind.EnableWindow(bUseDarkTheme && m_chkDarkMenu.GetCheck());
+//	}
 	if (SysVersion::IsWin10v1809orLater()) {
 		m_chkDarkTitle.EnableWindow(bUseDarkTheme);
 	}
