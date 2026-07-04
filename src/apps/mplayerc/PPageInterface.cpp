@@ -23,6 +23,8 @@
 #include "MainFrm.h"
 #include "PPageInterface.h"
 #include "DSUtil/SysVersion.h"
+#include "controls/DarkTheme.h"
+#include <ExtLib/ui/TreePropSheet/PropPageFrameDefault.h>
 
 // CPPageInterface dialog
 
@@ -172,6 +174,23 @@ BOOL CPPageInterface::OnApply()
 	s.bDarkMenu = !!m_chkDarkMenu.GetCheck();
 	//s.bDarkMenuBlurBehind = !!m_chkDarkMenuBlurBehind.GetCheck();
 	s.bDarkTitle = !!m_chkDarkTitle.GetCheck();
+
+	// If the dark-theme toggle (or the theme colours) changed while the Options dialog is
+	// still open, re-theme the whole property sheet so it doesn't end up a mix of light and
+	// dark controls. GA_ROOT gives the sheet's top-level window (the pages live under it).
+	{
+		const bool bDarkToggled   = (!!s.bUseDarkTheme != !!bUseDarkTheme);
+		const bool bColorsChanged = s.nThemeBrightness != m_nThemeBrightness_Old
+			|| s.nThemeRed   != m_nThemeRed_Old
+			|| s.nThemeGreen != m_nThemeGreen_Old
+			|| s.nThemeBlue  != m_nThemeBlue_Old;
+		if (bDarkToggled || (s.bUseDarkTheme && bColorsChanged)) {
+			TreePropSheet::CPropPageFrameDefault::s_bDarkMode = DarkTheme::IsActive();
+			TreePropSheet::CPropPageFrameDefault::s_clrFace   = DarkTheme::FaceColor();
+			TreePropSheet::CPropPageFrameDefault::s_clrText   = DarkTheme::TextColor();
+			DarkTheme::RefreshTheme(::GetAncestor(GetSafeHwnd(), GA_ROOT));
+		}
+	}
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
 	s.fUseTimeTooltip		= !!m_fUseTimeTooltip;
@@ -400,9 +419,15 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			dc.Attach(pNMCD->hdc);
 			CRect r;
 			CopyRect(&r,&pNMCD->rc);
-			CPen penFrEnabled (PS_SOLID, 0, GetSysColor(COLOR_BTNTEXT));
-			CPen penFrDisabled (PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
+			const bool bDark = DarkTheme::IsActive();
+			CPen penFrEnabled (PS_SOLID, 0, bDark ? DarkTheme::CtrlBorderColor() : GetSysColor(COLOR_BTNTEXT));
+			CPen penFrDisabled (PS_SOLID, 0, bDark ? DarkTheme::CtrlBorderColor() : GetSysColor(COLOR_BTNSHADOW));
 			CPen *penOld = dc.SelectObject(&penFrEnabled);
+			CBrush brBack(bDark ? DarkTheme::FaceColor() : GetSysColor(COLOR_3DFACE));
+			CBrush* pOldBrush = dc.SelectObject(&brBack);
+			if (bDark) {
+				dc.FillSolidRect(&r, DarkTheme::FaceColor()); // avoid a light ring around the rounded swatch
+			}
 
 			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) {
 				dc.SelectObject(&penFrDisabled);
@@ -418,6 +443,7 @@ void CPPageInterface::OnCustomDrawBtns(NMHDR *pNMHDR, LRESULT *pResult)
 			}
 
 			dc.SelectObject(&penOld);
+			dc.SelectObject(pOldBrush);
 			dc.Detach();
 
 			*pResult = CDRF_SKIPDEFAULT;

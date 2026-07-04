@@ -21,6 +21,8 @@
 
 #include "stdafx.h"
 #include "PPageSheet.h"
+#include "controls/DarkTheme.h"
+#include <ExtLib/ui/TreePropSheet/PropPageFrameDefault.h>
 #include <HighDPI.h>
 
 // CPPageSheet
@@ -100,10 +102,20 @@ CTreeCtrl* CPPageSheet::CreatePageTreeObject()
 
 BEGIN_MESSAGE_MAP(CPPageSheet, CTreePropSheet)
 	ON_WM_CONTEXTMENU()
+	ON_WM_CTLCOLOR()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 BOOL CPPageSheet::OnInitDialog()
 {
+	// Tell the TreePropSheet page frame which palette to use before it paints.
+	TreePropSheet::CPropPageFrameDefault::s_bDarkMode = DarkTheme::IsActive();
+	TreePropSheet::CPropPageFrameDefault::s_clrFace   = DarkTheme::FaceColor();
+	TreePropSheet::CPropPageFrameDefault::s_clrText   = DarkTheme::TextColor();
+
+	// Enable per-process dark mode before the standard controls are created.
+	DarkTheme::AllowDarkModeForApp();
+
 	BOOL bResult = __super::OnInitDialog();
 
 	if (CTreeCtrl* pTree = GetPageTreeControl()) {
@@ -116,7 +128,40 @@ BOOL CPPageSheet::OnInitDialog()
 		GetPageTreeControl()->EnableWindow (FALSE);
 	}
 
+	if (DarkTheme::IsActive()) {
+		DarkTheme::EnableForWindow(GetSafeHwnd());
+		DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
+
+		if (CTreeCtrl* pTree = GetPageTreeControl()) {
+			pTree->SetBkColor(DarkTheme::FaceColor());
+			pTree->SetTextColor(DarkTheme::TextColor());
+		}
+	}
+
 	return bResult;
+}
+
+HBRUSH CPPageSheet::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = __super::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	if (HBRUSH hbrDark = DarkTheme::OnCtlColor(pDC, nCtlColor)) {
+		return hbrDark;
+	}
+
+	return hbr;
+}
+
+BOOL CPPageSheet::OnEraseBkgnd(CDC* pDC)
+{
+	if (DarkTheme::IsActive()) {
+		CRect rc;
+		GetClientRect(rc);
+		pDC->FillSolidRect(rc, DarkTheme::FaceColor());
+		return TRUE;
+	}
+
+	return __super::OnEraseBkgnd(pDC);
 }
 
 void CPPageSheet::OnContextMenu(CWnd* /*pWnd*/, CPoint /*point*/)

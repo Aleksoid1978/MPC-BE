@@ -23,6 +23,7 @@
 
 #include "PPageBase.h"
 #include "controls/FloatEdit.h"
+#include "controls/DarkCheckListBox.h"
 
 bool IsSupportedExternalVideoRenderer(CLSID clsid);
 
@@ -46,7 +47,7 @@ public:
 
 	enum { IDD = IDD_PPAGEEXTERNALFILTERS };
 
-	CCheckListBox m_filters;
+	CDarkCheckListBox m_filters;
 	int m_iLoadType = FilterOverride::PREFERRED;
 	CHexEdit m_dwMerit;
 	CTreeCtrl m_tree;

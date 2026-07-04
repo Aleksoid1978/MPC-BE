@@ -22,10 +22,14 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFullscreen.h"
+#include "controls/DarkTheme.h"
 #include "DSUtil/SysVersion.h"
 #include "DSUtil/std_helper.h"
 #include "MultiMonitor.h"
 #include <map>
+#include <uxtheme.h>
+#include <vssym32.h> // BP_CHECKBOX / CBS_*
+#pragma comment(lib, "uxtheme.lib")
 
 static CString FormatModeString(const dispmode& dmod)
 {
@@ -72,7 +76,7 @@ BEGIN_MESSAGE_MAP(CPPageFullscreen, CPPageBase)
 	ON_NOTIFY(NM_CUSTOMDRAW, IDC_LIST1, OnCustomdrawList)
 	ON_CLBN_CHKCHANGE(IDC_LIST1, OnCheckChangeList)
 
-	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateFullscreenRes)
+	ON_UPDATE_COMMAND_UI(IDC_LIST1, OnUpdateFullscreenList)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK7, OnUpdateFullscreenRes)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateFullscreenRes)
 	ON_UPDATE_COMMAND_UI(IDC_RESTORERESCHECK, OnUpdateFullscreenRes)
@@ -211,6 +215,7 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER
 							| LVS_EX_GRIDLINES | LVS_EX_BORDERSELECT | LVS_EX_ONECLICKACTIVATE | LVS_EX_CHECKBOXES | LVS_EX_FLATSB);
+
 	m_list.InsertColumn(COL_Z, ResStr(IDS_PPAGE_FS_CLN_ON_OFF), LVCFMT_LEFT, 60, -1, -1);
 	m_list.InsertColumn(COL_VFR_F, ResStr(IDS_PPAGE_FS_CLN_FROM_FPS), LVCFMT_RIGHT, 60, -1, -1);
 	m_list.InsertColumn(COL_VFR_T, ResStr(IDS_PPAGE_FS_CLN_TO_FPS), LVCFMT_RIGHT, 60, -1, -1);
@@ -220,6 +225,10 @@ BOOL CPPageFullscreen::OnInitDialog()
 
 	ModesUpdate();
 	UpdateData(FALSE);
+
+	// Set the initial locked state + matching checkbox images now (before the first
+	// paint), so the list does not briefly show the wrong set.
+	UpdateListLockState();
 
 	return TRUE;
 }
@@ -232,21 +241,71 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 	if ( CDDS_PREPAINT == pLVCD->nmcd.dwDrawStage ) {
 		*pResult = CDRF_NOTIFYITEMDRAW;
 	} else if ( CDDS_ITEMPREPAINT == pLVCD->nmcd.dwDrawStage ) {
-		*pResult = CDRF_NOTIFYSUBITEMDRAW;
+		// Also ask for a post-paint so we can draw our own checkbox over the native one
+		// (dark theme only).
+		*pResult = CDRF_NOTIFYSUBITEMDRAW | (DarkTheme::IsActive() ? CDRF_NOTIFYPOSTPAINT : 0);
+	} else if ( CDDS_ITEMPOSTPAINT == pLVCD->nmcd.dwDrawStage ) {
+		// The native LVS_EX_CHECKBOXES glyph does not follow the dark theme: unchecked
+		// boxes look white, and it can't be reliably greyed for the inactive list. So we
+		// draw the checkbox ourselves over the native one: a dark box, a celeste tick when
+		// active or a grey tick when the list is inactive (auto-mode off).
+		if (DarkTheme::IsActive()) {
+			const int item = (int)pLVCD->nmcd.dwItemSpec;
+			CRect rcBounds, rcLabel;
+			if (m_list.GetItemRect(item, &rcBounds, LVIR_BOUNDS)
+					&& m_list.GetItemRect(item, &rcLabel, LVIR_LABEL)
+					&& rcLabel.left > rcBounds.left) {
+				CDC* pDC = CDC::FromHandle(pLVCD->nmcd.hdc);
+
+				// Cover the whole native checkbox area with the row background.
+				CRect rcGap(rcBounds.left, rcBounds.top, rcLabel.left, rcBounds.bottom);
+				pDC->FillSolidRect(rcGap, DarkTheme::FaceColor());
+
+				const bool active  = (m_listLocked == 0);
+				const bool checked = (m_list.GetCheck(item) != FALSE);
+
+				// Draw the native themed checkbox glyph over the (hidden) native one: the
+				// normal (celeste) glyph when the list is active, or the greyed-out disabled
+				// glyph when inactive — the same grey as the standalone disabled checkboxes.
+				if (HTHEME hTheme = ::OpenThemeData(m_list.GetSafeHwnd(), L"BUTTON")) {
+					const int st = active
+						? (checked ? CBS_CHECKEDNORMAL   : CBS_UNCHECKEDNORMAL)
+						: (checked ? CBS_CHECKEDDISABLED : CBS_UNCHECKEDDISABLED);
+					SIZE gsz = { 14, 14 };
+					::GetThemePartSize(hTheme, pDC->GetSafeHdc(), BP_CHECKBOX, st, nullptr, TS_DRAW, &gsz);
+					RECT rg;
+					rg.left   = rcGap.left + (rcGap.Width()  - gsz.cx) / 2;
+					rg.top    = rcGap.top  + (rcGap.Height() - gsz.cy) / 2;
+					rg.right  = rg.left + gsz.cx;
+					rg.bottom = rg.top  + gsz.cy;
+					::DrawThemeBackground(hTheme, pDC->GetSafeHdc(), BP_CHECKBOX, st, &rg, nullptr);
+					::CloseThemeData(hTheme);
+				}
+			}
+		}
+		*pResult = CDRF_DODEFAULT;
 	} else if ( (CDDS_ITEMPREPAINT | CDDS_SUBITEM) == pLVCD->nmcd.dwDrawStage ) {
 		COLORREF crText, crBkgnd;
 
 		m_fullScreenModes.bEnabled = m_bEnableAutoMode ? m_bEnableAutoMode + m_bBeforePlayback : 0;
 
-		if (m_fullScreenModes.bEnabled == FALSE) {
-			crText = RGB(128,128,128);
-			crBkgnd = RGB(240, 240, 240);
+		if (DarkTheme::IsActive()) {
+			crBkgnd = DarkTheme::FaceColor();
+			crText = (m_fullScreenModes.bEnabled == FALSE) ? ThemeRGB(110, 115, 120) : DarkTheme::TextColor();
+			if (m_list.GetCheck(pLVCD->nmcd.dwItemSpec) == false) {
+				crText = ThemeRGB(110, 115, 120);
+			}
 		} else {
-			crText = RGB(0,0,0);
-			crBkgnd = RGB(255,255,255);
-		}
-		if (m_list.GetCheck(pLVCD->nmcd.dwItemSpec) == false) {
-			crText = RGB(128,128,128);
+			if (m_fullScreenModes.bEnabled == FALSE) {
+				crText = RGB(128,128,128);
+				crBkgnd = RGB(240, 240, 240);
+			} else {
+				crText = RGB(0,0,0);
+				crBkgnd = RGB(255,255,255);
+			}
+			if (m_list.GetCheck(pLVCD->nmcd.dwItemSpec) == false) {
+				crText = RGB(128,128,128);
+			}
 		}
 		pLVCD->clrText = crText;
 		pLVCD->clrTextBk = crBkgnd;
@@ -393,6 +452,40 @@ void CPPageFullscreen::OnCheckChangeList()
 void CPPageFullscreen::OnUpdateFullscreenRes(CCmdUI* pCmdUI)
 {
 	pCmdUI->Enable(m_bEnableAutoMode);
+}
+
+void CPPageFullscreen::OnUpdateFullscreenList(CCmdUI* pCmdUI)
+{
+	if (!DarkTheme::IsActive()) {
+		pCmdUI->Enable(m_bEnableAutoMode);
+		return;
+	}
+
+	// A natively disabled list-view ignores our dark theming and repaints itself with the
+	// light system colours (white rows/borders/checkboxes). So instead of disabling the
+	// window we keep it enabled (it stays dark) but "locked": all interaction is blocked
+	// so it behaves like a disabled control. The row custom-draw dims the text when
+	// auto-mode is off to show it is inactive; the native (dark) checkboxes stay as they
+	// are (replacing the checkbox state image list fights LVS_EX_CHECKBOXES and glitches).
+	pCmdUI->Enable(TRUE);
+	UpdateListLockState();
+}
+
+void CPPageFullscreen::UpdateListLockState()
+{
+	if (!DarkTheme::IsActive()) {
+		return;
+	}
+
+	// Read the real check state of "use autochange" (IDC_CHECK2) directly — the DDX
+	// member m_bEnableAutoMode is only synced on UpdateData() and lags a frame behind.
+	const int locked = (IsDlgButtonChecked(IDC_CHECK2) == BST_CHECKED) ? 0 : 1;
+	if (locked == m_listLocked) {
+		return;
+	}
+	m_listLocked = locked;
+	m_list.SetLocked(locked != 0);
+	m_list.Invalidate();
 }
 
 void CPPageFullscreen::OnUpdateShowBarsWhenFullScreen(CCmdUI* pCmdUI)
