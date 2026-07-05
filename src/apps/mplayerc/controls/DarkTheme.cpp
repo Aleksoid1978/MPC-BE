@@ -33,19 +33,6 @@
 namespace DarkTheme
 {
 	namespace {
-		// Fixed dark palette for the Options dialog. The R/G/B/Brightness sliders on the
-		// Interface page tint the *player* only; the Options window stays a constant dark
-		// (tying it to the sliders caused half-repaints/flicker and drove text to black).
-		// These equal the ThemeRGB result at the shipped defaults (brightness 15, colour
-		// 255,255,255), so the shade matches the default look but never changes.
-		inline COLORREF DRGB(int r, int g, int b) {
-			auto f = [](int c) -> int {
-				int v = (15 + c) * 255 / 256;
-				return v < 0 ? 0 : (v > 255 ? 255 : v);
-			};
-			return RGB(f(r), f(g), f(b));
-		}
-
 		// ---- undocumented uxtheme.dll ordinals (Windows 10 1809+) ----
 		enum PreferredAppMode { APPMODE_DEFAULT, APPMODE_ALLOWDARK, APPMODE_FORCEDARK, APPMODE_FORCELIGHT, APPMODE_MAX };
 
@@ -70,6 +57,14 @@ namespace DarkTheme
 		COLORREF g_clrCtrl = CLR_INVALID;
 		HBRUSH   g_hbrFace = nullptr;
 		HBRUSH   g_hbrCtrl = nullptr;
+
+		// Snapshot of the colours used by the R/G/B/Brightness sliders. Those sliders control the
+		// theme, so painting them with the *live* colour makes the one being dragged change colour
+		// under the cursor while the others wait for release. Instead they paint from this snapshot,
+		// updated only when a drag ends (CommitThemeColors), so all four move together on release.
+		COLORREF g_committedFace   = CLR_INVALID;
+		COLORREF g_committedGroove = CLR_INVALID;
+		COLORREF g_committedBorder = CLR_INVALID;
 
 		bool Build1903orLater() {
 			static const bool b = IsWindowsVersionOrGreaterBuild(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 18362);
@@ -107,8 +102,8 @@ namespace DarkTheme
 		}
 
 		void EnsureBrushes() {
-			const COLORREF clrFace = DRGB(22, 27, 32);
-			const COLORREF clrCtrl = DRGB(10, 14, 18);
+			const COLORREF clrFace = ThemeRGB(22, 27, 32);
+			const COLORREF clrCtrl = ThemeRGB(10, 14, 18);
 			if (clrFace != g_clrFace || !g_hbrFace) {
 				if (g_hbrFace) {
 					::DeleteObject(g_hbrFace);
@@ -162,7 +157,7 @@ namespace DarkTheme
 
 					CRect rcFrame = rc;
 					rcFrame.top += textH / 2;
-					CBrush brFrame(DRGB(70, 75, 80));
+					CBrush brFrame(ThemeRGB(70, 75, 80));
 					pDC->FrameRect(rcFrame, &brFrame);
 
 					if (!text.IsEmpty()) {
@@ -195,7 +190,7 @@ namespace DarkTheme
 		// Push buttons: Windows 11 draws them rounded, optionally with an icon, but the dark
 		// BUTTON visual style ("DarkMode_Explorer") is flat and drops the icon, while leaving
 		// them un-themed keeps them light. So we owner-draw them: a rounded dark face (with
-		// hover/pressed shades from the fixed dark palette), the shared border (an accent for
+		// hover/pressed shades from the themed palette), the shared border (an accent for
 		// the default button), the native icon + text, and a
 		// focus rectangle. The default window proc still runs all the click/keyboard logic; we
 		// only take over painting. dwRefData carries the hot (hover) state.
@@ -241,13 +236,13 @@ namespace DarkTheme
 
 					pDC->FillSolidRect(rc, FaceColor()); // dialog bg behind the rounded corners
 
-					const COLORREF face = disabled ? DRGB(38, 43, 48)
-										: pressed  ? DRGB(36, 41, 46)
-										: hot      ? DRGB(62, 69, 76)
-												   : DRGB(50, 56, 62);
-					const COLORREF border = disabled ? DRGB(60, 65, 70)
+					const COLORREF face = disabled ? ThemeRGB(38, 43, 48)
+										: pressed  ? ThemeRGB(36, 41, 46)
+										: hot      ? ThemeRGB(62, 69, 76)
+												   : ThemeRGB(50, 56, 62);
+					const COLORREF border = disabled ? ThemeRGB(60, 65, 70)
 										  : isDef    ? RGB(76, 194, 255)
-													 : DRGB(84, 90, 96);
+													 : ThemeRGB(84, 90, 96);
 
 					CBrush brFace(face);
 					CPen   penBd(PS_SOLID, 1, border);
@@ -405,8 +400,8 @@ namespace DarkTheme
 							CDC* pDC = CDC::FromHandle(p->hdc);
 							CRect rc(p->rc);
 							pDC->FillSolidRect(rc, FaceColor());
-							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), DRGB(70, 75, 80));
-							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, DRGB(70, 75, 80));
+							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), ThemeRGB(70, 75, 80));
+							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, ThemeRGB(70, 75, 80));
 
 							wchar_t buf[256] = {};
 							HDITEMW hdi = {};
@@ -530,9 +525,9 @@ namespace DarkTheme
 					CRect rc;
 					::GetClientRect(hWnd, &rc);
 
-					const COLORREF clrFace   = DRGB(38, 44, 50);
-					const COLORREF clrBorder = DRGB(70, 75, 80);
-					const COLORREF clrArrow   = DRGB(170, 175, 180);
+					const COLORREF clrFace   = ThemeRGB(38, 44, 50);
+					const COLORREF clrBorder = ThemeRGB(70, 75, 80);
+					const COLORREF clrArrow   = RGB(170, 175, 180); // fixed: foreground glyph never tints
 
 					pDC->FillSolidRect(rc, clrFace);
 
@@ -573,7 +568,7 @@ namespace DarkTheme
 		// and a celeste thumb, painted deterministically in WM_PAINT.
 		const UINT_PTR kTrackbarSubclassId = 6;
 
-		LRESULT CALLBACK TrackbarSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
+		LRESULT CALLBACK TrackbarSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR dwData) {
 			switch (msg) {
 				case WM_ERASEBKGND:
 					return 1; // background is painted in WM_PAINT
@@ -583,19 +578,26 @@ namespace DarkTheme
 
 					CRect rc;
 					::GetClientRect(hWnd, &rc);
-					pDC->FillSolidRect(rc, FaceColor());
+
+					// The R/G/B/Brightness sliders (dwData != 0) paint from the committed snapshot so
+					// the one being dragged doesn't recolour live; other sliders use the live colour.
+					const bool frozen = (dwData != 0 && g_committedFace != CLR_INVALID);
+					const COLORREF face   = frozen ? g_committedFace   : FaceColor();
+					const COLORREF groove = frozen ? g_committedGroove : ThemeRGB(10, 14, 18);
+					const COLORREF border = frozen ? g_committedBorder : ThemeRGB(60, 65, 70);
+					pDC->FillSolidRect(rc, face);
 
 					RECT rcCh{};
 					::SendMessageW(hWnd, TBM_GETCHANNELRECT, 0, reinterpret_cast<LPARAM>(&rcCh));
 					CRect ch(rcCh);
-					pDC->FillSolidRect(ch, DRGB(10, 14, 18));                    // dark groove
-					pDC->Draw3dRect(ch, DRGB(60, 65, 70), DRGB(60, 65, 70)); // subtle border
+					pDC->FillSolidRect(ch, groove);      // dark groove
+					pDC->Draw3dRect(ch, border, border); // subtle border
 
 					RECT rcTh{};
 					::SendMessageW(hWnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&rcTh));
 					CRect th(rcTh);
 					const bool disabled = (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) != 0;
-					pDC->FillSolidRect(th, disabled ? DRGB(90, 95, 100) : RGB(76, 194, 255)); // celeste thumb
+					pDC->FillSolidRect(th, disabled ? ThemeRGB(90, 95, 100) : RGB(76, 194, 255)); // celeste thumb
 
 					::EndPaint(hWnd, &ps);
 					return 0;
@@ -721,6 +723,58 @@ namespace DarkTheme
 			}
 		}
 
+		// Disabled text statics are drawn by Windows with an embossed grey (a light 1px shadow),
+		// which looks bad on a dark background. Owner-draw disabled text labels flat instead — a
+		// plain grey caption, no emboss. Enabled statics fall through to the default painting.
+		const UINT_PTR kStaticSubclassId = 10;
+
+		LRESULT CALLBACK StaticSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
+			switch (msg) {
+				case WM_ENABLE:
+					::InvalidateRect(hWnd, nullptr, TRUE); // repaint when the enable state changes
+					break;
+				case WM_PAINT:
+					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) {
+						PAINTSTRUCT ps;
+						CDC* pDC = CDC::FromHandle(::BeginPaint(hWnd, &ps));
+						CRect rc;
+						::GetClientRect(hWnd, &rc);
+						pDC->FillSolidRect(rc, FaceColor());
+
+						HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(hWnd, WM_GETFONT, 0, 0));
+						CFont* pOldFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
+						pDC->SetBkMode(TRANSPARENT);
+						pDC->SetTextColor(RGB(110, 115, 120)); // flat disabled grey, no emboss
+
+						CString text;
+						const int len = ::GetWindowTextLengthW(hWnd);
+						if (len > 0) {
+							::GetWindowTextW(hWnd, text.GetBuffer(len + 1), len + 1);
+							text.ReleaseBuffer();
+						}
+
+						const LONG st = ::GetWindowLongW(hWnd, GWL_STYLE) & SS_TYPEMASK;
+						UINT fmt = DT_NOPREFIX;
+						if (st == SS_CENTER)     fmt |= DT_CENTER;
+						else if (st == SS_RIGHT) fmt |= DT_RIGHT;
+						if (st == SS_LEFTNOWORDWRAP || st == SS_SIMPLE) fmt |= DT_SINGLELINE | DT_VCENTER;
+						else                                            fmt |= DT_WORDBREAK;
+						pDC->DrawTextW(text, rc, fmt);
+
+						if (pOldFont) {
+							pDC->SelectObject(pOldFont);
+						}
+						::EndPaint(hWnd, &ps);
+						return 0;
+					}
+					break; // enabled: let the default painting run (colour via WM_CTLCOLORSTATIC)
+				case WM_NCDESTROY:
+					RemoveWindowSubclass(hWnd, StaticSubclassProc, kStaticSubclassId);
+					break;
+			}
+			return DefSubclassProc(hWnd, msg, wParam, lParam);
+		}
+
 		void ThemeControl(HWND hCtrl) {
 			if (pAllowDarkModeForWindow) {
 				pAllowDarkModeForWindow(hCtrl, true);
@@ -805,8 +859,14 @@ namespace DarkTheme
 				// (handled by the page); repaint just the edge with the dark border.
 				const LONG st = GetWindowLongW(hCtrl, GWL_STYLE);
 				const LONG ex = GetWindowLongW(hCtrl, GWL_EXSTYLE);
+				const LONG sType = st & SS_TYPEMASK;
 				if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
 					ApplyDarkBorder(hCtrl);
+				} else if (sType == SS_LEFT || sType == SS_CENTER || sType == SS_RIGHT
+						|| sType == SS_LEFTNOWORDWRAP || sType == SS_SIMPLE) {
+					// Plain text labels: owner-draw disabled ones flat (Windows would emboss them,
+					// which looks bad on dark). Enabled ones keep the default painting.
+					SetWindowSubclass(hCtrl, StaticSubclassProc, kStaticSubclassId, 0);
 				}
 			} else {
 				// Note: SysTabControl32 is handled by CDarkTabCtrl (a CTabCtrl-derived
@@ -831,6 +891,7 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, SpinSubclassProc,     kSpinSubclassId);
 			RemoveWindowSubclass(hChild, BorderSubclassProc,   kBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
+			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
 
 			DWORD_PTR gridFlag = 0;
 			const bool hadGrid = GetWindowSubclass(hChild, ListViewSubclassProc, kListViewSubclassId, &gridFlag) && gridFlag;
@@ -865,14 +926,15 @@ namespace DarkTheme
 		return AfxGetAppSettings().bUseDarkTheme && SysVersion::IsWin10v1809orLater();
 	}
 
-	// The whole Options palette is FIXED (DRGB = the ThemeRGB result at the shipped defaults):
-	// the R/G/B/Brightness sliders tint the player interface only, never the Options dialog, so
-	// it never half-repaints or drives its text to black when the sliders move.
-	COLORREF FaceColor()       { return DRGB(22, 27, 32); }
+	// The background palette follows the R/G/B/Brightness sliders (ThemeRGB), so the Options
+	// dialog tints in real time to match the player. The TEXT colour is deliberately FIXED (not
+	// run through ThemeRGB) so it stays readable wherever the sliders are, instead of being
+	// driven to black when a channel is lowered.
+	COLORREF FaceColor()       { return ThemeRGB(22, 27, 32); }
 	COLORREF TextColor()       { return RGB(165, 170, 175); }
-	COLORREF CtrlBackColor()   { return DRGB(10, 14, 18); }
-	COLORREF CtrlBorderColor() { return DRGB(70, 75, 80); }
-	COLORREF GridlineColor()   { return DRGB(40, 45, 50); }
+	COLORREF CtrlBackColor()   { return ThemeRGB(10, 14, 18); }
+	COLORREF CtrlBorderColor() { return ThemeRGB(70, 75, 80); }
+	COLORREF GridlineColor()   { return ThemeRGB(40, 45, 50); }
 
 	void AllowDarkModeForApp() {
 		if (!IsActive()) {
@@ -913,6 +975,12 @@ namespace DarkTheme
 		BOOL bDark = TRUE;
 		if (FAILED(DwmSetWindowAttribute(hWnd, 20, &bDark, sizeof(bDark)))) {
 			DwmSetWindowAttribute(hWnd, 19, &bDark, sizeof(bDark));
+		}
+		// Win11: tint the title-bar background with the same colour as the player's caption
+		// (ThemeRGB(45,50,55)), so the Options title matches the player and follows the sliders.
+		if (SysVersion::IsWin11orLater()) {
+			COLORREF cap = ThemeRGB(45, 50, 55);
+			DwmSetWindowAttribute(hWnd, 35 /*DWMWA_CAPTION_COLOR*/, &cap, sizeof(cap));
 		}
 	}
 
@@ -959,11 +1027,19 @@ namespace DarkTheme
 		ThemeControl(hCtrl);
 	}
 
-	void MakeTrackbarOwnerDrawn(HWND hTrackbar) {
+	void CommitThemeColors() {
+		// Snapshot the current theme colours for the R/G/B/Brightness sliders. Call this when a
+		// slider drag ends so all four repaint together to the final colour (see TrackbarSubclassProc).
+		g_committedFace   = FaceColor();
+		g_committedGroove = ThemeRGB(10, 14, 18);
+		g_committedBorder = ThemeRGB(60, 65, 70);
+	}
+
+	void MakeTrackbarOwnerDrawn(HWND hTrackbar, bool bThemeControl) {
 		if (!IsActive() || !hTrackbar) {
 			return;
 		}
-		SetWindowSubclass(hTrackbar, TrackbarSubclassProc, kTrackbarSubclassId, 0);
+		SetWindowSubclass(hTrackbar, TrackbarSubclassProc, kTrackbarSubclassId, bThemeControl ? 1 : 0);
 		::InvalidateRect(hTrackbar, nullptr, TRUE);
 	}
 
@@ -1004,6 +1080,35 @@ namespace DarkTheme
 			RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
 	}
 
+	void RefreshColors(HWND hRoot) {
+		if (!IsActive() || !hRoot) {
+			return;
+		}
+		// Re-apply the themed background colours the sliders just changed (tree/list backgrounds
+		// are stored in the control, so they don't re-tint on their own), then invalidate the
+		// sheet. WM_CTLCOLOR* refreshes the cached brushes (EnsureBrushes) for everything else.
+		// The text colour is fixed, so nothing there needs updating. Called when a slider drag
+		// ends (not on every tick), so this one repaint doesn't produce visible flicker.
+		EnumChildWindows(hRoot, [](HWND h, LPARAM) -> BOOL {
+			wchar_t cls[32] = {};
+			GetClassNameW(h, cls, _countof(cls));
+			if (_wcsicmp(cls, L"SysTreeView32") == 0) {
+				::SendMessageW(h, TVM_SETBKCOLOR, 0, static_cast<LPARAM>(FaceColor()));
+			} else if (_wcsicmp(cls, L"SysListView32") == 0) {
+				const COLORREF bk = FaceColor();
+				::SendMessageW(h, LVM_SETBKCOLOR,     0, static_cast<LPARAM>(bk));
+				::SendMessageW(h, LVM_SETTEXTBKCOLOR, 0, static_cast<LPARAM>(bk));
+			}
+			return TRUE;
+		}, 0);
+		// Also re-tint the title bar (Win11) so the caption follows the sliders, like the player's.
+		if (SysVersion::IsWin11orLater()) {
+			COLORREF cap = ThemeRGB(45, 50, 55);
+			DwmSetWindowAttribute(hRoot, 35 /*DWMWA_CAPTION_COLOR*/, &cap, sizeof(cap));
+		}
+		::RedrawWindow(hRoot, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+	}
+
 	bool MakeCheckStateImageList(CImageList& il, int size, HWND hRef, bool bDisabled) {
 		if (!IsActive() || size <= 0) {
 			return false;
@@ -1015,9 +1120,9 @@ namespace DarkTheme
 			// which made the checkboxes vanish; a solid grey box + grey tick reads clearly
 			// as an inactive checkbox and never disappears.
 			const COLORREF mask   = RGB(255, 0, 255);
-			const COLORREF fill   = DRGB(34, 39, 44);
-			const COLORREF border = DRGB(90, 95, 100);
-			const COLORREF mark   = DRGB(120, 125, 130);
+			const COLORREF fill   = ThemeRGB(34, 39, 44);
+			const COLORREF border = ThemeRGB(90, 95, 100);
+			const COLORREF mark   = ThemeRGB(120, 125, 130);
 
 			CClientDC screen(nullptr);
 			CDC dc;
@@ -1173,8 +1278,8 @@ namespace DarkTheme
 				if (p->dwItemSpec == TBCD_CHANNEL) {
 					CDC* pDC = CDC::FromHandle(p->hdc);
 					CRect rc(p->rc);
-					pDC->FillSolidRect(rc, DRGB(10, 14, 18));                        // dark groove
-					pDC->Draw3dRect(rc, DRGB(60, 65, 70), DRGB(60, 65, 70));     // subtle border
+					pDC->FillSolidRect(rc, ThemeRGB(10, 14, 18));                        // dark groove
+					pDC->Draw3dRect(rc, ThemeRGB(60, 65, 70), ThemeRGB(60, 65, 70));     // subtle border
 					*pResult = CDRF_SKIPDEFAULT;
 				} else {
 					*pResult = CDRF_DODEFAULT; // keep the default thumb and tick marks
@@ -1224,12 +1329,12 @@ namespace DarkTheme
 		if (isPush) {
 			// Flat dark push button (face darkens when pressed, lightens on hover).
 			const bool focus = (p->uItemState & CDIS_FOCUS) != 0;
-			const COLORREF face = disabled ? DRGB(30, 34, 38)
-								: pressed  ? DRGB(28, 33, 38)
-								: hot      ? DRGB(52, 59, 66)
-								:            DRGB(44, 50, 56);
+			const COLORREF face = disabled ? ThemeRGB(30, 34, 38)
+								: pressed  ? ThemeRGB(28, 33, 38)
+								: hot      ? ThemeRGB(52, 59, 66)
+								:            ThemeRGB(44, 50, 56);
 			pDC->FillSolidRect(rc, face);
-			pDC->Draw3dRect(rc, DRGB(80, 86, 92), DRGB(80, 86, 92));
+			pDC->Draw3dRect(rc, ThemeRGB(80, 86, 92), ThemeRGB(80, 86, 92));
 
 			CString btext;
 			const int blen = ::GetWindowTextLengthW(hCtrl);

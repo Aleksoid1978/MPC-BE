@@ -135,6 +135,8 @@ BOOL CPPageSheet::OnInitDialog()
 		if (CTreeCtrl* pTree = GetPageTreeControl()) {
 			pTree->SetBkColor(DarkTheme::FaceColor());
 			pTree->SetTextColor(DarkTheme::TextColor());
+			// Double-buffer the nav tree so it doesn't flicker during the live slider re-tint.
+			pTree->SendMessage(TVM_SETEXTENDEDSTYLE, TVS_EX_DOUBLEBUFFER, TVS_EX_DOUBLEBUFFER);
 		}
 	}
 

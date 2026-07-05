@@ -59,7 +59,11 @@ namespace DarkTheme
 	// Fully owner-draws a trackbar (dark background, dark groove, celeste thumb) via a
 	// subclass. Use for sliders whose NM_CUSTOMDRAW channel colour is not reliably applied
 	// (e.g. the subtitle Default Style alpha sliders after the Reset button).
-	void MakeTrackbarOwnerDrawn(HWND hTrackbar);
+	// bThemeControl marks the R/G/B/Brightness sliders (which control the theme colour): they
+	// paint from a committed snapshot instead of the live colour, so the one being dragged doesn't
+	// recolour under the cursor. Call CommitThemeColors() when a drag ends to update the snapshot.
+	void MakeTrackbarOwnerDrawn(HWND hTrackbar, bool bThemeControl = false);
+	void CommitThemeColors();
 
 	// Applies the dark theme to a whole auxiliary top-level dialog opened from the Options
 	// pages (dark title bar, dark background + control colours, themed child controls).
@@ -71,6 +75,10 @@ namespace DarkTheme
 	// directions — applying when now active, stripping every subclass/override when now
 	// inactive — and forces a full redraw. Pass the Options property sheet HWND.
 	void RefreshTheme(HWND hRoot);
+
+	// Re-tints the themed backgrounds live as the R/G/B/Brightness sliders move, so the Options
+	// dialog tracks the player colour in real time (the text colour stays fixed). Pass the sheet.
+	void RefreshColors(HWND hRoot);
 
 	// Builds a dark themed checkbox STATE image list for a list-view using
 	// LVS_EX_CHECKBOXES (index 0 = none, 1 = unchecked, 2 = checked). Assigning this
@@ -95,8 +103,8 @@ namespace DarkTheme
 	// Returns true (with *pResult set) only for check/radio buttons; false otherwise.
 	bool ButtonCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
 
-	// Fixed dark palette for the Options dialog: independent of the R/G/B/Brightness sliders
-	// (those tint the player interface only), so the Options window never changes shade.
+	// Background palette follows the R/G/B/Brightness sliders (tints in real time to match the
+	// player); TextColor() is fixed so text stays readable regardless of the slider values.
 	COLORREF FaceColor();       // dialog / page / static background
 	COLORREF TextColor();       // text
 	COLORREF CtrlBackColor();   // sunken control interior (edit / listbox)

@@ -85,7 +85,7 @@ void CDarkTabCtrl::DrawTabItem(int nItem, CRect rItem, bool selected, CDC* pDC)
 	CRect rText(rItem);
 	rText.left += 6;
 	pDC->SetBkMode(TRANSPARENT);
-	pDC->SetTextColor(selected ? DarkTheme::TextColor() : ThemeRGB(140, 145, 150));
+	pDC->SetTextColor(selected ? DarkTheme::TextColor() : RGB(140, 145, 150)); // fixed: text never tints
 	pDC->DrawTextW(buf, rText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS);
 }
 

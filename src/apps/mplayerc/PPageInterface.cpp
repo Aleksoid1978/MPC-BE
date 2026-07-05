@@ -92,6 +92,15 @@ BOOL CPPageInterface::OnInitDialog()
 	m_ThemeGreenCtrl.SetRange		(0, 255, TRUE);
 	m_ThemeBlueCtrl.SetRange		(0, 255, TRUE);
 
+	// Owner-draw the theme sliders deterministically. Relying on NM_CUSTOMDRAW left the active
+	// slider's background unpainted (white) on some repaints and didn't refresh the others; the
+	// subclass always fills the themed background, so all four stay consistent.
+	DarkTheme::MakeTrackbarOwnerDrawn(m_ThemeBrightnessCtrl.GetSafeHwnd(), true);
+	DarkTheme::MakeTrackbarOwnerDrawn(m_ThemeRedCtrl.GetSafeHwnd(), true);
+	DarkTheme::MakeTrackbarOwnerDrawn(m_ThemeGreenCtrl.GetSafeHwnd(), true);
+	DarkTheme::MakeTrackbarOwnerDrawn(m_ThemeBlueCtrl.GetSafeHwnd(), true);
+	DarkTheme::CommitThemeColors(); // initial snapshot for the sliders
+
 	m_clrFaceABGR			= m_clrFaceABGR_Old			= s.clrFaceABGR;
 	m_clrOutlineABGR		= m_clrOutlineABGR_Old		= s.clrOutlineABGR;
 	m_fUseWin7TaskBar		= s.fUseWin7TaskBar;
@@ -300,8 +309,9 @@ void CPPageInterface::OnThemeChange()
 	pFrame->Invalidate();
 	pFrame->m_wndPlaylistBar.Invalidate();
 
-	// The Options dialog is deliberately not repainted here: its palette is fixed, so the
-	// R/G/B/Brightness sliders only affect the player, never the open Options sheet.
+	// OnThemeChange runs on every slider tick to keep the player live. The Options sheet is
+	// re-tinted separately, when the drag ends (see OnHScroll), because repainting its standard
+	// controls on every tick flickers (they aren't double-buffered like the player's).
 }
 
 BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)
@@ -373,6 +383,19 @@ void CPPageInterface::OnClickClrDefault()
 	m_clrOutlineABGR_Old	= s.clrOutlineABGR;
 
 	UpdateData(FALSE);
+
+	// Reset is a one-shot (not a drag), so re-tint the Options sheet to the default colours here.
+	if (DarkTheme::IsActive()) {
+		DarkTheme::CommitThemeColors();
+		if (HWND hSheet = ::GetAncestor(GetSafeHwnd(), GA_ROOT)) {
+			TreePropSheet::CPropPageFrameDefault::s_clrFace = DarkTheme::FaceColor();
+			DarkTheme::RefreshColors(hSheet);
+		}
+		m_ThemeBrightnessCtrl.Invalidate();
+		m_ThemeRedCtrl.Invalidate();
+		m_ThemeGreenCtrl.Invalidate();
+		m_ThemeBlueCtrl.Invalidate();
+	}
 }
 
 void CPPageInterface::OnClickClrFace()
@@ -499,6 +522,25 @@ void CPPageInterface::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 		UpdateData();
 		s.nThemeBlue		= m_nThemeBlue;
 		OnThemeChange();
+	}
+
+	// Re-tint the open Options sheet to match the new colours when the drag ends (SB_ENDSCROLL).
+	// It is done on release, not on every tick: continuously repainting the sheet's standard
+	// controls flickers (they are not owner-drawn / double-buffered like the player's). The player
+	// follows live via OnThemeChange above.
+	const bool bThemeSlider = (*pScrollBar == m_ThemeBrightnessCtrl || *pScrollBar == m_ThemeRedCtrl
+		|| *pScrollBar == m_ThemeGreenCtrl || *pScrollBar == m_ThemeBlueCtrl);
+	if (bThemeSlider && nSBCode == SB_ENDSCROLL && DarkTheme::IsActive()) {
+		DarkTheme::CommitThemeColors(); // snapshot the final colour so all four sliders move together
+		if (HWND hSheet = ::GetAncestor(GetSafeHwnd(), GA_ROOT)) {
+			TreePropSheet::CPropPageFrameDefault::s_clrFace = DarkTheme::FaceColor();
+			DarkTheme::RefreshColors(hSheet);
+		}
+		// Repaint the four sliders so they all move to the final (committed) colour on release.
+		m_ThemeBrightnessCtrl.Invalidate();
+		m_ThemeRedCtrl.Invalidate();
+		m_ThemeGreenCtrl.Invalidate();
+		m_ThemeBlueCtrl.Invalidate();
 	}
 
 	SetModified();

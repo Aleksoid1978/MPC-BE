@@ -291,9 +291,9 @@ void CPPageFullscreen::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		if (DarkTheme::IsActive()) {
 			crBkgnd = DarkTheme::FaceColor();
-			crText = (m_fullScreenModes.bEnabled == FALSE) ? ThemeRGB(110, 115, 120) : DarkTheme::TextColor();
+			crText = (m_fullScreenModes.bEnabled == FALSE) ? RGB(110, 115, 120) : DarkTheme::TextColor();
 			if (m_list.GetCheck(pLVCD->nmcd.dwItemSpec) == false) {
-				crText = ThemeRGB(110, 115, 120);
+				crText = RGB(110, 115, 120);
 			}
 		} else {
 			if (m_fullScreenModes.bEnabled == FALSE) {
