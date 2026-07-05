@@ -372,9 +372,9 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 8		"불러온 파일이 없으면 최근 파일 열기"
 10		"두 번 클릭"
 12		"영상 영역으로 창 이동"
-13		"Enable long press speed-up"
-14		"Long press speed"
-16		"Long press delay"
+13		"길게 누를 때, 반응 속도 향상 기능 활성화"
+14		"길게 누르기 속도"
+16		"길게 누르기 지연"
 18		"우 클릭"
 21		"기본값"
 END
