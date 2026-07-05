@@ -20,13 +20,12 @@
 
 #include "stdafx.h"
 #include "DarkTheme.h"
-#include "../MainFrm.h" // AfxGetAppSettings(), ThemeRGB()
+#include "../MainFrm.h" // AfxGetAppSettings()
 #include "DSUtil/SysVersion.h"
 #include <dwmapi.h>
 #include <uxtheme.h>
 #include <vssym32.h>  // BP_CHECKBOX / BP_RADIOBUTTON / CBS_* / RBS_*
 #include <commctrl.h> // SetWindowSubclass
-#include <ExtLib/ui/coolsb/coolscroll.h> // flat dark scrollbars (same as the playlist)
 
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "uxtheme.lib")
@@ -34,6 +33,19 @@
 namespace DarkTheme
 {
 	namespace {
+		// Fixed dark palette for the Options dialog. The R/G/B/Brightness sliders on the
+		// Interface page tint the *player* only; the Options window stays a constant dark
+		// (tying it to the sliders caused half-repaints/flicker and drove text to black).
+		// These equal the ThemeRGB result at the shipped defaults (brightness 15, colour
+		// 255,255,255), so the shade matches the default look but never changes.
+		inline COLORREF DRGB(int r, int g, int b) {
+			auto f = [](int c) -> int {
+				int v = (15 + c) * 255 / 256;
+				return v < 0 ? 0 : (v > 255 ? 255 : v);
+			};
+			return RGB(f(r), f(g), f(b));
+		}
+
 		// ---- undocumented uxtheme.dll ordinals (Windows 10 1809+) ----
 		enum PreferredAppMode { APPMODE_DEFAULT, APPMODE_ALLOWDARK, APPMODE_FORCEDARK, APPMODE_FORCELIGHT, APPMODE_MAX };
 
@@ -95,8 +107,8 @@ namespace DarkTheme
 		}
 
 		void EnsureBrushes() {
-			const COLORREF clrFace = ThemeRGB(22, 27, 32);
-			const COLORREF clrCtrl = ThemeRGB(10, 14, 18);
+			const COLORREF clrFace = DRGB(22, 27, 32);
+			const COLORREF clrCtrl = DRGB(10, 14, 18);
 			if (clrFace != g_clrFace || !g_hbrFace) {
 				if (g_hbrFace) {
 					::DeleteObject(g_hbrFace);
@@ -150,7 +162,7 @@ namespace DarkTheme
 
 					CRect rcFrame = rc;
 					rcFrame.top += textH / 2;
-					CBrush brFrame(ThemeRGB(70, 75, 80));
+					CBrush brFrame(DRGB(70, 75, 80));
 					pDC->FrameRect(rcFrame, &brFrame);
 
 					if (!text.IsEmpty()) {
@@ -161,7 +173,7 @@ namespace DarkTheme
 
 						const bool disabled = (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) != 0;
 						pDC->SetBkMode(TRANSPARENT);
-						pDC->SetTextColor(disabled ? ThemeRGB(110, 115, 120) : TextColor());
+						pDC->SetTextColor(disabled ? RGB(110, 115, 120) : TextColor());
 						CRect rcLabel(x, rc.top, rc.right - 4, rc.top + textH);
 						pDC->DrawTextW(text, rcLabel, DT_LEFT | DT_SINGLELINE | DT_TOP);
 					}
@@ -175,6 +187,128 @@ namespace DarkTheme
 				}
 				case WM_NCDESTROY:
 					RemoveWindowSubclass(hWnd, GroupBoxSubclassProc, kGroupBoxSubclassId);
+					break;
+			}
+			return DefSubclassProc(hWnd, msg, wParam, lParam);
+		}
+
+		// Push buttons: Windows 11 draws them rounded, optionally with an icon, but the dark
+		// BUTTON visual style ("DarkMode_Explorer") is flat and drops the icon, while leaving
+		// them un-themed keeps them light. So we owner-draw them: a rounded dark face (with
+		// hover/pressed shades from the fixed dark palette), the shared border (an accent for
+		// the default button), the native icon + text, and a
+		// focus rectangle. The default window proc still runs all the click/keyboard logic; we
+		// only take over painting. dwRefData carries the hot (hover) state.
+		const UINT_PTR kButtonSubclassId = 9;
+
+		LRESULT CALLBACK ButtonSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR dwHot) {
+			switch (msg) {
+				case WM_MOUSEMOVE:
+					if (!dwHot) {
+						TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, hWnd, 0 };
+						::TrackMouseEvent(&tme);
+						SetWindowSubclass(hWnd, ButtonSubclassProc, kButtonSubclassId, 1);
+						::InvalidateRect(hWnd, nullptr, FALSE);
+					}
+					break;
+				case WM_MOUSELEAVE:
+					SetWindowSubclass(hWnd, ButtonSubclassProc, kButtonSubclassId, 0);
+					::InvalidateRect(hWnd, nullptr, FALSE);
+					break;
+				case WM_ENABLE:
+					// The property sheet enables/disables Apply as pages are modified. On that
+					// transition the default button proc repaints itself light, bypassing our
+					// owner-draw; swallow it and force our own dark repaint instead.
+					::InvalidateRect(hWnd, nullptr, FALSE);
+					return 0;
+				case WM_ERASEBKGND:
+					return 1;
+				case WM_PAINT: {
+					PAINTSTRUCT ps;
+					HDC hdc = ::BeginPaint(hWnd, &ps);
+					CDC* pDC = CDC::FromHandle(hdc);
+
+					CRect rc;
+					::GetClientRect(hWnd, &rc);
+
+					const LONG    style    = ::GetWindowLongW(hWnd, GWL_STYLE);
+					const LRESULT bst      = ::SendMessageW(hWnd, BM_GETSTATE, 0, 0);
+					const bool    disabled = (style & WS_DISABLED) != 0;
+					const bool    pressed  = (bst & BST_PUSHED) != 0;
+					const bool    focused  = (bst & BST_FOCUS) != 0;
+					const bool    hot      = dwHot != 0 && !disabled;
+					const bool    isDef    = (style & BS_TYPEMASK) == BS_DEFPUSHBUTTON;
+
+					pDC->FillSolidRect(rc, FaceColor()); // dialog bg behind the rounded corners
+
+					const COLORREF face = disabled ? DRGB(38, 43, 48)
+										: pressed  ? DRGB(36, 41, 46)
+										: hot      ? DRGB(62, 69, 76)
+												   : DRGB(50, 56, 62);
+					const COLORREF border = disabled ? DRGB(60, 65, 70)
+										  : isDef    ? RGB(76, 194, 255)
+													 : DRGB(84, 90, 96);
+
+					CBrush brFace(face);
+					CPen   penBd(PS_SOLID, 1, border);
+					HGDIOBJ ob = pDC->SelectObject(brFace);
+					HGDIOBJ op = pDC->SelectObject(penBd);
+					pDC->RoundRect(rc.left, rc.top, rc.right, rc.bottom, 8, 8);
+					pDC->SelectObject(ob);
+					pDC->SelectObject(op);
+
+					CString text;
+					const int len = ::GetWindowTextLengthW(hWnd);
+					if (len > 0) {
+						::GetWindowTextW(hWnd, text.GetBuffer(len + 1), len + 1);
+						text.ReleaseBuffer();
+					}
+					HICON hIcon = reinterpret_cast<HICON>(::SendMessageW(hWnd, BM_GETIMAGE, IMAGE_ICON, 0));
+
+					HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(hWnd, WM_GETFONT, 0, 0));
+					CFont* pOldFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
+					pDC->SetBkMode(TRANSPARENT);
+					pDC->SetTextColor(disabled ? RGB(120, 125, 130) : TextColor());
+
+					const int icon = hIcon ? 16 : 0;
+					if (!text.IsEmpty() && (style & BS_MULTILINE)) {
+						// Multi-line captions (e.g. the "AVI Splitter\nconfiguration" filter buttons)
+						// must wrap: a single-line draw collapses the line break and overflows the
+						// button. Word-wrap and centre the text block vertically.
+						CRect rt(rc.left + 4, rc.top, rc.right - 4, rc.bottom);
+						CRect calc = rt;
+						pDC->DrawTextW(text, calc, DT_CENTER | DT_WORDBREAK | DT_CALCRECT);
+						const int oy = (rc.Height() - calc.Height()) / 2;
+						rt.top = rc.top + (oy > 0 ? oy : 0);
+						pDC->DrawTextW(text, rt, DT_CENTER | DT_WORDBREAK);
+					} else {
+						const CSize ext = text.IsEmpty() ? CSize(0, 0) : pDC->GetTextExtent(text);
+						const int gap  = (hIcon && !text.IsEmpty()) ? 4 : 0;
+						int x = rc.left + (rc.Width() - (icon + gap + ext.cx)) / 2;
+						const int cy = rc.top + rc.Height() / 2;
+						if (hIcon) {
+							::DrawIconEx(hdc, x, cy - icon / 2, hIcon, icon, icon, 0, nullptr, DI_NORMAL);
+							x += icon + gap;
+						}
+						if (!text.IsEmpty()) {
+							CRect rt(x, rc.top, rc.right, rc.bottom);
+							pDC->DrawTextW(text, rt, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+						}
+					}
+					if (pOldFont) {
+						pDC->SelectObject(pOldFont);
+					}
+
+					if (focused && !disabled) {
+						CRect fr = rc;
+						fr.DeflateRect(3, 3);
+						pDC->DrawFocusRect(fr);
+					}
+					::EndPaint(hWnd, &ps);
+					return 0;
+				}
+				case WM_NCDESTROY:
+					RemoveWindowSubclass(hWnd, ButtonSubclassProc, kButtonSubclassId);
 					break;
 			}
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
@@ -271,8 +405,8 @@ namespace DarkTheme
 							CDC* pDC = CDC::FromHandle(p->hdc);
 							CRect rc(p->rc);
 							pDC->FillSolidRect(rc, FaceColor());
-							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), ThemeRGB(70, 75, 80));
-							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, ThemeRGB(70, 75, 80));
+							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), DRGB(70, 75, 80));
+							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, DRGB(70, 75, 80));
 
 							wchar_t buf[256] = {};
 							HDITEMW hdi = {};
@@ -396,9 +530,9 @@ namespace DarkTheme
 					CRect rc;
 					::GetClientRect(hWnd, &rc);
 
-					const COLORREF clrFace   = ThemeRGB(38, 44, 50);
-					const COLORREF clrBorder = ThemeRGB(70, 75, 80);
-					const COLORREF clrArrow   = ThemeRGB(170, 175, 180);
+					const COLORREF clrFace   = DRGB(38, 44, 50);
+					const COLORREF clrBorder = DRGB(70, 75, 80);
+					const COLORREF clrArrow   = DRGB(170, 175, 180);
 
 					pDC->FillSolidRect(rc, clrFace);
 
@@ -454,14 +588,14 @@ namespace DarkTheme
 					RECT rcCh{};
 					::SendMessageW(hWnd, TBM_GETCHANNELRECT, 0, reinterpret_cast<LPARAM>(&rcCh));
 					CRect ch(rcCh);
-					pDC->FillSolidRect(ch, ThemeRGB(10, 14, 18));                    // dark groove
-					pDC->Draw3dRect(ch, ThemeRGB(60, 65, 70), ThemeRGB(60, 65, 70)); // subtle border
+					pDC->FillSolidRect(ch, DRGB(10, 14, 18));                    // dark groove
+					pDC->Draw3dRect(ch, DRGB(60, 65, 70), DRGB(60, 65, 70)); // subtle border
 
 					RECT rcTh{};
 					::SendMessageW(hWnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&rcTh));
 					CRect th(rcTh);
 					const bool disabled = (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) != 0;
-					pDC->FillSolidRect(th, disabled ? ThemeRGB(90, 95, 100) : RGB(76, 194, 255)); // celeste thumb
+					pDC->FillSolidRect(th, disabled ? DRGB(90, 95, 100) : RGB(76, 194, 255)); // celeste thumb
 
 					::EndPaint(hWnd, &ps);
 					return 0;
@@ -471,224 +605,6 @@ namespace DarkTheme
 					break;
 			}
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
-		}
-
-		// CoolSB draws its thumb purely from its own stored scroll position (see CalcThumbSize)
-		// and never updates it on its own: during a drag it only posts WM_VSCROLL(SB_THUMBTRACK)
-		// and expects the owner to feed the new position back. Wheel/keyboard scrolling it does
-		// not see at all. These controls (list-view, tree-view, list-box) scroll themselves and
-		// keep their real scroll info, so we subclass them and, after every scroll, copy that
-		// real info into CoolSB — otherwise the flat thumb snaps back to the top while the
-		// content scrolls underneath it.
-		const UINT_PTR kCoolSBSyncId = 8;
-
-		// True when the control actually has something to scroll in this direction. Mirrors
-		// CoolSB's own IsScrollInfoActive so our show/hide decision matches its thumb logic.
-		bool IsBarScrollable(HWND hCtrl, int bar) {
-			SCROLLINFO si = { sizeof(si), SIF_RANGE | SIF_PAGE };
-			if (!::GetScrollInfo(hCtrl, bar, &si)) {
-				return false;
-			}
-			return !(si.nPage > (UINT)si.nMax || si.nMax <= si.nMin || si.nMax == 0);
-		}
-
-		// Tree-views (e.g. the Options navigation tree) carry WS_HSCROLL and, once CoolSB's
-		// vertical bar narrows their client, report a horizontal range — producing a phantom
-		// bottom bar that was never there natively. They don't need horizontal scrolling here,
-		// so we never manage or show their horizontal bar.
-		// Decides whether a control should show a horizontal scrollbar. In the Options dialog the
-		// only control that legitimately needs one is a multi-column report list-view (the Keys
-		// list). Tree-views, list-boxes (the Internal/External Filters check lists) and single-
-		// column lists (Formats, Select Filter) fit their content to the width, so any horizontal
-		// bar there is the spurious one from the vertical-bar reservation — never show it.
-		bool NeedsHorzBar(HWND hCtrl) {
-			wchar_t cls[32] = {};
-			GetClassNameW(hCtrl, cls, _countof(cls));
-
-			if (_wcsicmp(cls, L"SysListView32") != 0) {
-				return false; // tree-views, list-boxes, ... : single-column here
-			}
-			if ((GetWindowLongW(hCtrl, GWL_STYLE) & LVS_TYPEMASK) != LVS_REPORT) {
-				return IsBarScrollable(hCtrl, SB_HORZ); // list/icon modes scroll horizontally by nature
-			}
-			HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hCtrl, LVM_GETHEADER, 0, 0));
-			const int cols = hHeader ? static_cast<int>(::SendMessageW(hHeader, HDM_GETITEMCOUNT, 0, 0)) : 0;
-			if (cols <= 1) {
-				return false; // a single column fits the width
-			}
-			// Multi-column: show it only if the columns really overflow, ignoring the ~vertical-
-			// bar-width that the vertical bar reservation alone introduces.
-			SCROLLINFO si = { sizeof(si), SIF_RANGE | SIF_PAGE };
-			if (!::GetScrollInfo(hCtrl, SB_HORZ, &si)) {
-				return false;
-			}
-			if (si.nPage > (UINT)si.nMax || si.nMax <= si.nMin || si.nMax == 0) {
-				return false; // nothing to scroll horizontally
-			}
-			const int overflow = (si.nMax - si.nMin + 1) - static_cast<int>(si.nPage);
-			return overflow > ::GetSystemMetrics(SM_CXVSCROLL) + 4;
-		}
-
-		// CoolSB reserves and draws a bar for every direction whose WS_*SCROLL style was set
-		// when it was initialised, even with nothing to scroll. The native control hides an
-		// unused bar; mirror that so no empty gutter shows up.
-		void UpdateBarVisibility(HWND hCtrl) {
-			CoolSB_ShowScrollBar(hCtrl, SB_VERT, IsBarScrollable(hCtrl, SB_VERT));
-			CoolSB_ShowScrollBar(hCtrl, SB_HORZ, NeedsHorzBar(hCtrl));
-		}
-
-		void SyncCoolSB(HWND hCtrl) {
-			// While CoolSB is actively dragging its thumb it already paints it following the
-			// mouse; only update the stored position (no redraw) then, to avoid fighting that
-			// paint. For wheel/keyboard scrolling we do need the redraw to move the thumb.
-			const BOOL redraw = !CoolSB_IsThumbTracking(hCtrl);
-			SCROLLINFO si = { sizeof(si), SIF_ALL };
-			if (::GetScrollInfo(hCtrl, SB_VERT, &si)) {
-				CoolSB_SetScrollInfo(hCtrl, SB_VERT, &si, redraw);
-			}
-			// Only feed the horizontal bar when it's genuinely wanted; otherwise CoolSB's
-			// SetScrollInfo would auto-re-show a phantom/spurious bottom bar on every scroll.
-			if (NeedsHorzBar(hCtrl)) {
-				SCROLLINFO sih = { sizeof(sih), SIF_ALL };
-				if (::GetScrollInfo(hCtrl, SB_HORZ, &sih)) {
-					CoolSB_SetScrollInfo(hCtrl, SB_HORZ, &sih, redraw);
-				}
-			}
-		}
-
-		// Scrolls a CoolSB-managed control to an absolute position. CoolSB posts the target in
-		// the SB_THUMB* message, but common controls (tree-view, list-view) read the drag
-		// position from the scrollbar's nTrackPos — which cannot be set through the API — so a
-		// posted SB_THUMBTRACK moves nothing on them (only CPlayerListCtrl overrides OnVScroll
-		// to use the message value). Instead we step the control with line scrolls, which every
-		// control honours (relative, no position needed), reading the real position back until
-		// it reaches the target. Intermediate steps are not painted (all inside one message),
-		// so there is no visible stepping.
-		void ScrollToPos(HWND hCtrl, UINT bar, int target) {
-			wchar_t cls[32] = {};
-			GetClassNameW(hCtrl, cls, _countof(cls));
-
-			// List-views can scroll to an absolute position in a single shot (LVM_SCROLL takes a
-			// pixel delta), so avoid the per-line loop which freezes on large lists (e.g. Keys).
-			// Mirrors CPlayerListCtrl::OnVScroll: pixel delta = span * (target - pos) / page.
-			if (_wcsicmp(cls, L"SysListView32") == 0) {
-				SCROLLINFO si = { sizeof(si), SIF_RANGE | SIF_PAGE | SIF_POS };
-				if (!::GetScrollInfo(hCtrl, bar, &si)) {
-					return;
-				}
-				RECT rc; ::GetClientRect(hCtrl, &rc);
-				const int span  = (bar == SB_VERT) ? rc.bottom : rc.right;
-				const int denom = (si.nPage != 0) ? (int)si.nPage : (si.nMax + 1);
-				if (denom <= 0) {
-					return;
-				}
-				const int delta = (int)((LONGLONG)span * (target - si.nPos) / denom);
-				if (delta != 0) {
-					if (bar == SB_VERT) ::SendMessageW(hCtrl, LVM_SCROLL, 0, delta);
-					else                ::SendMessageW(hCtrl, LVM_SCROLL, delta, 0);
-				}
-				return;
-			}
-
-			// Generic controls (tree-view, list-box): step there with line scrolls, which every
-			// control honours. These have few scroll units, so the loop stays cheap.
-			const UINT msg = (bar == SB_VERT) ? WM_VSCROLL : WM_HSCROLL;
-			SCROLLINFO si = { sizeof(si), SIF_POS };
-			if (!::GetScrollInfo(hCtrl, bar, &si)) {
-				return;
-			}
-			int cur = si.nPos;
-			for (int guard = 0; cur != target && guard < 20000; ++guard) {
-				const bool down = target > cur; // SB_LINEDOWN == SB_LINERIGHT, SB_LINEUP == SB_LINELEFT
-				DefSubclassProc(hCtrl, msg, MAKEWPARAM(down ? SB_LINEDOWN : SB_LINEUP, 0), 0);
-				SCROLLINFO now = { sizeof(now), SIF_POS };
-				::GetScrollInfo(hCtrl, bar, &now);
-				if (now.nPos == cur) {
-					break; // clamped at an end, cannot move further
-				}
-				const bool crossed = (now.nPos < target) != (cur < target);
-				cur = now.nPos;
-				if (crossed) {
-					break; // one line stepped past the target (control's line > 1 unit); close enough
-				}
-			}
-		}
-
-		LRESULT CALLBACK CoolSBSyncProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
-			switch (msg) {
-				case WM_VSCROLL:
-				case WM_HSCROLL: {
-					const UINT bar  = (msg == WM_VSCROLL) ? SB_VERT : SB_HORZ;
-					const int  code = LOWORD(wParam);
-					LRESULT r = 0;
-					if (code == SB_THUMBTRACK || code == SB_THUMBPOSITION) {
-						ScrollToPos(hWnd, bar, HIWORD(wParam)); // drive the scroll ourselves
-					} else {
-						r = DefSubclassProc(hWnd, msg, wParam, lParam);
-					}
-					// A horizontal scroll bitblts the content and leaves our hand-drawn vertical
-					// column grid lines behind as ghosts (only the newly exposed strip repaints).
-					// Force a full repaint so they are redrawn cleanly.
-					if (msg == WM_HSCROLL) {
-						::InvalidateRect(hWnd, nullptr, TRUE);
-					}
-					SyncCoolSB(hWnd);
-					return r;
-				}
-				case WM_MOUSEWHEEL:
-				case WM_MOUSEHWHEEL:
-				case WM_KEYDOWN:
-				case WM_KEYUP: {
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
-					SyncCoolSB(hWnd);
-					return r;
-				}
-				case WM_PAINT: {
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
-					// When the control's scroll range changes (e.g. the Keys list is filtered as
-					// the user types) CoolSB doesn't hear about it. Detect the mismatch cheaply
-					// and recompute the flat scrollbar; only acts when the range actually changed.
-					SCROLLINFO real = { sizeof(real), SIF_RANGE | SIF_PAGE };
-					SCROLLINFO cool = { sizeof(cool), SIF_RANGE | SIF_PAGE };
-					if (::GetScrollInfo(hWnd, SB_VERT, &real) && CoolSB_GetScrollInfo(hWnd, SB_VERT, &cool)
-							&& (real.nMin != cool.nMin || real.nMax != cool.nMax || real.nPage != cool.nPage)) {
-						SyncCoolSB(hWnd);
-						UpdateBarVisibility(hWnd);
-					}
-					return r;
-				}
-				case WM_NCDESTROY:
-					RemoveWindowSubclass(hWnd, CoolSBSyncProc, kCoolSBSyncId);
-					break;
-			}
-			return DefSubclassProc(hWnd, msg, wParam, lParam);
-		}
-
-		// Scrollbars are replaced with CoolSB -- the same flat dark scrollbar the playlist uses
-		// (InitializeCoolSB is handed our ThemeRGB palette). CoolSB actually replaces the native
-		// scrollbar (it removes the WS_*SCROLL styles and owns the non-client area), so unlike
-		// painting over the native bar nothing of the original ever shows through while scrolling.
-		void ApplyScrollBars(HWND hCtrl) {
-			if (CoolSB_IsCoolScrollEnabled(hCtrl)) {
-				return; // already initialised (ApplyThemeToChildren may run more than once)
-			}
-			// Install the sync subclass first so it sits behind CoolSB's window proc and sees the
-			// scroll messages after the control has processed (and scrolled) them.
-			SetWindowSubclass(hCtrl, CoolSBSyncProc, kCoolSBSyncId, 0);
-			if (!InitializeCoolSB(hCtrl, ThemeRGB)) {
-				RemoveWindowSubclass(hCtrl, CoolSBSyncProc, kCoolSBSyncId);
-				return;
-			}
-			CoolSB_SetStyle(hCtrl, SB_VERT, CSBS_HOTTRACKED);
-			CoolSB_SetStyle(hCtrl, SB_HORZ, CSBS_HOTTRACKED);
-			if (SysVersion::IsWin8orLater()) {
-				CoolSB_SetSize(hCtrl, SB_VERT, ::GetSystemMetrics(SM_CYVSCROLL), ::GetSystemMetrics(SM_CXVSCROLL));
-				CoolSB_SetSize(hCtrl, SB_HORZ, ::GetSystemMetrics(SM_CXHSCROLL), ::GetSystemMetrics(SM_CYHSCROLL));
-			}
-			// Seed CoolSB with the control's current scroll range/position.
-			SyncCoolSB(hCtrl);
-			// Hide the bars that have nothing to scroll (e.g. the tree's horizontal bar).
-			UpdateBarVisibility(hCtrl);
 		}
 
 		// Subclass for auxiliary top-level dialogs (opened from the Options pages, e.g. the
@@ -710,6 +626,19 @@ namespace DarkTheme
 					// the CTLCOLOR_* constants in the same order.
 					if (HBRUSH hbr = OnCtlColor(pDC, msg - WM_CTLCOLORMSGBOX)) {
 						return reinterpret_cast<LRESULT>(hbr);
+					}
+					break;
+				}
+				case WM_NOTIFY: {
+					// Radio buttons keep black text under native dark mode (checkboxes go light);
+					// draw radios/checkboxes (and any sliders) ourselves via NM_CUSTOMDRAW, like the
+					// Options pages do, so their captions match.
+					NMHDR* pNMHDR = reinterpret_cast<NMHDR*>(lParam);
+					if (pNMHDR && pNMHDR->code == NM_CUSTOMDRAW) {
+						LRESULT result = 0;
+						if (TrackbarCustomDraw(pNMHDR, &result) || ButtonCustomDraw(pNMHDR, &result)) {
+							return result;
+						}
 					}
 					break;
 				}
@@ -780,11 +709,16 @@ namespace DarkTheme
 			GetClassNameW(hCtrl, cls, _countof(cls));
 
 			if (_wcsicmp(cls, L"Button") == 0) {
-				if ((GetWindowLongW(hCtrl, GWL_STYLE) & BS_TYPEMASK) == BS_GROUPBOX) {
+				const LONG bt = GetWindowLongW(hCtrl, GWL_STYLE) & BS_TYPEMASK;
+				if (bt == BS_GROUPBOX) {
 					SetWindowSubclass(hCtrl, GroupBoxSubclassProc, kGroupBoxSubclassId, 0);
 					InvalidateRect(hCtrl, nullptr, TRUE);
+				} else if (bt == BS_PUSHBUTTON || bt == BS_DEFPUSHBUTTON) {
+					// Owner-draw so they stay dark AND keep the Win11 rounding + icon.
+					SetWindowSubclass(hCtrl, ButtonSubclassProc, kButtonSubclassId, 0);
+					InvalidateRect(hCtrl, nullptr, TRUE);
 				} else {
-					// checkboxes, radios, push buttons
+					// checkboxes, radios
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 				}
 			} else if (_wcsicmp(cls, L"ComboBox") == 0) {
@@ -792,9 +726,6 @@ namespace DarkTheme
 			} else if (_wcsicmp(cls, L"Edit") == 0) {
 				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
 				ApplyDarkBorder(hCtrl);
-				if (GetWindowLongW(hCtrl, GWL_STYLE) & ES_MULTILINE) {
-					ApplyScrollBars(hCtrl); // multiline edits can show scrollbars
-				}
 			} else if (_wcsicmp(cls, L"SysListView32") == 0) {
 				// List-view controls ignore WM_CTLCOLOR: their background (the area
 				// not covered by columns/rows) must be set explicitly, otherwise it
@@ -824,7 +755,6 @@ namespace DarkTheme
 					InvalidateRect(hHeader, nullptr, TRUE);
 				}
 				ApplyDarkBorder(hCtrl); // dark outer border to match everything else
-				ApplyScrollBars(hCtrl); // flat MPC-HC-style scrollbars
 			} else if (_wcsicmp(cls, L"SysTreeView32") == 0) {
 				// Tree-views, like list-views, need their background/text colors set
 				// explicitly (SetWindowTheme only handles the glyphs and scrollbar).
@@ -832,7 +762,6 @@ namespace DarkTheme
 				::SendMessageW(hCtrl, TVM_SETBKCOLOR,   0, static_cast<LPARAM>(FaceColor()));
 				::SendMessageW(hCtrl, TVM_SETTEXTCOLOR, 0, static_cast<LPARAM>(TextColor()));
 				ApplyDarkBorder(hCtrl); // dark outer border to match everything else
-				ApplyScrollBars(hCtrl); // flat MPC-HC-style scrollbars
 			} else if (_wcsicmp(cls, UPDOWN_CLASSW) == 0) {
 				// Spin buttons: fully owner-drawn (native dark mode leaves them light).
 				SetWindowSubclass(hCtrl, SpinSubclassProc, kSpinSubclassId, 0);
@@ -843,7 +772,6 @@ namespace DarkTheme
 				// light — repaint it with the shared dark border like edits/lists/trees.
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 				ApplyDarkBorder(hCtrl);
-				ApplyScrollBars(hCtrl); // flat MPC-HC-style scrollbars
 			} else if (_wcsicmp(cls, L"Static") == 0) {
 				// Sunken value boxes (e.g. Brightness/Contrast/Hue/Saturation on the
 				// Color correction page are SS_SUNKEN RTEXT statics) keep a light 3D edge
@@ -873,18 +801,14 @@ namespace DarkTheme
 		// open. Removing a subclass that isn't present is a safe no-op.
 		BOOL CALLBACK StripThemeChildProc(HWND hChild, LPARAM) {
 			RemoveWindowSubclass(hChild, GroupBoxSubclassProc, kGroupBoxSubclassId);
+			RemoveWindowSubclass(hChild, ButtonSubclassProc,   kButtonSubclassId);
 			RemoveWindowSubclass(hChild, SpinSubclassProc,     kSpinSubclassId);
 			RemoveWindowSubclass(hChild, BorderSubclassProc,   kBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
-			RemoveWindowSubclass(hChild, CoolSBSyncProc,       kCoolSBSyncId);
 
 			DWORD_PTR gridFlag = 0;
 			const bool hadGrid = GetWindowSubclass(hChild, ListViewSubclassProc, kListViewSubclassId, &gridFlag) && gridFlag;
 			RemoveWindowSubclass(hChild, ListViewSubclassProc, kListViewSubclassId);
-
-			if (CoolSB_IsCoolScrollEnabled(hChild)) {
-				UninitializeCoolSB(hChild); // restores the native scrollbars + window proc
-			}
 
 			wchar_t cls[64] = {};
 			GetClassNameW(hChild, cls, _countof(cls));
@@ -915,11 +839,14 @@ namespace DarkTheme
 		return AfxGetAppSettings().bUseDarkTheme && SysVersion::IsWin10v1809orLater();
 	}
 
-	COLORREF FaceColor()       { return ThemeRGB(22, 27, 32); }
-	COLORREF TextColor()       { return ThemeRGB(165, 170, 175); }
-	COLORREF CtrlBackColor()   { return ThemeRGB(10, 14, 18); }
-	COLORREF CtrlBorderColor() { return ThemeRGB(70, 75, 80); }
-	COLORREF GridlineColor()   { return ThemeRGB(40, 45, 50); }
+	// The whole Options palette is FIXED (DRGB = the ThemeRGB result at the shipped defaults):
+	// the R/G/B/Brightness sliders tint the player interface only, never the Options dialog, so
+	// it never half-repaints or drives its text to black when the sliders move.
+	COLORREF FaceColor()       { return DRGB(22, 27, 32); }
+	COLORREF TextColor()       { return RGB(165, 170, 175); }
+	COLORREF CtrlBackColor()   { return DRGB(10, 14, 18); }
+	COLORREF CtrlBorderColor() { return DRGB(70, 75, 80); }
+	COLORREF GridlineColor()   { return DRGB(40, 45, 50); }
 
 	void AllowDarkModeForApp() {
 		if (!IsActive()) {
@@ -1014,13 +941,6 @@ namespace DarkTheme
 		::InvalidateRect(hTrackbar, nullptr, TRUE);
 	}
 
-	void ThemeScrollBars(HWND hCtrl) {
-		if (!IsActive() || !hCtrl) {
-			return;
-		}
-		ApplyScrollBars(hCtrl);
-	}
-
 	void ThemeDialog(HWND hDlg) {
 		if (!IsActive() || !hDlg) {
 			return;
@@ -1029,7 +949,9 @@ namespace DarkTheme
 		EnableForWindow(hDlg);                 // dark title bar + allow dark mode
 		SetWindowSubclass(hDlg, DialogSubclassProc, kDialogSubclassId, 0); // dark bg / ctl colours
 		ApplyThemeToChildren(hDlg);            // theme the child controls
-		::InvalidateRect(hDlg, nullptr, TRUE);
+		// Repaint the dialog AND its child controls: InvalidateRect alone doesn't reach the
+		// child windows, so freshly-themed checkboxes/statics would keep their stale light paint.
+		::RedrawWindow(hDlg, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
 	}
 
 	void RefreshTheme(HWND hRoot) {
@@ -1067,9 +989,9 @@ namespace DarkTheme
 			// which made the checkboxes vanish; a solid grey box + grey tick reads clearly
 			// as an inactive checkbox and never disappears.
 			const COLORREF mask   = RGB(255, 0, 255);
-			const COLORREF fill   = ThemeRGB(34, 39, 44);
-			const COLORREF border = ThemeRGB(90, 95, 100);
-			const COLORREF mark   = ThemeRGB(120, 125, 130);
+			const COLORREF fill   = DRGB(34, 39, 44);
+			const COLORREF border = DRGB(90, 95, 100);
+			const COLORREF mark   = DRGB(120, 125, 130);
 
 			CClientDC screen(nullptr);
 			CDC dc;
@@ -1225,8 +1147,8 @@ namespace DarkTheme
 				if (p->dwItemSpec == TBCD_CHANNEL) {
 					CDC* pDC = CDC::FromHandle(p->hdc);
 					CRect rc(p->rc);
-					pDC->FillSolidRect(rc, ThemeRGB(10, 14, 18));                        // dark groove
-					pDC->Draw3dRect(rc, ThemeRGB(60, 65, 70), ThemeRGB(60, 65, 70));     // subtle border
+					pDC->FillSolidRect(rc, DRGB(10, 14, 18));                        // dark groove
+					pDC->Draw3dRect(rc, DRGB(60, 65, 70), DRGB(60, 65, 70));     // subtle border
 					*pResult = CDRF_SKIPDEFAULT;
 				} else {
 					*pResult = CDRF_DODEFAULT; // keep the default thumb and tick marks
@@ -1276,12 +1198,12 @@ namespace DarkTheme
 		if (isPush) {
 			// Flat dark push button (face darkens when pressed, lightens on hover).
 			const bool focus = (p->uItemState & CDIS_FOCUS) != 0;
-			const COLORREF face = disabled ? ThemeRGB(30, 34, 38)
-								: pressed  ? ThemeRGB(28, 33, 38)
-								: hot      ? ThemeRGB(52, 59, 66)
-								:            ThemeRGB(44, 50, 56);
+			const COLORREF face = disabled ? DRGB(30, 34, 38)
+								: pressed  ? DRGB(28, 33, 38)
+								: hot      ? DRGB(52, 59, 66)
+								:            DRGB(44, 50, 56);
 			pDC->FillSolidRect(rc, face);
-			pDC->Draw3dRect(rc, ThemeRGB(80, 86, 92), ThemeRGB(80, 86, 92));
+			pDC->Draw3dRect(rc, DRGB(80, 86, 92), DRGB(80, 86, 92));
 
 			CString btext;
 			const int blen = ::GetWindowTextLengthW(hCtrl);
@@ -1293,7 +1215,7 @@ namespace DarkTheme
 			HFONT hbf = reinterpret_cast<HFONT>(::SendMessageW(hCtrl, WM_GETFONT, 0, 0));
 			CFont* pOldBf = hbf ? pDC->SelectObject(CFont::FromHandle(hbf)) : nullptr;
 			pDC->SetBkMode(TRANSPARENT);
-			pDC->SetTextColor(disabled ? ThemeRGB(110, 115, 120) : TextColor());
+			pDC->SetTextColor(disabled ? RGB(110, 115, 120) : TextColor());
 
 			// Centre the caption vertically even when it wraps to two lines.
 			CRect rcCalc = rc;
@@ -1368,7 +1290,7 @@ namespace DarkTheme
 		CFont* pOldFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
 
 		pDC->SetBkMode(TRANSPARENT);
-		pDC->SetTextColor(disabled ? ThemeRGB(110, 115, 120) : TextColor());
+		pDC->SetTextColor(disabled ? RGB(110, 115, 120) : TextColor());
 
 		UINT fmt = DT_LEFT;
 		if (style & BS_MULTILINE) {

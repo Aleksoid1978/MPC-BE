@@ -61,12 +61,6 @@ namespace DarkTheme
 	// (e.g. the subtitle Default Style alpha sliders after the Reset button).
 	void MakeTrackbarOwnerDrawn(HWND hTrackbar);
 
-	// Replaces a control's native scrollbars with the flat MPC-HC-style ones (dark gutter,
-	// solid grey thumb, visible arrow buttons). Applied automatically to lists/trees/list-
-	// boxes/multiline-edits by ApplyThemeToChildren; call it directly for scrolling controls
-	// that do not pass through the Options theming (e.g. the playlist).
-	void ThemeScrollBars(HWND hCtrl);
-
 	// Applies the dark theme to a whole auxiliary top-level dialog opened from the Options
 	// pages (dark title bar, dark background + control colours, themed child controls).
 	// Call once from the dialog's OnInitDialog.
@@ -101,7 +95,8 @@ namespace DarkTheme
 	// Returns true (with *pResult set) only for check/radio buttons; false otherwise.
 	bool ButtonCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
 
-	// Theme palette (respects nThemeBrightness / nThemeRGB via ThemeRGB()).
+	// Fixed dark palette for the Options dialog: independent of the R/G/B/Brightness sliders
+	// (those tint the player interface only), so the Options window never changes shade.
 	COLORREF FaceColor();       // dialog / page / static background
 	COLORREF TextColor();       // text
 	COLORREF CtrlBackColor();   // sunken control interior (edit / listbox)

@@ -175,21 +175,15 @@ BOOL CPPageInterface::OnApply()
 	//s.bDarkMenuBlurBehind = !!m_chkDarkMenuBlurBehind.GetCheck();
 	s.bDarkTitle = !!m_chkDarkTitle.GetCheck();
 
-	// If the dark-theme toggle (or the theme colours) changed while the Options dialog is
-	// still open, re-theme the whole property sheet so it doesn't end up a mix of light and
-	// dark controls. GA_ROOT gives the sheet's top-level window (the pages live under it).
-	{
-		const bool bDarkToggled   = (!!s.bUseDarkTheme != !!bUseDarkTheme);
-		const bool bColorsChanged = s.nThemeBrightness != m_nThemeBrightness_Old
-			|| s.nThemeRed   != m_nThemeRed_Old
-			|| s.nThemeGreen != m_nThemeGreen_Old
-			|| s.nThemeBlue  != m_nThemeBlue_Old;
-		if (bDarkToggled || (s.bUseDarkTheme && bColorsChanged)) {
-			TreePropSheet::CPropPageFrameDefault::s_bDarkMode = DarkTheme::IsActive();
-			TreePropSheet::CPropPageFrameDefault::s_clrFace   = DarkTheme::FaceColor();
-			TreePropSheet::CPropPageFrameDefault::s_clrText   = DarkTheme::TextColor();
-			DarkTheme::RefreshTheme(::GetAncestor(GetSafeHwnd(), GA_ROOT));
-		}
+	// If the dark-theme toggle changed while the Options dialog is still open, re-theme the
+	// whole property sheet so it doesn't end up a mix of light and dark controls. (The theme
+	// colours no longer matter here — the Options palette is fixed — so only the toggle does.)
+	// GA_ROOT gives the sheet's top-level window (the pages live under it).
+	if (!!s.bUseDarkTheme != !!bUseDarkTheme) {
+		TreePropSheet::CPropPageFrameDefault::s_bDarkMode = DarkTheme::IsActive();
+		TreePropSheet::CPropPageFrameDefault::s_clrFace   = DarkTheme::FaceColor();
+		TreePropSheet::CPropPageFrameDefault::s_clrText   = DarkTheme::TextColor();
+		DarkTheme::RefreshTheme(::GetAncestor(GetSafeHwnd(), GA_ROOT));
 	}
 
 	s.fUseWin7TaskBar		= !!m_fUseWin7TaskBar;
@@ -305,6 +299,9 @@ void CPPageInterface::OnThemeChange()
 
 	pFrame->Invalidate();
 	pFrame->m_wndPlaylistBar.Invalidate();
+
+	// The Options dialog is deliberately not repainted here: its palette is fixed, so the
+	// R/G/B/Brightness sliders only affect the player, never the open Options sheet.
 }
 
 BEGIN_MESSAGE_MAP(CPPageInterface, CPPageBase)

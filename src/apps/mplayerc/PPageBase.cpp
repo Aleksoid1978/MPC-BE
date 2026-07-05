@@ -93,12 +93,15 @@ BOOL CPPageBase::OnSetActive()
 
 	BOOL bRet = __super::OnSetActive();
 
-	// Re-apply the dark visual style on every activation. It is idempotent (controls
-	// already themed are skipped), and doing it each time avoids a race on the page
-	// shown first, whose controls may not have been ready the very first time.
-	DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
-	// Keep group boxes behind the controls they frame so their dark fill never paints over
-	// them (which made labels/combos vanish until invalidated, e.g. after Apply).
+	// Apply the dark visual style once, on first activation. Re-theming on every activation
+	// (SetWindowTheme per control + repaint) made switching pages sluggish; the controls stay
+	// themed for the page's lifetime, so once is enough.
+	if (!m_bDarkThemeApplied) {
+		DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
+		m_bDarkThemeApplied = true;
+	}
+	// Keep group boxes behind the controls they frame so their dark fill never paints over them.
+	// Cheap (no SetWindowTheme), runs every activation so it self-heals after a runtime toggle.
 	DarkTheme::FixGroupBoxes(GetSafeHwnd());
 
 	return bRet;
