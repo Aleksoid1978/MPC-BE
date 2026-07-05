@@ -24,6 +24,7 @@
 #include "ItemPropertiesDlg.h"
 #include "FavoriteOrganizeDlg.h"
 #include "DSUtil/std_helper.h"
+#include "controls/DarkTheme.h"
 
 // CFavoriteOrganizeDlg dialog
 
@@ -177,6 +178,8 @@ BOOL CFavoriteOrganizeDlg::OnInitDialog()
 	AddAnchor(IDOK, BOTTOM_RIGHT);
 
 	EnableSaveRestore(IDS_R_DLG_ORGANIZE_FAV);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

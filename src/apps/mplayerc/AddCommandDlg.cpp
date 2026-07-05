@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AddCommandDlg.h"
+#include "controls/DarkTheme.h"
 
 // CAddCommandDlg dialog
 
@@ -134,6 +135,8 @@ BOOL CAddCommandDlg::OnInitDialog()
 	}
 
 	m_okButton.EnableWindow(FALSE);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

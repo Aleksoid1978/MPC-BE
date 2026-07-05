@@ -74,6 +74,22 @@ namespace DarkTheme
 	// Call once from the dialog's OnInitDialog.
 	void ThemeDialog(HWND hDlg);
 
+	// RAII guard that dark-themes standard Win32 message boxes (MessageBox / AfxMessageBox) shown on
+	// the current thread while it is alive: a thread-local WH_CBT hook catches the message box window
+	// (class "#32770") as it activates and runs ThemeDialog on it (dark title, dark background, light
+	// text, themed buttons). No-op when the dark theme is inactive. Message boxes are drawn by the OS
+	// with system colours and can't be themed any other way. Construct one on the stack immediately
+	// before the AfxMessageBox/MessageBox call, e.g. the "Check for Updates" result dialog.
+	class CDarkMessageBoxHook {
+	public:
+		CDarkMessageBoxHook();
+		~CDarkMessageBoxHook();
+		CDarkMessageBoxHook(const CDarkMessageBoxHook&) = delete;
+		CDarkMessageBoxHook& operator=(const CDarkMessageBoxHook&) = delete;
+	private:
+		bool m_hooked;
+	};
+
 	// Re-applies or removes the dark theme across a whole window tree in response to the
 	// "Use dark theme" toggle being changed at runtime (Interface page + Apply). Handles both
 	// directions — applying when now active, stripping every subclass/override when now

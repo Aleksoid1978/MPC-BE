@@ -817,6 +817,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Hide all dockable bars by default
 	for (const auto& pDockingBar : m_dockingbars) {
+		// Draw the bar frame / gripper / floating-frame border dark, like the playlist bar. Without
+		// this the Shader Editor, Capture, Navigation and Subresync bars render their sizing frame
+		// with light system colours (a bright "white frame", docked or floating).
+		pDockingBar->m_bUseDarkTheme = s.bUseDarkTheme;
 		pDockingBar->ShowWindow(SW_HIDE);
 	}
 
@@ -7890,7 +7894,7 @@ void CMainFrame::OnViewRotate(UINT nID)
 			}
 
 			CString info;
-			info.Format(L"Rotation: %d°", rotation);
+			info.Format(L"Rotation: %dï¿½", rotation);
 			SendStatusMessage(info, 3000);
 		}
 	}

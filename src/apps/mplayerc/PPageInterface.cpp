@@ -236,14 +236,18 @@ BOOL CPPageInterface::OnApply()
 
 	pFrame->m_wndPreView.SetRelativeSize(s.iSmartSeekSize);
 
-	pFrame->m_wndPlaylistBar.m_bUseDarkTheme = s.bUseDarkTheme;
+	// Update every docking bar's dark-frame flag (not just the playlist bar) so the Shader Editor,
+	// Capture, Navigation and Subresync bar frames follow the theme toggle too, then repaint them.
+	for (const auto& pDockingBar : pFrame->m_dockingbars) {
+		pDockingBar->m_bUseDarkTheme = s.bUseDarkTheme;
+		if (pDockingBar->IsWindowVisible()) {
+			pDockingBar->SendMessageW(WM_NCPAINT, 1, NULL);
+			pDockingBar->RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
+			pDockingBar->Invalidate();
+		}
+	}
 	pFrame->SetColor();
 	pFrame->SetColorTitle();
-	if (pFrame->m_wndPlaylistBar.IsWindowVisible()) {
-		pFrame->m_wndPlaylistBar.SendMessageW(WM_NCPAINT, 1, NULL);
-		pFrame->m_wndPlaylistBar.RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
-		pFrame->m_wndPlaylistBar.Invalidate();
-	}
 
 	pFrame->ResetMenu();
 	pFrame->m_wndStatusBar.SetMenu();

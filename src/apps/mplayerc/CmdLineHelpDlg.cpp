@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "CmdLineHelpDlg.h"
 #include "Misc.h"
+#include "controls/DarkTheme.h"
 
 CmdLineHelpDlg::CmdLineHelpDlg(const CStringW& cmdLine)
 	: CResizableDialog(CmdLineHelpDlg::IDD)
@@ -116,6 +117,8 @@ BOOL CmdLineHelpDlg::OnInitDialog()
 	AddAnchor(IDOK, BOTTOM_RIGHT);
 
 	EnableSaveRestore(IDS_R_DLG_CMD_LINE_HELP);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return FALSE;
 }

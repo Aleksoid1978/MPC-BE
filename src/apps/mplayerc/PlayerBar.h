@@ -46,4 +46,9 @@ public:
 
 	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
+
+	// The base returns 0 (black) — only the playlist bar used to override this, so every other
+	// docking bar (Shader Editor, Capture, Navigation, Subresync) painted its dark frame / gripper /
+	// close button pure black. Provide the themed colour here so all CPlayerBar-derived bars match.
+	COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const override;
 };

@@ -23,6 +23,7 @@
 #include "ItemPropertiesDlg.h"
 #include "HistoryDlg.h"
 #include "DSUtil/std_helper.h"
+#include "controls/DarkTheme.h"
 
 // CHistoryDlg dialog
 
@@ -284,6 +285,8 @@ BOOL CHistoryDlg::OnInitDialog()
 	m_list.InsertColumn(COL_POS, ResStr(IDS_HISTORY_POSITION));
 
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

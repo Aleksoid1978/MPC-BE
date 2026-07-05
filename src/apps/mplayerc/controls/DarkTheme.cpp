@@ -266,8 +266,11 @@ namespace DarkTheme
 					if (::GetPropW(hWnd, L"MPC_UAC_SHIELD")) {
 						static HICON s_hShield = nullptr; // cached once for the process lifetime
 						if (!s_hShield) {
+							// Load the large (32px) shield rather than the small (16px) one: we scale
+							// it to the DPI-adjusted size below, and downscaling 32->size stays crisp
+							// where upscaling a 16px source would blur (visible at 150-200% DPI).
 							SHSTOCKICONINFO sii = { sizeof(sii) };
-							if (SUCCEEDED(::SHGetStockIconInfo(SIID_SHIELD, SHGSI_ICON | SHGSI_SMALLICON, &sii))) {
+							if (SUCCEEDED(::SHGetStockIconInfo(SIID_SHIELD, SHGSI_ICON, &sii))) {
 								s_hShield = sii.hIcon;
 							} else {
 								s_hShield = ::LoadIconW(nullptr, IDI_SHIELD);
@@ -283,7 +286,9 @@ namespace DarkTheme
 					pDC->SetBkMode(TRANSPARENT);
 					pDC->SetTextColor(disabled ? RGB(120, 125, 130) : TextColor());
 
-					const int icon = hIcon ? 16 : 0;
+					// Scale the icon (UAC shield) by the DC's DPI so it isn't a tiny 16px glyph on a
+					// button that Windows has scaled up at 150-200% display scaling.
+					const int icon = hIcon ? ::MulDiv(16, pDC->GetDeviceCaps(LOGPIXELSY), 96) : 0;
 					if (!text.IsEmpty() && (style & BS_MULTILINE)) {
 						// Multi-line captions (e.g. the "AVI Splitter\nconfiguration" filter buttons)
 						// must wrap: a single-line draw collapses the line break and overflows the
@@ -830,7 +835,21 @@ namespace DarkTheme
 			} else if (_wcsicmp(cls, L"ComboBox") == 0) {
 				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
 			} else if (_wcsicmp(cls, L"Edit") == 0) {
-				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
+				// DarkMode_CFD darkens the interior/border but leaves the control's own scrollbars
+				// light. For multiline edits that actually have scrollbars (the Command Line Switches
+				// help box, the Shader Editor source/output), use DarkMode_Explorer instead so the
+				// scrollbar is dark like the tree/list controls; the border is redrawn by
+				// ApplyDarkBorder either way, so we don't lose the CFD border styling that matters.
+				// DarkMode_CFD darkens the interior/border but leaves the control's own scrollbars
+				// light. For multiline edits that actually have scrollbars (the Command Line Switches
+				// help box, the Shader Editor source/output), use DarkMode_Explorer instead so the
+				// scrollbar is dark like the tree/list controls.
+				const LONG est = GetWindowLongW(hCtrl, GWL_STYLE);
+				if (est & (WS_VSCROLL | WS_HSCROLL)) {
+					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
+				} else {
+					SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
+				}
 				ApplyDarkBorder(hCtrl);
 			} else if (_wcsicmp(cls, L"SysListView32") == 0) {
 				// List-view controls ignore WM_CTLCOLOR: their background (the area
@@ -1106,12 +1125,83 @@ namespace DarkTheme
 			return;
 		}
 		LoadApi();
+		// Ensure the process-wide immersive dark mode is on. Without it the native scrollbars of
+		// child edits/lists render light and the DarkMode_CFD border stays a light "frame" — visible
+		// when an auxiliary dialog (Command Line Switches, Shader Editor, ...) is opened directly,
+		// before the Options sheet (which used to be the only caller of this) has ever been shown.
+		AllowDarkModeForApp();
 		EnableForWindow(hDlg);                 // dark title bar + allow dark mode
 		SetWindowSubclass(hDlg, DialogSubclassProc, kDialogSubclassId, 0); // dark bg / ctl colours
 		ApplyThemeToChildren(hDlg);            // theme the child controls
 		// Repaint the dialog AND its child controls: InvalidateRect alone doesn't reach the
 		// child windows, so freshly-themed checkboxes/statics would keep their stale light paint.
-		::RedrawWindow(hDlg, nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN);
+		// RDW_UPDATENOW forces a synchronous repaint so controls that otherwise only redraw on the
+		// next interaction (some third-party filter property-page widgets stayed light until hovered)
+		// pick up the theme immediately; RDW_FRAME also refreshes their non-client border.
+		::RedrawWindow(hDlg, nullptr, nullptr,
+			RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
+	}
+
+	// --- Dark message boxes (MessageBox / AfxMessageBox) via a thread-local CBT hook ---------------
+	// A message box is a standard "#32770" dialog the OS creates and paints with system colours; the
+	// only way to theme it is to catch its creation and re-theme it. CDarkMessageBoxHook installs a
+	// WH_CBT hook for the lifetime of the guard; when the message box activates we run ThemeDialog on
+	// it. Scope the guard tightly around the AfxMessageBox call so nothing else is affected.
+	namespace {
+		HHOOK g_msgBoxHook = nullptr;
+		const UINT_PTR kMsgBoxSubclassId = 11;
+
+		// The message box repaints its lower button "band" with a light system colour in its own
+		// WM_PAINT, over the dark erase ThemeDialog installs. Paint the whole client dark ourselves and
+		// skip the default paint so the band stays dark; the icon / text / buttons are child windows and
+		// repaint on top. Installed on top of ThemeDialog's subclass, so WM_CTLCOLOR* still go dark.
+		LRESULT CALLBACK MsgBoxSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
+			switch (msg) {
+				case WM_PAINT: {
+					PAINTSTRUCT ps;
+					HDC hdc = ::BeginPaint(hWnd, &ps);
+					CRect rc;
+					::GetClientRect(hWnd, &rc);
+					CDC::FromHandle(hdc)->FillSolidRect(rc, FaceColor());
+					::EndPaint(hWnd, &ps);
+					return 0;
+				}
+				case WM_NCDESTROY:
+					RemoveWindowSubclass(hWnd, MsgBoxSubclassProc, kMsgBoxSubclassId);
+					break;
+			}
+			return DefSubclassProc(hWnd, msg, wParam, lParam);
+		}
+
+		LRESULT CALLBACK MsgBoxCBTProc(int code, WPARAM wParam, LPARAM lParam) {
+			if (code == HCBT_ACTIVATE) {
+				HWND hWnd = reinterpret_cast<HWND>(wParam);
+				wchar_t cls[16] = {};
+				::GetClassNameW(hWnd, cls, _countof(cls));
+				if (wcscmp(cls, L"#32770") == 0) { // the dialog class MessageBox uses
+					ThemeDialog(hWnd);
+					SetWindowSubclass(hWnd, MsgBoxSubclassProc, kMsgBoxSubclassId, 0);
+					::RedrawWindow(hWnd, nullptr, nullptr,
+						RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+				}
+			}
+			return ::CallNextHookEx(g_msgBoxHook, code, wParam, lParam);
+		}
+	}
+
+	CDarkMessageBoxHook::CDarkMessageBoxHook() : m_hooked(false) {
+		// One hook per thread at a time; nested message boxes reuse the outer guard's hook.
+		if (IsActive() && !g_msgBoxHook) {
+			g_msgBoxHook = ::SetWindowsHookExW(WH_CBT, MsgBoxCBTProc, nullptr, ::GetCurrentThreadId());
+			m_hooked = (g_msgBoxHook != nullptr);
+		}
+	}
+
+	CDarkMessageBoxHook::~CDarkMessageBoxHook() {
+		if (m_hooked && g_msgBoxHook) {
+			::UnhookWindowsHookEx(g_msgBoxHook);
+			g_msgBoxHook = nullptr;
+		}
 	}
 
 	void RefreshTheme(HWND hRoot) {
