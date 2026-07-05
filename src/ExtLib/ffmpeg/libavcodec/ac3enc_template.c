@@ -346,9 +346,31 @@ static void compute_rematrixing_strategy(AC3EncodeContext *s)
     }
 }
 
-
-static void encode_frame(AC3EncodeContext *s, uint8_t * const *samples)
+static void copy_input_samples(AC3EncodeContext *s, const AVFrame *frame)
 {
+    int end = frame ? frame->nb_samples : 0;
+
+    /* copy new samples and zero any remaining samples */
+    if (frame) {
+        av_samples_copy(s->input_samples, frame->extended_data, 0, 0,
+                        frame->nb_samples, s->channels,
+                        s->avctx->sample_fmt);
+    }
+    av_samples_set_silence(s->input_samples, end,
+                           s->avctx->frame_size - end,
+                           s->channels, s->avctx->sample_fmt);
+}
+
+static void encode_frame(AC3EncodeContext *s, const AVFrame *frame)
+{
+    uint8_t **samples;
+
+    if (!frame || frame->nb_samples < s->avctx->frame_size) {
+        copy_input_samples(s, frame);
+        samples = s->input_samples;
+    } else
+        samples = frame->extended_data;
+
     apply_mdct(s, samples);
 
     s->cpl_on = s->cpl_enabled;

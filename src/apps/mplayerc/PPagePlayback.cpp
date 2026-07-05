@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -85,20 +85,18 @@ BOOL CPPagePlayback::OnInitDialog()
 	m_nLoops		= s.nLoops;
 	m_fRewind		= s.fRewind;
 
+	CStringW str;
 	for (int idx = 1; idx <= 10; idx++) {
-		CString str; str.Format(L"%d", idx);
+		str.Format(L"%d", idx);
 		m_nVolumeStepCtrl.AddString(str);
 	}
 	m_nVolumeStep = s.nVolumeStep - 1;
 
 	AddStringData(m_nSpeedStepCtrl, ResStr(IDS_AG_AUTO), 0);
-	AddStringData(m_nSpeedStepCtrl, L"1",     1);
-	AddStringData(m_nSpeedStepCtrl, L"5",     5);
-	AddStringData(m_nSpeedStepCtrl, L"10",   10);
-	AddStringData(m_nSpeedStepCtrl, L"20",   20);
-	AddStringData(m_nSpeedStepCtrl, L"25",   25);
-	AddStringData(m_nSpeedStepCtrl, L"50",   50);
-	AddStringData(m_nSpeedStepCtrl, L"100", 100);
+	for (const auto step : g_SpeedSteps) {
+		str.Format(L"%d", step);
+		AddStringData(m_nSpeedStepCtrl, str, step);
+	}
 	SelectByItemData(m_nSpeedStepCtrl, s.nSpeedStep);
 	m_bSpeedNotReset = s.bSpeedNotReset;
 

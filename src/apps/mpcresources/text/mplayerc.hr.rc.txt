@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Izvoz"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Lijevi gumb"
 6		"Klik"
 8		"Ukoliko nema učitanja, otvori nedavnu datoteku"
 10		"Dvoklik"
 12		"Pomakni prozor uz područje video zapisa"
-13		"Desni click"
-16		"Default"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Desni click"
+21		"Default"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

@@ -2,14 +2,26 @@
 
 1.9.0.x dev
 =============================
+yt-dlp
+Fixed detection of the VP9 video codec for some video hosting services.
+Protocol "http_dash_segments" is not supported.
+
 Player
 Fixed remembering the title of the entry in the playlist for URLs processed by yt-dlp.
 Fixed getting icon for file properties window when path length is 260 or more characters.
+The "Use Blur Behind effect" setting has been removed because it does not work correctly.
+Added the ability to speed up video by long-pressing the left mouse button.
 
 Added Vietnamese translation (by vuanhvu11982-afk).
+Updated German translation (by Klaus1189).
+Updated Romanian translation (by Andrei Miloiu).
+Updated Japanese translation (by tsubasanouta).
+Updated Korean translation (by Hackjjang).
 
 Updated libraries:
-	ffmpeg n8.2-dev-2058-g87bd15dc3c.
+	Detours v4.0.1-131-gd644ce9;
+	ffmpeg n8.2-dev-2181-g6f2f3755a0;
+	nanosvg git-48120e9.
 
 
 1.9.0 - 2026-06-27

@@ -37,6 +37,7 @@
 #include "ac3.h"
 #include "ac3defs.h"
 #include "ac3dsp.h"
+#include "audio_frame_queue.h"
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "mathops.h"
@@ -233,6 +234,7 @@ typedef struct AC3EncodeContext {
     int exponent_bits;                      ///< number of bits used for exponents
 
     uint8_t *planar_samples[AC3_MAX_CHANNELS - 1];
+    uint8_t *input_samples[AC3_MAX_CHANNELS - 1];
     uint8_t *bap_buffer;
     uint8_t *bap1_buffer;
     CoefType *mdct_coef_buffer;
@@ -252,8 +254,10 @@ typedef struct AC3EncodeContext {
     uint8_t *ref_bap     [AC3_MAX_CHANNELS][AC3_MAX_BLOCKS]; ///< bit allocation pointers (bap)
     int ref_bap_set;                                         ///< indicates if ref_bap pointers have been set
 
+    AudioFrameQueue afq;
+
     /** fixed vs. float function pointers */
-    void (*encode_frame)(struct AC3EncodeContext *s, uint8_t * const *samples);
+    void (*encode_frame)(struct AC3EncodeContext *s, const AVFrame *frame);
 
     /* AC-3 vs. E-AC-3 function pointers */
     void (*output_frame_header)(struct AC3EncodeContext *s, struct PutBitContext *pb);

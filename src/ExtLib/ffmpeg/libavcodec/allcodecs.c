@@ -46,6 +46,7 @@ extern const FFCodec ff_ansi_decoder;
 extern const FFCodec ff_apng_encoder;
 extern const FFCodec ff_apng_decoder;
 extern const FFCodec ff_apv_decoder;
+extern const FFCodec ff_apv_vulkan_encoder;
 extern const FFCodec ff_arbc_decoder;
 extern const FFCodec ff_argo_decoder;
 extern const FFCodec ff_asv1_encoder;

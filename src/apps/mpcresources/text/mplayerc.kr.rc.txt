@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"내보내기"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"좌 버튼"
 6		"클릭"
 8		"불러온 파일이 없으면 최근 파일 열기"
 10		"두 번 클릭"
 12		"영상 영역으로 창 이동"
-13		"우 클릭"
-16		"기본값"
+13		"길게 누를 때, 반응 속도 향상 기능 활성화"
+14		"길게 누르기 속도"
+16		"길게 누르기 지연"
+18		"우 클릭"
+21		"기본값"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

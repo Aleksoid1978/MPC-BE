@@ -116,7 +116,8 @@ const FFCodec ff_ac3_encoder = {
     CODEC_LONG_NAME("ATSC A/52A (AC-3)"),
     .p.type          = AVMEDIA_TYPE_AUDIO,
     .p.id            = AV_CODEC_ID_AC3,
-    .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
+    .p.capabilities  = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_DELAY |
+                       AV_CODEC_CAP_SMALL_LAST_FRAME | AV_CODEC_CAP_ENCODER_REORDERED_OPAQUE,
     .priv_data_size  = sizeof(AC3EncodeContext),
     .init            = ff_ac3_float_encode_init,
     FF_CODEC_ENCODE_CB(ff_ac3_encode_frame),

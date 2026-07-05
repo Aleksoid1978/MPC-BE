@@ -95,7 +95,7 @@ BOOL CPPageYoutube::OnInitDialog()
 	m_cbVideoCodec.AddString(L"AV1");
 	m_cbVideoCodec.SetCurSel(s.iYdlVcodec);
 
-	for (const auto& h : s_CommonVideoHeights) {
+	for (const auto& h : g_CommonVideoHeights) {
 		CString str;
 		if (h == 0) {
 			str = ResStr(IDS_AUDIO_ONLY);

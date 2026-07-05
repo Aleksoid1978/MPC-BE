@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,8 +74,11 @@ void CPPageMouse::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_COMBO1, m_cmbLeftButtonClick);
 	DDX_Control(pDX, IDC_COMBO2, m_cmbLeftButtonDblClick);
 	DDX_Control(pDX, IDC_COMBO3, m_cmbRightButtonClick);
+	DDX_Control(pDX, IDC_COMBO4, m_cmbMouseLongPressLeftSpeedRate);
+	DDX_Control(pDX, IDC_COMBO5, m_cmbMouseLongPressLeftSpeedDelay);
 	DDX_Control(pDX, IDC_CHECK1, m_chkMouseLeftClickOpenRecent);
 	DDX_Control(pDX, IDC_CHECK2, m_chkMouseEasyMove);
+	DDX_Control(pDX, IDC_CHECK3, m_chkMouseLongPressLeftSpeed);
 	DDX_Control(pDX, IDC_LIST1, m_list);
 }
 
@@ -133,6 +136,22 @@ BOOL CPPageMouse::OnInitDialog()
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(s.bMouseLeftClickOpenRecent ? BST_CHECKED : BST_UNCHECKED);
 	m_chkMouseEasyMove.SetCheck(s.bMouseEasyMove ? BST_CHECKED : BST_UNCHECKED);
+	m_chkMouseLongPressLeftSpeed.SetCheck(s.bMouseLeftLongPressSpeed ? BST_CHECKED : BST_UNCHECKED);
+
+	CStringW str;
+	for (int i = 2; i <= 8; i++) {
+		str.Format(L"%dx", i);
+		AddStringData(m_cmbMouseLongPressLeftSpeedRate, str, i);
+	}
+	SelectByItemData(m_cmbMouseLongPressLeftSpeedRate, s.nMouseLeftLongPressSpeedRate);
+	m_cmbMouseLongPressLeftSpeedRate.EnableWindow(s.bMouseLeftLongPressSpeed ? TRUE : FALSE);
+
+	for (const auto delay : g_LongPressDelays) {
+		str.Format(L"%d ms", delay);
+		AddStringData(m_cmbMouseLongPressLeftSpeedDelay, str, delay);
+	}
+	SelectByItemData(m_cmbMouseLongPressLeftSpeedDelay, s.nMouseLeftLongPressSpeedDelay);
+	m_cmbMouseLongPressLeftSpeedDelay.EnableWindow(s.bMouseLeftLongPressSpeed ? TRUE : FALSE);
 
 	m_table_values[ROW_BTN_M][COL_CMD]    = s.MouseMiddleClick.normal;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = s.MouseMiddleClick.ctrl;
@@ -219,6 +238,9 @@ BOOL CPPageMouse::OnApply()
 
 	s.bMouseLeftClickOpenRecent = !!m_chkMouseLeftClickOpenRecent.GetCheck();
 	s.bMouseEasyMove            = !!m_chkMouseEasyMove.GetCheck();
+	s.bMouseLeftLongPressSpeed  = !!m_chkMouseLongPressLeftSpeed.GetCheck();
+	s.nMouseLeftLongPressSpeedRate = (int)GetCurItemData(m_cmbMouseLongPressLeftSpeedRate);
+	s.nMouseLeftLongPressSpeedDelay = (int)GetCurItemData(m_cmbMouseLongPressLeftSpeedDelay);
 
 	s.MouseMiddleClick.normal = m_table_values[ROW_BTN_M][COL_CMD];
 	s.MouseMiddleClick.ctrl   = m_table_values[ROW_BTN_M][COL_CTRL];
@@ -254,6 +276,9 @@ BOOL CPPageMouse::OnApply()
 
 BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnLeftClickChange)
+	ON_CBN_SELCHANGE(IDC_COMBO4, OnLongPressLeftSpeedRateChange)
+	ON_CBN_SELCHANGE(IDC_COMBO5, OnLongPressLeftSpeedDelayChange)
+	ON_BN_CLICKED(IDC_CHECK3, OnLongPressLeftSpeedChange)
 	ON_NOTIFY(LVN_BEGINLABELEDITW, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
 	ON_NOTIFY(LVN_ENDLABELEDITW, IDC_LIST1, OnEndlabeleditList)
@@ -270,6 +295,23 @@ void CPPageMouse::OnLeftClickChange()
 		m_chkMouseLeftClickOpenRecent.EnableWindow(FALSE);
 	}
 
+	SetModified();
+}
+
+void CPPageMouse::OnLongPressLeftSpeedChange()
+{
+	m_cmbMouseLongPressLeftSpeedRate.EnableWindow(m_chkMouseLongPressLeftSpeed.GetCheck() ? TRUE : FALSE);
+	m_cmbMouseLongPressLeftSpeedDelay.EnableWindow(m_chkMouseLongPressLeftSpeed.GetCheck() ? TRUE : FALSE);
+	SetModified();
+}
+
+void CPPageMouse::OnLongPressLeftSpeedRateChange()
+{
+	SetModified();
+}
+
+void CPPageMouse::OnLongPressLeftSpeedDelayChange()
+{
 	SetModified();
 }
 
@@ -374,6 +416,11 @@ void CPPageMouse::OnBnClickedReset()
 
 	m_chkMouseLeftClickOpenRecent.SetCheck(BST_UNCHECKED);
 	m_chkMouseEasyMove.SetCheck(BST_CHECKED);
+	m_chkMouseLongPressLeftSpeed.SetCheck(BST_UNCHECKED);
+	SelectByItemData(m_cmbMouseLongPressLeftSpeedRate, 2);
+	SelectByItemData(m_cmbMouseLongPressLeftSpeedDelay, 300);
+	m_cmbMouseLongPressLeftSpeedRate.EnableWindow(TRUE);
+	m_cmbMouseLongPressLeftSpeedDelay.EnableWindow(TRUE);
 
 	m_table_values[ROW_BTN_M][COL_CMD]    = 0;
 	m_table_values[ROW_BTN_M][COL_CTRL]   = 0;

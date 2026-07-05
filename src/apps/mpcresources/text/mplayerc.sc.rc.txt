@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"导出"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"左键"
 6		"点击"
 8		"如果未加载任何内容，则打开最近使用的文件"
 10		"双击"
 12		"通过视频区域移动播放窗口"
-13		"右键"
-16		"重置"
+13		"启用长按加速"
+14		"长按倍速"
+16		"长按延迟"
+18		"右键"
+21		"重置"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

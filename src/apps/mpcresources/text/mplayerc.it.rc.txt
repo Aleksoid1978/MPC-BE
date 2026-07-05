@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Esporta"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Pulsante sinistro"
 6		"Clic"
 8		"Se non viene caricato nulla, apri il file recente"
 10		"Doppio clic"
 12		"Sposta finestra per area video"
-13		"Clic destro"
-16		"Predefinito"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Clic destro"
+21		"Predefinito"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

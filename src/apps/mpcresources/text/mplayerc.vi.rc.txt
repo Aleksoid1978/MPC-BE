@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Xuất"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Nút trái"
 6		"Nhấp"
 8		"Nếu không có gì được tải, mở tệp gần đây"
 10		"Nhấp đúp"
 12		"Di chuyển cửa sổ bằng vùng video"
-13		"Nút phải"
-16		"Mặc định"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Nút phải"
+21		"Mặc định"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

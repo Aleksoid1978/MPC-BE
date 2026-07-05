@@ -394,7 +394,8 @@ public:
 		TIMER_STATUSERASER,
 		TIMER_FLYBARWINDOWHIDER,
 		TIMER_DM_AUTOCHANGING,
-		TIMER_PAUSE
+		TIMER_PAUSE,
+		TIMER_MOUSE_LEFT_LONGPRESS_SPEED
 	};
 
 	void SetColorMenu();
@@ -1328,8 +1329,17 @@ public:
 private:
 	int			GetStreamCount(DWORD dwSelGroup);
 
+	bool		IsLeftLongPressSpeedAvailable(UINT nFlags) const;
+	void		BeginLeftLongPressSpeed(UINT nFlags, CPoint point);
+	bool		CancelLeftLongPressSpeed(bool bRestoreRate);
+
 	BOOL		m_bLeftMouseDown			= FALSE;
 	BOOL		m_bLeftMouseDownFullScreen	= FALSE;
+	bool		m_bLeftLongPressSpeedCandidate = false;
+	bool		m_bLeftLongPressSpeedActive = false;
+	bool		m_bLeftLongPressSpeedDelayedClick = false;
+	CPoint		m_leftLongPressSpeedPoint;
+	double		m_leftLongPressSpeedPreviousRate = 1.0;
 	bool		m_bWaitingRButtonUp = false;
 
 	int			m_nAudioTrackStored    = -1;

@@ -226,8 +226,6 @@ enum : int {
 	PLAYBACKWND_FITSCREENLARGER,
 };
 
-inline static const std::vector<int> s_CommonVideoHeights = { 4320, 2880, 2160, 1080, 1440, 720, 480, 360, 0 };
-
 struct ShaderC {
 	CString   label;
 	CString   profile;
@@ -443,6 +441,11 @@ struct fullScreenRes {
 	CString monitorId;
 };
 
+inline const std::vector<int> g_SpeedSteps = { 1, 5, 10, 20, 25, 50, 100 };
+inline const std::vector<int> g_AutoScaleFactors = { 50, 100, 200 };
+inline const std::vector<int> g_LongPressDelays = { 300, 400, 500 };
+inline const std::vector<int> g_CommonVideoHeights = { 4320, 2880, 2160, 1080, 1440, 720, 480, 360, 0 };
+
 class CAppSettings
 {
 	bool bInitialized;
@@ -524,6 +527,9 @@ public:
 	bool			bMouseLeftClickOpenRecent;
 	UINT			nMouseLeftDblClick;
 	bool			bMouseEasyMove;
+	bool			bMouseLeftLongPressSpeed;
+	int				nMouseLeftLongPressSpeedRate;
+	int				nMouseLeftLongPressSpeedDelay;
 	UINT			nMouseRightClick;
 	struct MOUSE_ASSIGNMENT {
 		UINT normal;

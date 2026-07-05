@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Exportovať"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Ľavé tlačidlo"
 6		"Klik"
 8		"Ak sa nič nenačíta, otvoriť posledný súbor"
 10		"Dvojklik"
 12		"Presunúť okno podľa oblasti videa"
-13		"Klik pravým tlačidlom"
-16		"Predvolené"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Klik pravým tlačidlom"
+21		"Predvolené"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

@@ -147,6 +147,7 @@ SRCS_LC = \
 	libavcodec/atrac3plusdsp.c \
 	libavcodec/atrac9dec.c \
 	libavcodec/atsc_a53.c \
+	libavcodec/audio_frame_queue.c \
 	libavcodec/audiodsp.c \
 	libavcodec/av1_parse.c \
 	libavcodec/av1_parser.c \
@@ -906,6 +907,7 @@ SRCS_ASM_LC = \
 	libavcodec/x86/ttadsp.asm \
 	libavcodec/x86/utvideodsp.asm \
 	libavcodec/x86/v210.asm \
+	libavcodec/x86/vc1dsp_inv_trans.asm \
 	libavcodec/x86/vc1dsp_loopfilter.asm \
 	libavcodec/x86/vc1dsp_mc.asm \
 	libavcodec/x86/videodsp.asm \

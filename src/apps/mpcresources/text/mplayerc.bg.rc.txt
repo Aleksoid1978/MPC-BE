@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Експортиране"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Ляв бутон"
 6		"Кликване върху"
 8		"Ако няма нищо заредено, да се отвори последният файл"
 10		"Двоен клик"
 12		"Преместване на прозореца извън видео зоната"
-13		"Десен клик"
-16		"По подразбиране"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Десен клик"
+21		"По подразбиране"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

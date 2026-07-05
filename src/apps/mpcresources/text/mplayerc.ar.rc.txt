@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"تصدير"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"زر الفأرة الأيسر"
 6		"نقرة"
 8		"إذا لم يتم تحميل أي شيء، افتح الملف الأخير"
 10		"نقرة مزدوجة"
 12		"تحريك النافذة عبر منطقة الفيديو"
-13		"زر الفأرة الأيمن"
-16		"افتراضي"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"زر الفأرة الأيمن"
+21		"افتراضي"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

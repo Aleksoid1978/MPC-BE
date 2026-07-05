@@ -344,19 +344,4 @@ void ff_sws_op_list_update_comps(SwsOpList *ops);
  */
 int ff_sws_op_list_optimize(SwsOpList *ops);
 
-/**
- * Helper function to enumerate over all possible (optimized) operation lists,
- * under the current set of options in `ctx`, and run the given callback on
- * each list.
- *
- * @param src_fmt If set (not AV_PIX_FMT_NONE), constrain the source format
- * @param dst_fmt If set (not AV_PIX_FMT_NONE), constrain the destination format
- * @return 0 on success, the return value if cb() < 0, or a negative error code
- *
- * @note `ops` belongs to ff_sws_enum_op_lists(), but may be mutated by `cb`.
- */
-int ff_sws_enum_op_lists(SwsContext *ctx, void *opaque,
-                         enum AVPixelFormat src_fmt, enum AVPixelFormat dst_fmt,
-                         int (*cb)(SwsContext *ctx, void *opaque, SwsOpList *ops));
-
 #endif

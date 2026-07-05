@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Експорт"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Ліва кнопка"
 6		"Клацання"
 8		"Якщо нічого не завантажено, то відкрити останній файл"
 10		"Подвійне клацання"
 12		"Переносити вікно за відеообласть"
-13		"Клацання правою кнопкою"
-16		"За замовчуванням"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Клацання правою кнопкою"
+21		"За замовчуванням"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

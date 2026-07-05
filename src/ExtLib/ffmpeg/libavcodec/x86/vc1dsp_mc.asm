@@ -21,6 +21,17 @@
 
 %include "libavutil/x86/x86util.asm"
 
+SECTION_RODATA
+
+pb_m4_18: times 8 db -4, 18
+pb_53_m3: times 8 db 53, -3
+pb_m3_53: times 8 db -3, 53
+pb_18_m4: times 8 db 18, -4
+pb_m4_36: times 8 db -4, 36
+pb_36_m4: times 8 db 36, -4
+pb_m4_53: times 8 db -4, 53
+pb_m3_18: times 8 db -3, 18
+
 cextern pw_9
 cextern pw_128
 
@@ -158,7 +169,6 @@ cglobal vc1_%2_hor_16b_shift2, 4, 5, 0, dst, stride, src, rnd, h
     LOAD_ROUNDER_MMX rndd
     mova               m5, [pw_9]
     mova               m6, [pw_128]
-    pxor               m0, m0
 
 .loop:
     mova               m1, [srcq + 2 * 0]
@@ -193,100 +203,214 @@ INIT_MMX mmxext
 HOR_16B_SHIFT2 OP_AVG, avg
 %endif ; HAVE_MMX_INLINE
 
-%macro INV_TRANS_INIT 0
-    movsxdifnidn linesizeq, linesized
-    movd       m0, blockd
-    SPLATW     m0, m0
-    pxor       m1, m1
-    psubw      m1, m0
-    packuswb   m0, m0
-    packuswb   m1, m1
+%define MOV8  movq
+%define MOV16 movu
 
-    DEFINE_ARGS dest, linesize, linesize3
-    lea    linesize3q, [linesizeq*3]
+INIT_XMM ssse3
+%macro HOR_8B 2
+
+cglobal vc1_%1_mspel_mc10_%2, 4, 4, 6, dst, src, stride, rnd
+    mova              m1, [pb_m4_53]
+    mova              m2, [pb_m3_18]
+    sub             rndd, 32
+    jmp               vc1_%1_mspel_mc30_%2_after_prologue
+
+cglobal vc1_%1_mspel_mc20_%2, 4, 4, 6, dst, src, stride, rnd
+    mova              m1, [pb_m4_36]
+    lea             rndd, [4*rndd-32]
+    mova              m2, m1
+    jmp               vc1_%1_mspel_mc30_%2_after_prologue
+
+cglobal vc1_%1_mspel_mc30_%2, 4, 4, 6, dst, src, stride, rnd
+    mova              m2, [pb_m4_53]
+    mova              m1, [pb_m3_18]
+    sub             rndd, 32
+
+vc1_%1_mspel_mc30_%2_after_prologue:
+    movd              m0, rndd
+    WIN64_SPILL_XMM    7+(%2>>4)
+%define hd  rndd
+    mov               hd, %2
+    SPLATW            m0, m0
+.loop:
+    MOV%2             m3, [srcq-1]
+    MOV%2             m4, [srcq]
+    MOV%2             m5, [srcq+1]
+    MOV%2             m6, [srcq+2]
+
+%if %2 == 8
+    punpcklbw         m3, m4
+    pmaddubsw         m3, m1
+%ifidn %1,avg
+    movq              m4, [dstq]
+%endif
+    punpcklbw         m6, m5
+    pmaddubsw         m6, m2
+    add             srcq, strideq
+    psubw             m3, m0
+    paddw             m3, m6
+    psraw             m3, 6
+    packuswb          m3, m3
+%ifidn %1,avg
+    pavgb             m3, m4
+%endif
+    movq          [dstq], m3
+%else
+    SBUTTERFLY        bw, 3, 4, 7
+    pmaddubsw         m3, m1
+    pmaddubsw         m4, m1
+    SBUTTERFLY        bw, 6, 5, 7
+    pmaddubsw         m6, m2
+    pmaddubsw         m5, m2
+    add             srcq, strideq
+    psubw             m3, m0
+    psubw             m4, m0
+    paddw             m3, m6
+    paddw             m4, m5
+    psraw             m3, 6
+    psraw             m4, 6
+    packuswb          m3, m4
+%ifidn %1, avg
+    pavgb             m3, [dstq]
+%endif
+    mova          [dstq], m3
+%endif
+    add             dstq, strideq
+    dec               hd
+    jnz            .loop
+    RET
 %endmacro
 
-%macro INV_TRANS_PROCESS 1
-    mov%1                  m2, [destq+linesizeq*0]
-    mov%1                  m3, [destq+linesizeq*1]
-    mov%1                  m4, [destq+linesizeq*2]
-    mov%1                  m5, [destq+linesize3q]
-    paddusb                m2, m0
-    paddusb                m3, m0
-    paddusb                m4, m0
-    paddusb                m5, m0
-    psubusb                m2, m1
-    psubusb                m3, m1
-    psubusb                m4, m1
-    psubusb                m5, m1
-    mov%1 [linesizeq*0+destq], m2
-    mov%1 [linesizeq*1+destq], m3
-    mov%1 [linesizeq*2+destq], m4
-    mov%1 [linesize3q +destq], m5
+HOR_8B put, 8
+HOR_8B avg, 8
+
+HOR_8B put, 16
+HOR_8B avg, 16
+
+%macro SETUP_COEFFS 3 ; width, coeff1, coeff2
+    ASSERT (%3-%2 == 16)
+%if ARCH_X86_64 || (%1 == 8)
+    mova          m1, [%2]
+    mova          m2, [%3]
+%define COEFF0 m1
+%define COEFF1 m2
+%define M8 m8
+%define M9 m9
+%else
+    lea           r4, [%2]
+%define COEFF0 [r4]
+%define COEFF1 [r4+(%3-%2)]
+%define M8 m1
+%define M9 m2
+%endif
 %endmacro
 
-; ff_vc1_inv_trans_?x?_dc_mmxext(uint8_t *dest, ptrdiff_t linesize, int16_t *block)
-INIT_MMX mmxext
-cglobal vc1_inv_trans_4x4_dc, 3,4,0, dest, linesize, block
-    movsx         r3d, WORD [blockq]
-    mov        blockd, r3d             ; dc
-    shl        blockd, 4               ; 16 * dc
-    lea        blockd, [blockq+r3+4]   ; 17 * dc + 4
-    sar        blockd, 3               ; >> 3
-    mov           r3d, blockd          ; dc
-    shl        blockd, 4               ; 16 * dc
-    lea        blockd, [blockq+r3+64]  ; 17 * dc + 64
-    sar        blockd, 7               ; >> 7
+%macro VER_8B 2
+cglobal vc1_%1_mspel_mc01_%2, 4, 4+ARCH_X86_32*(%2>>4), 6, dst, src, stride, rnd
+    SETUP_COEFFS %2, pb_m4_18, pb_53_m3
+    add             rndd, 31
+    jmp               vc1_%1_mspel_mc03_%2_after_prologue
 
-    INV_TRANS_INIT
+cglobal vc1_%1_mspel_mc02_%2, 4, 4+ARCH_X86_32*(%2>>4), 6, dst, src, stride, rnd
+    SETUP_COEFFS %2, pb_m4_36, pb_36_m4
+    lea             rndd, [4*rndd+28]
+    jmp               vc1_%1_mspel_mc03_%2_after_prologue
 
-    INV_TRANS_PROCESS h
+cglobal vc1_%1_mspel_mc03_%2, 4, 4+ARCH_X86_32*(%2>>4), 6, dst, src, stride, rnd
+    SETUP_COEFFS %2, pb_m3_53, pb_18_m4
+    add             rndd, 31
+
+vc1_%1_mspel_mc03_%2_after_prologue:
+    neg          strideq
+    movd              m0, rndd
+    WIN64_SPILL_XMM    8, 8+3*(%2>>4)
+    MOV%2             m3, [srcq+strideq]
+    neg          strideq
+    MOV%2             m4, [srcq]
+    MOV%2             m5, [srcq+strideq]
+    SPLATW            m0, m0
+%if %2 == 16
+    WIN64_PUSH_XMM    11, 8
+%endif
+    lea             srcq, [srcq+2*strideq]
+%define hd  rndd
+%if %2 == 8
+    punpcklbw         m3, m5
+%else
+    punpcklbw         m7, m3, m5
+    punpckhbw         m3, m5
+%endif
+    mov               hd, %2
+
+.loop:
+    MOV%2             m6, [srcq]
+%if %2 == 8
+    pmaddubsw         m3, m1
+    punpcklbw         m4, m6
+    pmaddubsw         m7, m4, m2
+    paddw             m3, m0
+    add             srcq, strideq
+    paddw             m7, m3
+    mova              m3, m4
+%ifidn %1, avg
+    movq              m4, [dstq]
+%endif
+    psraw             m7, 6
+%ifnidn %1, avg
+    mova              m4, m5
+%endif
+    packuswb          m7, m7
+%ifidn %1, avg
+    pavgb             m7, m4
+    mova              m4, m5
+%endif
+    movq          [dstq], m7
+%else
+    pmaddubsw         m7, COEFF0
+    pmaddubsw         m3, COEFF0
+    punpcklbw         M8, m4, m6
+    punpckhbw         m4, m6
+    pmaddubsw         M9, M8, COEFF1
+    paddw             m7, m0
+%if ARCH_X86_64
+    pmaddubsw        m10, m4, m2
+    paddw             m3, m0
+    paddw             m9, m7
+    mova              m7, m8
+    psraw             m9, 6
+    paddw            m10, m3
+%else
+    paddw             m3, m0
+    paddw             M9, m7
+    mova              m7, M8
+    pmaddubsw         M8, m4, COEFF1
+    psraw             M9, 6
+    paddw             M8, m3
+%endif
+    add             srcq, strideq
+    mova              m3, m4
+%if ARCH_X86_64
+    psraw            m10, 6
+    packuswb          m9, m10
+%else
+    psraw             M8, 6
+    packuswb          M9, M8
+%endif
+%ifidn %1, avg
+    pavgb             M9, [dstq]
+%endif
+    mova              m4, m5
+    mova          [dstq], M9
+%endif
+    add             dstq, strideq
+    mova              m5, m6
+    dec               hd
+    jnz            .loop
     RET
+%endmacro
 
-INIT_MMX mmxext
-cglobal vc1_inv_trans_4x8_dc, 3,4,0, dest, linesize, block
-    movsx         r3d, WORD [blockq]
-    mov        blockd, r3d             ; dc
-    shl        blockd, 4               ; 16 * dc
-    lea        blockd, [blockq+r3+4]   ; 17 * dc + 4
-    sar        blockd, 3               ; >> 3
-    shl        blockd, 2               ;  4 * dc
-    lea        blockd, [blockq*3+64]   ; 12 * dc + 64
-    sar        blockd, 7               ; >> 7
+VER_8B put, 8
+VER_8B avg, 8
 
-    INV_TRANS_INIT
-
-    INV_TRANS_PROCESS h
-    lea         destq, [destq+linesizeq*4]
-    INV_TRANS_PROCESS h
-    RET
-
-INIT_MMX mmxext
-cglobal vc1_inv_trans_8x4_dc, 3,4,0, dest, linesize, block
-    movsx      blockd, WORD [blockq]   ; dc
-    lea        blockd, [blockq*3+1]    ;  3 * dc + 1
-    sar        blockd, 1               ; >> 1
-    mov           r3d, blockd          ; dc
-    shl        blockd, 4               ; 16 * dc
-    lea        blockd, [blockq+r3+64]  ; 17 * dc + 64
-    sar        blockd, 7               ; >> 7
-
-    INV_TRANS_INIT
-
-    INV_TRANS_PROCESS a
-    RET
-
-INIT_MMX mmxext
-cglobal vc1_inv_trans_8x8_dc, 3,3,0, dest, linesize, block
-    movsx      blockd, WORD [blockq]   ; dc
-    lea        blockd, [blockq*3+1]    ;  3 * dc + 1
-    sar        blockd, 1               ; >> 1
-    lea        blockd, [blockq*3+16]   ;  3 * dc + 16
-    sar        blockd, 5               ; >> 5
-
-    INV_TRANS_INIT
-
-    INV_TRANS_PROCESS a
-    lea         destq, [destq+linesizeq*4]
-    INV_TRANS_PROCESS a
-    RET
+VER_8B put, 16
+VER_8B avg, 16

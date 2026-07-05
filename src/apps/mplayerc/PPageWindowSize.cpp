@@ -1,5 +1,5 @@
 /*
- * (C) 2019 see Authors.txt
+ * (C) 2019-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -73,9 +73,11 @@ BOOL CPPageWindowSize::OnInitDialog()
 		m_chkFitLargerOnly.SetCheck(BST_UNCHECKED);
 	}
 
-	AddStringData(m_cmbScaleLevel,  L"50%",  50);
-	AddStringData(m_cmbScaleLevel, L"100%", 100);
-	AddStringData(m_cmbScaleLevel, L"200%", 200);
+	CStringW str;
+	for (const auto scale : g_AutoScaleFactors) {
+		str.Format(L"%d%", scale);
+		AddStringData(m_cmbScaleLevel, str, scale);
+	}
 	SelectByItemData(m_cmbScaleLevel, s.nAutoScaleFactor);
 
 	m_nFitFactor = s.nAutoFitFactor;

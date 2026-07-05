@@ -350,7 +350,7 @@ bool CHistoryFile::OpenSessionInfo(SessionInfo& sesInfo, bool bReadPos)
 			}
 		}
 
-		if (sesInfo.Title.IsEmpty()) {
+		if (!si.Title.IsEmpty()) {
 			sesInfo.Title = si.Title;
 		}
 	}

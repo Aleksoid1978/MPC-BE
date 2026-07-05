@@ -366,14 +366,17 @@ BEGIN DIALOGEX IDD_PPAGEMISC LINES 36
 35		"Ver"
 END
 
-BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 17
+BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 5		"Sol tuş"
 6		"Tıklama"
 8		"Hiçbir şey yüklenmemişse son dosyayı aç"
 10		"Çift Tıklama"
 12		"Pencereyi video alanı vasıtasıyla taşı"
-13		"Sağ Tıklama"
-16		"Varsayılan"
+13		"Enable long press speed-up"
+14		"Long press speed"
+16		"Long press delay"
+18		"Sağ Tıklama"
+21		"Varsayılan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEOSD LINES 26

@@ -272,16 +272,4 @@ int ff_sws_uop_list_append(SwsUOpList *uops, SwsUOp *uop);
 int ff_sws_ops_translate(SwsContext *ctx, const SwsOpList *ops,
                          SwsUOpFlags flags, SwsUOpList *uops);
 
-/**
- * Generate a set of boilerplate C preprocessor macros for describing and
- * programmatically iterating over all possible SwsUOps.
- *
- * This function can be quite slow as it iterates over every possible
- * combination of pixel formats and flags.
- *
- * Returns 0 or a negative error code. On success, an allocated string is
- * returned via `out_str`, and must be av_free()'d by the caller.
- */
-int ff_sws_uops_macros_gen(char **out_str);
-
 #endif

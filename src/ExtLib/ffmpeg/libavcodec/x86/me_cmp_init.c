@@ -177,7 +177,7 @@ av_cold void ff_me_cmp_init_x86(MECmpContext *c, AVCodecContext *avctx)
 
 #if ARCH_X86_64
         c->median_sad[0] = ff_median_sad16_ssse3;
-        c->median_sad[1] = ff_median_sad8_ssse3;
 #endif
+        c->median_sad[1] = ff_median_sad8_ssse3;
     }
 }
