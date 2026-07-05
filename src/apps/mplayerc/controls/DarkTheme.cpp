@@ -1142,13 +1142,14 @@ namespace DarkTheme
 			RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
 	}
 
-	// --- Dark message boxes (MessageBox / AfxMessageBox) via a thread-local CBT hook ---------------
+	// --- Dark message boxes (MessageBox / AfxMessageBox) via a WH_CBT hook -------------------------
 	// A message box is a standard "#32770" dialog the OS creates and paints with system colours; the
-	// only way to theme it is to catch its creation and re-theme it. CDarkMessageBoxHook installs a
-	// WH_CBT hook for the lifetime of the guard; when the message box activates we run ThemeDialog on
-	// it. Scope the guard tightly around the AfxMessageBox call so nothing else is affected.
+	// only way to theme it is to catch it as it activates and re-theme it. A persistent hook on the UI
+	// thread (InstallMessageBoxHook) covers all main-thread message boxes; CDarkMessageBoxHook is a
+	// scoped guard for the few shown from a worker thread (a thread hook only sees its own thread).
 	namespace {
-		HHOOK g_msgBoxHook = nullptr;
+		HHOOK g_msgBoxHook = nullptr;           // scoped (CDarkMessageBoxHook)
+		HHOOK g_persistentMsgBoxHook = nullptr; // process-lifetime (InstallMessageBoxHook)
 		const UINT_PTR kMsgBoxSubclassId = 11;
 
 		// The message box repaints its lower button "band" with a light system colour in its own
@@ -1173,24 +1174,68 @@ namespace DarkTheme
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
 		}
 
+		// A standard message box holds only static labels / icon and push buttons. Any other control
+		// class (edit, combo, tree, tab, list, or a nested dialog / property page) means it's a real
+		// dialog that themes itself — the hook must not blanket-theme those (that would re-theme the
+		// Options sheet and every aux dialog on activation and risk breaking them).
+		BOOL CALLBACK MsgBoxChildProc(HWND hChild, LPARAM lParam) {
+			auto* flags = reinterpret_cast<bool*>(lParam); // [0] = only statics/buttons, [1] = has a button
+			wchar_t cls[32] = {};
+			GetClassNameW(hChild, cls, _countof(cls));
+			if (_wcsicmp(cls, L"Button") == 0) {
+				flags[1] = true;
+			} else if (_wcsicmp(cls, L"Static") != 0) {
+				flags[0] = false;
+				return FALSE; // found a non-message-box control, stop
+			}
+			return TRUE;
+		}
+
+		bool LooksLikeMessageBox(HWND hWnd) {
+			bool flags[2] = { true, false };
+			EnumChildWindows(hWnd, MsgBoxChildProc, reinterpret_cast<LPARAM>(flags));
+			return flags[0] && flags[1];
+		}
+
+		void ThemeMessageBoxWindow(HWND hWnd) {
+			if (!IsActive() || !hWnd) {
+				return;
+			}
+			wchar_t cls[16] = {};
+			::GetClassNameW(hWnd, cls, _countof(cls));
+			if (wcscmp(cls, L"#32770") != 0) {
+				return; // not the dialog class MessageBox uses
+			}
+			DWORD_PTR ref = 0;
+			if (GetWindowSubclass(hWnd, DialogSubclassProc, kDialogSubclassId, &ref)) {
+				return; // one of our own dialogs (it themes itself) — leave it alone
+			}
+			if (!LooksLikeMessageBox(hWnd)) {
+				return; // a real dialog, not a message box
+			}
+			ThemeDialog(hWnd);
+			SetWindowSubclass(hWnd, MsgBoxSubclassProc, kMsgBoxSubclassId, 0);
+			::RedrawWindow(hWnd, nullptr, nullptr,
+				RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+		}
+
 		LRESULT CALLBACK MsgBoxCBTProc(int code, WPARAM wParam, LPARAM lParam) {
 			if (code == HCBT_ACTIVATE) {
-				HWND hWnd = reinterpret_cast<HWND>(wParam);
-				wchar_t cls[16] = {};
-				::GetClassNameW(hWnd, cls, _countof(cls));
-				if (wcscmp(cls, L"#32770") == 0) { // the dialog class MessageBox uses
-					ThemeDialog(hWnd);
-					SetWindowSubclass(hWnd, MsgBoxSubclassProc, kMsgBoxSubclassId, 0);
-					::RedrawWindow(hWnd, nullptr, nullptr,
-						RDW_INVALIDATE | RDW_ERASE | RDW_ALLCHILDREN | RDW_UPDATENOW);
-				}
+				ThemeMessageBoxWindow(reinterpret_cast<HWND>(wParam));
 			}
-			return ::CallNextHookEx(g_msgBoxHook, code, wParam, lParam);
+			return ::CallNextHookEx(nullptr, code, wParam, lParam); // hhk is ignored on modern Windows
+		}
+	}
+
+	void InstallMessageBoxHook() {
+		// Persistent, checks IsActive() per message box (so it follows the theme toggle), installed once.
+		if (!g_persistentMsgBoxHook) {
+			g_persistentMsgBoxHook = ::SetWindowsHookExW(WH_CBT, MsgBoxCBTProc, nullptr, ::GetCurrentThreadId());
 		}
 	}
 
 	CDarkMessageBoxHook::CDarkMessageBoxHook() : m_hooked(false) {
-		// One hook per thread at a time; nested message boxes reuse the outer guard's hook.
+		// One scoped hook per thread at a time; nested message boxes reuse the outer guard's hook.
 		if (IsActive() && !g_msgBoxHook) {
 			g_msgBoxHook = ::SetWindowsHookExW(WH_CBT, MsgBoxCBTProc, nullptr, ::GetCurrentThreadId());
 			m_hooked = (g_msgBoxHook != nullptr);

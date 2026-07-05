@@ -71,6 +71,7 @@
 #include <filters/renderer/VideoRenderers/IPinHook.h>
 #include "filters/ffmpeg_link_fix.h"
 #include "ComPropertySheet.h"
+#include "controls/DarkTheme.h"
 #include <comdef.h>
 #include <dwmapi.h>
 
@@ -823,6 +824,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		pDockingBar->m_bUseDarkTheme = s.bUseDarkTheme;
 		pDockingBar->ShowWindow(SW_HIDE);
 	}
+
+	// Dark-theme every standard message box shown on the UI thread (Reset/Export settings, error
+	// prompts, ...) without wrapping each call site. Follows the theme toggle; no-op when it's off.
+	DarkTheme::InstallMessageBoxHook();
 
 	m_fileDropTarget.Register(this);
 

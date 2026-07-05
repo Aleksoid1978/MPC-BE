@@ -90,6 +90,15 @@ namespace DarkTheme
 		bool m_hooked;
 	};
 
+	// Installs a process-lifetime WH_CBT hook on the calling (main UI) thread that dark-themes every
+	// standard message box shown on that thread, so we don't have to wrap each of the ~70
+	// AfxMessageBox/MessageBox call sites. Only windows that actually look like a message box (class
+	// "#32770" containing solely static labels + push buttons, not one of our own themed dialogs) are
+	// touched. The hook checks the theme state each time, so it follows the "Use dark theme" toggle.
+	// Call once, e.g. from the main frame's OnCreate. Idempotent. Worker-thread message boxes (the
+	// updater) still use CDarkMessageBoxHook, since a thread hook only sees its own thread.
+	void InstallMessageBoxHook();
+
 	// Re-applies or removes the dark theme across a whole window tree in response to the
 	// "Use dark theme" toggle being changed at runtime (Interface page + Apply). Handles both
 	// directions — applying when now active, stripping every subclass/override when now
