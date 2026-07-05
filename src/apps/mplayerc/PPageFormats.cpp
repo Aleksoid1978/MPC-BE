@@ -44,14 +44,17 @@ static constexpr auto registeredKey        = L"Software\\Clients\\Media\\MPC-BE\
 // premultiplied alpha instead darkened the celeste and left the unchecked box white.
 // Because the app runs in force-dark mode, OpenThemeData(..., "BUTTON") resolves to the
 // dark (celeste) checkbox.
-static bool MakeThemedCheckImageList(CImageList& il, int h, HWND hRef)
+static bool MakeThemedCheckImageList(CImageList& il, int h, HWND hRef, bool bDark)
 {
-	DarkTheme::AllowDarkModeForApp();     // force-dark app mode
-	DarkTheme::ApplyThemeToControl(hRef); // allow dark mode on the list *now* — this runs at
-	                                      // OnInitDialog time, before the page's OnSetActive
-	                                      // themes it, so without this OpenThemeData(hRef,
-	                                      // "BUTTON") would resolve to the light checkbox
-	                                      // (a darker blue with a white unchecked box).
+	if (bDark) {
+		DarkTheme::AllowDarkModeForApp();     // force-dark app mode
+		DarkTheme::ApplyThemeToControl(hRef); // allow dark mode on the list *now* — this runs at
+		                                      // OnInitDialog time, before the page's OnSetActive
+		                                      // themes it, so OpenThemeData(hRef, "BUTTON") resolves
+		                                      // to the dark checkbox (celeste check), not the light one.
+	}
+	// In light mode the control keeps its default theme, so OpenThemeData resolves to the native
+	// light checkbox glyph — the same one the other checklists show when the dark theme is off.
 
 	HTHEME hTheme = ::OpenThemeData(hRef, L"BUTTON");
 	if (!hTheme) {
@@ -136,7 +139,7 @@ static bool MakeThemedCheckImageList(CImageList& il, int h, HWND hRef)
 // with a celeste checkmark, matching the palette of the rest of the dark dialog.
 static void MakeDarkCheckImageList(CImageList& il, int h, HWND hRef)
 {
-	if (MakeThemedCheckImageList(il, h, hRef)) {
+	if (MakeThemedCheckImageList(il, h, hRef, true)) {
 		return;
 	}
 
@@ -229,22 +232,16 @@ void CPPageFormats::DoDataExchange(CDataExchange* pDX)
 
 int CPPageFormats::GetChecked(int iItem)
 {
-	LVITEM lvi;
-	lvi.iItem = iItem;
-	lvi.iSubItem = 0;
-	lvi.mask = LVIF_IMAGE;
-	m_list.GetItem(&lvi);
-	return(lvi.iImage);
+	// The check state lives in the item's state-image index (1-based). Using the state image
+	// instead of the small icon keeps the checkbox out of the row's selection highlight, like a
+	// native list-view checkbox (the small icon shares the item cell and gets the highlight).
+	const UINT st = m_list.GetItemState(iItem, LVIS_STATEIMAGEMASK);
+	return (int)(st >> 12) - 1; // 0 = none, 1 = all, 2 = partial
 }
 
 void CPPageFormats::SetChecked(int iItem, int iChecked)
 {
-	LVITEM lvi;
-	lvi.iItem = iItem;
-	lvi.iSubItem = 0;
-	lvi.mask = LVIF_IMAGE;
-	lvi.iImage = iChecked;
-	m_list.SetItem(&lvi);
+	m_list.SetItemState(iItem, INDEXTOSTATEIMAGEMASK(iChecked + 1), LVIS_STATEIMAGEMASK);
 }
 
 CString CPPageFormats::GetEnqueueCommand()
@@ -816,18 +813,8 @@ END_MESSAGE_MAP()
 
 // CPPageFormats message handlers
 
-BOOL CPPageFormats::OnInitDialog()
+void CPPageFormats::BuildCheckImageList()
 {
-	__super::OnInitDialog();
-
-	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
-
-	m_bFileExtChanged = false;
-
-	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
-
-	m_list.InsertColumn(COL_CATEGORY, L"Category", LVCFMT_LEFT);
-
 	int chkH = 0;
 	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
 		chkH = pDpi->ScaleY(12);
@@ -837,9 +824,13 @@ BOOL CPPageFormats::OnInitDialog()
 		chkH = dpi.ScaleY(12);
 	}
 
+	m_onoff.DeleteImageList(); // rebuildable: re-run when the dark theme is toggled at runtime
+
 	if (DarkTheme::IsActive()) {
 		MakeDarkCheckImageList(m_onoff, chkH, m_list.GetSafeHwnd());
-	} else {
+	} else if (!MakeThemedCheckImageList(m_onoff, chkH, m_list.GetSafeHwnd(), false)) {
+		// Native (themed) light checkboxes matching the other checklists; fall back to upstream's
+		// SVG glyphs only if the visual style is unavailable.
 		CSvgImage svgImage;
 		if (svgImage.Load(IDF_SVG_ONOFF)) {
 			int w = 0;
@@ -854,7 +845,37 @@ BOOL CPPageFormats::OnInitDialog()
 		}
 	}
 
-	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
+	m_list.SetImageList(&m_onoff, LVSIL_STATE);
+	m_onoffDark = DarkTheme::IsActive();
+}
+
+BOOL CPPageFormats::OnSetActive()
+{
+	const BOOL bRet = __super::OnSetActive();
+
+	// The checkbox glyphs are baked into an image list at init time; if the dark theme was
+	// toggled since then, rebuild them so unchecked boxes don't stay dark on a light dialog.
+	if (m_onoffDark != DarkTheme::IsActive()) {
+		BuildCheckImageList();
+		m_list.Invalidate();
+	}
+
+	return bRet;
+}
+
+BOOL CPPageFormats::OnInitDialog()
+{
+	__super::OnInitDialog();
+
+	SetCursor(m_hWnd, IDC_BUTTON1, IDC_HAND);
+
+	m_bFileExtChanged = false;
+
+	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT);
+
+	m_list.InsertColumn(COL_CATEGORY, L"Category", LVCFMT_LEFT);
+
+	BuildCheckImageList();
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 	mf.UpdateData(false);
@@ -1233,9 +1254,10 @@ void CPPageFormats::OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem == COL_CATEGORY) {
-		CRect r;
-		m_list.GetItemRect(lpnmlv->iItem, r, LVIR_ICON);
-		if (r.PtInRect(lpnmlv->ptAction)) {
+		LVHITTESTINFO hti = {};
+		hti.pt = lpnmlv->ptAction;
+		m_list.HitTest(&hti);
+		if (hti.flags & LVHT_ONITEMSTATEICON) {
 			if (m_bInsufficientPrivileges) {
 				MessageBoxW(ResStr (IDS_CANNOT_CHANGE_FORMAT));
 			} else {

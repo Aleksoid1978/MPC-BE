@@ -700,6 +700,27 @@ namespace DarkTheme
 				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); // force NC repaint
 		}
 
+		// The colour-well buttons on the Interface / OSD / Subtitle-style pages are push buttons
+		// that each page paints with the selected colour via NM_CUSTOMDRAW (its OnCustomDrawBtns).
+		// Owner-drawing them here would steal WM_PAINT and show the button caption ("B", "O", ...)
+		// instead of the colour swatch, so ThemeControl skips them and lets the page draw them.
+		bool IsOwnerColorButton(HWND hCtrl) {
+			switch (::GetDlgCtrlID(hCtrl)) {
+				case IDC_BUTTON_CLRFACE:
+				case IDC_BUTTON_CLROUTLINE:
+				case IDC_BUTTON_CLRFONT:
+				case IDC_BUTTON_CLRGRAD1:
+				case IDC_BUTTON_CLRGRAD2:
+				case IDC_COLORPRI:
+				case IDC_COLORSEC:
+				case IDC_COLOROUTL:
+				case IDC_COLORSHAD:
+					return true;
+				default:
+					return false;
+			}
+		}
+
 		void ThemeControl(HWND hCtrl) {
 			if (pAllowDarkModeForWindow) {
 				pAllowDarkModeForWindow(hCtrl, true);
@@ -714,9 +735,14 @@ namespace DarkTheme
 					SetWindowSubclass(hCtrl, GroupBoxSubclassProc, kGroupBoxSubclassId, 0);
 					InvalidateRect(hCtrl, nullptr, TRUE);
 				} else if (bt == BS_PUSHBUTTON || bt == BS_DEFPUSHBUTTON) {
-					// Owner-draw so they stay dark AND keep the Win11 rounding + icon.
-					SetWindowSubclass(hCtrl, ButtonSubclassProc, kButtonSubclassId, 0);
-					InvalidateRect(hCtrl, nullptr, TRUE);
+					if (IsOwnerColorButton(hCtrl)) {
+						// Colour-well button: leave it for its page's NM_CUSTOMDRAW handler, which
+						// fills it with the selected colour (owner-drawing would show its caption).
+					} else {
+						// Owner-draw so they stay dark AND keep the Win11 rounding + icon.
+						SetWindowSubclass(hCtrl, ButtonSubclassProc, kButtonSubclassId, 0);
+						InvalidateRect(hCtrl, nullptr, TRUE);
+					}
 				} else {
 					// checkboxes, radios
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
