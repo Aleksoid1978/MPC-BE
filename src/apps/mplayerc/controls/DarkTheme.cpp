@@ -26,6 +26,7 @@
 #include <uxtheme.h>
 #include <vssym32.h>  // BP_CHECKBOX / BP_RADIOBUTTON / CBS_* / RBS_*
 #include <commctrl.h> // SetWindowSubclass
+#include <shellapi.h> // SHGetStockIconInfo (UAC shield)
 
 #pragma comment(lib, "dwmapi.lib")
 #pragma comment(lib, "uxtheme.lib")
@@ -260,10 +261,21 @@ namespace DarkTheme
 					}
 					HICON hIcon = reinterpret_cast<HICON>(::SendMessageW(hWnd, BM_GETIMAGE, IMAGE_ICON, 0));
 					// The UAC elevation shield (BCM_SETSHIELD) is drawn internally by the button and
-					// is NOT returned by BM_GETIMAGE, so owner-drawing dropped it. Draw it ourselves
-					// when the button is flagged (MarkUacShield). IDI_SHIELD is a shared system icon.
-					if (!hIcon && ::GetPropW(hWnd, L"MPC_UAC_SHIELD")) {
-						hIcon = ::LoadIconW(nullptr, IDI_SHIELD);
+					// is NOT returned by BM_GETIMAGE, so owner-drawing dropped it. When the button is
+					// flagged (MarkUacShield), draw the system shield ourselves.
+					if (::GetPropW(hWnd, L"MPC_UAC_SHIELD")) {
+						static HICON s_hShield = nullptr; // cached once for the process lifetime
+						if (!s_hShield) {
+							SHSTOCKICONINFO sii = { sizeof(sii) };
+							if (SUCCEEDED(::SHGetStockIconInfo(SIID_SHIELD, SHGSI_ICON | SHGSI_SMALLICON, &sii))) {
+								s_hShield = sii.hIcon;
+							} else {
+								s_hShield = ::LoadIconW(nullptr, IDI_SHIELD);
+							}
+						}
+						if (s_hShield) {
+							hIcon = s_hShield;
+						}
 					}
 
 					HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(hWnd, WM_GETFONT, 0, 0));
@@ -965,6 +977,28 @@ namespace DarkTheme
 		g_bAppAllowed = true;
 	}
 
+	void DisallowDarkModeForApp() {
+		LoadApi();
+		if (!g_bApiOk) {
+			return;
+		}
+		// Undo the process-wide force-dark set by AllowDarkModeForApp, so turning the dark theme off
+		// at runtime reverts the main window's menus: they use the immersive dark menu theme, which
+		// would otherwise stay dark until the app restarts. FORCELIGHT keeps the app light here.
+		if (pSetPreferredAppMode) {
+			pSetPreferredAppMode(APPMODE_FORCELIGHT);
+		} else if (pAllowDarkModeForApp) {
+			pAllowDarkModeForApp(false);
+		}
+		if (pRefreshImmersiveColorPolicyState) {
+			pRefreshImmersiveColorPolicyState();
+		}
+		if (pFlushMenuThemes) {
+			pFlushMenuThemes();
+		}
+		g_bAppAllowed = false;
+	}
+
 	void EnableForWindow(HWND hWnd) {
 		if (!IsActive() || !hWnd) {
 			return;
@@ -1080,10 +1114,14 @@ namespace DarkTheme
 		LoadApi();
 		if (IsActive()) {
 			// Turned on at runtime: (re)apply to the sheet and every already-created page.
+			AllowDarkModeForApp();             // re-arm the process-wide force-dark (menus etc.)
 			EnableForWindow(hRoot);            // dark title bar (checks IsActive internally)
 			ApplyThemeToChildren(hRoot);       // recurses into all descendant controls
 		} else {
-			// Turned off at runtime: strip every subclass/override so everything goes light.
+			// Turned off at runtime: strip every subclass/override so everything goes light, and
+			// undo the process-wide force-dark so the main window's menus revert to light (they use
+			// the immersive dark menu theme, which otherwise stays dark until the app restarts).
+			DisallowDarkModeForApp();
 			if (g_bApiOk && pAllowDarkModeForWindow) {
 				pAllowDarkModeForWindow(hRoot, false);
 			}
