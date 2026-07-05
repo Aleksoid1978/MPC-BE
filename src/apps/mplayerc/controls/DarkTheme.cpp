@@ -295,9 +295,16 @@ namespace DarkTheme
 						rt.top = rc.top + (oy > 0 ? oy : 0);
 						pDC->DrawTextW(text, rt, DT_CENTER | DT_WORDBREAK);
 					} else {
-						const CSize ext = text.IsEmpty() ? CSize(0, 0) : pDC->GetTextExtent(text);
+						// Measure the *rendered* width with DT_CALCRECT so the "&" accelerator prefix
+						// isn't counted (GetTextExtent includes it, which shifted the caption left).
+						int textW = 0;
+						if (!text.IsEmpty()) {
+							CRect calc(0, 0, 0, 0);
+							pDC->DrawTextW(text, calc, DT_SINGLELINE | DT_CALCRECT);
+							textW = calc.Width();
+						}
 						const int gap  = (hIcon && !text.IsEmpty()) ? 4 : 0;
-						int x = rc.left + (rc.Width() - (icon + gap + ext.cx)) / 2;
+						int x = rc.left + (rc.Width() - (icon + gap + textW)) / 2;
 						const int cy = rc.top + rc.Height() / 2;
 						if (hIcon) {
 							::DrawIconEx(hdc, x, cy - icon / 2, hIcon, icon, icon, 0, nullptr, DI_NORMAL);
