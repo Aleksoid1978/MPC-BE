@@ -259,6 +259,12 @@ namespace DarkTheme
 						text.ReleaseBuffer();
 					}
 					HICON hIcon = reinterpret_cast<HICON>(::SendMessageW(hWnd, BM_GETIMAGE, IMAGE_ICON, 0));
+					// The UAC elevation shield (BCM_SETSHIELD) is drawn internally by the button and
+					// is NOT returned by BM_GETIMAGE, so owner-drawing dropped it. Draw it ourselves
+					// when the button is flagged (MarkUacShield). IDI_SHIELD is a shared system icon.
+					if (!hIcon && ::GetPropW(hWnd, L"MPC_UAC_SHIELD")) {
+						hIcon = ::LoadIconW(nullptr, IDI_SHIELD);
+					}
 
 					HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(hWnd, WM_GETFONT, 0, 0));
 					CFont* pOldFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
@@ -303,6 +309,7 @@ namespace DarkTheme
 					return 0;
 				}
 				case WM_NCDESTROY:
+					::RemovePropW(hWnd, L"MPC_UAC_SHIELD");
 					RemoveWindowSubclass(hWnd, ButtonSubclassProc, kButtonSubclassId);
 					break;
 			}
@@ -1041,6 +1048,16 @@ namespace DarkTheme
 		}
 		SetWindowSubclass(hTrackbar, TrackbarSubclassProc, kTrackbarSubclassId, bThemeControl ? 1 : 0);
 		::InvalidateRect(hTrackbar, nullptr, TRUE);
+	}
+
+	void MarkUacShield(HWND hButton) {
+		if (!hButton) {
+			return;
+		}
+		// Flag a push button so its owner-draw (ButtonSubclassProc) paints the UAC elevation shield.
+		// Needed because BCM_SETSHIELD's glyph is drawn internally and lost when we owner-draw.
+		::SetPropW(hButton, L"MPC_UAC_SHIELD", reinterpret_cast<HANDLE>(1));
+		::InvalidateRect(hButton, nullptr, FALSE);
 	}
 
 	void ThemeDialog(HWND hDlg) {

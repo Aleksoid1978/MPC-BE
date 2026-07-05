@@ -65,6 +65,10 @@ namespace DarkTheme
 	void MakeTrackbarOwnerDrawn(HWND hTrackbar, bool bThemeControl = false);
 	void CommitThemeColors();
 
+	// Flags a push button so its owner-draw paints the UAC elevation shield. Call it alongside
+	// BCM_SETSHIELD: the shield glyph is drawn internally by the button and lost when we owner-draw.
+	void MarkUacShield(HWND hButton);
+
 	// Applies the dark theme to a whole auxiliary top-level dialog opened from the Options
 	// pages (dark title bar, dark background + control colours, themed child controls).
 	// Call once from the dialog's OnInitDialog.

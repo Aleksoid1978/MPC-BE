@@ -939,6 +939,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON5)->SendMessageW(BCM_SETSHIELD, 0, 1);
+		DarkTheme::MarkUacShield(GetDlgItem(IDC_BUTTON5)->GetSafeHwnd());
 
 		m_bInsufficientPrivileges = true;
 	} else {
