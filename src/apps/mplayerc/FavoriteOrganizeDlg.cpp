@@ -214,20 +214,29 @@ void CFavoriteOrganizeDlg::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStr
 
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 
+	// This list is owner-drawn, so ThemeDialog can't recolour it — paint the rows in the dark palette
+	// ourselves (the fixed light COLOR_WINDOW / black text left the items white on the dark theme).
+	const bool dark = DarkTheme::IsActive();
+
 	CBrush b;
 	if (!!m_list.GetItemState(nItem, LVIS_SELECTED)) {
-		b.CreateSolidBrush(0xf1dacc);
+		b.CreateSolidBrush(dark ? RGB(38, 79, 120) : 0xf1dacc);
 		pDC->FillRect(rcItem, &b);
 		b.DeleteObject();
-		b.CreateSolidBrush(0xc56a31);
+		b.CreateSolidBrush(dark ? RGB(76, 194, 255) : 0xc56a31);
 		pDC->FrameRect(rcItem, &b);
 	} else {
-		b.CreateSysColorBrush(COLOR_WINDOW);
+		if (dark) {
+			b.CreateSolidBrush(DarkTheme::FaceColor());
+		} else {
+			b.CreateSysColorBrush(COLOR_WINDOW);
+		}
 		pDC->FillRect(rcItem, &b);
 	}
 
 	CStringW str;
-	pDC->SetTextColor(0);
+	pDC->SetBkMode(TRANSPARENT); // don't paint a light box behind the text over the dark row
+	pDC->SetTextColor(dark ? DarkTheme::TextColor() : 0);
 
 	str = m_list.GetItemText(nItem, 0);
 	pDC->TextOut(rcItem.left + 3, (rcItem.top + rcItem.bottom - pDC->GetTextExtent(str).cy) / 2, str);

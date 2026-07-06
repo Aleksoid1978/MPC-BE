@@ -385,14 +385,21 @@ namespace DarkTheme
 				::LineTo(hdc, rcClient.right, r.bottom - 1);
 			}
 
-			// vertical line at each column's right edge, through the item rows only
+			// vertical line at each column's right edge, through the item rows only. Header_GetItemRect
+			// is relative to the header window, which is scrolled left when the list is scrolled
+			// horizontally; map the header's client origin into the list-view's client so the lines
+			// follow the scroll (otherwise they stay at the unscrolled column positions).
 			if (hHeader) {
+				POINT hdrOrg = { 0, 0 };
+				::ClientToScreen(hHeader, &hdrOrg);
+				::ScreenToClient(hWnd, &hdrOrg); // hdrOrg.x = -horizontal scroll offset
 				const int cols = static_cast<int>(::SendMessageW(hHeader, HDM_GETITEMCOUNT, 0, 0));
 				for (int c = 0; c < cols; ++c) {
 					RECT hr{};
 					if (Header_GetItemRect(hHeader, c, &hr)) {
-						::MoveToEx(hdc, hr.right - 1, headerH, nullptr);
-						::LineTo(hdc, hr.right - 1, gridBottom);
+						const int x = hdrOrg.x + hr.right - 1;
+						::MoveToEx(hdc, x, headerH, nullptr);
+						::LineTo(hdc, x, gridBottom);
 					}
 				}
 			}
@@ -402,6 +409,41 @@ namespace DarkTheme
 			::ReleaseDC(hWnd, hdc);
 		}
 
+		// A report list-view draws faint column separators (and, past the last item, a light
+		// "empty" strip) that the light system theme provides; on the dark background they show as
+		// a bright vertical line (e.g. the empty Organize Favorites list) or a light band. Overpaint
+		// the area from the last item's bottom down to the client bottom with the dark face colour.
+		// For an empty list that is the whole body, which covers the stray column separator.
+		void FillListEmptyArea(HWND hWnd) {
+			if ((GetWindowLongW(hWnd, GWL_STYLE) & LVS_TYPEMASK) != LVS_REPORT) {
+				return;
+			}
+			CRect rcClient;
+			::GetClientRect(hWnd, &rcClient);
+
+			int top = rcClient.top;
+			const int count = static_cast<int>(::SendMessageW(hWnd, LVM_GETITEMCOUNT, 0, 0));
+			if (count > 0) {
+				RECT rcLast{}; rcLast.left = LVIR_BOUNDS;
+				::SendMessageW(hWnd, LVM_GETITEMRECT, count - 1, reinterpret_cast<LPARAM>(&rcLast));
+				top = rcLast.bottom;
+			} else if (HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hWnd, LVM_GETHEADER, 0, 0))) {
+				if (::IsWindowVisible(hHeader)) {
+					RECT rh; ::GetClientRect(hHeader, &rh);
+					top = rcClient.top + rh.bottom;
+				}
+			}
+			if (top < rcClient.bottom) {
+				if (HDC hdc = ::GetDC(hWnd)) {
+					RECT rcEmpty = { rcClient.left, top, rcClient.right, rcClient.bottom };
+					HBRUSH br = ::CreateSolidBrush(FaceColor());
+					::FillRect(hdc, &rcEmpty, br);
+					::DeleteObject(br);
+					::ReleaseDC(hWnd, hdc);
+				}
+			}
+		}
+
 		// A list-view's column header (SysHeader32) is not darkened by SetWindowTheme
 		// and it sends its NM_CUSTOMDRAW to the list-view (its parent), not to the
 		// dialog, so we subclass the list-view and paint the header ourselves. When the
@@ -409,9 +451,20 @@ namespace DarkTheme
 		const UINT_PTR kListViewSubclassId = 2;
 
 		LRESULT CALLBACK ListViewSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR dwRefData) {
-			if (msg == WM_PAINT && dwRefData) {
+			if (msg == WM_PAINT) {
 				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
-				DrawListGridlines(hWnd);
+				FillListEmptyArea(hWnd);      // dark over the light empty strip / stray column separator
+				if (dwRefData) {
+					DrawListGridlines(hWnd);  // dark grid (only for lists that originally had grid lines)
+				}
+				return res;
+			}
+			if (msg == WM_HSCROLL && dwRefData) {
+				// A horizontal scroll bit-blts the client, smearing our overpainted vertical grid lines
+				// (they end up doubled / misaligned, e.g. the Keys list). Force a full repaint so they
+				// are redrawn at the new offset. Only needed for grid lists (double-buffered → no flicker).
+				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
+				::InvalidateRect(hWnd, nullptr, FALSE);
 				return res;
 			}
 			if (msg == WM_NOTIFY) {

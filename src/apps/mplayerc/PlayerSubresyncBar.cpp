@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerSubresyncBar.h"
+#include "controls/DarkTheme.h"
 
 
 // CPlayerSubresyncBar
@@ -51,6 +52,11 @@ BOOL CPlayerSubresyncBar::Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* 
 		CRect(0, 0, 100, 100), this, IDC_SUBRESYNCLIST);
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+
+	// This bar isn't run through ThemeDialog, so the list kept a white empty background, a light
+	// WS_EX_CLIENTEDGE border and a light column header. Theme the control directly (dark background /
+	// border / header; per-item colours are still handled by our NM_CUSTOMDRAW). No-op when off.
+	DarkTheme::ApplyThemeToControl(m_list.GetSafeHwnd());
 
 	return TRUE;
 }
@@ -1180,37 +1186,50 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		COLORREF clrText;
 		COLORREF clrTextBk;
 
+		// This subtitle grid is custom-drawn with fixed light colours; remap them to the dark palette
+		// when the dark theme is on, keeping the same semantics (editable vs read-only columns,
+		// alternating groups, the currently-playing line, the edited start/end markers).
+		const bool dark = DarkTheme::IsActive();
+
 		if ((pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_TEXT || pLVCD->iSubItem == COL_STYLE
 				|| pLVCD->iSubItem == COL_LAYER || pLVCD->iSubItem == COL_ACTOR || pLVCD->iSubItem == COL_EFFECT)
 				&& m_mode == TEXTSUB) {
-			clrText = 0;
+			clrText = dark ? DarkTheme::TextColor() : (COLORREF)0;
 		} else if ((pLVCD->iSubItem == COL_START)
 				   && m_mode == VOBSUB) {
-			clrText = 0;
+			clrText = dark ? DarkTheme::TextColor() : (COLORREF)0;
 		} else {
-			clrText = 0x606060;
+			clrText = dark ? RGB(120, 125, 130) : (COLORREF)0x606060;
 		}
 
-		clrTextBk = 0xffffff;
-		//if (s_totalGroups > 0)
-		clrTextBk -= ((s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
+		if (dark) {
+			// two subtly different dark shades for the alternating groups
+			clrTextBk = (s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? DarkTheme::FaceColor() : DarkTheme::CtrlBackColor();
+		} else {
+			clrTextBk = 0xffffff;
+			//if (s_totalGroups > 0)
+			clrTextBk -= ((s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
+		}
 
 		if (m_sts[pLVCD->nmcd.dwItemSpec].start <= m_rt / 10000 && m_rt / 10000 < m_sts[pLVCD->nmcd.dwItemSpec].end) {
-			clrText |= 0xFF;
+			clrText |= 0xFF; // tint the currently-playing line
 		}
 
 		int nCheck = (int)m_list.GetItemData((int)pLVCD->nmcd.dwItemSpec);
 
+		const COLORREF clrEditStrong = dark ? RGB(50, 70, 100) : (COLORREF)0xffddbb; // edited start/end marker
+		const COLORREF clrEditWeak   = dark ? RGB(40, 55, 78)  : (COLORREF)0xffeedd; // preview marker
+
 		if ((nCheck & 1) && (pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_PREVSTART)) {
-			clrTextBk = 0xffddbb;
+			clrTextBk = clrEditStrong;
 		} else if ((nCheck & 4) && (/*pLVCD->iSubItem == COL_START ||*/ pLVCD->iSubItem == COL_PREVSTART)) {
-			clrTextBk = 0xffeedd;
+			clrTextBk = clrEditWeak;
 		}
 
 		if ((nCheck & 2) && (pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_PREVEND)) {
-			clrTextBk = 0xffddbb;
+			clrTextBk = clrEditStrong;
 		} else if ((nCheck & 8) && (/*pLVCD->iSubItem == COL_END ||*/ pLVCD->iSubItem == COL_PREVEND)) {
-			clrTextBk = 0xffeedd;
+			clrTextBk = clrEditWeak;
 		}
 
 		pLVCD->clrText = clrText;
