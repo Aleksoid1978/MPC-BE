@@ -680,13 +680,57 @@ namespace DarkTheme
 					RECT rcTh{};
 					::SendMessageW(hWnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&rcTh));
 					CRect th(rcTh);
+					// Thumb states: dragged (pressed) > hovered > normal, so the slider gives the same
+					// visual feedback as a native one. Disabled overrides all.
 					const bool disabled = (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) != 0;
-					pDC->FillSolidRect(th, disabled ? ThemeRGB(90, 95, 100) : RGB(76, 194, 255)); // celeste thumb
+					const bool pressed  = ::GetPropW(hWnd, L"MPC_TB_PRESSED") != nullptr;
+					const bool hover    = ::GetPropW(hWnd, L"MPC_TB_HOVER")   != nullptr;
+					COLORREF thumbClr;
+					if (disabled)     { thumbClr = ThemeRGB(90, 95, 100); }
+					else if (pressed) { thumbClr = RGB(150, 224, 255); } // brightest while dragging
+					else if (hover)   { thumbClr = RGB(115, 210, 255); } // lighter on hover
+					else              { thumbClr = RGB(76, 194, 255); }  // celeste
+					pDC->FillSolidRect(th, thumbClr);
 
 					::EndPaint(hWnd, &ps);
 					return 0;
 				}
+				case WM_MOUSEMOVE: {
+					// Hover only when the cursor is over the thumb itself, not the whole track.
+					RECT rcTh{};
+					::SendMessageW(hWnd, TBM_GETTHUMBRECT, 0, reinterpret_cast<LPARAM>(&rcTh));
+					const POINT pt = { static_cast<short>(LOWORD(lParam)), static_cast<short>(HIWORD(lParam)) };
+					const bool over = ::PtInRect(&rcTh, pt) != FALSE;
+					if (over != (::GetPropW(hWnd, L"MPC_TB_HOVER") != nullptr)) {
+						if (over) { ::SetPropW(hWnd, L"MPC_TB_HOVER", reinterpret_cast<HANDLE>(1)); }
+						else      { ::RemovePropW(hWnd, L"MPC_TB_HOVER"); }
+						::InvalidateRect(hWnd, nullptr, FALSE);
+					}
+					if (over) {
+						TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, hWnd, 0 };
+						::TrackMouseEvent(&tme); // so we get WM_MOUSELEAVE to clear the hover
+					}
+					break; // pass through so the trackbar still handles the move
+				}
+				case WM_MOUSELEAVE:
+					if (::GetPropW(hWnd, L"MPC_TB_HOVER")) {
+						::RemovePropW(hWnd, L"MPC_TB_HOVER");
+						::InvalidateRect(hWnd, nullptr, FALSE);
+					}
+					break;
+				case WM_LBUTTONDOWN:
+					::SetPropW(hWnd, L"MPC_TB_PRESSED", reinterpret_cast<HANDLE>(1));
+					::InvalidateRect(hWnd, nullptr, FALSE);
+					break; // pass through so the trackbar drags
+				case WM_LBUTTONUP:
+					if (::GetPropW(hWnd, L"MPC_TB_PRESSED")) {
+						::RemovePropW(hWnd, L"MPC_TB_PRESSED");
+						::InvalidateRect(hWnd, nullptr, FALSE);
+					}
+					break;
 				case WM_NCDESTROY:
+					::RemovePropW(hWnd, L"MPC_TB_HOVER");
+					::RemovePropW(hWnd, L"MPC_TB_PRESSED");
 					RemoveWindowSubclass(hWnd, TrackbarSubclassProc, kTrackbarSubclassId);
 					break;
 			}
@@ -966,11 +1010,22 @@ namespace DarkTheme
 					// which looks bad on dark). Enabled ones keep the default painting.
 					SetWindowSubclass(hCtrl, StaticSubclassProc, kStaticSubclassId, 0);
 				}
+			} else if (_wcsicmp(cls, TRACKBAR_CLASSW) == 0) {
+				// Owner-draw every slider (dark groove + celeste thumb with hover / pressed states).
+				// The native DarkMode trackbar thumb renders ugly black-on-hover / white-when-pressed
+				// states otherwise. Skip trackbars already owner-drawn explicitly: the theme
+				// R/G/B/Brightness sliders carry dwData = 1 for their frozen-colour snapshot, and
+				// re-subclassing here (dwData = 0) would clobber that.
+				DWORD_PTR existing = 0;
+				if (!GetWindowSubclass(hCtrl, TrackbarSubclassProc, kTrackbarSubclassId, &existing)) {
+					SetWindowSubclass(hCtrl, TrackbarSubclassProc, kTrackbarSubclassId, 0);
+					InvalidateRect(hCtrl, nullptr, TRUE);
+				}
 			} else {
 				// Note: SysTabControl32 is handled by CDarkTabCtrl (a CTabCtrl-derived
 				// owner-drawn control), not here — installing a comctl subclass would sit
 				// in front of MFC's WndProc and steal WM_PAINT from that class.
-				// up-down, scrollbar, trackbar, ...
+				// up-down, scrollbar, ...
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 			}
 		}
