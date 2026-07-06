@@ -372,9 +372,9 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 8		"Hiçbir şey yüklenmemişse son dosyayı aç"
 10		"Çift Tıklama"
 12		"Pencereyi video alanı vasıtasıyla taşı"
-13		"Enable long press speed-up"
-14		"Long press speed"
-16		"Long press delay"
+13		"Uzun basıldığında oynatmayı hızlandır"
+14		"Oynatma hızı"
+16		"Hızlanmadan önceki gecikme"
 18		"Sağ Tıklama"
 21		"Varsayılan"
 END
