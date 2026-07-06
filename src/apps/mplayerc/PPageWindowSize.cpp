@@ -75,7 +75,7 @@ BOOL CPPageWindowSize::OnInitDialog()
 
 	CStringW str;
 	for (const auto scale : g_AutoScaleFactors) {
-		str.Format(L"%d%", scale);
+		str.Format(L"%d%%", scale);
 		AddStringData(m_cmbScaleLevel, str, scale);
 	}
 	SelectByItemData(m_cmbScaleLevel, s.nAutoScaleFactor);
