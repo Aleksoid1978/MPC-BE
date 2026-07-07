@@ -272,16 +272,38 @@ void CPlayerSubresyncBar::ResetSubtitle()
 				m_list.SetItemData(i, (DWORD_PTR)TSEP);
 			}
 			prevstart = m_subtimes[i].orgstart;
-
-			// Since all items in COL_START and COL_PREVSTART have the same text size,
-			// we can compute it for the first element only so that it's faster.
-			if (i == 0) {
-				m_list.SetColumnWidth(COL_START, LVSCW_AUTOSIZE);
-				m_list.SetColumnWidth(COL_PREVSTART, LVSCW_AUTOSIZE);
-			}
 		}
 
 		UpdateStrings();
+
+		// Size the narrow columns (End = 4 px, Charset = 20 px by default) to fit their header caption
+		// and first-row value. Measure only the header text + the first data row, NOT LVSCW_AUTOSIZE
+		// per column: that scans every row of all 11 columns (slow on big subs) and forces the list to
+		// repaint mid-population, which left ghost separator lines piling up until the load finished.
+		// Every row in a time/number column is the same width, so the first row is representative;
+		// columns only ever grow, so the wide Text column keeps its default width.
+		if (CHeaderCtrl* pHeader = m_list.GetHeaderCtrl()) {
+			CClientDC dc(&m_list);
+			CFont* pOldFont = dc.SelectObject(m_list.GetFont());
+			for (int col = 0, nCols = pHeader->GetItemCount(); col < nCols; col++) {
+				wchar_t buf[256] = {};
+				HDITEMW hdi = {};
+				hdi.mask = HDI_TEXT;
+				hdi.pszText = buf;
+				hdi.cchTextMax = _countof(buf) - 1;
+				int wNeed = pHeader->GetItem(col, &hdi) ? dc.GetTextExtent(buf).cx + 12 : 0; // header + padding
+				if (nCount > 0) {
+					const int wCell = dc.GetTextExtent(m_list.GetItemText(0, col)).cx + 12; // first row + padding
+					if (wCell > wNeed) {
+						wNeed = wCell;
+					}
+				}
+				if (wNeed > m_list.GetColumnWidth(col)) {
+					m_list.SetColumnWidth(col, wNeed); // only grow, so Text keeps its default width
+				}
+			}
+			dc.SelectObject(pOldFont);
+		}
 	}
 
 	m_list.SetRedraw(TRUE);
