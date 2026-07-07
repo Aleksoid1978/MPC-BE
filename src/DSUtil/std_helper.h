@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include <array>
 #include <regex>
 
 // this operator is needed to use GUID or CLSID as key in std::map
@@ -30,11 +31,18 @@ inline bool operator < (const GUID & a, const GUID & b)
 
 // helper function to create array without specifying size
 // example: auto test_array = make_array<float>(0, 1, 3.14, 2,718, );
-template< class T, class... Args >
-auto make_array(Args&&... args) -> auto
+template< class T = void, class... Args >
+constexpr auto make_array(Args&&... args)
 {
-	using Array = std::array<T, sizeof...(args)>;
-	return Array{ static_cast<T>(args)... };
+	using Type = std::conditional_t<
+		std::is_same_v<T, void>,
+		std::common_type_t<std::decay_t<Args>...>,
+		T
+	>;
+
+	return std::array<Type, sizeof...(args)>{
+		static_cast<Type>(std::forward<Args>(args))...
+	};
 }
 
 // returns an iterator on the found element, or last if nothing is found

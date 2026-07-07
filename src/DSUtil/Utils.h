@@ -31,8 +31,25 @@ inline T discard(T const& val, T const& def, T const& lo, T const& hi)
 }
 
 // If the specified value is out of set, set to default values.
+template <typename T, typename Container>
+inline T discard(T const& val, T const& def, const Container& vars)
+{
+	static_assert(std::is_same_v<typename Container::value_type, T>,
+				  "Container elements must be of type T");
+
+	if (val != def) {
+		for (const auto& v : vars) {
+			if (val == v) {
+				return val;
+			}
+		}
+	}
+	return def;
+}
+
+// for initializer_list
 template <typename T>
-inline T discard(T const& val, T const& def, const std::vector<T>& vars)
+inline T discard(T const& val, T const& def, std::initializer_list<T> vars)
 {
 	if (val != def) {
 		for (const auto& v : vars) {

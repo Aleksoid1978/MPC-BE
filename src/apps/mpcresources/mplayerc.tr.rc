@@ -813,10 +813,10 @@ BEGIN
     LTEXT           "Çift Tıklama",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Pencereyi video alanı vasıtasıyla taşı",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
-    CONTROL         "Enable long press speed-up",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
-    LTEXT           "Long press speed",IDC_STATIC,20,97,130,8
+    CONTROL         "Uzun basıldığında oynatmayı hızlandır",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
+    LTEXT           "Oynatma hızı",IDC_STATIC,20,97,130,8
     COMBOBOX        IDC_COMBO4,153,95,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Long press delay",IDC_STATIC,20,113,130,8
+    LTEXT           "Hızlanmadan önceki gecikme",IDC_STATIC,20,113,130,8
     COMBOBOX        IDC_COMBO5,153,111,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Sağ Tıklama",IDC_STATIC,10,134,60,8
     COMBOBOX        IDC_COMBO3,70,133,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP

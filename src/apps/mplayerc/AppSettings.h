@@ -31,6 +31,8 @@
 #include <afxsock.h>
 #include "FileItem.h"
 
+#include "DSUtil/std_helper.h"
+
 constexpr auto EXTENDED_PATH_PREFIX = LR"(\\?\)";
 
 // flags for CAppSettings::nCS
@@ -441,10 +443,10 @@ struct fullScreenRes {
 	CString monitorId;
 };
 
-inline const std::vector<int> g_SpeedSteps = { 1, 5, 10, 20, 25, 50, 100 };
-inline const std::vector<int> g_AutoScaleFactors = { 50, 100, 200 };
-inline const std::vector<int> g_LongPressDelays = { 300, 400, 500 };
-inline const std::vector<int> g_CommonVideoHeights = { 4320, 2880, 2160, 1080, 1440, 720, 480, 360, 0 };
+inline constexpr auto g_SpeedSteps         = make_array(1, 5, 10, 20, 25, 50, 100);
+inline constexpr auto g_AutoScaleFactors   = make_array(50, 100, 200);
+inline constexpr auto g_LongPressDelays    = make_array(300, 400, 500);
+inline constexpr auto g_CommonVideoHeights = make_array(4320, 2880, 2160, 1440, 1080, 720, 480, 360, 0);
 
 class CAppSettings
 {

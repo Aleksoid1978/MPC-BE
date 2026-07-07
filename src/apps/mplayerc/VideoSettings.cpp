@@ -90,16 +90,16 @@ void CRenderersSettings::Load()
 	CProfile& profile = AfxGetProfile();
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_VIDEORENDERER, iVideoRenderer);
-	iVideoRenderer = discard(iVideoRenderer, (int)VIDRNDT_EVR_CP,
-		{VIDRNDT_EVR,
-		VIDRNDT_EVR_CP,
-		VIDRNDT_SYNC,
-		VIDRNDT_MPCVR,
-		VIDRNDT_DXR,
-		VIDRNDT_MADVR,
-		VIDRNDT_NULL_ANY,
-		VIDRNDT_NULL_UNCOMP,
-		});
+	iVideoRenderer = discard<int>(iVideoRenderer, VIDRNDT_EVR_CP,
+								  { VIDRNDT_EVR,
+								  VIDRNDT_EVR_CP,
+								  VIDRNDT_SYNC,
+								  VIDRNDT_MPCVR,
+								  VIDRNDT_DXR,
+								  VIDRNDT_MADVR,
+								  VIDRNDT_NULL_ANY,
+								  VIDRNDT_NULL_UNCOMP,
+								  });
 	profile.ReadBool(IDS_R_VIDEO, IDS_RS_EXCLUSIVEFULLSCREEN, bExclusiveFullscreen);
 
 	profile.ReadInt(IDS_R_VIDEO, IDS_RS_COLOR_BRIGHTNESS, iBrightness, -100, 100);
