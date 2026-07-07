@@ -23,6 +23,10 @@
 #include "DarkTheme.h"
 #include "../MainFrm.h" // ThemeRGB()
 
+// windowsx.h defines a function-like SubclassWindow(hwnd, lpfn) macro that collides with
+// CWnd::SubclassWindow(HWND); undef it so the MFC method call below parses correctly.
+#undef SubclassWindow
+
 IMPLEMENT_DYNAMIC(CDarkTabCtrl, CTabCtrl)
 
 BEGIN_MESSAGE_MAP(CDarkTabCtrl, CTabCtrl)
@@ -146,4 +150,37 @@ void CDarkTabCtrl::OnPaint()
 	memDC.SelectObject(pOldFont);
 	dc.BitBlt(0, 0, rClient.Width(), rClient.Height(), &memDC, 0, 0, SRCCOPY);
 	memDC.SelectObject(pOldBmp);
+}
+
+// CDarkPropertySheet
+
+IMPLEMENT_DYNAMIC(CDarkPropertySheet, CPropertySheet)
+
+BEGIN_MESSAGE_MAP(CDarkPropertySheet, CPropertySheet)
+END_MESSAGE_MAP()
+
+CDarkPropertySheet::CDarkPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
+	: CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+{
+}
+
+CDarkPropertySheet::~CDarkPropertySheet()
+{
+}
+
+BOOL CDarkPropertySheet::OnInitDialog()
+{
+	BOOL bResult = CPropertySheet::OnInitDialog();
+
+	// Attach the owner-drawn dark tab (the stock tab keeps a light body/frame; CDarkTabCtrl falls
+	// back to native when the theme is off), then dark-theme the sheet frame: title bar, background
+	// and the OK/Cancel/Apply buttons. Each page dark-themes its own contents in its OnInitDialog.
+	if (DarkTheme::IsActive()) {
+		if (CTabCtrl* pTab = GetTabControl()) {
+			m_darkTab.SubclassWindow(pTab->GetSafeHwnd());
+		}
+	}
+	DarkTheme::ThemeDialog(GetSafeHwnd());
+
+	return bResult;
 }

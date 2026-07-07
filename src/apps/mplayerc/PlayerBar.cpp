@@ -125,10 +125,19 @@ void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 	// When floated, the bar lives in an MFC mini-frame that is an independent top-level window whose
 	// caption Windows paints light. Apply the dark title bar (immersive dark mode + themed caption
 	// colour, like the main window and the Options dialogs) so the floating window matches the theme.
+	// Do it once per mini-frame, not on every position change: dragging a floating bar fires this
+	// continuously, and re-running EnableForWindow each time floods the DWM (RefreshImmersiveColor
+	// PolicyState + DwmSetWindowAttribute) and leaves the window smearing across the screen.
 	if (IsFloating() && AfxGetAppSettings().bDarkTitle) {
 		if (CFrameWnd* pMiniFrame = GetParentFrame()) {
-			DarkTheme::EnableForWindow(pMiniFrame->GetSafeHwnd());
+			HWND hMiniFrame = pMiniFrame->GetSafeHwnd();
+			if (hMiniFrame != m_hThemedMiniFrame) {
+				DarkTheme::EnableForWindow(hMiniFrame);
+				m_hThemedMiniFrame = hMiniFrame;
+			}
 		}
+	} else {
+		m_hThemedMiniFrame = nullptr; // redocked / hidden — re-theme next time it floats
 	}
 }
 

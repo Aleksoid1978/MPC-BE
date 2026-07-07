@@ -33,6 +33,12 @@ protected :
 	UINT m_defDockBarID;
 	CString m_strSettingName;
 
+	// The floating mini-frame we last applied the dark title to. Dragging a floating bar fires
+	// OnWindowPosChanged continuously; re-running EnableForWindow (which calls the heavy
+	// RefreshImmersiveColorPolicyState + DwmSetWindowAttribute) on every move floods the DWM and
+	// smears the window. Track the frame so we theme it once per float, not once per move.
+	HWND m_hThemedMiniFrame = nullptr;
+
 public:
 	CPlayerBar();
 	virtual ~CPlayerBar();

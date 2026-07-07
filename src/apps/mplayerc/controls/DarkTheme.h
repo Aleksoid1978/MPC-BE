@@ -56,6 +56,14 @@ namespace DarkTheme
 	// through ApplyThemeToChildren.
 	void ApplyThemeToControl(HWND hCtrl);
 
+	// Applies OR strips the dark theme on a single control to match the current state, and repaints
+	// it. Unlike ApplyThemeToControl (which only ever applies), this reverts the control to its light
+	// look when the theme is off — so a control themed once (e.g. the Subresync bar's list, themed in
+	// its Create) can follow the "Use dark theme" toggle instead of staying stuck dark. Its dark
+	// paint subclasses draw unconditionally, so they MUST be removed (not just left installed) when
+	// the theme is turned off, which is what the strip path does.
+	void RefreshThemeForControl(HWND hCtrl);
+
 	// Fully owner-draws a trackbar (dark background, dark groove, celeste thumb) via a
 	// subclass. Use for sliders whose NM_CUSTOMDRAW channel colour is not reliably applied
 	// (e.g. the subtitle Default Style alpha sliders after the Reset button).

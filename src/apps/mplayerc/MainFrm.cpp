@@ -72,6 +72,7 @@
 #include "filters/ffmpeg_link_fix.h"
 #include "ComPropertySheet.h"
 #include "controls/DarkTheme.h"
+#include "controls/DarkTabCtrl.h"
 #include <comdef.h>
 #include <dwmapi.h>
 
@@ -9056,7 +9057,7 @@ void CMainFrame::OnMenuSubtitlesStyle()
 		CString caption = ResStr(IDS_SUBTITLES_STYLES);
 		caption.Replace(L"&", nullptr);
 
-		CPropertySheet dlg(caption, GetModalParent());
+		CDarkPropertySheet dlg(caption, GetModalParent());
 		for (size_t i = 0; i < pages.size(); i++) {
 			dlg.AddPage(pages[i].get());
 		}

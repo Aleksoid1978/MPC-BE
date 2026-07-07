@@ -21,6 +21,7 @@
 #pragma once
 
 #include <afxcmn.h>
+#include <afxdlgs.h> // CPropertySheet
 
 // A CTabCtrl that fully owner-draws itself in the dark palette. The native tab
 // control ignores SetWindowTheme("DarkMode_*") and always paints its body/pane
@@ -42,4 +43,26 @@ protected:
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnPaint();
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+};
+
+// A CPropertySheet that dark-themes its own frame: the owner-drawn dark tab strip (the stock
+// SysTabControl32 ignores SetWindowTheme and keeps a light body/frame) plus the sheet's dark title
+// bar, background and OK/Cancel/Apply buttons via DarkTheme::ThemeDialog. The pages themselves are
+// expected to dark-theme their own contents (CPPageBase does this). Falls back to a plain light
+// property sheet when the dark theme is off. Use in place of CPropertySheet for stand-alone sheets
+// (e.g. the subtitle "Styles..." dialog) that aren't the Options sheet.
+class CDarkPropertySheet : public CPropertySheet
+{
+	DECLARE_DYNAMIC(CDarkPropertySheet)
+
+public:
+	CDarkPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);
+	virtual ~CDarkPropertySheet();
+
+protected:
+	CDarkTabCtrl m_darkTab; // owner-drawn dark tab, attached in OnInitDialog when the dark theme is on
+
+	virtual BOOL OnInitDialog();
+
+	DECLARE_MESSAGE_MAP()
 };

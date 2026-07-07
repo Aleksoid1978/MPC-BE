@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "PlayerSubresyncBar.h"
 #include "controls/DarkTheme.h"
+#include "controls/DarkTabCtrl.h"
 
 
 // CPlayerSubresyncBar
@@ -55,10 +56,18 @@ BOOL CPlayerSubresyncBar::Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* 
 
 	// This bar isn't run through ThemeDialog, so the list kept a white empty background, a light
 	// WS_EX_CLIENTEDGE border and a light column header. Theme the control directly (dark background /
-	// border / header; per-item colours are still handled by our NM_CUSTOMDRAW). No-op when off.
-	DarkTheme::ApplyThemeToControl(m_list.GetSafeHwnd());
+	// border / header; per-item colours are still handled by our NM_CUSTOMDRAW). Use the reversible
+	// refresh so the list also follows a later "Use dark theme" toggle-off. No-op / strip when off.
+	RefreshListDarkTheme();
 
 	return TRUE;
+}
+
+void CPlayerSubresyncBar::RefreshListDarkTheme()
+{
+	if (::IsWindow(m_list.GetSafeHwnd())) {
+		DarkTheme::RefreshThemeForControl(m_list.GetSafeHwnd());
+	}
 }
 
 void CPlayerSubresyncBar::ReloadTranslatableResources()
@@ -1075,7 +1084,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							}
 						}
 
-						CPropertySheet dlg(L"Styles...", this, iSelPage);
+						CDarkPropertySheet dlg(L"Styles...", this, iSelPage);
 						for (const auto& page : pages) {
 							dlg.AddPage(page.get());
 						}
@@ -1254,9 +1263,18 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			CRect rcItem;
 			m_list.GetItemRect(nItem, &rcItem, LVIR_BOUNDS);
 
+			// The row separator and column grid lines were drawn with fixed light greys: 0xe0e0e0 shows
+			// as a bright near-white line on the dark rows ("not look good"), and the group-separator's
+			// 0x404040 is nearly invisible against the dark background ("badly represented"). Remap both
+			// to the dark palette when it's active — subtle grid lines, and a clearly lighter separator.
+			const bool dark = DarkTheme::IsActive();
+
 			{
 				bool fSeparator = nItem < m_list.GetItemCount() - 1 && (m_list.GetItemData(nItem + 1)&TSEP);
-				CPen p(PS_INSIDEFRAME, 1, fSeparator ? 0x404040 : 0xe0e0e0);
+				const COLORREF clrLine = dark
+					? (fSeparator ? ThemeRGB(95, 105, 115) : DarkTheme::GridlineColor())
+					: (fSeparator ? RGB(64, 64, 64) : RGB(224, 224, 224));
+				CPen p(PS_INSIDEFRAME, 1, clrLine);
 				CPen* old = pDC->SelectObject(&p);
 				pDC->MoveTo(CPoint(rcItem.left, rcItem.bottom - 1));
 				pDC->LineTo(CPoint(rcItem.right, rcItem.bottom - 1));
@@ -1264,7 +1282,8 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			}
 
 			{
-				CPen p(PS_INSIDEFRAME, 1, 0xe0e0e0);
+				const COLORREF clrGrid = dark ? DarkTheme::GridlineColor() : RGB(224, 224, 224);
+				CPen p(PS_INSIDEFRAME, 1, clrGrid);
 				CPen* old = pDC->SelectObject(&p);
 
 				CHeaderCtrl* pHeader = (CHeaderCtrl*)m_list.GetDlgItem(0);

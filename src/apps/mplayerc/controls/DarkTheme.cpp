@@ -451,6 +451,16 @@ namespace DarkTheme
 		const UINT_PTR kListViewSubclassId = 2;
 
 		LRESULT CALLBACK ListViewSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR dwRefData) {
+			if (msg == WM_CTLCOLOREDIT) {
+				// The in-place label-edit control a list-view creates for renaming an item (e.g. the
+				// Organize Favorites list, the Subresync grid) is a child of the list-view, so its
+				// WM_CTLCOLOREDIT is sent here, not to the dialog. Give it the dark edit colours so it
+				// isn't a bright white box hovering over the dark list.
+				CDC* pDC = CDC::FromHandle(reinterpret_cast<HDC>(wParam));
+				if (HBRUSH hbr = OnCtlColor(pDC, CTLCOLOR_EDIT)) {
+					return reinterpret_cast<LRESULT>(hbr);
+				}
+			}
 			if (msg == WM_PAINT) {
 				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
 				FillListEmptyArea(hWnd);      // dark over the light empty strip / stray column separator
@@ -470,6 +480,17 @@ namespace DarkTheme
 			if (msg == WM_NOTIFY) {
 				NMHDR* pNM = reinterpret_cast<NMHDR*>(lParam);
 				HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hWnd, LVM_GETHEADER, 0, 0));
+				if (pNM && pNM->hwndFrom == hHeader
+						&& (pNM->code == HDN_ITEMCHANGEDA || pNM->code == HDN_ITEMCHANGEDW
+							|| pNM->code == HDN_ENDTRACKA || pNM->code == HDN_ENDTRACKW)) {
+					// A column resize — dragging a header divider, or double-clicking the divider
+					// "gripper" to auto-size the column — bit-blts the rows to the right of that divider,
+					// which smears our hand-drawn grid lines / dark header-fill (they double up or stay at
+					// the old offsets). Let the list process the size change, then force a clean repaint.
+					const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
+					::InvalidateRect(hWnd, nullptr, FALSE);
+					return res;
+				}
 				if (pNM && pNM->code == NM_CUSTOMDRAW && pNM->hwndFrom == hHeader) {
 					LPNMCUSTOMDRAW p = reinterpret_cast<LPNMCUSTOMDRAW>(lParam);
 					switch (p->dwDrawStage) {
@@ -1200,6 +1221,24 @@ namespace DarkTheme
 			return;
 		}
 		ThemeControl(hCtrl);
+	}
+
+	void RefreshThemeForControl(HWND hCtrl) {
+		if (!hCtrl) {
+			return;
+		}
+		LoadApi();
+		if (IsActive()) {
+			if (g_bApiOk) {
+				ThemeControl(hCtrl);
+			}
+		} else {
+			// Undo everything ThemeControl installed (subclasses that paint dark unconditionally,
+			// the DarkMode_* visual style, the dark list/tree background) so the control goes back to
+			// its native light look instead of leaving a half-dark control after a runtime toggle-off.
+			StripThemeChildProc(hCtrl, 0);
+		}
+		::InvalidateRect(hCtrl, nullptr, TRUE);
 	}
 
 	void CommitThemeColors() {

@@ -240,6 +240,13 @@ BOOL CPPageInterface::OnApply()
 	// Capture, Navigation and Subresync bar frames follow the theme toggle too, then repaint them.
 	for (const auto& pDockingBar : pFrame->m_dockingbars) {
 		pDockingBar->m_bUseDarkTheme = s.bUseDarkTheme;
+		// The frame flag above doesn't reach the Subresync bar's list, which is themed once at
+		// creation (dark header / border / background via control subclasses that paint
+		// unconditionally). Re-apply or strip that so the list follows the toggle instead of staying
+		// dark (dark chrome, light rows) when the theme is turned off.
+		if (auto* pSubresyncBar = dynamic_cast<CPlayerSubresyncBar*>(pDockingBar)) {
+			pSubresyncBar->RefreshListDarkTheme();
+		}
 		if (pDockingBar->IsWindowVisible()) {
 			pDockingBar->SendMessageW(WM_NCPAINT, 1, NULL);
 			pDockingBar->RedrawWindow(nullptr, nullptr, RDW_ERASE | RDW_INVALIDATE);
