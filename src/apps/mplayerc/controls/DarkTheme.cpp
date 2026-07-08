@@ -816,18 +816,29 @@ namespace DarkTheme
 		LRESULT CALLBACK BorderSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
 			switch (msg) {
 				case WM_NCPAINT: {
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam); // draws scrollbars first
-					HDC hdc = ::GetWindowDC(hWnd);
-					if (hdc) {
-						RECT wr;
-						::GetWindowRect(hWnd, &wr);
+					RECT wr;
+					::GetWindowRect(hWnd, &wr);
+					POINT org = { 0, 0 };
+					::ClientToScreen(hWnd, &org);
+					int edge = org.y - wr.top; // NC border thickness: 1 (WS_BORDER) or 2 (client edge)
+					if (edge < 1) {
+						edge = 1;
+					}
+					// Controls WITH scroll bars (multiline edits like MediaInfo, list/tree views): let the
+					// default proc paint — and validate — the whole non-client with the real update region,
+					// then overpaint our dark frame. Clipping the frame out of the default's region instead
+					// left it perpetually invalid, so scrolling dropped the border entirely.
+					// Controls WITHOUT scroll bars (single-line edits, the About / File Properties fields,
+					// sunken statics): skip the default entirely so it never draws the light client-edge —
+					// that light->dark overpaint was what flickered as themed edits (DarkMode_CFD/_Explorer)
+					// repaint their border on hover / mouse-move. Nothing else lives in their non-client.
+					const LONG style = ::GetWindowLongW(hWnd, GWL_STYLE);
+					LRESULT r = 0;
+					if (style & (WS_VSCROLL | WS_HSCROLL)) {
+						r = DefSubclassProc(hWnd, msg, wParam, lParam);
+					}
+					if (HDC hdc = ::GetWindowDC(hWnd)) {
 						RECT rc = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
-						POINT org = { 0, 0 };
-						::ClientToScreen(hWnd, &org);
-						int edge = org.y - wr.top; // border thickness: 1 (WS_BORDER) or 2 (client edge)
-						if (edge < 1) {
-							edge = 1;
-						}
 						HBRUSH br = ::CreateSolidBrush(CtrlBorderColor());
 						for (int k = 0; k < edge; ++k) {
 							::FrameRect(hdc, &rc, br);
@@ -953,22 +964,21 @@ namespace DarkTheme
 			} else if (_wcsicmp(cls, L"ComboBox") == 0) {
 				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
 			} else if (_wcsicmp(cls, L"Edit") == 0) {
-				// DarkMode_CFD darkens the interior/border but leaves the control's own scrollbars
-				// light. For multiline edits that actually have scrollbars (the Command Line Switches
-				// help box, the Shader Editor source/output), use DarkMode_Explorer instead so the
-				// scrollbar is dark like the tree/list controls; the border is redrawn by
-				// ApplyDarkBorder either way, so we don't lose the CFD border styling that matters.
-				// DarkMode_CFD darkens the interior/border but leaves the control's own scrollbars
-				// light. For multiline edits that actually have scrollbars (the Command Line Switches
-				// help box, the Shader Editor source/output), use DarkMode_Explorer instead so the
-				// scrollbar is dark like the tree/list controls.
 				const LONG est = GetWindowLongW(hCtrl, GWL_STYLE);
 				if (est & (WS_VSCROLL | WS_HSCROLL)) {
+					// Multiline scrolling edits (MediaInfo, Command Line Switches, Shader Editor):
+					// DarkMode_Explorer gives a dark scrollbar and a dark-enough border. Do NOT custom-
+					// draw the border here: a multiline edit scrolls its client with ScrollWindowEx, which
+					// dragged our overpainted non-client border into the middle of the text on every
+					// scroll. The theme border stays put, so it's the right owner for scrolling edits.
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 				} else {
+					// Single-line / non-scrolling edits (most Options fields, the About / File Properties
+					// value boxes): DarkMode_CFD darkens the interior; the client-edge stays light, so we
+					// repaint it dark (BorderSubclassProc skips the default paint for these, no flicker).
 					SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
+					ApplyDarkBorder(hCtrl);
 				}
-				ApplyDarkBorder(hCtrl);
 			} else if (_wcsicmp(cls, L"SysListView32") == 0) {
 				// List-view controls ignore WM_CTLCOLOR: their background (the area
 				// not covered by columns/rows) must be set explicitly, otherwise it
@@ -1011,10 +1021,14 @@ namespace DarkTheme
 				InvalidateRect(hCtrl, nullptr, TRUE);
 			} else if (_wcsicmp(cls, L"ListBox") == 0) {
 				// Plain list boxes (e.g. DVD preferred-language) get their interior from
-				// WM_CTLCOLORLISTBOX (handled by the page), but their sunken border stays
-				// light — repaint it with the shared dark border like edits/lists/trees.
+				// WM_CTLCOLORLISTBOX (handled by the page), but their sunken border stays light.
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
-				ApplyDarkBorder(hCtrl);
+				// Only custom-draw the border on non-scrolling list boxes. A scrolling one (the
+				// Internal Filters lists) repaints its border on hover, so overpainting it flickered;
+				// leave the theme's dark border for those, like scrolling edits.
+				if (!(GetWindowLongW(hCtrl, GWL_STYLE) & (WS_VSCROLL | WS_HSCROLL))) {
+					ApplyDarkBorder(hCtrl);
+				}
 			} else if (_wcsicmp(cls, L"Static") == 0) {
 				// Sunken value boxes (e.g. Brightness/Contrast/Hue/Saturation on the
 				// Color correction page are SS_SUNKEN RTEXT statics) keep a light 3D edge
