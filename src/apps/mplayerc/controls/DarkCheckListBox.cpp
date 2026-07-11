@@ -89,9 +89,15 @@ void CDarkCheckListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if (rcClient.right > rcFill.right) {
 			rcFill.right = rcClient.right;
 		}
+		// ...but bound the fill to the client bottom, and clip the text (ETO_CLIPPED): clearing the
+		// clip let a partially-visible last item paint its background/text *below* the list box, so the
+		// row spilled out of the control into the page underneath ("the list leaves its box").
+		if (rcFill.bottom > rcClient.bottom) {
+			rcFill.bottom = rcClient.bottom;
+		}
 		pDC->SelectClipRgn(nullptr);
 
-		pDC->ExtTextOutW(lpDrawItemStruct->rcItem.left, yText, ETO_OPAQUE,
+		pDC->ExtTextOutW(lpDrawItemStruct->rcItem.left, yText, ETO_OPAQUE | ETO_CLIPPED,
 			rcFill, strText, strText.GetLength(), nullptr);
 	}
 
