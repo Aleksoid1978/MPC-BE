@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Giới thiệu"
 7		"MPC-BE"
 8		"Bản quyền © 2002-2026 xem Authors.txt"
@@ -735,7 +735,7 @@ BEGIN MENU IDR_MAINFRAME LINES 138
 47		"Toàn màn &hình"
 48		"&Thu phóng"
 53		"Tự động vừa"
-56		"&Ngôn ngữ"
+56		"&Ngôn ngữ (Language)"
 58		"Cài đặt trình kết xuất"
 60		"&Kiểm tra xé hình"
 61		"&Hiển thị thống kê"
