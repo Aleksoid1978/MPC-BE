@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2022 see Authors.txt
+ * (C) 2021-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -135,6 +135,8 @@ BOOL CAddCommandDlg::OnInitDialog()
 	}
 
 	m_okButton.EnableWindow(FALSE);
+
+	SHAutoComplete(m_FilterEdit, SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 
 	DarkTheme::ThemeDialog(GetSafeHwnd());
 

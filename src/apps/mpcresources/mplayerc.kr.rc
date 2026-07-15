@@ -915,9 +915,9 @@ BEGIN
     GROUPBOX        "MPC 영상 렌더러 정보",IDC_STATIC,5,177,285,27
     CONTROL         "추가 창에서 전체 화면 전용(실험)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "영상 프레임",IDC_STATIC,5,208,210,53
-    LTEXT           "기본 모드 :",IDC_STATIC,10,220,74,8
-    COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "영상 프레임",IDC_STATIC,5,208,212,53
+    LTEXT           "기본 모드 :",IDC_STATIC,10,220,79,8
+    COMBOBOX        IDC_COMBO8,90,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "살짝 확대하면 크기 조정 안 함",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,195,10
     CONTROL         "살짝 축소하면 크기 조정 안 함",IDC_CHECK8,

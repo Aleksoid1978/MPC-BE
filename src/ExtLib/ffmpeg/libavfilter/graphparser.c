@@ -114,10 +114,10 @@ static void append_inout(AVFilterInOut **inouts, AVFilterInOut **element)
 
 static int parse_sws_flags(const char **buf, char **dst, void *log_ctx)
 {
-    char *p = strchr(*buf, ';');
-
     if (strncmp(*buf, "sws_flags=", 10))
         return 0;
+
+    const char *p = strchr(*buf, ';');
 
     if (!p) {
         av_log(log_ctx, AV_LOG_ERROR, "sws_flags not terminated with ';'.\n");

@@ -264,7 +264,7 @@ private:
 	size_t m_cntOffset = 0;
 
 	int m_nSearchBarHeight = 20;
-	CColorEdit m_REdit;
+	CColorEdit m_FilterEdit;
 
 	int TGetFirstVisible();
 	int TGetOffset();

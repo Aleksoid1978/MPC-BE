@@ -402,8 +402,8 @@ int av_channel_layout_from_string(AVChannelLayout *channel_layout,
         return ret;
 
     if (ret >= 0) {
-        end = strchr(str, ')');
-        if (matches == 2 && (nb_channels != channel_layout->nb_channels || !end || *++end)) {
+        const char *end_par = strchr(str, ')');
+        if (matches == 2 && (nb_channels != channel_layout->nb_channels || !end_par || *++end_par)) {
             av_channel_layout_uninit(channel_layout);
             return AVERROR(EINVAL);
         }
@@ -749,7 +749,7 @@ int av_channel_layout_index_from_channel(const AVChannelLayout *channel_layout,
 int av_channel_layout_index_from_string(const AVChannelLayout *channel_layout,
                                         const char *str)
 {
-    char *chname;
+    const char *chname;
     enum AVChannel ch = AV_CHAN_NONE;
 
     switch (channel_layout->order) {

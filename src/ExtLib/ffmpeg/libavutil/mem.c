@@ -283,16 +283,14 @@ char *av_strdup(const char *s)
 
 char *av_strndup(const char *s, size_t len)
 {
-    char *ret = NULL, *end;
-
     if (!s)
         return NULL;
 
-    end = memchr(s, 0, len);
+    const char *end = memchr(s, 0, len);
     if (end)
         len = end - s;
 
-    ret = av_realloc(NULL, len + 1);
+    char *ret = av_realloc(NULL, len + 1);
     if (!ret)
         return NULL;
 

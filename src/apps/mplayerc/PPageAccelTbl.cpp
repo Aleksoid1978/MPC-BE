@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -607,6 +607,8 @@ BOOL CPPageAccelTbl::OnInitDialog()
 		SetupList();
 		SetupColWidths(true);
 	}
+
+	SHAutoComplete(m_FilterEdit, SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 
 	// subclass the keylist control
 	OldControlProc = (WNDPROC) SetWindowLongPtrW(m_list.m_hWnd, GWLP_WNDPROC, (LONG_PTR) ControlProc);

@@ -3840,6 +3840,12 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("MXF SMPTE-436M ANC"),
     },
     {
+        .id        = AV_CODEC_ID_ITUT_T35,
+        .type      = AVMEDIA_TYPE_DATA,
+        .name      = "itut_t35",
+        .long_name = NULL_IF_CONFIG_SMALL("ITU-T T.35 metadata"),
+    },
+    {
         .id        = AV_CODEC_ID_MPEG2TS,
         .type      = AVMEDIA_TYPE_DATA,
         .name      = "mpegts",

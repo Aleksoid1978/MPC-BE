@@ -41,6 +41,7 @@ Spanish               : IPeluchito
 Turkish               : Thingol, cmhrky
 Ukrainian             : arestarh1986
 Japanese              : Gyeong, Socket774, tsubasanouta
+Vietnamese            : vuanhvu11982-afk
 
 Official Beta testers:
 ----------------------

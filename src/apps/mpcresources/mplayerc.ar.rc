@@ -915,9 +915,9 @@ BEGIN
     GROUPBOX        "إعدادات MPC Video Renderer",IDC_STATIC,5,177,285,27
     CONTROL         "ملء الشاشة الحصري على نافذة إضافية (تجريبي)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "التأطير",IDC_STATIC,5,208,210,53
-    LTEXT           "الوضع الافتراضي:",IDC_STATIC,10,220,74,8
-    COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "التأطير",IDC_STATIC,5,208,212,53
+    LTEXT           "الوضع الافتراضي:",IDC_STATIC,10,220,79,8
+    COMBOBOX        IDC_COMBO8,90,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "عدم الضبط في حالة زيادة حجم الإطار",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,195,10
     CONTROL         "عدم الضبط في حالة نقصان حجم الإطار",IDC_CHECK8,

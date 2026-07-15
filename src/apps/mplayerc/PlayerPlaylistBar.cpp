@@ -816,15 +816,16 @@ BOOL CPlayerPlaylistBar::Create(CWnd* pParentWnd, UINT defDockBarID)
 	m_list.InsertColumn(COL_NAME, L"Name", LVCFMT_LEFT);
 	m_list.InsertColumn(COL_TIME, L"Time", LVCFMT_RIGHT);
 
-	m_REdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, IDC_FINDINPLAYLIST);
+	m_FilterEdit.Create(WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_TABSTOP, CRect(10, 10, 100, 10), this, IDC_FINDINPLAYLIST);
 	if (AfxGetAppSettings().bUseDarkTheme) {
-		m_REdit.SetBkColor(m_crBND);
-		m_REdit.SetTextColor(m_crTH);
+		m_FilterEdit.SetBkColor(m_crBND);
+		m_FilterEdit.SetTextColor(m_crTH);
 	} else {
-		m_REdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
-		m_REdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+		m_FilterEdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
+		m_FilterEdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
 	}
-	m_REdit.SetSel(0, 0);
+	m_FilterEdit.SetSel(0, 0);
+	SHAutoComplete(m_FilterEdit, SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
 
 	ScaleFontInternal();
 
@@ -865,7 +866,7 @@ void CPlayerPlaylistBar::ScaleFontInternal()
 	m_font.DeleteObject();
 	if (m_font.CreateFontIndirectW(&lf)) {
 		m_list.SetFont(&m_font);
-		m_REdit.SetFont(&m_font);
+		m_FilterEdit.SetFont(&m_font);
 	}
 
 	CDC* pDC = m_list.GetDC();
@@ -971,7 +972,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 	}
 
 	if (IsWindow(pMsg->hwnd) && IsVisible() && pMsg->message >= WM_KEYFIRST && pMsg->message <= WM_KEYLAST) {
-		if (pMsg->hwnd == m_REdit.GetSafeHwnd()) {
+		if (pMsg->hwnd == m_FilterEdit.GetSafeHwnd()) {
 			IsDialogMessageW(pMsg);
 
 			auto& playlist = GetCurPlayList();
@@ -980,7 +981,7 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			if (playlist.GetCount() > 1
 					&& (pMsg->message == WM_CHAR
 						|| (pMsg->message == WM_KEYDOWN && (pMsg->wParam == VK_RETURN || pMsg->wParam == VK_F3 || pMsg->wParam == VK_DELETE || pMsg->wParam == VK_BACK)))) {
-				CString text; m_REdit.GetWindowTextW(text);
+				CString text; m_FilterEdit.GetWindowTextW(text);
 				if (!text.IsEmpty()) {
 					::CharLowerBuffW(text.GetBuffer(), text.GetLength());
 
@@ -1024,9 +1025,9 @@ BOOL CPlayerPlaylistBar::PreTranslateMessage(MSG* pMsg)
 			}
 
 			if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
-				m_REdit.SetSel(0, -1);
-				m_REdit.Clear();
-				m_REdit.SetSel(0, 0);
+				m_FilterEdit.SetSel(0, -1);
+				m_FilterEdit.Clear();
+				m_FilterEdit.SetSel(0, 0);
 
 				m_list.SetFocus();
 			}
@@ -4163,14 +4164,14 @@ void CPlayerPlaylistBar::TCalcLayout()
 
 void CPlayerPlaylistBar::TCalcREdit()
 {
-	if (IsWindow(m_REdit.GetSafeHwnd()) && AfxGetAppSettings().bShowPlaylistSearchBar) {
+	if (IsWindow(m_FilterEdit.GetSafeHwnd()) && AfxGetAppSettings().bShowPlaylistSearchBar) {
 		CRect rcTabBar;
 		GetClientRect(&rcTabBar);
 
 		CRect rc(rcTabBar);
 		rc.DeflateRect(3, 1);
 		rc.top = rc.bottom - m_nSearchBarHeight + 2;
-		m_REdit.MoveWindow(rc.left, rc.top, rc.Width(), rc.Height());
+		m_FilterEdit.MoveWindow(rc.left, rc.top, rc.Width(), rc.Height());
 	}
 }
 
@@ -5108,13 +5109,13 @@ void CPlayerPlaylistBar::SetColor()
 		m_crBackground = RGB(255, 255, 255);      // background
 	}
 
-	if (IsWindow(m_REdit.GetSafeHwnd())) {
+	if (IsWindow(m_FilterEdit.GetSafeHwnd())) {
 		if (AfxGetAppSettings().bUseDarkTheme) {
-			m_REdit.SetBkColor(m_crBND);
-			m_REdit.SetTextColor(m_crTH);
+			m_FilterEdit.SetBkColor(m_crBND);
+			m_FilterEdit.SetTextColor(m_crTH);
 		} else {
-			m_REdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
-			m_REdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
+			m_FilterEdit.SetBkColor(::GetSysColor(COLOR_WINDOW));
+			m_FilterEdit.SetTextColor(::GetSysColor(COLOR_WINDOWTEXT));
 		}
 	}
 }

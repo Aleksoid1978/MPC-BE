@@ -49,6 +49,7 @@ extern const FFBitStreamFilter ff_hapqa_extract_bsf;
 extern const FFBitStreamFilter ff_hevc_metadata_bsf;
 extern const FFBitStreamFilter ff_hevc_mp4toannexb_bsf;
 extern const FFBitStreamFilter ff_imx_dump_header_bsf;
+extern const FFBitStreamFilter ff_lcevc_merge_bsf;
 extern const FFBitStreamFilter ff_lcevc_metadata_bsf;
 extern const FFBitStreamFilter ff_media100_to_mjpegb_bsf;
 extern const FFBitStreamFilter ff_mjpeg2jpeg_bsf;
@@ -75,6 +76,12 @@ extern const FFBitStreamFilter ff_vp9_superframe_bsf;
 extern const FFBitStreamFilter ff_vp9_superframe_split_bsf;
 extern const FFBitStreamFilter ff_vvc_metadata_bsf;
 extern const FFBitStreamFilter ff_vvc_mp4toannexb_bsf;
+
+/* these filters are part of public or internal API,
+ * they are formatted to not be found by the grep
+ * as they are manually added */
+extern  const FFBitStreamFilter ff_source_bsf;
+extern  const FFBitStreamFilter ff_sink_bsf;
 
 #include "libavcodec/bsf_list.c"
 

@@ -386,6 +386,7 @@ int ff_mjpeg_decode_sof(MJpegDecodeContext *s)
     }
 
     s->nb_components = nb_components;
+    s->nb_seq_component_scans = 0;
     s->h_max         = 1;
     s->v_max         = 1;
     for (i = 0; i < nb_components; i++) {
@@ -1770,6 +1771,16 @@ int ff_mjpeg_decode_sos(MJpegDecodeContext *s)
     if (s->mjpb_skiptosod)
         bytestream2_skip(&s->gB, s->mjpb_skiptosod);
 
+    if (!s->progressive && !s->lossless &&
+        s->avctx->codec_id != AV_CODEC_ID_MXPEG) {
+        s->nb_seq_component_scans += s->nb_components_sos;
+        if (s->nb_seq_component_scans > s->nb_components) {
+            av_log(s->avctx, AV_LOG_ERROR,
+                   "too many scans for a sequential image\n");
+            return AVERROR_INVALIDDATA;
+        }
+    }
+
     if (s->avctx->hwaccel) {
         const uint8_t *buf_ptr;
         size_t buf_size;
@@ -2750,7 +2761,7 @@ the_end:
             }
         }
     }
-    if (s->flipped && !s->rgb) {
+    if (s->flipped && !s->rgb && !s->bayer) {
         ret = av_pix_fmt_get_chroma_sub_sample(avctx->pix_fmt, &hshift, &vshift);
         if (ret)
             return ret;

@@ -18,10 +18,12 @@ Updated Romanian translation (by Andrei Miloiu).
 Updated Japanese translation (by tsubasanouta).
 Updated Korean translation (by Hackjjang).
 Updated Turkish translation (by cmhrky).
+Updated Hungarian translation (by mickey).
+Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
 	Detours v4.0.1-131-gd644ce9;
-	ffmpeg n8.2-dev-2181-g6f2f3755a0;
+	ffmpeg n8.2-dev-2245-g6bae3bd385;
 	nanosvg git-48120e9.
 
 

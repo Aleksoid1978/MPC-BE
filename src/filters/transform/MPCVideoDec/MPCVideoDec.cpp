@@ -2026,7 +2026,7 @@ HRESULT CMPCVideoDecFilter::FindDecoderConfiguration()
 
 					if (DXVA2_H264_VLD_Intel == guid) {
 						const int width_mbs  = m_nSurfaceWidth / 16;
-						const int height_mbs = m_nSurfaceWidth / 16;
+						const int height_mbs = m_nSurfaceHeight / 16;
 						const int max_ref_frames_dpb41 = std::min(11, 32768 / (width_mbs * height_mbs));
 						if (m_pAVCtx->refs > max_ref_frames_dpb41) {
 							DLog(L"    => Too many reference frames for Intel H.264 ClearVideo decoder, skip");

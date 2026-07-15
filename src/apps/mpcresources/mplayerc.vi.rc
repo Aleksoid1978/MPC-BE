@@ -60,12 +60,12 @@ END
 
 IDD_SELECTMEDIATYPE DIALOGEX 0, 0, 225, 47
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Chọn kiểu phương tiện"
+CAPTION "Chọn loại phương tiện"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     COMBOBOX        IDC_COMBO1,5,5,215,37,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
     DEFPUSHBUTTON   "OK",IDOK,116,28,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,170,28,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,170,28,50,14
 END
 
 IDD_CAPTURE_DLG DIALOGEX 0, 0, 132, 293
@@ -87,13 +87,13 @@ BEGIN
     COMBOBOX        IDC_COMBO2,77,74,40,89,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO6,10,89,107,118,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Đầu ra",IDC_STATIC,5,107,117,179
-    CONTROL         "Ghi Video",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,116,107,9
+    CONTROL         "Ghi hình Video",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,116,107,9
     CONTROL         "Xem trước",IDC_CHECK2,"Button",BS_AUTO3STATE | WS_TABSTOP,10,126,107,9
     COMBOBOX        IDC_COMBO7,10,136,107,62,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO9,10,151,40,89,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO10,52,151,65,116,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,167,110,1
-    CONTROL         "Ghi Âm thanh",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,169,107,9
+    CONTROL         "Ghi âm thanh",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,169,107,9
     CONTROL         "Xem trước",IDC_CHECK4,"Button",BS_AUTO3STATE | WS_TABSTOP,10,179,107,9
     COMBOBOX        IDC_COMBO8,10,189,107,50,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO12,10,204,40,50,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
@@ -105,7 +105,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,236,110,1
     EDITTEXT        IDC_EDIT4,10,239,91,13,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_BUTTON3,103,239,14,13
-    CONTROL         "Âm thanh sang wav",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
+    CONTROL         "Âm thanh ra wav",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
     PUSHBUTTON      "Ghi",IDC_BUTTON2,75,270,45,13,WS_DISABLED | WS_GROUP
     COMBOBOX        IDC_COMBO14,10,254,107,18,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
@@ -114,25 +114,25 @@ IDD_PPAGEAUDIO DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Bộ kết xuất âm thanh",IDC_STATIC,5,5,285,46
+    GROUPBOX        "Trình kết xuất âm thanh",IDC_STATIC,5,5,285,46
     COMBOBOX        IDC_AUDRND_COMBO,10,15,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Thuộc tính",IDC_BUTTON1,226,14,60,14
     COMBOBOX        IDC_COMBO1,10,33,212,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Đầu ra kép",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,226,35,60,10
     GROUPBOX        "Âm thanh",IDC_STATIC,5,53,285,46
     CTEXT           "Âm lượng",IDC_STATIC,42,60,55,8
-    RTEXT           "Nhỏ nhất",IDC_STATIC,7,80,20,8
+    RTEXT           "Nhỏ",IDC_STATIC,7,80,20,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_AUTOTICKS | TBS_BOTH | TBS_TOOLTIPS | WS_TABSTOP | 0x400,28,72,85,19
-    LTEXT           "Lớn nhất",IDC_STATIC,116,80,27,8
+    LTEXT           "Lớn",IDC_STATIC,116,80,27,8
     CTEXT           "Cân bằng",IDC_STATIC_BALANCE,191,60,55,8,SS_NOTIFY
-    RTEXT           "T",IDC_STATIC,144,80,30,8
+    RTEXT           "Trái",IDC_STATIC,144,80,30,8
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
-    LTEXT           "P",IDC_STATIC,262,80,27,8
+    LTEXT           "Phải",IDC_STATIC,262,80,27,8
     GROUPBOX        "Cài đặt mở âm thanh",IDC_STATIC,5,102,285,51
     CONTROL         "Tự động tải tệp âm thanh",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
     EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Đặt lại",IDC_BUTTON2,235,124,50,13
-    CONTROL         "Ưu tiên tệp âm thanh bên ngoài hơn tệp âm thanh nhúng",IDC_CHECK3,
+    CONTROL         "Ưu tiên tệp âm thanh bên ngoài hơn rãnh âm thanh nhúng",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,273,9
 END
 
@@ -141,10 +141,10 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Bộ trộn kênh",IDC_STATIC,5,3,286,72
-    CONTROL         "Trộn kênh sang:",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,106,9
+    CONTROL         "Trộn kênh thành:",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,15,106,9
     COMBOBOX        IDC_COMBO2,129,14,62,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Yêu cầu stereo từ bộ giải mã",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,197,15,89,16
-    CONTROL         "Chuyển hướng âm trầm (bass) tới LFE",IDC_BASSREDIRECT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,30,143,9
+    CONTROL         "Chuyển hướng âm trầm sang LFE",IDC_BASSREDIRECT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,30,143,9
     RTEXT           "Static",IDC_STATIC5,9,42,87,8
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,100,42,114,12
     RTEXT           "Static",IDC_STATIC8,9,58,87,8
@@ -152,7 +152,7 @@ BEGIN
     GROUPBOX        "Điều khiển âm lượng",IDC_STATIC,5,77,286,73
     RTEXT           "Static",IDC_STATIC4,9,88,82,8
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,95,87,109,12
-    CONTROL         "Tự động điều khiển âm lượng",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,154,9
+    CONTROL         "Điều khiển âm lượng tự động",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,104,154,9
     CONTROL         "Tăng cường âm thanh",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,167,104,117,9
     RTEXT           "Static",IDC_STATIC6,91,119,83,8
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,117,109,12
@@ -160,7 +160,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,178,133,109,12
     GROUPBOX        "",IDC_STATIC,5,154,285,49
     CONTROL         "Bộ lọc FFmpeg",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,153,61,10
-    PUSHBUTTON      "Cài đặt trước",IDC_BUTTON1,9,166,59,14
+    PUSHBUTTON      "Cấu hình sẵn",IDC_BUTTON1,9,166,59,14
     CONTROL         "Không sử dụng cho nguồn stereo và mono",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,166,180,10
     COMBOBOX        IDC_COMBO1,10,184,58,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -179,14 +179,14 @@ END
 
 IDD_GOTO_DLG DIALOGEX 0, 0, 186, 120
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Đi đến..."
+CAPTION "Đi tới..."
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Nhập mã thời gian theo định dạng [hh:]mm:ss.ms để chuyển đến thời gian chỉ định. Bạn không cần nhập dấu phân cách một cách tường minh.",IDC_STATIC,5,5,173,27
+    LTEXT           "Nhập mã thời gian theo định dạng [hh:]mm:ss.ms để chuyển đến thời gian chỉ định. Bạn không cần nhập dấu phân cách.",IDC_STATIC,5,5,173,27
     LTEXT           "Thời gian",IDC_STATIC,10,42,35,8
     CONTROL         "00:00:00.000",IDC_EDIT1,"MfcMaskedEdit",WS_BORDER | WS_TABSTOP | 0x80,47,39,80,14
     DEFPUSHBUTTON   "Đi!",IDC_OK1,131,39,50,14
-    LTEXT           "Nhập hai số để chuyển đến khung hình chỉ định, số đầu tiên là số khung hình, số thứ hai là tốc độ khung hình.",IDC_STATIC,5,64,173,26
+    LTEXT           "Nhập hai số để chuyển đến khung hình chỉ định, số đầu là số khung hình, số thứ hai là tốc độ khung hình.",IDC_STATIC,5,64,173,26
     LTEXT           "Khung hình",IDC_STATIC,10,99,35,8
     EDITTEXT        IDC_EDIT2,47,96,81,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Đi!",IDC_OK2,131,96,50,14
@@ -206,9 +206,9 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,68,188,20,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Duyệt...",IDC_BUTTON2,200,67,50,14
     DEFPUSHBUTTON   "OK",IDOK,148,94,50,14,WS_GROUP
-    PUSHBUTTON      "Hủy",IDCANCEL,200,94,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,200,94,50,14
     CONTROL         "Thêm vào danh sách phát mà không mở",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,84,188,9
-    CONTROL         "Dán URL từ bộ nhớ tạm",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
+    CONTROL         "Dán URL từ bảng nhớ tạm",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,96,134,9
 END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 241, 202
@@ -220,7 +220,7 @@ BEGIN
     LTEXT           "MPC-BE",IDC_STATIC1,30,5,195,8,SS_NOPREFIX
     CONTROL         "Bản quyền © 2002-2026 xem Authors.txt",IDC_AUTHORS_LINK,
                     "SysLink",WS_TABSTOP,30,17,195,8
-    LTEXT           "Phiên bản:1.90.0",IDC_VERSION,30,34,90,8
+    LTEXT           "Phiên bản:",IDC_VERSION,30,34,90,8
     LTEXT           "Trình biên dịch MPC-BE:",IDC_STATIC,30,66,90,8
     LTEXT           "Trình biên dịch FFmpeg:",IDC_STATIC,30,83,90,8
     LTEXT           "Libavcodec / Libavutil:",IDC_STATIC,30,99,90,8
@@ -233,8 +233,8 @@ BEGIN
                     "SysLink",WS_TABSTOP,30,114,200,8
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
-    LTEXT           "Đây là chương trình miễn phí và được phát hành theo Giấy phép Công cộng GNU.",IDC_STATIC,30,138,200,18
-    LTEXT           "Bản dịch tiếng Việt được thực hiện bởi Vũ Anh Vũ",IDC_STATIC,30,161,200,18
+    LTEXT           "Chương trình này là phần mềm miễn phí và được phát hành theo Giấy phép Công cộng GNU.",IDC_STATIC,30,138,200,18
+    LTEXT           "Bản dịch tiếng Việt bởi Vũ Anh Vũ",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "OK",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -261,15 +261,15 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Tùy chọn mở",IDC_STATIC,5,5,115,71
-    CONTROL         "Buộc sử dụng một tiến trình đơn",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,53,105,18
-    CONTROL         "Sử dụng cùng một tiến trình cho mọi tệp",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
-    CONTROL         "Tiến trình mới cho mọi tệp",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
+    CONTROL         "Buộc một tiến trình duy nhất",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,10,53,105,18
+    CONTROL         "Sử dụng cùng tiến trình cho mọi tệp",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,17,105,18
+    CONTROL         "Tiến trình mới cho mỗi tệp",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,35,105,18
     LTEXT           "Văn bản thanh tiêu đề",IDC_STATIC,10,79,109,8
     COMBOBOX        IDC_COMBO1,10,90,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Văn bản thanh tìm kiếm",IDC_STATIC,10,107,100,8
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Vị trí cài đặt",IDC_STATIC,5,135,115,55
-    CONTROL         "Registry Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
+    CONTROL         "Windows registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
     CONTROL         "Hồ sơ người dùng",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
     CONTROL         "Thư mục trình phát",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
     GROUPBOX        "Lịch sử",IDC_STATIC,124,5,167,128,WS_GROUP
@@ -281,12 +281,12 @@ BEGIN
     LTEXT           "Số lượng tệp gần đây:",IDC_STATIC,129,47,122,8
     EDITTEXT        IDC_EDIT1,255,45,30,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,275,45,12,13
-    CONTROL         "Ghi nhớ vị trí DVD",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
-    CONTROL         "Ghi nhớ vị trí Tệp",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
-    CONTROL         "Ghi nhớ mức Thu phóng Pan-n-Scan cuối cùng",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
-    CONTROL         "Ghi nhớ danh sách phát chính",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
+    CONTROL         "Nhớ vị trí DVD",IDC_DVD_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,60,156,9
+    CONTROL         "Nhớ vị trí tệp",IDC_FILE_POS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,72,158,9
+    CONTROL         "Nhớ mức Thu phóng Pan-n-Scan cuối cùng",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,84,156,9
+    CONTROL         "Nhớ danh sách phát chính",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,96,156,9
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,129,108,158,1
-    CONTROL         "Hiển thị tiêu đề cho URL trong các tệp gần đây",IDC_CHECK4,
+    CONTROL         "Hiển thị tiêu đề cho URL trong tệp gần đây",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,129,112,156,17
     GROUPBOX        "Khác",IDC_STATIC,124,135,167,55,WS_GROUP
     CONTROL         "Biểu tượng khay hệ thống",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,9
@@ -296,11 +296,11 @@ BEGIN
     LTEXT           "Kết nối:",IDC_STATIC,129,202,96,8
     EDITTEXT        IDC_EDIT2,230,200,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,200,11,13
-    LTEXT           "giây",IDC_STATIC,263,202,26,8
+    LTEXT           "giây.",IDC_STATIC,263,202,26,8
     LTEXT           "Nhận dữ liệu:",IDC_STATIC,129,218,96,8
     EDITTEXT        IDC_EDIT4,230,216,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,248,216,12,13
-    LTEXT           "giây",IDC_STATIC,263,218,26,8
+    LTEXT           "giây.",IDC_STATIC,263,218,26,8
 END
 
 IDD_PPAGEDVD DIALOGEX 0, 0, 296, 264
@@ -312,13 +312,13 @@ BEGIN
     CONTROL         "Đường dẫn do người dùng xác định:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
-    GROUPBOX        "Ngôn ngữ ưu tiên cho Bộ điều hướng DVD",IDC_STATIC,5,62,286,74
+    GROUPBOX        "Ngôn ngữ ưu tiên cho Điều hướng DVD",IDC_STATIC,5,62,286,74
     CONTROL         "Menu",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,74,65,8
     CONTROL         "Âm thanh",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,10,86,65,8
     CONTROL         "Phụ đề",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,10,98,65,8
     LISTBOX         IDC_LIST1,79,74,208,66,WS_VSCROLL | WS_GROUP | WS_TABSTOP
     GROUPBOX        "Cài đặt bổ sung",IDC_STATIC,5,140,286,37
-    CONTROL         "Cho phép phụ đề chi tiết (closed captions) trong 'Bộ giải mã dòng 21'",IDC_CHECK2,
+    CONTROL         "Cho phép phụ đề chi tiết trong 'Bộ giải mã Line 21'",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,152,278,9
     CONTROL         "Bắt đầu phát từ Tiêu đề chính",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,164,220,9
 END
@@ -329,7 +329,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Phát lại",IDC_STATIC,5,5,129,60
     CONTROL         "Phát",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
-    CONTROL         "Lặp lại vô hạn",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
+    CONTROL         "Lặp lại mãi mãi",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
     EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     LTEXT           "lần",IDC_STATIC1,90,17,40,8
     CONTROL         "Tua lại khi phát xong",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
@@ -353,10 +353,10 @@ BEGIN
     COMBOBOX        IDC_COMBO4,113,134,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Thêm vào danh sách phát:",IDC_STATIC,10,153,139,8
     COMBOBOX        IDC_COMBO5,150,150,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Sử dụng luồng công việc để xây dựng biểu đồ bộ lọc",IDC_CHECK7,
+    CONTROL         "Sử dụng luồng worker để xây dựng biểu đồ bộ lọc",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,167,276,9
     CONTROL         "Báo cáo các pin không kết xuất được",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,276,9
-    CONTROL         "Ghi nhớ các rãnh đã chọn trong danh sách phát",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,191,276,9
+    CONTROL         "Nhớ các rãnh đã chọn trong danh sách phát",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,191,276,9
     CONTROL         "Tìm kiếm nhanh (trên khung hình chính)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,209,264,9
     CONTROL         "Tạm dừng phát video khi thu nhỏ",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,221,280,9
@@ -379,18 +379,18 @@ BEGIN
     GROUPBOX        "Khoảng trễ",IDC_STATIC,212,5,79,28
     EDITTEXT        IDC_EDIT4,217,17,40,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "ms",IDC_STATIC,261,19,25,11
-    GROUPBOX        "Cài đặt kết cấu (mở lại video để thấy các thay đổi)",IDC_STATIC,5,37,286,68
-    LTEXT           "Số phụ đề đệm:",IDC_STATIC,10,51,125,8
+    GROUPBOX        "Cài đặt kết cấu (mở lại video để xem thay đổi)",IDC_STATIC,5,37,286,68
+    LTEXT           "Số lượng hình ảnh phụ vào bộ đệm:",IDC_STATIC,10,51,125,8
     EDITTEXT        IDC_EDIT1,139,49,32,12,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,159,49,12,12
     LTEXT           "Độ phân giải kết cấu tối đa:",IDC_STATIC,10,67,125,8
     COMBOBOX        IDC_COMBO1,139,65,59,45,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Cho phép hoạt ảnh khi đang đệm",IDC_CHECK_SPCANIMWITHBUFFER,
+    CONTROL         "Cho phép hoạt ảnh khi đệm",IDC_CHECK_SPCANIMWITHBUFFER,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,81,277,9
-    CONTROL         "Cho phép bỏ qua một số phụ đề nếu hàng đợi bị trễ",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
+    CONTROL         "Cho phép bỏ qua một số hình ảnh phụ nếu hàng đợi bị chậm",IDC_CHECK_ALLOW_DROPPING_SUBPIC,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,10,93,277,9
     GROUPBOX        "Cảnh báo",IDC_STATIC,5,108,286,43
-    LTEXT           "Nếu bạn ghi đè và bật khử răng cưa toàn màn hình ở đâu đó trong cài đặt card video, phụ đề sẽ không trông đẹp hơn mà chắc chắn sẽ tiêu tốn CPU của bạn.",IDC_STATIC,10,120,267,27
+    LTEXT           "Nếu bạn ghi đè và bật khử răng cưa toàn màn hình trong cài đặt card video, phụ đề sẽ không trông đẹp hơn mà chắc chắn sẽ ngốn CPU của bạn.",IDC_STATIC,10,120,267,27
 END
 
 IDD_PPAGEFORMATS DIALOGEX 0, 0, 296, 264
@@ -405,15 +405,15 @@ BEGIN
     GROUPBOX        "Liên kết",IDC_STATIC,5,189,286,26
     PUSHBUTTON      "&Video",IDC_BUTTON4,10,198,40,14
     PUSHBUTTON      "Â&m thanh",IDC_BUTTON3,52,198,40,14
-    PUSHBUTTON      "&Sửa đổi",IDC_BUTTON5,42,198,63,14,NOT WS_VISIBLE
+    PUSHBUTTON      "&Chỉnh sửa",IDC_BUTTON5,42,198,63,14,NOT WS_VISIBLE
     PUSHBUTTON      "Tấ&t cả",IDC_BUTTON1,108,198,40,14
-    PUSHBUTTON      "&Không",IDC_BUTTON6,150,198,40,14
+    PUSHBUTTON      "&Không chọn",IDC_BUTTON6,150,198,40,14
     CONTROL         "Với biểu tượng",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,201,70,9
     GROUPBOX        "Tự động phát",IDC_STATIC1,5,217,108,37
     CONTROL         "Video",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,229,47,9
     CONTROL         "Âm nhạc",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,241,47,9
     CONTROL         "DVD",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,229,47,9
-    CONTROL         "CD âm thanh",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
+    CONTROL         "Audio CD",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
     GROUPBOX        "Menu ngữ cảnh Explorer",IDC_STATIC,117,217,118,24
     CONTROL         "Thư mục",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,229,50,9
     CONTROL         "Tệp",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
@@ -424,43 +424,43 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,5,282,105
-    CONTROL         "Sử dụng chủ đề ""tối"" (mặc định)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,9,WS_EX_TRANSPARENT
+    CONTROL         "Sử dụng giao diện ""tối"" (mặc định)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,9,WS_EX_TRANSPARENT
     LTEXT           "Độ sáng :",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
     LTEXT           "Thiết lập màu của chỉ báo âm thanh:",IDC_STATIC2,14,31,165,8
-    LTEXT           "Tô màu:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Đổ đầy:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "B",IDC_BUTTON_CLRFACE,64,41,20,14
     LTEXT           "Nền:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "O",IDC_BUTTON_CLROUTLINE,140,41,20,14
     PUSHBUTTON      "Mặc định",IDC_BUTTON_CLRDEFAULT,164,41,56,14
-    RTEXT           "Đỏ:",IDC_STATIC3,224,19,10,8,0,WS_EX_TRANSPARENT
-    RTEXT           "Xanh lá:",IDC_STATIC4,224,34,10,8,0,WS_EX_TRANSPARENT
-    RTEXT           "Xanh dương:",IDC_STATIC5,224,49,10,8,0,WS_EX_TRANSPARENT
+    RTEXT           "R:",IDC_STATIC3,224,19,10,8,0,WS_EX_TRANSPARENT
+    RTEXT           "G:",IDC_STATIC4,224,34,10,8,0,WS_EX_TRANSPARENT
+    RTEXT           "B:",IDC_STATIC5,224,49,10,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,19,53,12
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Bật menu tối",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Sử dụng hiệu ứng làm mờ nền (Windows 10 trở lên)",IDC_CHECK7,
+    CONTROL         "Sử dụng hiệu ứng mờ nền (Windows 10 trở lên)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Bật tiêu đề tối (Windows 10 trở lên)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
-    CONTROL         "Sử dụng chú giải công cụ thời gian:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
+    CONTROL         "Sử dụng chú giải thời gian:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Sử dụng bản xem trước khi tìm kiếm",IDC_CHECK_PRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,135,224,9
+    CONTROL         "Sử dụng xem trước khi tìm kiếm",IDC_CHECK_PRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,135,224,9
     LTEXT           "Kích thước tương đối so với chiều rộng màn hình:",IDC_STATIC6,24,149,138,8
     EDITTEXT        IDC_EDIT1,166,148,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC7,194,149,10,8
     COMBOBOX        IDC_COMBO4,207,148,42,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Trực tuyến",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,135,47,9,WS_EX_TRANSPARENT
-    CONTROL         "Sử dụng dấu chương",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
-    CONTROL         "Sử dụng thanh điều khiển nổi",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,174,182,9
-    LTEXT           "Cỡ chữ danh sách phát:",IDC_STATIC,13,187,110,8
+    CONTROL         "Sử dụng điểm đánh dấu chương",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
+    CONTROL         "Sử dụng thanh điều khiển trượt",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,174,182,9
+    LTEXT           "Kích thước phông chữ danh sách phát:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Cỡ thanh điều khiển:",IDC_STATIC8,14,96,99,8
+    LTEXT           "Kích thước điều khiển:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Sử dụng các tính năng thanh tác vụ của Windows 7 (trở lên)",IDC_CHECK_WIN7,
+    CONTROL         "Sử dụng tính năng thanh tác vụ của Windows 7 (trở lên)",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
 
@@ -469,7 +469,7 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,4,169,43,WS_GROUP
-    CONTROL         "Hiện OSD",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,11,156,9
+    CONTROL         "Hiển thị OSD",IDC_SHOW_OSD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,11,156,9
     CONTROL         "Hiện tên tệp phương tiện",IDC_CHECK14,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,23,148,9
     CONTROL         "Hiện thời gian tìm kiếm",IDC_CHECK15,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,35,152,9
     GROUPBOX        "",IDC_STATIC,7,49,282,60
@@ -481,7 +481,7 @@ BEGIN
     RTEXT           "Nền:",IDC_STATIC,13,77,43,8
     PUSHBUTTON      "G1",IDC_BUTTON_CLRGRAD1,62,74,20,14
     PUSHBUTTON      "G2",IDC_BUTTON_CLRGRAD2,62,92,20,14
-    RTEXT           "Độ trong suốt:",IDC_STATIC,86,77,72,8
+    RTEXT           "Trong suốt:",IDC_STATIC,86,77,72,8
     CONTROL         "",IDC_SLIDER_OSDTRANS,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,166,76,51,12
     RTEXT           "Kích thước đường viền:",IDC_STATIC,86,94,72,8
     EDITTEXT        IDC_EDIT4,169,92,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -497,17 +497,17 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Kích thước cửa sổ khi khởi động",IDC_STATIC,5,5,286,67
     CONTROL         "Kích thước cửa sổ tiêu chuẩn",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,16,106,10
-    CONTROL         "Ghi nhớ kích thước cửa sổ cuối cùng",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
-    CONTROL         "Thiết lập kích thước cửa sổ chỉ định",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
-    CONTROL         "Thiết lập vùng video chỉ định",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
+    CONTROL         "Nhớ kích thước cửa sổ cuối cùng",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,30,127,10
+    CONTROL         "Đặt kích thước cửa sổ xác định",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,10,44,118,10
+    CONTROL         "Đặt vùng video xác định",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,10,58,118,10
     EDITTEXT        IDC_EDIT1,133,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
     CTEXT           "×",IDC_STATIC,162,45,8,8
     EDITTEXT        IDC_EDIT2,172,43,28,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Kích thước hiện tại",IDC_BUTTON1,204,42,64,14
     GROUPBOX        "Sau khi bắt đầu phát",IDC_STATIC,5,76,286,68
     CONTROL         "không thay đổi",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,87,64,10
-    CONTROL         "co dãn theo kích thước video",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
-    CONTROL         "vừa khít cửa sổ với màn hình",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,10,116,123,10
+    CONTROL         "chia tỷ lệ theo kích thước video",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON,10,101,115,10
+    CONTROL         "vừa cửa sổ với màn hình",IDC_RADIO7,"Button",BS_AUTORADIOBUTTON,10,116,123,10
     COMBOBOX        IDC_COMBO1,133,99,43,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,133,115,32,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,155,115,11,13
@@ -515,9 +515,9 @@ BEGIN
     CONTROL         "Chỉ khi lớn hơn",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,184,116,102,10
     CONTROL         "Trả về vị trí và kích thước cửa sổ ban đầu sau khi đóng tệp",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,132,260,9
-    CONTROL         "Ghi nhớ vị trí cửa sổ cuối cùng",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,149,156,9
+    CONTROL         "Nhớ vị trí cửa sổ cuối cùng",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,149,156,9
     CONTROL         "Giới hạn tỷ lệ cửa sổ khi thay đổi kích thước",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,162,194,9
-    CONTROL         "Tự động hút vào cạnh màn hình",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,175,156,9
+    CONTROL         "Bám vào các cạnh màn hình",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,175,156,9
 END
 
 IDD_PPAGEEXTERNALFILTERS DIALOGEX 0, 0, 296, 264
@@ -526,17 +526,17 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,208,128,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_WANTKEYBOARDINPUT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Thêm bộ lọc...",IDC_BUTTON1,221,5,70,14
-    PUSHBUTTON      "Loại bỏ",IDC_BUTTON2,221,21,70,14
+    PUSHBUTTON      "Xóa",IDC_BUTTON2,221,21,70,14
     CONTROL         "Ưu tiên",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,221,39,70,8
     CONTROL         "Chặn",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,221,51,70,8
-    CONTROL         "Thiết lập độ ưu tiên:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
+    CONTROL         "Đặt độ ưu tiên:",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON,221,63,70,8
     EDITTEXT        IDC_EDIT1,221,75,70,13,ES_RIGHT | ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "Lên",IDC_BUTTON3,221,92,33,14
     PUSHBUTTON      "Xuống",IDC_BUTTON4,258,92,33,14
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,137,283,1
     CONTROL         "",IDC_TREE2,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,5,141,208,95
-    PUSHBUTTON      "Thêm kiểu phương tiện...",IDC_BUTTON5,221,141,70,14
-    PUSHBUTTON      "Thêm kiểu phụ...",IDC_BUTTON6,221,157,70,14
+    PUSHBUTTON      "Thêm loại phương tiện...",IDC_BUTTON5,221,141,70,14
+    PUSHBUTTON      "Thêm loại phụ...",IDC_BUTTON6,221,157,70,14
     PUSHBUTTON      "Xóa",IDC_BUTTON7,221,179,70,14
     PUSHBUTTON      "Đặt lại danh sách",IDC_BUTTON8,221,222,70,14
 END
@@ -548,7 +548,7 @@ BEGIN
     ICON            "",IDC_DEFAULTICON,5,5,21,20,SS_REALSIZEIMAGE
     EDITTEXT        IDC_EDIT1,32,13,186,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,30,214,1
-    LTEXT           "Kiểu:",IDC_STATIC,10,36,60,8
+    LTEXT           "Loại:",IDC_STATIC,10,36,60,8
     EDITTEXT        IDC_EDIT4,72,36,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "Kích thước:",IDC_STATIC,10,51,60,8
     EDITTEXT        IDC_EDIT3,72,51,151,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
@@ -597,20 +597,20 @@ END
 
 IDD_FAVADD DIALOGEX 0, 0, 252, 84
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Thêm mục ưa thích"
+CAPTION "Thêm vào mục yêu thích"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Chọn tên cho phím tắt của bạn:",IDC_STATIC,5,5,242,29
+    GROUPBOX        "Chọn tên cho lối tắt của bạn:",IDC_STATIC,5,5,242,29
     COMBOBOX        IDC_COMBO1,10,17,232,62,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Ghi nhớ vị trí",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
+    CONTROL         "Nhớ vị trí",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,38,232,9
     CONTROL         "Ổ đĩa tương đối",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,50,232,10
     DEFPUSHBUTTON   "OK",IDOK,143,62,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,197,62,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,197,62,50,14
 END
 
 IDD_FAVORGANIZE DIALOGEX 0, 0, 276, 170
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Tổ chức mục ưa thích"
+CAPTION "Sắp xếp mục yêu thích"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",0x0,5,5,205,160
@@ -624,7 +624,7 @@ END
 
 IDD_PNSPRESET_DLG DIALOGEX 0, 0, 210, 120
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Cài đặt trước Pan&Scan"
+CAPTION "Cấu hình Pan&Scan"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LISTBOX         IDC_LIST1,5,5,125,50,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
@@ -639,7 +639,7 @@ BEGIN
     PUSHBUTTON      "Xuống",IDC_BUTTON5,125,76,35,12
     PUSHBUTTON      "&Thiết lập",IDC_BUTTON1,165,76,35,12
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,93,188,1
-    PUSHBUTTON      "&Hủy",IDCANCEL,49,100,50,14
+    PUSHBUTTON      "&Hủy bỏ",IDCANCEL,49,100,50,14
     PUSHBUTTON      "&Lưu",IDOK,105,100,50,14
     LTEXT           "Vị trí: 0.0 -> 1.0",IDC_STATIC,134,5,70,8
     LTEXT           "Thu phóng: 0.2 -> 5.0",IDC_STATIC,134,32,70,8
@@ -658,7 +658,7 @@ BEGIN
     CONTROL         "",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,232,9,9
     LTEXT           "uICE:",IDC_STATICLINK2,18,232,35,8
     EDITTEXT        IDC_EDIT2,57,230,86,13,ES_AUTOHSCROLL
-    CONTROL         "Phím media toàn cục",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,245,160,9
+    CONTROL         "Phím đa phương tiện toàn cục",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,245,160,9
     PUSHBUTTON      "Chọn tất cả",IDC_BUTTON1,201,221,90,14
     PUSHBUTTON      "Đặt lại mục đã chọn",IDC_BUTTON2,201,239,90,14
 END
@@ -669,7 +669,7 @@ EXSTYLE WS_EX_TOOLWINDOW
 CAPTION "Cảnh báo"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "MPC-BE không thể kết xuất một số pin trong biểu đồ, có thể bạn chưa cài đặt các codec hoặc bộ lọc cần thiết trên hệ thống.",IDC_STATIC1,5,5,286,18
+    LTEXT           "MPC-BE không thể kết xuất một số pin trong biểu đồ, có thể bạn chưa cài đặt codec hoặc bộ lọc cần thiết trên hệ thống.",IDC_STATIC1,5,5,286,18
     LTEXT           "Các pin sau đây không tìm thấy bộ lọc có thể kết nối:",IDC_STATIC2,5,27,286,8
     COMBOBOX        IDC_COMBO1,5,39,286,87,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT1,5,56,286,140,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
@@ -699,7 +699,7 @@ IDD_SAVETHUMBSDIALOGTEMPL DIALOGEX 0, 0, 304, 52
 STYLE DS_SETFONT | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Hình thu nhỏ (Thumbnails):",IDC_STATIC,68,5,58,8
+    LTEXT           "Hình thu nhỏ:",IDC_STATIC,68,5,58,8
     EDITTEXT        IDC_EDIT4,130,3,36,13,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         "",IDC_SPIN4,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,154,5,12,13
     EDITTEXT        IDC_EDIT2,204,3,36,13,ES_AUTOHSCROLL | ES_READONLY
@@ -708,7 +708,7 @@ BEGIN
     LTEXT           "cột",IDC_STATIC,244,5,32,8
     EDITTEXT        IDC_EDIT3,130,19,36,13,ES_AUTOHSCROLL | ES_READONLY
     CONTROL         "",IDC_SPIN3,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,154,20,12,13
-    LTEXT           "Độ rộng ảnh:",IDC_STATIC,68,21,58,8
+    LTEXT           "Chiều rộng ảnh:",IDC_STATIC,68,21,58,8
     LTEXT           "pixel",IDC_STATIC,170,20,32,8
     LTEXT           "Chất lượng:",IDC_STATIC,68,37,58,8
     EDITTEXT        IDC_EDIT1,130,35,36,13,ES_AUTOHSCROLL | ES_READONLY
@@ -730,7 +730,7 @@ BEGIN
     CONTROL         "",IDC_LIST2,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | WS_TABSTOP,5,5,275,154,WS_EX_CLIENTEDGE
     PUSHBUTTON      "Duyệt...",IDC_BUTTON1,5,163,60,14
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,230,163,50,14
 END
 
 IDD_PPAGESUBSTYLE DIALOGEX 0, 0, 296, 264
@@ -751,13 +751,13 @@ BEGIN
     EDITTEXT        IDC_EDIT6,70,86,35,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN5,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,93,86,12,13
     GROUPBOX        "Kiểu đường viền",IDC_STATIC,5,106,105,68
-    CONTROL         "Viền ngoài",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,118,95,8
-    CONTROL         "Khung đục",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,130,95,8
-    LTEXT           "Độ rộng viền",IDC_STATIC,10,144,72,8
+    CONTROL         "Đường viền ngoài",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,118,95,8
+    CONTROL         "Hộp mờ đục",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,130,95,8
+    LTEXT           "Độ rộng đường viền",IDC_STATIC,10,144,72,8
     EDITTEXT        IDC_EDIT1,84,142,21,13,ES_RIGHT | ES_AUTOHSCROLL
-    LTEXT           "Độ sâu bóng đổ",IDC_STATIC,10,159,72,8
+    LTEXT           "Độ sâu đổ bóng",IDC_STATIC,10,159,72,8
     EDITTEXT        IDC_EDIT2,84,157,21,13,ES_RIGHT | ES_AUTOHSCROLL
-    GROUPBOX        "Căn lề màn hình && Lề",IDC_STATIC,114,5,177,60
+    GROUPBOX        "Căn chỉnh màn hình && Lề",IDC_STATIC,114,5,177,60
     CONTROL         "",IDC_RADIO3,"Button",BS_AUTORADIOBUTTON | WS_GROUP,119,41,10,8
     CONTROL         "",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON,131,41,10,8
     CONTROL         "",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON,143,41,10,8
@@ -779,7 +779,7 @@ BEGIN
     LTEXT           "Dưới",IDC_STATIC,223,38,26,8
     EDITTEXT        IDC_EDIT10,253,35,30,14,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN9,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,271,35,12,14
-    CONTROL         "Đặt vị trí phụ đề tương đối với khung hình video",IDC_CHECK_RELATIVETO,
+    CONTROL         "Định vị phụ đề tương đối so với khung hình video",IDC_CHECK_RELATIVETO,
                     "Button",BS_AUTO3STATE | WS_TABSTOP,119,53,170,9
     GROUPBOX        "Màu sắc && Độ trong suốt",IDC_STATIC,114,69,177,120
     LTEXT           "100%",IDC_STATIC,270,81,20,8
@@ -790,13 +790,13 @@ BEGIN
     LTEXT           "Phụ",IDC_STATIC,119,111,47,8
     PUSHBUTTON      "SEC",IDC_COLORSEC,170,108,20,14
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,109,100,12
-    LTEXT           "Viền ngoài",IDC_STATIC,119,127,47,8
+    LTEXT           "Đường viền ngoài",IDC_STATIC,119,127,47,8
     PUSHBUTTON      "OUTL",IDC_COLOROUTL,170,124,20,14
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,125,100,12
-    LTEXT           "Bóng đổ",IDC_STATIC,119,143,47,8
+    LTEXT           "Đổ bóng",IDC_STATIC,119,143,47,8
     PUSHBUTTON      "SHAD",IDC_COLORSHAD,170,140,20,14
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP | 0x400,190,141,100,12
-    CONTROL         "Liên kết kênh alpha",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,157,110,10
+    CONTROL         "Liên kết các kênh alpha",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,180,157,110,10
     PUSHBUTTON      "Đặt lại",IDC_RESET,242,192,50,14
 END
 
@@ -804,20 +804,20 @@ IDD_PPAGEMOUSE DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Nút trái",IDC_STATIC,5,5,286,121
+    GROUPBOX        "Nút chuột trái",IDC_STATIC,5,5,286,121
     LTEXT           "Nhấp",IDC_STATIC,10,18,60,8
     COMBOBOX        IDC_COMBO1,70,16,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Nếu không có gì được tải, mở tệp gần đây",IDC_CHECK1,
+    CONTROL         "Nếu không có tệp nào được tải, mở tệp gần đây",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,208,10
     LTEXT           "Nhấp đúp",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Di chuyển cửa sổ bằng vùng video",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
-    CONTROL         "Enable long press speed-up",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
-    LTEXT           "Long press speed",IDC_STATIC,20,97,130,8
+    CONTROL         "Bật tăng tốc khi nhấn giữ",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
+    LTEXT           "Tốc độ nhấn giữ",IDC_STATIC,20,97,130,8
     COMBOBOX        IDC_COMBO4,153,95,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Long press delay",IDC_STATIC,20,113,130,8
+    LTEXT           "Độ trễ nhấn giữ",IDC_STATIC,20,113,130,8
     COMBOBOX        IDC_COMBO5,153,111,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Nút phải",IDC_STATIC,10,134,60,8
+    LTEXT           "Nút chuột phải",IDC_STATIC,10,134,60,8
     COMBOBOX        IDC_COMBO3,70,133,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,152,286,88
     PUSHBUTTON      "Mặc định",IDC_BUTTON2,225,243,66,13
@@ -828,22 +828,22 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_TAB1,"SysTabControl32",WS_TABSTOP,0,0,296,246
-    LTEXT           "Nếu bạn muốn sử dụng phiên bản độc lập từ các bộ lọc này hoặc một bản thay thế khác, hãy vô hiệu hóa chúng tại đây.",IDC_STATIC,7,19,269,18
+    LTEXT           "Nếu bạn muốn sử dụng phiên bản độc lập của các bộ lọc này hoặc bộ lọc thay thế khác, hãy vô hiệu hóa chúng tại đây.",IDC_STATIC,7,19,269,18
     LISTBOX         IDC_LIST1,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST2,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Cấu hình\nBộ tách AVI",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nBộ tách MPEG",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nBộ tách Matroska",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nTrình đọc CDDA",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nTrình đọc VTS(IFO)",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nBộ giải mã video",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nBộ giải mã\nDVD-Video",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Cấu hình\nBộ giải mã âm thanh",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nAVI Splitter",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nMPEG Splitter",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nMatroska Splitter",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nCDDA Reader",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nVTS(IFO) Reader",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nbộ giải mã video",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nbộ giải mã\nDVD-Video",IDC_BUTTON3,220,76,70,30,BS_MULTILINE
+    PUSHBUTTON      "Cấu hình\nbộ giải mã âm thanh",IDC_BUTTON4,220,41,70,30,BS_MULTILINE
     LTEXT           "Độ dài bộ đệm:",IDC_STATIC1,221,216,69,8
     EDITTEXT        IDC_EDIT1,221,228,29,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,239,228,11,13
-    LTEXT           "giây",IDC_STATIC2,254,230,26,8
+    LTEXT           "giây.",IDC_STATIC2,254,230,26,8
 END
 
 IDD_PPAGEFILTERSPRIORITY DIALOGEX 0, 0, 296, 264
@@ -870,7 +870,7 @@ BEGIN
     COMBOBOX        IDC_COMBO7,66,112,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO8,66,127,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO9,66,142,220,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Để sử dụng chức năng này, hãy thêm các bộ lọc nguồn mong muốn vào 'Bộ lọc bên ngoài' và nhấp 'Áp dụng'. Sau đó, bạn có thể chỉ định bộ lọc nguồn mong muốn cho một định dạng tệp cụ thể.",IDC_STATIC,5,163,284,32
+    LTEXT           "Để sử dụng chức năng này, hãy thêm bộ lọc nguồn mong muốn vào 'Bộ lọc ngoài' và nhấp 'Áp dụng'. Sau đó, bạn có thể chỉ định bộ lọc nguồn cho định dạng tệp cụ thể.",IDC_STATIC,5,163,284,32
 END
 
 IDD_PPAGELOGO DIALOGEX 0, 0, 296, 264
@@ -878,7 +878,7 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LOGOPREVIEW,"Static",SS_BITMAP | SS_CENTERIMAGE,5,5,284,196
-    CONTROL         "Bên trong:",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,208,58,8
+    CONTROL         "Nội bộ:",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,208,58,8
     CONTROL         "Bên ngoài:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,5,224,58,8
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_ARROWKEYS | UDS_HORZ | WS_GROUP,64,205,36,13
     RTEXT           "",IDC_AUTHOR,100,207,190,8
@@ -890,16 +890,16 @@ IDD_PPAGEVIDEO DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Bộ kết xuất video",IDC_STATIC,5,5,285,29
+    GROUPBOX        "Trình kết xuất video",IDC_STATIC,5,5,285,29
     COMBOBOX        IDC_VIDRND_COMBO,10,15,213,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Thuộc tính",IDC_BUTTON1,226,14,60,14
     GROUPBOX        "Cài đặt EVR-CP và EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Chọn thiết bị kết xuất D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Toàn màn hình độc quyền trên một cửa sổ bổ sung",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
+    CONTROL         "Toàn màn hình độc quyền trên cửa sổ bổ sung",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,79,224,10
     CONTROL         "Đầu ra RGB 10-bit",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,92,92,10
-    CONTROL         "Đặt lại khi thay đổi màn hình hiển thị",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
+    CONTROL         "Đặt lại khi thay đổi màn hình",IDC_RESETDEVICE,"Button",BS_AUTOCHECKBOX | BS_TOP | WS_TABSTOP,10,65,164,9
     LTEXT           "Bộ đệm EVR:",IDC_STATIC5,10,107,65,8
     EDITTEXT        IDC_EVR_BUFFERS,10,120,35,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,33,120,12,13
@@ -907,19 +907,19 @@ BEGIN
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Bộ thay đổi kích thước:",IDC_STATIC3,115,141,72,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Thu nhỏ <50%:",IDC_STATIC10,115,158,72,8
+    LTEXT           "Giảm quy mô <50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Dải đầu ra:",IDC_STATIC4,10,141,65,8
+    LTEXT           "Phạm vi đầu ra:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Cài đặt MPC Video Renderer",IDC_STATIC,5,177,285,27
-    CONTROL         "Toàn màn hình độc quyền trên một cửa sổ bổ sung (thử nghiệm)",IDC_CHECK2,
+    CONTROL         "Toàn màn hình độc quyền trên cửa sổ bổ sung (thử nghiệm)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "Đóng khung",IDC_STATIC,5,208,210,53
-    LTEXT           "Chế độ mặc định:",IDC_STATIC,10,220,74,8
-    COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Không thay đổi kích thước khi tăng kích thước khung hình nhỏ",IDC_CHECK7,
+    GROUPBOX        "Đóng khung",IDC_STATIC,5,208,212,53
+    LTEXT           "Chế độ mặc định:",IDC_STATIC,10,220,79,8
+    COMBOBOX        IDC_COMBO8,90,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Không thay đổi kích thước khi tăng khung hình nhỏ",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,195,10
-    CONTROL         "Không thay đổi kích thước khi giảm kích thước khung hình nhỏ",IDC_CHECK8,
+    CONTROL         "Không thay đổi kích thước khi giảm khung hình nhỏ",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,247,195,10
     PUSHBUTTON      "Mặc định",IDC_BUTTON3,224,246,66,14
     LTEXT           "Chế độ trình bày:",IDC_STATIC6,115,107,72,8
@@ -941,7 +941,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Tải danh sách phát",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,145
-    CONTROL         "Sử dụng trình phân tích cú pháp danh sách phát YouTube tích hợp",IDC_CHECK7,
+    CONTROL         "Sử dụng trình phân tích danh sách phát YouTube tích hợp",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,137,206,10
     CONTROL         "yt-dlp",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Tệp thực thi:",IDC_STATIC,10,17,77,8
@@ -952,7 +952,7 @@ BEGIN
     LTEXT           "Địa chỉ MatriX (TorrServer):",IDC_STATIC,10,173,103,8
     EDITTEXT        IDC_EDIT2,10,185,276,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,205,283,1
-    LTEXT           "Tác nhân người dùng (User agent):",IDC_STATIC,10,214,77,8
+    LTEXT           "Tác nhân người dùng:",IDC_STATIC,10,214,77,8
     EDITTEXT        IDC_EDIT3,91,212,195,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Mặc định",IDC_BUTTON3,224,246,66,14
 END
@@ -963,21 +963,21 @@ CAPTION "Yêu cầu xác thực"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,106,108,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,158,108,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,158,108,50,14
     CONTROL         337,IDC_STATIC,"Static",SS_BITMAP,0,0,213,37
     LTEXT           "Khu vực hạn chế",IDC_STATIC,10,40,198,11
     LTEXT           "Tên người dùng:",IDC_STATIC,10,56,66,8
     LTEXT           "Mật khẩu:",IDC_STATIC,10,74,66,8
     COMBOBOX        IDC_COMBO1,79,56,129,56,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     EDITTEXT        IDC_EDIT3,79,74,129,13,ES_PASSWORD | ES_AUTOHSCROLL
-    CONTROL         "Ghi nhớ mật khẩu",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,79,92,129,9
+    CONTROL         "Nhớ mật khẩu của tôi",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,79,92,129,9
 END
 
 IDD_PPAGEWEBSERVER DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Lắng nghe trên cổng:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,95,9
+    CONTROL         "Lắng nghe tại cổng:",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,7,95,9
     EDITTEXT        IDC_EDIT1,104,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "Chất lượng hình ảnh %:",IDC_STATIC,150,7,95,8
     EDITTEXT        IDC_EDIT4,250,5,30,13,ES_AUTOHSCROLL | ES_NUMBER
@@ -995,7 +995,7 @@ BEGIN
     PUSHBUTTON      "Triển khai...",IDC_BUTTON2,240,89,50,14
     LTEXT           "Trang mặc định:",IDC_STATIC,5,107,285,8
     EDITTEXT        IDC_EDIT9,15,119,275,14,ES_AUTOHSCROLL
-    LTEXT           "Trình xử lý CGI: (.ext1=đường_dẫn1;.ext2=đường_dẫn2;...)",IDC_STATIC,5,137,285,8
+    LTEXT           "Trình xử lý CGI: (.ext1=path1;.ext2=path2;...)",IDC_STATIC,5,137,285,8
     EDITTEXT        IDC_EDIT3,15,149,275,14,ES_AUTOHSCROLL
 END
 
@@ -1005,7 +1005,7 @@ CAPTION "Phụ đề có sẵn trực tuyến"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,5,490,157
-    CONTROL         "Thay thế phụ đề hiện đang tải",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,169,150,9
+    CONTROL         "Thay thế phụ đề đang tải",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,169,150,9
     DEFPUSHBUTTON   "Tải xuống && Mở",IDOK,397,166,98,14
 END
 
@@ -1034,11 +1034,11 @@ BEGIN
     LISTBOX         IDC_LIST1,5,39,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Bật pixel shader sau khi thay đổi kích thước",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,109,150,10
     LISTBOX         IDC_LIST2,5,122,150,65,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "&Loại bỏ",IDC_BUTTON3,162,25,50,14
+    PUSHBUTTON      "&Xóa",IDC_BUTTON3,162,25,50,14
     PUSHBUTTON      "Di chuyển &Lên",IDC_BUTTON1,162,90,50,14
     PUSHBUTTON      "Di chuyển &Xuống",IDC_BUTTON4,162,108,50,14
     DEFPUSHBUTTON   "OK",IDOK,162,153,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,162,173,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,162,173,50,14
 END
 
 IDD_SHADEREDITOR_DLG DIALOGEX 0, 0, 205, 73
@@ -1081,9 +1081,9 @@ BEGIN
     CONTROL         "",IDC_SLI_SATURATION,"msctls_trackbar32",WS_TABSTOP | 0x400,99,65,187,14
     PUSHBUTTON      "Đặt lại",IDC_RESET,241,88,50,14
     GROUPBOX        "",IDC_STATIC5,5,88,179,74
-    CONTROL         "Quản lý màu",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
+    CONTROL         "Quản lý màu sắc",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,88,100,10
     LTEXT           "(cho EVR-CP, bề mặt 10/16-bit)",IDC_STATIC6,10,101,167,8
-    LTEXT           "Kiểu đầu vào:",IDC_STATIC7,10,116,70,8
+    LTEXT           "Loại đầu vào:",IDC_STATIC7,10,116,70,8
     COMBOBOX        IDC_COMBO3,84,113,95,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Ánh sáng môi trường:",IDC_STATIC8,10,133,70,8
     COMBOBOX        IDC_COMBO4,84,130,95,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -1095,18 +1095,18 @@ IDD_PPAGEMISC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Khoảng cách nhảy (nhỏ, trung bình, lớn tính bằng mili giây)",IDC_STATIC,7,5,220,34
+    GROUPBOX        "Khoảng cách bước nhảy (nhỏ, trung bình, lớn tính bằng ms)",IDC_STATIC,7,5,220,34
     EDITTEXT        IDC_EDIT1,15,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Mặc định",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Vô hiệu hóa 'tìm kiếm trong thư mục' trên 'Trước/Sau' khi danh sách phát chỉ có một mục",IDC_CHECK7,
+    CONTROL         "Vô hiệu hóa 'tìm kiếm trong thư mục' ở nút 'Trước/Sau' khi danh sách phát chỉ có một mục",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
-    CONTROL         "Ngăn chặn THU NHỎ khi Toàn màn hình trên màn hình không mặc định",IDC_CHECK6,
+    CONTROL         "Ngăn THU NHỎ khi ở chế độ toàn màn hình trên màn hình không mặc định",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
-    CONTROL         "Tự động ẩn con trỏ trong khi phát ở chế độ cửa sổ",IDC_CHECK5,
+    CONTROL         "Tự ẩn con trỏ trong khi phát ở chế độ cửa sổ",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
-    CONTROL         "Hiển thị số giờ trong thanh trạng thái và OSD",IDC_CHECK8,
+    CONTROL         "Hiện giờ số 0 trên thanh trạng thái và OSD",IDC_CHECK8,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,85,280,9
     LTEXT           "Không hiển thị 000xx.mpls ngắn hơn",IDC_STATIC,7,99,153,8
     EDITTEXT        IDC_EDIT5,163,97,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
@@ -1119,7 +1119,7 @@ BEGIN
     COMBOBOX        IDC_COMBO1,113,150,170,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Kiểm tra cập nhật",IDC_STATIC,5,167,286,40
     CONTROL         "Bật kiểm tra cập nhật tự động",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,179,250,9
-    LTEXT           "Độ trễ giữa mỗi lần kiểm tra:",IDC_STATIC5,10,192,110,8
+    LTEXT           "Độ trễ giữa các lần kiểm tra:",IDC_STATIC5,10,192,110,8
     EDITTEXT        IDC_EDIT4,120,190,30,13,ES_CENTER | ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,140,190,13,14
     LTEXT           "ngày",IDC_STATIC6,155,192,50,8
@@ -1130,22 +1130,22 @@ END
 
 IDD_TUNER_SCAN DIALOGEX 0, 0, 407, 246
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Quét bộ thu sóng"
+CAPTION "Quét bộ dò đài"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "Bắt đầu",ID_START,244,227,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,352,227,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,352,227,50,14
     CONTROL         "",IDC_STRENGTH,"msctls_progress32",PBS_VERTICAL | WS_BORDER,373,51,10,158
     CONTROL         "",IDC_QUALITY,"msctls_progress32",PBS_VERTICAL | WS_BORDER,387,51,10,158
     CONTROL         "",IDC_CHANNEL_LIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,5,37,343,172
     CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,5,213,343,10
     EDITTEXT        IDC_FREQ_START,84,5,40,13,ES_AUTOHSCROLL
-    LTEXT           "Tần số Bắt đầu",IDC_STATIC,5,7,75,8
+    LTEXT           "Tần số bắt đầu",IDC_STATIC,5,7,75,8
     EDITTEXT        IDC_BANDWIDTH,84,20,40,12,ES_AUTOHSCROLL
     LTEXT           "Băng thông",IDC_STATIC,5,22,75,8
     EDITTEXT        IDC_FREQ_END,211,5,40,12,ES_AUTOHSCROLL
-    LTEXT           "Tần số Kết thúc",IDC_STATIC,132,7,75,8
-    CONTROL         "Bỏ qua các kênh được mã hóa",IDC_CHECK_IGNORE_ENCRYPTED,
+    LTEXT           "Tần số kết thúc",IDC_STATIC,132,7,75,8
+    CONTROL         "Bỏ qua các kênh mã hóa",IDC_CHECK_IGNORE_ENCRYPTED,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,259,7,138,9
     DEFPUSHBUTTON   "Lưu",ID_SAVE,298,227,50,14
     LTEXT           "F",IDC_STATIC,375,37,8,8
@@ -1170,7 +1170,7 @@ BEGIN
     COMBOBOX        IDC_COMBO9,84,75,202,102,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Cài đặt kỹ thuật số (BDA)",IDC_STATIC,5,92,286,59
     LTEXT           "Nhà cung cấp mạng",IDC_STATIC4,10,106,70,8
-    LTEXT           "Bộ thu sóng",IDC_STATIC5,10,121,70,8
+    LTEXT           "Bộ dò đài",IDC_STATIC5,10,121,70,8
     LTEXT           "Bộ thu",IDC_STATIC6,10,136,70,8
     COMBOBOX        IDC_COMBO4,84,104,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO5,84,119,202,30,CBS_DROPDOWNLIST | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
@@ -1181,14 +1181,14 @@ IDD_PPAGESYNC DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Cài đặt EVR (trình trình bày tùy chỉnh)",IDC_STATIC,5,3,286,61
+    GROUPBOX        "Cài đặt EVR (bộ trình bày tùy chỉnh)",IDC_STATIC,5,3,286,61
     CONTROL         "VSync",IDC_VSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,14,121,10
     CONTROL         "VSync nội bộ",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
-    CONTROL         "Bật sửa lỗi thời gian khung hình",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
+    CONTROL         "Bật hiệu chỉnh thời gian khung hình",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Xả GPU trước VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Xả GPU sau khi Trình bày",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
-    CONTROL         "Đợi xả",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
-    GROUPBOX        "Cài đặt đồng bộ EVR",IDC_STATIC2,5,67,286,117
+    CONTROL         "Chờ xả",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,38,100,10
+    GROUPBOX        "Cài đặt EVR Sync",IDC_STATIC2,5,67,286,117
     CONTROL         "Đồng bộ video với màn hình",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Trình bày tại VSync gần nhất",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,274,8
     LTEXT           "Điều chỉnh tần số:",IDC_STATIC5,20,93,85,8
@@ -1201,26 +1201,26 @@ BEGIN
     LTEXT           "+/-",IDC_STATIC11,100,143,10,8
     EDITTEXT        IDC_CONTROLLIMIT,114,141,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     LTEXT           "ms",IDC_STATIC10,158,143,24,8
-    LTEXT           "Các thay đổi sẽ có hiệu lực sau khi quá trình phát đã được đóng và khởi động lại.",IDC_STATIC12,10,162,276,18
+    LTEXT           "Các thay đổi có hiệu lực sau khi quá trình phát đã đóng và khởi động lại.",IDC_STATIC12,10,162,276,18
 END
 
 IDD_PPAGEFULLSCREEN DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         "Khởi chạy tệp ở chế độ toàn màn hình",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,3,274,9
-    CONTROL         "Hiện thanh điều khiển khi toàn màn hình trong",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
+    CONTROL         "Mở tệp ở chế độ toàn màn hình",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,3,274,9
+    CONTROL         "Hiện điều khiển ở chế độ toàn màn hình trong",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
-    LTEXT           "giây",IDC_STATIC1,51,29,30,8
-    LTEXT           "0: tự động ẩn; -1: không ẩn",IDC_STATIC2,85,29,195,8
+    LTEXT           "giây.",IDC_STATIC1,51,29,30,8
+    LTEXT           "0: tự ẩn; -1: không ẩn",IDC_STATIC2,85,29,195,8
     CONTROL         "Thoát toàn màn hình khi kết thúc phát",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,43,276,9
     CONTROL         "Thoát toàn màn hình khi mất tiêu điểm",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,55,276,9
     LTEXT           "Màn hình toàn màn hình",IDC_STATIC,13,66,238,8
     COMBOBOX        IDC_COMBO1,13,75,273,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,5,91,287,169
-    CONTROL         "Sử dụng chế độ thay đổi màn hình toàn màn hình tự động",IDC_CHECK2,
+    CONTROL         "Sử dụng chế độ tự động chuyển toàn màn hình",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,90,267,9
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,101,226,124
     PUSHBUTTON      "Thêm",IDC_BUTTON1,240,101,48,16
@@ -1230,7 +1230,7 @@ BEGIN
     LTEXT           "Độ trễ:",IDC_STATIC,242,201,46,8
     EDITTEXT        IDC_EDIT2,240,213,24,12,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_HOTTRACK,254,214,10,8
-    LTEXT           "giây",IDC_STATIC,267,215,19,8
+    LTEXT           "giây.",IDC_STATIC,267,215,19,8
     CONTROL         "Thay đổi chế độ hiển thị trước khi bắt đầu phát",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,227,271,9
     CONTROL         "Áp dụng chế độ màn hình mặc định khi thoát toàn màn hình",IDC_CHECK3,
@@ -1254,22 +1254,22 @@ IDD_PPAGESUBTITLES DIALOGEX 0, 0, 296, 264
 STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Bộ kết xuất phụ đề:",IDC_STATIC,10,7,74,8
+    LTEXT           "Trình kết xuất phụ đề:",IDC_STATIC,10,7,74,8
     COMBOBOX        IDC_COMBO2,89,5,145,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Thuộc tính",IDC_BUTTON2,237,4,50,14
-    GROUPBOX        "Các đường dẫn tự động tải",IDC_STATIC,5,20,286,31
+    GROUPBOX        "Đường dẫn tự động tải",IDC_STATIC,5,20,286,31
     EDITTEXT        IDC_EDIT1,10,33,224,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Đặt lại",IDC_BUTTON1,237,33,50,13
     CONTROL         "Ưu tiên phụ đề bên ngoài hơn phụ đề nhúng",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,55,285,9
     CONTROL         "Bỏ qua phụ đề nhúng",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,67,285,9
-    CONTROL         "Tự động tải lại các tệp phụ đề sau khi phát hiện sửa đổi",IDC_CHECK3,
+    CONTROL         "Tự động tải lại tệp phụ đề sau khi phát hiện sửa đổi",IDC_CHECK3,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,79,285,9
     CONTROL         "Sử dụng Subresync",IDC_CHECK_SUBRESYNC,"Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,91,285,9
     GROUPBOX        "",IDC_STATIC,4,103,286,47
-    LTEXT           "Trang mã mặc định:",IDC_STATIC,10,108,120,8
+    LTEXT           "Bảng mã mặc định:",IDC_STATIC,10,108,120,8
     COMBOBOX        IDC_COMBO3,10,120,277,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Tự động phát hiện trang mã",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
+    CONTROL         "Tự động phát hiện bảng mã",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,178,10
 END
 
 IDD_UPDATE_DIALOG DIALOGEX 0, 0, 238, 60
@@ -1288,7 +1288,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "&Lưu",IDOK,129,82,50,14
-    PUSHBUTTON      "&Hủy",IDCANCEL,182,82,50,14
+    PUSHBUTTON      "&Hủy bỏ",IDCANCEL,182,82,50,14
     LTEXT           "Tiêu đề:",IDC_STATIC,10,6,50,8
     EDITTEXT        IDC_EDIT1,10,18,219,13,ES_AUTOHSCROLL
     LTEXT           "Đường dẫn:",IDC_STATIC,10,36,50,8
@@ -1303,7 +1303,7 @@ BEGIN
     LTEXT           "Tên:",IDC_STATIC,4,5,50,8
     EDITTEXT        IDC_EDIT1,58,4,188,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "OK",IDOK,142,23,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,196,23,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,196,23,50,14
 END
 
 IDD_CMD_LINE_HELP DIALOGEX 0, 0, 309, 177
@@ -1322,7 +1322,7 @@ CAPTION "Hộp thoại tên danh sách phát"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,150,42,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,204,42,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,204,42,50,14
     EDITTEXT        IDC_EDIT1,94,14,159,14,ES_AUTOHSCROLL
     RTEXT           "Tên:",IDC_STATIC,7,16,84,8
 END
@@ -1336,7 +1336,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,38,5,86,13,ES_AUTOHSCROLL
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,275,139,WS_EX_CLIENTEDGE
     DEFPUSHBUTTON   "OK",IDOK,177,163,50,14
-    PUSHBUTTON      "Hủy",IDCANCEL,230,163,50,14
+    PUSHBUTTON      "Hủy bỏ",IDCANCEL,230,163,50,14
 END
 
 IDD_HISTORY DIALOGEX 0, 0, 276, 170
@@ -1653,43 +1653,43 @@ BEGIN
     BEGIN
         MENUITEM "&Mở tệp nhanh...",         ID_FILE_OPENFILE
         MENUITEM SEPARATOR
-        MENUITEM "&Mở Tệp/URL...",           ID_FILE_OPENFILEURL
+        MENUITEM "&Mở tệp/URL...",           ID_FILE_OPENFILEURL
         MENUITEM "Mở &DVD/Blu-ray...",        ID_FILE_OPENDVD
-        MENUITEM "Mở &Thiết bị...",             ID_FILE_OPENDEVICE
-        MENUITEM "Mở Thư mục...",           ID_FILE_OPENDIRECTORY
+        MENUITEM "Mở t&hiết bị...",             ID_FILE_OPENDEVICE
+        MENUITEM "Mở thư mục...",           ID_FILE_OPENDIRECTORY
         MENUITEM "Mở ảnh &Iso...",          ID_FILE_OPENISO
-        MENUITEM "Mở &Đĩa",                  ID_SUBMENU_OPENDISC
-        MENUITEM "Các tệp gần đây",                ID_SUBMENU_RECENTFILES
+        MENUITEM "Mở đĩ&a",                  ID_SUBMENU_OPENDISC
+        MENUITEM "Tệp gần đây",                ID_SUBMENU_RECENTFILES
         MENUITEM "&Đóng",                      ID_FILE_CLOSEPLAYLIST
         MENUITEM SEPARATOR
-        MENUITEM "Lưu &thành...",                 ID_FILE_SAVE_COPY
-        MENUITEM "Lưu &Ảnh...",              ID_FILE_SAVE_IMAGE
-        MENUITEM "Lưu &Hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
+        MENUITEM "Lưu th&ành...",                 ID_FILE_SAVE_COPY
+        MENUITEM "Lưu &ảnh...",              ID_FILE_SAVE_IMAGE
+        MENUITEM "Lưu &hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
         MENUITEM SEPARATOR
         MENUITEM "&Tải phụ đề...",           ID_FILE_LOAD_SUBTITLE
         MENUITEM "Lưu p&hụ đề...",           ID_FILE_SAVE_SUBTITLE
         MENUITEM SEPARATOR
-        MENUITEM "Thuộc &tính",                 ID_FILE_PROPERTIES
+        MENUITEM "T&huộc tính",                 ID_FILE_PROPERTIES
         MENUITEM SEPARATOR
-        MENUITEM "Th&oát",                       ID_FILE_EXIT
+        MENUITEM "T&hoát",                       ID_FILE_EXIT
     END
     POPUP "&Xem"
     BEGIN
-        MENUITEM "Chú thích&&Menu",               ID_VIEW_CAPTIONMENU
+        MENUITEM "Tiêu đề&&Menu",               ID_VIEW_CAPTIONMENU
         MENUITEM "&Thanh tìm kiếm",                   ID_VIEW_SEEKER
         MENUITEM "Điều k&hiển",                   ID_VIEW_CONTROLS
         MENUITEM "&Thông tin",                ID_VIEW_INFORMATION
-        MENUITEM "Thống &kê",                 ID_VIEW_STATISTICS
-        MENUITEM "Trạ&ng thái",                     ID_VIEW_STATUS
+        MENUITEM "T&hống kê",                 ID_VIEW_STATISTICS
+        MENUITEM "Trạng t&hái",                     ID_VIEW_STATUS
         MENUITEM "Subresync",                   ID_VIEW_SUBRESYNC
         MENUITEM "Danh sách phát",                    ID_VIEW_PLAYLIST
-        MENUITEM "Chụp ảnh",                     ID_VIEW_CAPTURE
+        MENUITEM "Ghi hình",                     ID_VIEW_CAPTURE
         MENUITEM "Trình chỉnh sửa Shader",               ID_VIEW_SHADEREDITOR
         MENUITEM "Điều hướng",                  ID_VIEW_NAVIGATION
-        POPUP "&Cài đặt trước..."
+        POPUP "&Cấu hình sẵn..."
         BEGIN
             MENUITEM "&Tối thiểu",                    ID_VIEW_PRESETS_MINIMAL
-            MENUITEM "&Gọn nhẹ",                    ID_VIEW_PRESETS_COMPACT
+            MENUITEM "&Thu gọn",                    ID_VIEW_PRESETS_COMPACT
             MENUITEM "&Bình thường",                     ID_VIEW_PRESETS_NORMAL
         END
         MENUITEM SEPARATOR
@@ -1699,12 +1699,12 @@ BEGIN
             MENUITEM "&50%",                        ID_VIEW_ZOOM_50
             MENUITEM "&100%",                       ID_VIEW_ZOOM_100
             MENUITEM "&200%",                       ID_VIEW_ZOOM_200
-            MENUITEM "Tự động vừa khít",                    ID_VIEW_ZOOM_AUTOFIT
+            MENUITEM "Tự động vừa",                    ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
         MENUITEM "&Ngôn ngữ (Language)",                   ID_SUBMENU_LANGUAGE
         MENUITEM SEPARATOR
-        POPUP "Cài đặt bộ kết xuất"
+        POPUP "Cài đặt trình kết xuất"
         BEGIN
             MENUITEM "&Kiểm tra xé hình",               ID_VIEW_TEARING_TEST
             MENUITEM "&Hiển thị thống kê",              ID_VIEW_DISPLAYSTATS
@@ -1712,9 +1712,9 @@ BEGIN
             POPUP "Trình bày"
             BEGIN
                 MENUITEM "Toàn màn hình độc quyền",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Bật sửa lỗi thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Bật hiệu chỉnh thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
-            MENUITEM "Đặt lại cài đặt bộ kết xuất về mặc định", ID_VIEW_RESET_DEFAULT
+            MENUITEM "Đặt lại cài đặt trình kết xuất mặc định", ID_VIEW_RESET_DEFAULT
         END
         MENUITEM "Khung &video",                ID_SUBMENU_VIDEOFRAME
         MENUITEM "Pan&&S&can",                  ID_SUBMENU_PANSCAN
@@ -1727,7 +1727,7 @@ BEGIN
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "Hoán đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
         POPUP "Luôn trên cùng"
@@ -1735,7 +1735,7 @@ BEGIN
             MENUITEM "Không bao giờ",                       ID_ONTOP_NEVER
             MENUITEM "Luôn luôn",                      ID_ONTOP_ALWAYS
             MENUITEM "Khi đang phát",               ID_ONTOP_WHILEPLAYING
-            MENUITEM "Khi đang phát Video",         ID_ONTOP_WHILEPLAYINGVIDEO
+            MENUITEM "Khi đang phát video",         ID_ONTOP_WHILEPLAYINGVIDEO
         END
         MENUITEM "&Tùy chọn...",                 ID_VIEW_OPTIONS
     END
@@ -1743,11 +1743,11 @@ BEGIN
     BEGIN
         MENUITEM "&Phát/Tạm dừng",                 ID_PLAY_PLAYPAUSE
         MENUITEM "&Dừng",                       ID_PLAY_STOP
-        MENUITEM "Bước k&hung hình",                 ID_PLAY_FRAMESTEP
-        MENUITEM "&Đi đến...",                   ID_PLAY_GOTO
+        MENUITEM "Từng k&hung hình",                 ID_PLAY_FRAMESTEP
+        MENUITEM "&Đi tới...",                   ID_PLAY_GOTO
         POPUP "&Lặp lại"
         BEGIN
-            MENUITEM "Vô &hạn",                    ID_REPEAT_FOREVER
+            MENUITEM "Mãi &mãi",                    ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Đặt lại)",                ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Đánh dấu &A)",               ID_PLAY_REPEAT_AB_MARK_A
@@ -1765,21 +1765,21 @@ BEGIN
         MENUITEM "Phụ &đề",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
-        POPUP "Âm lư&ợng"
+        POPUP "Âm lượ&ng"
         BEGIN
-            MENUITEM "&Tăng",                         ID_VOLUME_UP
-            MENUITEM "&Giảm",                       ID_VOLUME_DOWN
+            MENUITEM "&Lên",                         ID_VOLUME_UP
+            MENUITEM "&Xuống",                       ID_VOLUME_DOWN
             MENUITEM "&Tắt tiếng",                       ID_VOLUME_MUTE
         END
         MENUITEM "Sau khi phát xong",              ID_SUBMENU_AFTERPLAYBACK
     END
     MENUITEM "&Điều hướng",                   ID_SUBMENU_NAVIGATE_MAIN
-    MENUITEM "Mục ưa &thích",                  ID_SUBMENU_FAVORITES_MAIN
+    MENUITEM "Mục yêu t&hích",                  ID_SUBMENU_FAVORITES_MAIN
     POPUP "&Trợ giúp"
     BEGIN
         MENUITEM "&Trang chủ",                  ID_HELP_HOMEPAGE
         MENUITEM "Kiểm tra &cập nhật",          ID_HELP_CHECKFORUPDATE
-        MENUITEM "&Các tham số dòng lệnh",      ID_HELP_SHOWCOMMANDLINESWITCHES
+        MENUITEM "&Tham số dòng lệnh",      ID_HELP_SHOWCOMMANDLINESWITCHES
         MENUITEM "Tải xuống hình ảnh &thanh công cụ",    ID_HELP_TOOLBARIMAGES
         MENUITEM SEPARATOR
         MENUITEM "&Giới thiệu...",                   ID_HELP_ABOUT
@@ -1794,32 +1794,32 @@ BEGIN
         BEGIN
             MENUITEM "&Mở tệp nhanh...",         ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "&Mở Tệp/URL...",           ID_FILE_OPENFILEURL
+            MENUITEM "&Mở tệp/URL...",           ID_FILE_OPENFILEURL
             MENUITEM "Mở &DVD/Blu-ray...",        ID_FILE_OPENDVD
-            MENUITEM "Mở &Thiết bị...",             ID_FILE_OPENDEVICE
-            MENUITEM "Mở Thư mục...",           ID_FILE_OPENDIRECTORY
+            MENUITEM "Mở t&hiết bị...",             ID_FILE_OPENDEVICE
+            MENUITEM "Mở thư mục...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Mở ảnh &Iso...",          ID_FILE_OPENISO
-            MENUITEM "Mở &Đĩa",                  ID_SUBMENU_OPENDISC
-            MENUITEM "Các tệp gần đây",                ID_SUBMENU_RECENTFILES
+            MENUITEM "Mở đĩ&a",                  ID_SUBMENU_OPENDISC
+            MENUITEM "Tệp gần đây",                ID_SUBMENU_RECENTFILES
             MENUITEM "&Đóng",                      ID_FILE_CLOSEPLAYLIST
             MENUITEM SEPARATOR
-            MENUITEM "Lưu &thành...",                 ID_FILE_SAVE_COPY
-            MENUITEM "Lưu &Ảnh...",              ID_FILE_SAVE_IMAGE
-            MENUITEM "Lưu &Hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
+            MENUITEM "Lưu th&ành...",                 ID_FILE_SAVE_COPY
+            MENUITEM "Lưu &ảnh...",              ID_FILE_SAVE_IMAGE
+            MENUITEM "Lưu &hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
             MENUITEM SEPARATOR
             MENUITEM "&Tải phụ đề...",           ID_FILE_LOAD_SUBTITLE
             MENUITEM "Lưu p&hụ đề...",           ID_FILE_SAVE_SUBTITLE
             MENUITEM SEPARATOR
-            MENUITEM "Thuộc &tính",                 ID_FILE_PROPERTIES
+            MENUITEM "T&huộc tính",                 ID_FILE_PROPERTIES
             MENUITEM SEPARATOR
-            MENUITEM "Th&oát",                       ID_FILE_EXIT
+            MENUITEM "T&hoát",                       ID_FILE_EXIT
         END
         MENUITEM SEPARATOR
         MENUITEM "&Phát/Tạm dừng",                 ID_PLAY_PLAYPAUSE
         MENUITEM "&Dừng",                       ID_PLAY_STOP
         POPUP "&Lặp lại"
         BEGIN
-            MENUITEM "Vô &hạn",                    ID_REPEAT_FOREVER
+            MENUITEM "Mãi &mãi",                    ID_REPEAT_FOREVER
             MENUITEM SEPARATOR
             MENUITEM "A-B (&Đặt lại)",                ID_PLAY_REPEAT_AB
             MENUITEM "A-B (Đánh dấu &A)",               ID_PLAY_REPEAT_AB_MARK_A
@@ -1832,61 +1832,61 @@ BEGIN
             MENUITEM "&50%",                        ID_VIEW_ZOOM_50
             MENUITEM "&100%",                       ID_VIEW_ZOOM_100
             MENUITEM "&200%",                       ID_VIEW_ZOOM_200
-            MENUITEM "Tự động vừa khít",                    ID_VIEW_ZOOM_AUTOFIT
+            MENUITEM "Tự động vừa",                    ID_VIEW_ZOOM_AUTOFIT
         END
         MENUITEM SEPARATOR
         MENUITEM "Khung &video",                ID_SUBMENU_VIDEOFRAME
         MENUITEM "Pan&&S&can",                  ID_SUBMENU_PANSCAN
         MENUITEM SEPARATOR
         MENUITEM "&Điều hướng",                   ID_SUBMENU_NAVIGATE
-        MENUITEM "Mục ưa &thích",                  ID_SUBMENU_FAVORITES
+        MENUITEM "Mục yêu t&hích",                  ID_SUBMENU_FAVORITES
         MENUITEM SEPARATOR
-        MENUITEM "&Bộ lọc",                    ID_SUBMENU_FILTERS
+        MENUITEM "B&ộ lọc",                    ID_SUBMENU_FILTERS
         MENUITEM "S&hader",                    ID_SUBMENU_SHADERS
         MENUITEM SEPARATOR
         MENUITEM "&Âm thanh",                      ID_SUBMENU_AUDIOLANG
         MENUITEM "Phụ &đề",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
-        POPUP "Âm lư&ợng"
+        POPUP "Âm lượ&ng"
         BEGIN
-            MENUITEM "&Tăng",                         ID_VOLUME_UP
-            MENUITEM "&Giảm",                       ID_VOLUME_DOWN
+            MENUITEM "&Lên",                         ID_VOLUME_UP
+            MENUITEM "&Xuống",                       ID_VOLUME_DOWN
             MENUITEM "&Tắt tiếng",                       ID_VOLUME_MUTE
         END
         MENUITEM "Sau khi phát xong",              ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
-        POPUP "&Xem"
+        POPUP "Vi&ew"
         BEGIN
             POPUP "Luôn trên cùng"
             BEGIN
                 MENUITEM "Không bao giờ",                       ID_ONTOP_NEVER
                 MENUITEM "Luôn luôn",                      ID_ONTOP_ALWAYS
                 MENUITEM "Khi đang phát",               ID_ONTOP_WHILEPLAYING
-                MENUITEM "Khi đang phát Video",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "Khi đang phát video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM SEPARATOR
-            MENUITEM "Chú thích&&Menu",               ID_VIEW_CAPTIONMENU
+            MENUITEM "Tiêu đề&&Menu",               ID_VIEW_CAPTIONMENU
             MENUITEM "Thanh tìm kiếm",                    ID_VIEW_SEEKER
             MENUITEM "Điều k&hiển",                   ID_VIEW_CONTROLS
             MENUITEM "&Thông tin",                ID_VIEW_INFORMATION
-            MENUITEM "Thống &kê",                 ID_VIEW_STATISTICS
-            MENUITEM "Trạ&ng thái",                     ID_VIEW_STATUS
+            MENUITEM "T&hống kê",                 ID_VIEW_STATISTICS
+            MENUITEM "Trạng t&hái",                     ID_VIEW_STATUS
             MENUITEM "Subresync",                   ID_VIEW_SUBRESYNC
             MENUITEM "Danh sách phát",                    ID_VIEW_PLAYLIST
-            MENUITEM "Chụp ảnh",                     ID_VIEW_CAPTURE
+            MENUITEM "Ghi hình",                     ID_VIEW_CAPTURE
             MENUITEM "Trình chỉnh sửa Shader",               ID_VIEW_SHADEREDITOR
             MENUITEM "Điều hướng",                  ID_VIEW_NAVIGATION
             MENUITEM "&Ngôn ngữ (Language)",                   ID_SUBMENU_LANGUAGE
-            POPUP "&Cài đặt trước..."
+            POPUP "&Cấu hình sẵn..."
             BEGIN
                 MENUITEM "&Tối thiểu",                    ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Gọn nhẹ",                    ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Thu gọn",                    ID_VIEW_PRESETS_COMPACT
                 MENUITEM "&Bình thường",                     ID_VIEW_PRESETS_NORMAL
             END
         END
         MENUITEM SEPARATOR
-        POPUP "Cài đặt bộ kết xuất"
+        POPUP "Cài đặt trình kết xuất"
         BEGIN
             MENUITEM "&Kiểm tra xé hình",               ID_VIEW_TEARING_TEST
             MENUITEM "&Hiển thị thống kê",              ID_VIEW_DISPLAYSTATS
@@ -1894,9 +1894,9 @@ BEGIN
             POPUP "Trình bày"
             BEGIN
                 MENUITEM "Toàn màn hình độc quyền",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Bật sửa lỗi thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Bật hiệu chỉnh thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
-            MENUITEM "Đặt lại cài đặt bộ kết xuất về mặc định", ID_VIEW_RESET_DEFAULT
+            MENUITEM "Đặt lại cài đặt trình kết xuất mặc định", ID_VIEW_RESET_DEFAULT
         END
         POPUP "Chế độ Stereo 3D"
         BEGIN
@@ -1907,13 +1907,13 @@ BEGIN
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "Hoán đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
-        MENUITEM "Thuộc &tính",                 ID_FILE_PROPERTIES
+        MENUITEM "T&huộc tính",                 ID_FILE_PROPERTIES
         MENUITEM "&Tùy chọn...",                 ID_VIEW_OPTIONS
         MENUITEM SEPARATOR
-        MENUITEM "Th&oát",                       ID_FILE_EXIT
+        MENUITEM "T&hoát",                       ID_FILE_EXIT
     END
 END
 
@@ -1925,42 +1925,42 @@ BEGIN
         BEGIN
             MENUITEM "&Mở tệp nhanh...",         ID_FILE_OPENFILE
             MENUITEM SEPARATOR
-            MENUITEM "&Mở Tệp/URL...",           ID_FILE_OPENFILEURL
+            MENUITEM "&Mở tệp/URL...",           ID_FILE_OPENFILEURL
             MENUITEM "Mở &DVD/Blu-ray...",        ID_FILE_OPENDVD
-            MENUITEM "Mở &Thiết bị...",             ID_FILE_OPENDEVICE
-            MENUITEM "Mở Thư mục...",           ID_FILE_OPENDIRECTORY
+            MENUITEM "Mở t&hiết bị...",             ID_FILE_OPENDEVICE
+            MENUITEM "Mở thư mục...",           ID_FILE_OPENDIRECTORY
             MENUITEM "Mở ảnh &Iso...",          ID_FILE_OPENISO
-            MENUITEM "Mở &Đĩa",                  ID_SUBMENU_OPENDISC
-            MENUITEM "Các tệp gần đây",                ID_SUBMENU_RECENTFILES
+            MENUITEM "Mở đĩ&a",                  ID_SUBMENU_OPENDISC
+            MENUITEM "Tệp gần đây",                ID_SUBMENU_RECENTFILES
             MENUITEM "&Đóng",                      ID_FILE_CLOSEPLAYLIST
             MENUITEM SEPARATOR
-            MENUITEM "Lưu &thành...",                 ID_FILE_SAVE_COPY
-            MENUITEM "Lưu Ảnh...",               ID_FILE_SAVE_IMAGE
-            MENUITEM "Lưu &Hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
+            MENUITEM "Lưu th&ành...",                 ID_FILE_SAVE_COPY
+            MENUITEM "Lưu ảnh...",               ID_FILE_SAVE_IMAGE
+            MENUITEM "Lưu &hình thu nhỏ...",         ID_FILE_SAVE_THUMBNAILS
             MENUITEM SEPARATOR
             MENUITEM "&Tải phụ đề...",           ID_FILE_LOAD_SUBTITLE
             MENUITEM "Lưu p&hụ đề...",           ID_FILE_SAVE_SUBTITLE
             MENUITEM SEPARATOR
-            MENUITEM "Thuộc t&ính",                 ID_FILE_PROPERTIES
+            MENUITEM "T&huộc tính",                 ID_FILE_PROPERTIES
         END
         POPUP "&Xem"
         BEGIN
-            MENUITEM "Chú thích&&Menu",               ID_VIEW_CAPTIONMENU
+            MENUITEM "Tiêu đề&&Menu",               ID_VIEW_CAPTIONMENU
             MENUITEM "&Thanh tìm kiếm",                   ID_VIEW_SEEKER
             MENUITEM "Điều k&hiển",                   ID_VIEW_CONTROLS
             MENUITEM "&Thông tin",                ID_VIEW_INFORMATION
-            MENUITEM "Thống &kê",                 ID_VIEW_STATISTICS
-            MENUITEM "Trạ&ng thái",                     ID_VIEW_STATUS
+            MENUITEM "T&hống kê",                 ID_VIEW_STATISTICS
+            MENUITEM "Trạng t&hái",                     ID_VIEW_STATUS
             MENUITEM "Subresync",                   ID_VIEW_SUBRESYNC
             MENUITEM "Danh sách phát",                    ID_VIEW_PLAYLIST
-            MENUITEM "Chụp ảnh",                     ID_VIEW_CAPTURE
+            MENUITEM "Ghi hình",                     ID_VIEW_CAPTURE
             MENUITEM "Trình chỉnh sửa Shader",               ID_VIEW_SHADEREDITOR
             MENUITEM "Điều hướng",                  ID_VIEW_NAVIGATION
             MENUITEM "&Ngôn ngữ (Language)",                   ID_SUBMENU_LANGUAGE
-            POPUP "&Cài đặt trước..."
+            POPUP "&Cấu hình sẵn..."
             BEGIN
                 MENUITEM "&Tối thiểu",                    ID_VIEW_PRESETS_MINIMAL
-                MENUITEM "&Gọn nhẹ",                    ID_VIEW_PRESETS_COMPACT
+                MENUITEM "&Thu gọn",                    ID_VIEW_PRESETS_COMPACT
                 MENUITEM "&Bình thường",                     ID_VIEW_PRESETS_NORMAL
             END
             MENUITEM SEPARATOR
@@ -1970,10 +1970,10 @@ BEGIN
                 MENUITEM "&50%",                        ID_VIEW_ZOOM_50
                 MENUITEM "&100%",                       ID_VIEW_ZOOM_100
                 MENUITEM "&200%",                       ID_VIEW_ZOOM_200
-                MENUITEM "Tự động vừa khít",                    ID_VIEW_ZOOM_AUTOFIT
+                MENUITEM "Tự động vừa",                    ID_VIEW_ZOOM_AUTOFIT
             END
             MENUITEM SEPARATOR
-            POPUP "Cài đặt bộ kết xuất"
+            POPUP "Cài đặt trình kết xuất"
             BEGIN
                 MENUITEM "&Kiểm tra xé hình",               ID_VIEW_TEARING_TEST
                 MENUITEM "&Hiển thị thống kê",              ID_VIEW_DISPLAYSTATS
@@ -1981,9 +1981,9 @@ BEGIN
                 POPUP "Trình bày"
                 BEGIN
                     MENUITEM "Toàn màn hình độc quyền",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                    MENUITEM "Bật sửa lỗi thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
+                    MENUITEM "Bật hiệu chỉnh thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
                 END
-                MENUITEM "Đặt lại cài đặt bộ kết xuất về mặc định", ID_VIEW_RESET_DEFAULT
+                MENUITEM "Đặt lại cài đặt trình kết xuất mặc định", ID_VIEW_RESET_DEFAULT
             END
             MENUITEM "Khung &video",                ID_SUBMENU_VIDEOFRAME
             MENUITEM "Pan&&S&can",                  ID_SUBMENU_PANSCAN
@@ -1996,7 +1996,7 @@ BEGIN
                 MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
                 MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
                 MENUITEM SEPARATOR
-                MENUITEM "Đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
+                MENUITEM "Hoán đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
             END
             MENUITEM SEPARATOR
             POPUP "Luôn trên cùng"
@@ -2004,7 +2004,7 @@ BEGIN
                 MENUITEM "Không bao giờ",                       ID_ONTOP_NEVER
                 MENUITEM "Luôn luôn",                      ID_ONTOP_ALWAYS
                 MENUITEM "Khi đang phát",               ID_ONTOP_WHILEPLAYING
-                MENUITEM "Khi đang phát Video",         ID_ONTOP_WHILEPLAYINGVIDEO
+                MENUITEM "Khi đang phát video",         ID_ONTOP_WHILEPLAYINGVIDEO
             END
             MENUITEM "&Tùy chọn...",                 ID_VIEW_OPTIONS
         END
@@ -2012,11 +2012,11 @@ BEGIN
         BEGIN
             MENUITEM "&Phát/Tạm dừng",                 ID_PLAY_PLAYPAUSE
             MENUITEM "&Dừng",                       ID_PLAY_STOP
-            MENUITEM "Bước k&hung hình",                 ID_PLAY_FRAMESTEP
-            MENUITEM "&Đi đến...",                   ID_PLAY_GOTO
+            MENUITEM "Từng k&hung hình",                 ID_PLAY_FRAMESTEP
+            MENUITEM "&Đi tới...",                   ID_PLAY_GOTO
             POPUP "&Lặp lại"
             BEGIN
-                MENUITEM "Vô &hạn",                    ID_REPEAT_FOREVER
+                MENUITEM "Mãi &mãi",                    ID_REPEAT_FOREVER
                 MENUITEM SEPARATOR
                 MENUITEM "A-B (&Đặt lại)",                ID_PLAY_REPEAT_AB
                 MENUITEM "A-B (Đánh dấu &A)",               ID_PLAY_REPEAT_AB_MARK_A
@@ -2028,12 +2028,12 @@ BEGIN
             MENUITEM "Đặt lại tốc độ",                  ID_PLAY_RESETRATE
         END
         MENUITEM "&Điều hướng",                   ID_SUBMENU_NAVIGATE
-        MENUITEM "Mục ưa &thích",                  ID_SUBMENU_FAVORITES
+        MENUITEM "Mục yêu t&hích",                  ID_SUBMENU_FAVORITES
         POPUP "&Trợ giúp"
         BEGIN
             MENUITEM "&Trang chủ",                  ID_HELP_HOMEPAGE
             MENUITEM "Kiểm tra &cập nhật",          ID_HELP_CHECKFORUPDATE
-            MENUITEM "&Các tham số dòng lệnh",      ID_HELP_SHOWCOMMANDLINESWITCHES
+            MENUITEM "&Tham số dòng lệnh",      ID_HELP_SHOWCOMMANDLINESWITCHES
             MENUITEM SEPARATOR
             MENUITEM "&Giới thiệu...",                   ID_HELP_ABOUT
         END
@@ -2045,15 +2045,15 @@ BEGIN
         MENUITEM "Phụ &đề",                  ID_SUBMENU_SUBTITLELANG
         MENUITEM "Static",                      ID_SUBMENU_VIDEOSTREAM
         MENUITEM SEPARATOR
-        POPUP "Âm lư&ợng"
+        POPUP "Âm lượ&ng"
         BEGIN
-            MENUITEM "&Tăng",                         ID_VOLUME_UP
-            MENUITEM "&Giảm",                       ID_VOLUME_DOWN
+            MENUITEM "&Lên",                         ID_VOLUME_UP
+            MENUITEM "&Xuống",                       ID_VOLUME_DOWN
             MENUITEM "&Tắt tiếng",                       ID_VOLUME_MUTE
         END
         MENUITEM "Sau khi phát xong",              ID_SUBMENU_AFTERPLAYBACK
         MENUITEM SEPARATOR
-        POPUP "Cài đặt bộ kết xuất"
+        POPUP "Cài đặt trình kết xuất"
         BEGIN
             MENUITEM "&Kiểm tra xé hình",               ID_VIEW_TEARING_TEST
             MENUITEM "&Hiển thị thống kê",              ID_VIEW_DISPLAYSTATS
@@ -2061,9 +2061,9 @@ BEGIN
             POPUP "Trình bày"
             BEGIN
                 MENUITEM "Toàn màn hình độc quyền",        ID_VIEW_EXCLUSIVE_FULLSCREEN
-                MENUITEM "Bật sửa lỗi thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
+                MENUITEM "Bật hiệu chỉnh thời gian khung hình", ID_VIEW_ENABLEFRAMETIMECORRECTION
             END
-            MENUITEM "Đặt lại cài đặt bộ kết xuất về mặc định", ID_VIEW_RESET_DEFAULT
+            MENUITEM "Đặt lại cài đặt trình kết xuất mặc định", ID_VIEW_RESET_DEFAULT
         END
         POPUP "Chế độ Stereo 3D"
         BEGIN
@@ -2074,13 +2074,13 @@ BEGIN
             MENUITEM "Half OverUnder",              ID_STEREO3D_HALFOVERUNDER
             MENUITEM "OverUnder",                   ID_STEREO3D_OVERUNDER
             MENUITEM SEPARATOR
-            MENUITEM "Đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
+            MENUITEM "Hoán đổi trái/phải",             ID_STEREO3D_SWAP_LEFTRIGHT
         END
         MENUITEM SEPARATOR
-        MENUITEM "Thuộc t&ính",                 ID_FILE_PROPERTIES
+        MENUITEM "T&huộc tính",                 ID_FILE_PROPERTIES
         MENUITEM "&Tùy chọn...",                 ID_VIEW_OPTIONS
         MENUITEM SEPARATOR
-        MENUITEM "Th&oát",                       ID_FILE_EXIT
+        MENUITEM "T&hoát",                       ID_FILE_EXIT
     END
 END
 
@@ -2107,7 +2107,7 @@ BEGIN
             MENUITEM "2.35:1",                      ID_ASPECTRATIO_235_100
             MENUITEM "1.85:1",                      ID_ASPECTRATIO_185_100
         END
-        MENUITEM "Sửa lỗi khác biệt AR Màn hình/Desktop", ID_VIEW_VF_COMPMONDESKARDIFF
+        MENUITEM "Sửa chênh lệch tỷ lệ khung hình Màn hình/Desktop", ID_VIEW_VF_COMPMONDESKARDIFF
     END
 END
 
@@ -2142,8 +2142,8 @@ BEGIN
     BEGIN
         MENUITEM "--------- Một lần ---------",    ID_AFTERPLAYBACK_ONCE
         MENUITEM "Thoát",                        ID_AFTERPLAYBACK_CLOSE
-        MENUITEM "Chế độ chờ (Stand By)",                    ID_AFTERPLAYBACK_STANDBY
-        MENUITEM "Ngủ đông (Hibernate)",                   ID_AFTERPLAYBACK_HIBERNATE
+        MENUITEM "Chế độ chờ",                    ID_AFTERPLAYBACK_STANDBY
+        MENUITEM "Ngủ đông",                   ID_AFTERPLAYBACK_HIBERNATE
         MENUITEM "Tắt máy",                    ID_AFTERPLAYBACK_SHUTDOWN
         MENUITEM "Đăng xuất",                     ID_AFTERPLAYBACK_LOGOFF
         MENUITEM "Khóa",                        ID_AFTERPLAYBACK_LOCK
@@ -2164,13 +2164,13 @@ BEGIN
     BEGIN
         MENUITEM "&Trước",                   ID_NAVIGATE_SKIPBACK
         MENUITEM "&Sau",                       ID_NAVIGATE_SKIPFORWARD
-        MENUITEM "&Đi đến...",                 ID_SUBMENU_JUMPTO
+        MENUITEM "&Nhảy tới...",                 ID_SUBMENU_JUMPTO
         MENUITEM SEPARATOR
         MENUITEM "&Menu Tiêu đề",                 ID_NAVIGATE_TITLEMENU
         MENUITEM "&Menu Gốc",                  ID_NAVIGATE_ROOTMENU
         MENUITEM "&Menu Phụ đề",              ID_NAVIGATE_SUBPICTUREMENU
         MENUITEM "&Menu Âm thanh",                 ID_NAVIGATE_AUDIOMENU
-        MENUITEM "Menu G&óc nhìn",                 ID_NAVIGATE_ANGLEMENU
+        MENUITEM "Menu G&óc",                 ID_NAVIGATE_ANGLEMENU
         MENUITEM "&Menu Chương",               ID_NAVIGATE_CHAPTERMENU
     END
 END
@@ -2181,9 +2181,9 @@ BEGIN
     BEGIN
         MENUITEM "Bật Pixel Shader trước khi thay đổi kích thước", ID_SHADERS_1_ENABLE
         MENUITEM "Bật Pixel Shader sau khi thay đổi kích thước", ID_SHADERS_2_ENABLE
-        MENUITEM "&Chọn Shaders...",          ID_SHADERS_SELECT
+        MENUITEM "&Chọn Shader...",          ID_SHADERS_SELECT
         MENUITEM SEPARATOR
-        MENUITEM "&Chỉnh sửa shaders...",            ID_VIEW_SHADEREDITOR
+        MENUITEM "&Chỉnh sửa shader...",            ID_VIEW_SHADEREDITOR
     END
 END
 
@@ -2353,27 +2353,27 @@ BEGIN
     IDS_CONTROLS_COMPLETING "Đang hoàn tất..."
     IDS_AUTOPLAY_PLAYVIDEO  "Phát video"
     IDS_AUTOPLAY_PLAYMUSIC  "Phát nhạc"
-    IDS_AUTOPLAY_PLAYAUDIOCD "Phát CD âm thanh"
+    IDS_AUTOPLAY_PLAYAUDIOCD "Phát Audio CD"
     IDS_AUTOPLAY_PLAYDVDMOVIE "Phát phim DVD"
     IDS_PROPSHEET_PROPERTIES "Thuộc tính"
     IDS_GRAPHBUILDER_AUDIOSWITCHER "Bộ chuyển đổi âm thanh"
     IDS_SUBTITLES_DEFAULT_STYLE "&Kiểu mặc định"
     IDS_SUBTITLES_FORCED    "&Chỉ ép buộc"
-    IDS_FAVFILES            "Tệp tin"
+    IDS_FAVFILES            "Tệp"
     IDS_FAVDVDS             "DVD"
 END
 
 STRINGTABLE
 BEGIN
     IDS_STATSBAR_SYNC_OFFSET "Độ lệch đồng bộ"
-    IDS_STATSBAR_SYNC_OFFSET_FORMAT "tb: %d ms, độ lệch: %d ms"
-    IDS_STATSBAR_JITTER     "Độ giật (Jitter)"
-    IDS_STATSBAR_BITRATE    "Tốc độ bit (Bitrate)"
-    IDS_STATSBAR_BITRATE_AVG_CUR " (tb/ht)"
+    IDS_STATSBAR_SYNC_OFFSET_FORMAT "trung bình: %d ms, độ lệch: %d ms"
+    IDS_STATSBAR_JITTER     "Jitter"
+    IDS_STATSBAR_BITRATE    "Tốc độ bit"
+    IDS_STATSBAR_BITRATE_AVG_CUR " (trung bình/hiện tại)"
     IDS_AUTOPLAY_PLAYBDMOVIE "Phát đĩa Blu-ray"
     IDS_TEXTBAR_NOTHING     "Không có gì"
-    IDS_TEXTBAR_FILENANE    "Tên tệp (nếu không thì là tiêu đề hoặc URL)"
-    IDS_TEXTBAR_TITLE       "Tiêu đề (nếu không thì là tên tệp hoặc URL)"
+    IDS_TEXTBAR_FILENANE    "Tên tệp (nếu không có thì dùng tiêu đề hoặc URL)"
+    IDS_TEXTBAR_TITLE       "Tiêu đề (nếu không có thì dùng tên tệp hoặc URL)"
     IDS_TEXTBAR_FULLPATH    "Đường dẫn đầy đủ"
 END
 
@@ -2393,18 +2393,18 @@ BEGIN
     IDS_PLAYLIST_NAME       "Danh sách phát"
     IDS_PLAYLIST_EXPLORER_NAME "Explorer"
     IDS_PLAYLIST_OPEN       "&Mở"
-    IDS_PLAYLIST_ADD        "Thê&m"
-    IDS_PLAYLIST_REMOVE     "&Loại bỏ"
+    IDS_PLAYLIST_ADD        "T&hêm"
+    IDS_PLAYLIST_REMOVE     "&Gỡ bỏ"
     IDS_PLAYLIST_DELETE     "&Xóa vào Thùng rác"
-    IDS_PLAYLIST_DELETE_QUESTION  "Bạn có chắc chắn muốn xóa (các) tệp này vào Thùng rác không ?"
-    IDS_PLAYLIST_CLEAR      "Xó&a"
-    IDS_PLAYLIST_REMOVEMISSINGFILES "Loại bỏ các tệp bị thiếu"
+    IDS_PLAYLIST_DELETE_QUESTION  "Bạn có chắc chắn muốn xóa (các) tệp này vào Thùng rác không?"
+    IDS_PLAYLIST_CLEAR      "X&óa"
+    IDS_PLAYLIST_REMOVEMISSINGFILES "Xóa các tệp bị thiếu"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PLAYLIST_COPYTOCLIPBOARD "&Sao chép vào bộ nhớ tạm"
-    IDS_PLAYLIST_PASTEFROMCLIPBOARD "Dán từ bộ nhớ tạm"
+    IDS_PLAYLIST_COPYTOCLIPBOARD "&Sao chép vào bảng nhớ tạm"
+    IDS_PLAYLIST_PASTEFROMCLIPBOARD "Dán từ bảng nhớ tạm"
     IDS_PLAYLIST_SAVEAS     "&Lưu thành..."
     IDS_PLAYLIST_SORT       "Sắp xếp"
     IDS_PLAYLIST_SORTBYLABEL "theo &nhãn"
@@ -2419,9 +2419,9 @@ BEGIN
     IDS_PLAYLIST_SORTBYSIZE "theo &kích thước"
     IDS_PLAYLIST_SORTREVERSE "đảo ngược"
     IDS_PLAYLIST_EXPLORER_REFRESH "Làm mới"
-    IDS_PLAYLIST_RANDOMIZE  "N&gẫu nhiên"
+    IDS_PLAYLIST_RANDOMIZE  "Xáo t&rộn"
     IDS_PLAYLIST_RESTORE    "K&hôi phục"
-    IDS_PLAYLIST_SHUFFLE    "Trộn bài"
+    IDS_PLAYLIST_SHUFFLE    "Ngẫu nhiên"
     IDS_PLAYLIST_OPENFOLDER "Mở thư mục chứa"
 END
 
@@ -2429,10 +2429,10 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_SHOWTOOLTIP "Hiển thị chú giải công cụ"
     IDS_PLAYLIST_SHOWSEARCHBAR "Hiển thị thanh tìm kiếm"
-    IDS_PLAYLIST_HIDEFS     "Ẩn khi Toàn màn hình"
+    IDS_PLAYLIST_HIDEFS     "Ẩn khi ở chế độ toàn màn hình"
     IDS_PLAYLIST_NEXTONERROR "Chuyển sang tệp tiếp theo khi có lỗi"
     IDS_PLAYLIST_DETERMINEDURATION "Xác định thời lượng khi thêm"
-    IDS_PLAYLIST_SKIPINVALID "Bỏ qua các phần tử không hợp lệ"
+    IDS_PLAYLIST_SKIPINVALID "Bỏ qua các thành phần không hợp lệ"
     IDS_PLAYLIST_INVALID    "Không hợp lệ"
 END
 
@@ -2454,21 +2454,21 @@ STRINGTABLE
 BEGIN
     IDS_RECORD_START        "Ghi"
     IDS_RECORD_STOP         "Dừng"
-    IDS_FILTERS_COPY_TO_CLIPBOARD "&Sao chép danh sách bộ lọc vào bộ nhớ tạm"
-    IDS_AG_COPY_IMAGE       "Sao chép ảnh vào bộ nhớ tạm"
-    IDS_PLAYLOOPMODE_AB     "Lặp A-B: Đặt lại vị trí"
-    IDS_PLAYLOOPMODE_AB_MARK_A "Lặp A-B: Đánh dấu vị trí A"
-    IDS_PLAYLOOPMODE_AB_MARK_B "Lặp A-B: Đánh dấu vị trí B"
-    IDS_ADDTOPLAYLISTROMCLIPBOARD "Thêm vào danh sách phát từ bộ nhớ tạm"
-    IDS_MOVEWINDOWBYVIDEO_ONOFF "Di chuyển cửa sổ bằng vùng video: Bật/Tắt"
-    IDS_MOVEWINDOWBYVIDEO_ON "Di chuyển cửa sổ bằng vùng video: Bật"
-    IDS_MOVEWINDOWBYVIDEO_OFF "Di chuyển cửa sổ bằng vùng video: Tắt"
-    IDS_AUDIO_FILTER_PRESET_1 "Dành cho âm thanh có các phần thì thầm và cháy nổ"
+    IDS_FILTERS_COPY_TO_CLIPBOARD "&Sao chép danh sách bộ lọc vào bảng nhớ tạm"
+    IDS_AG_COPY_IMAGE       "Sao chép ảnh vào bảng nhớ tạm"
+    IDS_PLAYLOOPMODE_AB     "Lặp lại A-B: Đặt lại vị trí"
+    IDS_PLAYLOOPMODE_AB_MARK_A "Lặp lại A-B: Đánh dấu vị trí A"
+    IDS_PLAYLOOPMODE_AB_MARK_B "Lặp lại A-B: Đánh dấu vị trí B"
+    IDS_ADDTOPLAYLISTROMCLIPBOARD "Thêm vào danh sách phát từ bảng nhớ tạm"
+    IDS_MOVEWINDOWBYVIDEO_ONOFF "Di chuyển cửa sổ theo vùng video: Bật/Tắt"
+    IDS_MOVEWINDOWBYVIDEO_ON "Di chuyển cửa sổ theo vùng video: Bật"
+    IDS_MOVEWINDOWBYVIDEO_OFF "Di chuyển cửa sổ theo vùng video: Tắt"
+    IDS_AUDIO_FILTER_PRESET_1 "Cho âm thanh có các phần thì thầm và cháy nổ"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_SYSTEM_CODEPAGE "Trang mã hệ thống - %u"
+    IDS_SUBTITLES_SYSTEM_CODEPAGE "Bảng mã hệ thống - %u"
     IDS_FRAME_HALF          "Kích thước một nửa"
     IDS_FRAME_NORMAL        "Kích thước bình thường"
     IDS_FRAME_DOUBLE        "Kích thước gấp đôi"
@@ -2477,9 +2477,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_FILE_FAV_ADDED      "Tệp đã được thêm vào mục ưa thích"
-    IDS_DVD_FAV_ADDED       "DVD đã được thêm vào mục ưa thích"
-    IDS_CAPTURE_SETTINGS    "Cài đặt chụp ảnh"
+    IDS_FILE_FAV_ADDED      "Tệp đã được thêm vào mục yêu thích"
+    IDS_DVD_FAV_ADDED       "DVD đã được thêm vào mục yêu thích"
+    IDS_CAPTURE_SETTINGS    "Cài đặt ghi hình"
     IDS_NAVIGATION_BAR      "Thanh điều hướng"
     IDS_SHADER_EDITOR       "Trình chỉnh sửa Shader"
     IDS_SUBRESYNC_CAPTION   "Subresync"
@@ -2487,7 +2487,7 @@ BEGIN
     IDS_SUBRESYNC_CLN_END   "Kết thúc"
     IDS_SUBRESYNC_CLN_PREVIEW "Xem trước"
     IDS_SUBRESYNC_CLN_VOB_ID "ID Vob"
-    IDS_SUBRESYNC_CLN_CELL_ID "ID ô (Cell ID)"
+    IDS_SUBRESYNC_CLN_CELL_ID "ID ô"
     IDS_SUBRESYNC_CLN_FORCED "Ép buộc"
     IDS_SUBRESYNC_CLN_TEXT  "Văn bản"
     IDS_SUBRESYNC_CLN_STYLE "Kiểu"
@@ -2509,15 +2509,15 @@ BEGIN
     IDS_PPAGE_FS_OTHER      "Khác"
     IDS_PPAGE_OUTPUT_SYS_DEF "Mặc định hệ thống"
     IDS_GRAPH_INTERFACES_ERROR  "Không truy vấn được các giao diện cần thiết để phát lại"
-    IDS_GRAPH_TARGET_WND_ERROR  "Không thể đặt cửa sổ mục tiêu cho thông báo đồ thị"
-    IDS_DVD_NAV_ALL_PINS_ERROR  "Không thể kết xuất tất cả các chân của bộ lọc DVD Navigator"
+    IDS_GRAPH_TARGET_WND_ERROR  "Không thể đặt cửa sổ đích cho thông báo đồ thị"
+    IDS_DVD_NAV_ALL_PINS_ERROR  "Không kết xuất được tất cả các pin của bộ lọc DVD Navigator"
 END
 
 STRINGTABLE
 BEGIN
     IDS_SUBRESYNC_SEPARATOR "&Dấu phân cách"
     IDS_SUBRESYNC_DELETE    "&Xóa"
-    IDS_SUBRESYNC_DUPLICATE "Nhâ&n bản"
+    IDS_SUBRESYNC_DUPLICATE "&Nhân bản"
     IDS_SUBRESYNC_RESET     "&Đặt lại"
 END
 
@@ -2540,8 +2540,8 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SUBDELAY_DEC     "Trễ phụ đề -"
-    IDS_AG_SUBDELAY_INC     "Trễ phụ đề +"
+    IDS_AG_SUBDELAY_DEC     "Độ trễ phụ đề -"
+    IDS_AG_SUBDELAY_INC     "Độ trễ phụ đề +"
     IDS_FILE_SAVE_THUMBNAILS "Lưu hình thu nhỏ"
     IDS_OSD_TEST            "Kiểm tra OSD"
     IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
@@ -2555,19 +2555,19 @@ BEGIN
     IDD_PPAGEMOUSE          "Trình phát::Chuột"
     IDD_PPAGELOGO           "Trình phát::Logo"
     IDD_PPAGEINTERFACE      "Trình phát::Giao diện"
-    IDD_PPAGEOSD            "Trình phát::OSD"
+    IDD_PPAGEOSD            "OSD"
     IDD_PPAGEWINDOWSIZE     "Trình phát::Kích thước cửa sổ"
-    IDD_PPAGEWEBSERVER      "Trình phát::Giao diện Web"
+    IDD_PPAGEWEBSERVER      "Trình phát::Giao diện web"
     IDD_PPAGEPLAYBACK       "Phát lại"
     IDD_PPAGEDVD            "Phát lại::DVD-Video"
 END
 
 STRINGTABLE
 BEGIN
-    IDD_PPAGECAPTURE        "Phát lại::Chụp ảnh"
-    IDD_PPAGEYOUTUBE        "Phát lại::Dịch vụ phương tiện trực tuyến"
+    IDD_PPAGECAPTURE        "Phát lại::Ghi hình"
+    IDD_PPAGEYOUTUBE        "Phát lại::Phương tiện trực tuyến"
     IDD_PPAGEVIDEO          "Video"
-    IDD_PPAGECOLOR          "Video::Chỉnh màu"
+    IDD_PPAGECOLOR          "Video::Hiệu chỉnh màu"
     IDD_PPAGESYNC           "Video::Đồng bộ khung hình"
     IDD_PPAGEFULLSCREEN     "Video::Toàn màn hình"
     IDD_PPAGEAUDIO          "Âm thanh"
@@ -2577,7 +2577,7 @@ BEGIN
     IDD_PPAGESUBSTYLE       "Phụ đề::Kiểu mặc định"
     IDD_PPAGEINTERNALFILTERS "Bộ lọc nội bộ"
     IDD_PPAGEEXTERNALFILTERS "Bộ lọc ngoài"
-    IDD_PPAGEFILTERSPRIORITY "Bộ lọc ngoài::Ưu tiên"
+    IDD_PPAGEFILTERSPRIORITY "Bộ lọc ngoài::Độ ưu tiên"
     IDD_PPAGEMISC           "Khác"
 END
 
@@ -2600,51 +2600,51 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CHECK_SUBRESYNC     "Cho phép xem và chỉnh sửa phụ đề (bao gồm mã thời gian), điều hướng bằng phụ đề. Có thể làm chậm đáng kể việc tải phụ đề."
-    IDC_BASSREDIRECT_CHECK  "Lấy âm trầm từ các kênh trước và chuyển đến loa siêu trầm (subwoofer)"
+    IDC_CHECK_SUBRESYNC     "Cho phép xem và chỉnh sửa phụ đề (bao gồm mã thời gian), điều hướng theo phụ đề. Có thể làm chậm đáng kể việc tải phụ đề."
+    IDC_BASSREDIRECT_CHECK  "Tách âm trầm khỏi các kênh trước và chuyển đến loa siêu trầm"
 END
 
 STRINGTABLE
 BEGIN
-    IDC_REGULARSURF         "Bề mặt video sẽ được cấp phát như một bề mặt ngoài màn hình (offscreen) thông thường."
-    IDC_DX9RESIZER_COMBO    "Nếu không có hỗ trợ Pixel Shader 2.0, bộ lọc song tuyến (bilinear) đơn giản sẽ được tự động sử dụng."
+    IDC_REGULARSURF         "Bề mặt video sẽ được phân bổ như một bề mặt ngoài màn hình thông thường."
+    IDC_DX9RESIZER_COMBO    "Nếu không có hỗ trợ Pixel Shader 2.0, bộ lọc song tuyến (bilinear) đơn giản sẽ được sử dụng tự động."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "Bộ kết xuất video MPC"
-    IDS_PPAGE_OUTPUT_EVR    "Bộ kết xuất video nâng cao (EVR)"
-    IDS_PPAGE_OUTPUT_EVR_CUSTOM "EVR (bộ trình bày tùy chỉnh)"
-    IDS_PPAGE_OUTPUT_DXR    "Bộ kết xuất video Haali"
+    IDS_PPAGE_OUTPUT_MPCVR  "Trình kết xuất video MPC"
+    IDS_PPAGE_OUTPUT_EVR    "Trình kết xuất video nâng cao (EVR)"
+    IDS_PPAGE_OUTPUT_EVR_CUSTOM "Trình kết xuất video nâng cao (trình bày tùy chỉnh)"
+    IDS_PPAGE_OUTPUT_DXR    "Trình kết xuất video Haali"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (bất kỳ)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (không nén)"
     IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Bộ kết xuất video đồng bộ"
-    IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Bộ kết xuất đã chọn chưa được cài đặt."
+    IDS_PPAGE_OUTPUT_SYNC   "Trình kết xuất video đồng bộ"
+    IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Trình kết xuất đã chọn chưa được cài đặt."
     IDS_REND_NOT_AVAILABLE  "**không khả dụng**"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_REND_NOT_INSTALLED  "**chưa được cài đặt**"
-    IDS_PPAGE_OUTPUT_SURF_OFFSCREEN "Bề mặt phẳng ngoài màn hình thông thường"
+    IDS_REND_NOT_INSTALLED  "**chưa cài đặt**"
+    IDS_PPAGE_OUTPUT_SURF_OFFSCREEN "Bề mặt phẳng offscreen thông thường"
     IDS_PPAGE_OUTPUT_SURF_2D "Bề mặt 2D"
-    IDS_PPAGE_OUTPUT_SURF_3D "Bề mặt 3D (khuyến nghị)"
+    IDS_PPAGE_OUTPUT_SURF_3D "Bề mặt 3D (khuyến khích)"
     IDS_DOWNLOAD_SUBS       "Tải xuống phụ đề"
     IDS_CM_INPUT_AUTO       "Tự động phát hiện"
     IDS_CM_AMBIENTLIGHT_BRIGHT "Sáng (Gamma 2.2)"
     IDS_CM_AMBIENTLIGHT_DIM "Mờ (Gamma 2.35)"
     IDS_CM_AMBIENTLIGHT_DARK "Tối (Gamma 2.4)"
-    IDS_CM_INTENT_PERCEPTUAL "Cảm nhận (Perceptual)"
-    IDS_CM_INTENT_RELATIVECM "Chuyển đổi màu tương đối (Relative Colorimetric)"
-    IDS_CM_INTENT_SATURATION "Độ bão hòa (Saturation)"
-    IDS_CM_INTENT_ABSOLUTECM "Chuyển đổi màu tuyệt đối (Absolute Colorimetric)"
-    IDS_WEBUI_DISABLED_PREVIEW_MSG  "Xem trước hiện đang bị tắt. Bạn có thể bật nó trong các tùy chọn của MPC-BE."
+    IDS_CM_INTENT_PERCEPTUAL "Perceptual"
+    IDS_CM_INTENT_RELATIVECM "Relative Colorimetric"
+    IDS_CM_INTENT_SATURATION "Saturation"
+    IDS_CM_INTENT_ABSOLUTECM "Absolute Colorimetric"
+    IDS_WEBUI_DISABLED_PREVIEW_MSG  "Tính năng xem trước hiện đang bị tắt. Bạn có thể bật nó trong tùy chọn của MPC-BE."
 END
 
 STRINGTABLE
 BEGIN
-    IDC_D3D9DEVICE_CHECK    "Chỉ định bộ điều hợp đồ họa để kết xuất. Cảnh báo: có thể làm việc không chính xác trên các màn hình được kết nối với bộ điều hợp khác."
+    IDC_D3D9DEVICE_CHECK    "Chỉ định bộ điều hợp đồ họa để kết xuất. Cảnh báo: có thể hoạt động không chính xác trên các màn hình được kết nối với bộ điều hợp khác."
 END
 
 STRINGTABLE
@@ -2654,20 +2654,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_SRC_CDDA            "Phát AudioCD"
-    IDS_SRC_AVI             "Các tệp không liên tục (non-interleaved) không được chào đón"
-    IDS_SRC_VTS             "Mở VTS_xx_0.ifo để tải các tệp VTS_xx_x.vob thành một mảnh"
+    IDS_SRC_CDDA            "Phát Audio CD"
+    IDS_SRC_AVI             "Tệp không xen kẽ không được chấp nhận"
+    IDS_SRC_VTS             "Mở VTS_xx_0.ifo để tải các tệp VTS_xx_x.vob như một khối"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_SHADERS_SELECT   "Chọn Shaders"
-    IDS_AG_SHADERS_1_ENABLE "Bật/Tắt Pixel Shaders"
-    IDS_AG_SHADERS_2_ENABLE "Bật/Tắt Screen Space Pixel Shaders"
-    IDS_OSD_SHADERS_1_ON    "Pixel Shaders trước khi thay đổi kích thước: bật"
-    IDS_OSD_SHADERS_1_OFF   "Pixel Shaders trước khi thay đổi kích thước: tắt"
-    IDS_OSD_SHADERS_2_ON    "Pixel Shaders sau khi thay đổi kích thước: bật"
-    IDS_OSD_SHADERS_2_OFF   "Pixel Shaders sau khi thay đổi kích thước: tắt"
+    IDS_AG_SHADERS_SELECT   "Chọn Shader"
+    IDS_AG_SHADERS_1_ENABLE "Bật/Tắt Pixel Shader"
+    IDS_AG_SHADERS_2_ENABLE "Bật/Tắt Pixel Shader không gian màn hình"
+    IDS_OSD_SHADERS_1_ON    "Pixel Shader trước khi thay đổi kích thước: bật"
+    IDS_OSD_SHADERS_1_OFF   "Pixel Shader trước khi thay đổi kích thước: tắt"
+    IDS_OSD_SHADERS_2_ON    "Pixel Shader sau khi thay đổi kích thước: bật"
+    IDS_OSD_SHADERS_2_OFF   "Pixel Shader sau khi thay đổi kích thước: tắt"
     IDS_AG_VSYNCINTERNAL    "VSync nội bộ"
 END
 
@@ -2682,10 +2682,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CHECK_RELATIVETO    "Trạng thái mặc định được kế thừa cho các kiểu khác ở nơi mà nó vẫn chưa được định nghĩa"
-    IDC_CHECK_ALLOW_DROPPING_SUBPIC  "Vô hiệu hóa tùy chọn này sẽ ngăn phụ đề nhấp nháy nhưng có thể khiến bộ kết xuất video bỏ qua một số khung hình video."
-    IDC_CHECK_SPCANIMWITHBUFFER  "Cho phép hoạt ảnh phụ đề khi sử dụng bộ đệm phụ đề lớn hơn 0. Vô hiệu hóa tùy chọn này sẽ giảm mức sử dụng CPU. Cũng hãy vô hiệu hóa nếu bạn thấy phụ đề bị nhấp nháy."
-    IDC_BUTTON_EXT_SET      "Sau khi nhấp nút này, trạng thái kiểm tra của nhóm định dạng sẽ phản ánh liên kết tệp thực tế cho MPC-BE. Một phần mở rộng mới thêm vào thường sẽ bị làm xám, vì vậy đừng quên kiểm tra lại trước khi đóng hộp thoại này!"
+    IDC_CHECK_RELATIVETO    "Trạng thái mặc định được kế thừa cho các kiểu khác mà nó vẫn chưa được xác định"
+    IDC_CHECK_ALLOW_DROPPING_SUBPIC  "Vô hiệu hóa tùy chọn này sẽ ngăn phụ đề bị nhấp nháy nhưng có thể khiến trình kết xuất video bỏ qua một số khung hình video."
+    IDC_CHECK_SPCANIMWITHBUFFER  "Cho phép hoạt ảnh phụ đề khi sử dụng bộ đệm hình ảnh phụ lớn hơn 0. Vô hiệu hóa tùy chọn này sẽ giảm mức sử dụng CPU. Đồng thời vô hiệu hóa nếu bạn thấy phụ đề bị chớp tắt."
+    IDC_BUTTON_EXT_SET      "Sau khi nhấp vào nút này, trạng thái đã chọn của nhóm định dạng sẽ phản ánh liên kết tệp thực tế cho MPC-BE. Một phần mở rộng mới được thêm vào thường sẽ bị làm mờ, vì vậy đừng quên kiểm tra lại trước khi đóng hộp thoại này!"
 END
 
 STRINGTABLE
@@ -2720,8 +2720,8 @@ STRINGTABLE
 BEGIN
     IDS_AG_AUDIO            "Âm thanh"
     IDS_AG_ZOOM             "Thu phóng"
-    IDS_FAVORITES_ADD       "&Thêm vào mục ưa thích..."
-    IDS_FAVORITES_ORGANIZE  "&Tổ chức mục ưa thích..."
+    IDS_FAVORITES_ADD       "&Thêm vào mục yêu thích..."
+    IDS_FAVORITES_ORGANIZE  "&Quản lý mục yêu thích..."
     IDS_CONTROLS_CLOSING    "Đang đóng..."
     IDS_CONTROLS_PLAYING    "Đang phát"
     IDS_CONTROLS_PAUSED     "Đã tạm dừng"
@@ -2733,31 +2733,31 @@ BEGIN
     IDS_SHOW_HISTORY        "Hiển thị lịch sử"
     IDS_RECENT_FILES_CLEAR  "Xóa danh sách"
     IDS_RECENT_FILES        "Tệp gần đây"
-    IDS_RECENT_FILES_QUESTION  "Bạn có chắc chắn muốn xóa danh sách tệp gần đây không ?"
-    IDS_HISTORY_REDUCE_QUESTION  "Tệp lịch sử của bạn chứa %u mục. Bạn có chắc chắn muốn giảm số lượng mục xuống %u không?"
+    IDS_RECENT_FILES_QUESTION  "Bạn có chắc chắn muốn xóa danh sách tệp gần đây không?"
+    IDS_HISTORY_REDUCE_QUESTION  "Tệp lịch sử của bạn chứa %u mục. Bạn có chắc chắn muốn giảm số lượng mục xuống còn %u không?"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_ENABLEFRAMETIMECORRECTION "Bật sửa lỗi thời gian khung hình"
+    IDS_AG_ENABLEFRAMETIMECORRECTION "Bật hiệu chỉnh thời gian khung hình"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_PNS_FLIP         "PanScan Lật ngang"
-    IDS_AG_PNS_ROTATE_CCW   "PanScan Xoay ngược chiều kim đồng hồ"
-    IDS_AG_PNS_ROTATE_CW    "PanScan Xoay theo chiều kim đồng hồ"
+    IDS_AG_PNS_FLIP         "PnS Lật ngang"
+    IDS_AG_PNS_ROTATE_CCW   "PnS Xoay ngược chiều kim đồng hồ"
+    IDS_AG_PNS_ROTATE_CW    "PnS Xoay theo chiều kim đồng hồ"
     IDS_AG_TEARING_TEST     "Kiểm tra xé hình"
-    IDS_SCALE_16_9          "Tỷ lệ TV 16:9,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_WIDESCREEN    "Thu phóng màn hình rộng,%.3f,%.3f,%.3f,%.3f"
-    IDS_SCALE_ULTRAWIDE     "Thu phóng màn hình siêu rộng,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_16_9          "Tỷ lệ theo TV 16:9,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_WIDESCREEN    "Thu phóng theo màn hình rộng,%.3f,%.3f,%.3f,%.3f"
+    IDS_SCALE_ULTRAWIDE     "Thu phóng theo màn hình siêu rộng,%.3f,%.3f,%.3f,%.3f"
 END
 
 STRINGTABLE
 BEGIN
     IDS_CONTROLS_STOPPED    "Đã dừng"
     IDS_CONTROLS_BUFFERING  "Đang đệm... (%d%%)"
-    IDS_CONTROLS_CAPTURING  "Đang chụp..."
+    IDS_CONTROLS_CAPTURING  "Đang ghi hình..."
     IDS_CONTROLS_OPENING    "Đang mở..."
     IDS_CONTROLS_CLOSED     "Đã đóng"
     IDS_SUBTITLES_OPTIONS   "&Tùy chọn..."
@@ -2785,17 +2785,17 @@ BEGIN
     IDS_AG_COMMAND          "Lệnh"
     IDS_AG_KEY              "Phím"
     IDS_AG_TYPE             "Loại"
-    IDS_AG_MOUSE            "Chuột ở chế độ cửa sổ"
-    IDS_AG_MOUSE_FS         "Chuột ở chế độ toàn màn hình"
+    IDS_AG_MOUSE            "Chuột chế độ cửa sổ"
+    IDS_AG_MOUSE_FS         "Chuột toàn màn hình"
     IDS_AG_APP_COMMAND      "Lệnh ứng dụng"
     IDS_AG_MENU_PLAYER_A    "Menu trình phát (tự động)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_MEDIAFILES       "Tệp phương tiện (tất cả các loại)"
-    IDS_AG_VIDEOFILES       "Tệp video (tất cả các loại)"
-    IDS_AG_AUDIOFILES       "Tệp âm thanh (tất cả các loại)"
+    IDS_AG_MEDIAFILES       "Tệp phương tiện (mọi loại)"
+    IDS_AG_VIDEOFILES       "Tệp video (mọi loại)"
+    IDS_AG_AUDIOFILES       "Tệp âm thanh (mọi loại)"
     IDS_AG_ALLFILES         "Tất cả tệp"
 END
 
@@ -2805,8 +2805,8 @@ BEGIN
     IDS_AG_AUDIO_FILE       "Tệp âm thanh"
     IDS_AG_PLAYLIST_FILE    "Tệp danh sách phát"
     IDS_AG_OTHER            "Khác"
-    IDS_PIXELSHADERCOMPILER_0  "Không thể tải D3DX9_xx.DLL, pixel shaders sẽ không hoạt động."
-    IDS_PIXELSHADERCOMPILER_1  "Không tìm thấy các điểm vào hàm cần thiết trong D3DX9_xx.DLL, pixel shaders sẽ không hoạt động."
+    IDS_PIXELSHADERCOMPILER_0  "Không thể tải D3DX9_xx.DLL, pixel shader sẽ không hoạt động."
+    IDS_PIXELSHADERCOMPILER_1  "Không tìm thấy điểm nhập hàm cần thiết trong D3DX9_xx.DLL, pixel shader sẽ không hoạt động."
     IDS_AG_NOT_KNOWN        "Không xác định"
     IDS_AG_OPEN_FILE        "Mở tệp nhanh"
     IDS_AG_OPEN_FILEURL     "Mở tệp/URL"
@@ -2820,14 +2820,14 @@ BEGIN
     IDS_VIDEO_STREAM        "Video: %s"
     IDS_APPLY               "Áp dụng"
     IDS_CLEAR               "Xóa"
-    IDS_CANCEL              "Hủy"
-    IDS_TEXTFILE_ENC        "Mã hóa:"
+    IDS_CANCEL              "Hủy bỏ"
+    IDS_TEXTFILE_ENC        "Bảng mã:"
     IDS_SAVE_FILE           "Đang lưu tệp"
     IDS_VOLUME_OSD_MUTE     "Âm lượng: %d%% [Tắt tiếng]"
-    IDS_COPY_TO_CLIPBOARD   "Sao chép vào bộ nhớ tạm"
+    IDS_COPY_TO_CLIPBOARD   "Sao chép vào bảng nhớ tạm"
     IDS_AUDIO_LEVEL         "Mức (%d):"
-    IDS_AUDIO_RELEASETIME   "Thời gian giải phóng (Release time) (%d):"
-    IDS_AUDIO_GAIN          "Độ khuếch đại (Gain) (%+.1f dB):"
+    IDS_AUDIO_RELEASETIME   "Thời gian giải phóng (%d):"
+    IDS_AUDIO_GAIN          "Độ lợi (%+.1f dB):"
     IDS_SAVING_THUMBNAIL    "Đang lưu hình thu nhỏ"
     IDS_SEEKBEGIN           "Nhảy đến đầu"
 END
@@ -2838,12 +2838,12 @@ BEGIN
     IDS_CUSTOM_CHANNEL_MAPPING "Bật/Tắt ánh xạ kênh tùy chỉnh"
     IDS_OSD_CUSTOM_CH_MAPPING_ON "Ánh xạ kênh tùy chỉnh: Bật"
     IDS_OSD_CUSTOM_CH_MAPPING_OFF "Ánh xạ kênh tùy chỉnh: Tắt"
-    IDS_TOGGLE_AUTOVOLUMECONTROL "Bật/Tắt kiểm soát âm lượng tự động"
-    IDS_OSD_AUTOVOLUMECONTROL_ON "Kiểm soát âm lượng tự động: Bật"
-    IDS_OSD_AUTOVOLUMECONTROL_OFF "Kiểm soát âm lượng tự động: Tắt"
-    IDS_REGAIN_VOLUME       "Bật/Tắt khôi phục âm lượng"
-    IDS_OSD_REGAIN_VOLUME_ON "Khôi phục âm lượng: Bật"
-    IDS_OSD_REGAIN_VOLUME_OFF "Khôi phục âm lượng: Tắt"
+    IDS_TOGGLE_AUTOVOLUMECONTROL "Bật/Tắt điều khiển âm lượng tự động"
+    IDS_OSD_AUTOVOLUMECONTROL_ON "Điều khiển âm lượng tự động: Bật"
+    IDS_OSD_AUTOVOLUMECONTROL_OFF "Điều khiển âm lượng tự động: Tắt"
+    IDS_REGAIN_VOLUME       "Bật/Tắt lấy lại âm lượng"
+    IDS_OSD_REGAIN_VOLUME_ON "Lấy lại âm lượng: Bật"
+    IDS_OSD_REGAIN_VOLUME_OFF "Lấy lại âm lượng: Tắt"
     IDS_UNDETERMINED        "Chưa xác định"
 END
 
@@ -2853,7 +2853,7 @@ BEGIN
     IDS_AG_SAVE_AS          "Lưu thành"
     IDS_AG_SAVE_IMAGE       "Lưu ảnh"
     IDS_AG_AUTOSAVE_IMAGE   "Lưu ảnh (tự động)"
-    IDS_OSD_IMAGE_SAVED     "Ảnh đã lưu thành công"
+    IDS_OSD_IMAGE_SAVED     "Ảnh đã được lưu thành công"
     IDS_AG_LOAD_SUBTITLE    "Tải phụ đề ngoài..."
     IDS_AG_SAVE_SUBTITLE    "Lưu phụ đề"
     IDS_AG_PROPERTIES       "Thuộc tính"
@@ -2861,29 +2861,29 @@ BEGIN
     IDS_AG_PLAYPAUSE        "Phát/Tạm dừng"
     IDS_AG_PLAY             "Phát"
     IDS_AG_STOP             "Dừng"
-    IDS_AG_FRAMESTEP        "Bước khung hình"
-    IDS_AG_FRAMESTEP_BACK   "Bước khung hình lùi"
-    IDS_AG_GO_TO            "Đi đến"
+    IDS_AG_FRAMESTEP        "Từng khung hình"
+    IDS_AG_FRAMESTEP_BACK   "Từng khung hình lùi"
+    IDS_AG_GO_TO            "Đi tới"
     IDS_AG_INCREASE_RATE    "Tăng tốc độ"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_FT_CORRECTION_ON "Sửa lỗi thời gian khung hình: Bật"
-    IDS_OSD_RS_FT_CORRECTION_OFF "Sửa lỗi thời gian khung hình: Tắt"
+    IDS_OSD_RS_FT_CORRECTION_ON "Hiệu chỉnh thời gian khung hình: Bật"
+    IDS_OSD_RS_FT_CORRECTION_OFF "Hiệu chỉnh thời gian khung hình: Tắt"
     IDS_OSD_RS_TARGET_VSYNC_OFFSET "Độ lệch VSync mục tiêu: %.1f"
     IDS_OSD_RS_VSYNC_OFFSET "Độ lệch VSync: %d"
     IDS_OSD_SPEED           "Tốc độ: %sx"
-    IDS_OSD_THUMBS_SAVED    "Hình thu nhỏ đã lưu thành công"
-    IDS_MENU_VIDEO_STREAM   "Luồng vide&o"
-    IDS_MENU_VIDEO_ANGLE    "Góc nhìn vide&o"
+    IDS_OSD_THUMBS_SAVED    "Hình thu nhỏ đã được lưu thành công"
+    IDS_MENU_VIDEO_STREAM   "Luồng &video"
+    IDS_MENU_VIDEO_ANGLE    "Góc &video"
     IDS_RESET_SETTINGS      "Đặt lại cài đặt"
-    IDS_RESET_SETTINGS_WARNING  "Bạn có chắc chắn muốn khôi phục MPC-BE về cài đặt mặc định không?\nHãy cẩn thận rằng TẤT CẢ các cài đặt hiện tại của bạn sẽ bị mất!"
-    IDS_RESET_SETTINGS_MUTEX  "Vui lòng đóng tất cả các phiên bản của MPC-BE để có thể khôi phục cài đặt mặc định."
+    IDS_RESET_SETTINGS_WARNING  "Bạn có chắc chắn muốn khôi phục MPC-BE về cài đặt mặc định không?\nHãy cẩn thận vì TẤT CẢ cài đặt hiện tại của bạn sẽ bị mất!"
+    IDS_RESET_SETTINGS_MUTEX  "Vui lòng đóng tất cả các phiên bản của MPC-BE để khôi phục cài đặt mặc định."
     IDS_EXPORT_SETTINGS     "Xuất cài đặt"
-    IDS_EXPORT_SETTINGS_WARNING  "Một số thay đổi vẫn chưa được lưu.\nBạn có muốn lưu chúng trước khi xuất không?"
+    IDS_EXPORT_SETTINGS_WARNING  "Một số thay đổi chưa được lưu.\nBạn có muốn lưu chúng trước khi xuất không?"
     IDS_EXPORT_SETTINGS_SUCCESS  "Cài đặt đã được xuất thành công."
-    IDS_EXPORT_SETTINGS_FAILED  "Xuất thất bại! Điều này có thể xảy ra khi bạn không có quyền chính xác."
+    IDS_EXPORT_SETTINGS_FAILED  "Xuất thất bại! Điều này có thể xảy ra khi bạn không có quyền phù hợp."
     IDS_BDA_ERROR           "Lỗi BDA"
 END
 
@@ -2897,33 +2897,33 @@ STRINGTABLE
 BEGIN
     IDS_AG_MENU_AUDIOLANG   "Menu ngôn ngữ âm thanh"
     IDS_AG_MENU_SUBTITLELANG "Menu ngôn ngữ phụ đề"
-    IDS_AG_MENU_JUMPTO      "Menu đi đến..."
-    IDS_AG_MENU_AFTERPLAYBACK "Menu sau khi phát xong"
+    IDS_AG_MENU_JUMPTO      "Menu nhảy tới..."
+    IDS_AG_MENU_AFTERPLAYBACK "Menu sau khi phát"
     IDS_AG_RESET_STATS      "Đặt lại thống kê đồng bộ EVR"
     IDS_VIEW_BORDERLESS     "Ẩn đường viền\tCtrl+0"
     IDS_VIEW_FRAMEONLY      "Chỉ khung hình\tCtrl+0"
-    IDS_VIEW_CAPTIONMENU    "Hiển thị Tiêu đề&&Menu\tCtrl+0"
-    IDS_VIEW_HIDEMENU       "Ẩn menu\tCtrl+0"
+    IDS_VIEW_CAPTIONMENU    "Hiện tiêu đề&&Menu\tCtrl+0"
+    IDS_VIEW_HIDEMENU       "Ẩn Menu\tCtrl+0"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_DECREASE_RATE    "Giảm tốc độ"
     IDS_AG_RESET_RATE       "Đặt lại tốc độ"
-    IDS_AG_AUDIODELAY_PLUS  "Trễ âm thanh +10ms"
-    IDS_AG_AUDIODELAY_MINUS "Trễ âm thanh -10ms"
-    IDS_AG_JUMP_FORWARD_1   "Nhảy tới (nhỏ)"
+    IDS_AG_AUDIODELAY_PLUS  "Độ trễ âm thanh +10ms"
+    IDS_AG_AUDIODELAY_MINUS "Độ trễ âm thanh -10ms"
+    IDS_AG_JUMP_FORWARD_1   "Nhảy tiến (nhỏ)"
     IDS_AG_JUMP_BACKWARD_1  "Nhảy lùi (nhỏ)"
-    IDS_AG_JUMP_FORWARD_2   "Nhảy tới (trung bình)"
+    IDS_AG_JUMP_FORWARD_2   "Nhảy tiến (trung bình)"
     IDS_AG_JUMP_BACKWARD_2  "Nhảy lùi (trung bình)"
-    IDS_AG_JUMP_FORWARD_3   "Nhảy tới (lớn)"
+    IDS_AG_JUMP_FORWARD_3   "Nhảy tiến (lớn)"
     IDS_AG_JUMP_BACKWARD_3  "Nhảy lùi (lớn)"
-    IDS_AG_JUMP_FORWARD_K   "Nhảy tới (khung hình chính)"
+    IDS_AG_JUMP_FORWARD_K   "Nhảy tiến (khung hình chính)"
     IDS_AG_JUMP_BACKWARD_K  "Nhảy lùi (khung hình chính)"
     IDS_AG_NEXT             "Tiếp theo"
-    IDS_AG_PREVIOUS         "Trước"
+    IDS_AG_PREVIOUS         "Trước đó"
     IDS_AG_NEXT_FILE        "Tệp tiếp theo"
-    IDS_AG_PREVIOUS_FILE    "Tệp trước"
+    IDS_AG_PREVIOUS_FILE    "Tệp trước đó"
 END
 
 STRINGTABLE
@@ -2936,84 +2936,84 @@ BEGIN
     IDS_CENTER_LEVEL_DEC    "Giảm mức trung tâm"
     IDS_CENTER_LEVEL        "Mức trung tâm (%+.1f dB)"
     IDS_CENTER_LEVEL_OSD    "Mức trung tâm: %+.1f dB"
-    IDS_SURROUND_LEVEL      "Mức âm thanh vòm (Surround) (%+.1f dB)"
+    IDS_SURROUND_LEVEL      "Mức độ âm thanh vòm (%+.1f dB)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_VIEW_MINIMAL     "Xem Tối thiểu"
-    IDS_AG_VIEW_COMPACT     "Xem Gọn nhẹ"
-    IDS_AG_VIEW_NORMAL      "Xem Bình thường"
+    IDS_AG_VIEW_MINIMAL     "Xem tối thiểu"
+    IDS_AG_VIEW_COMPACT     "Xem thu gọn"
+    IDS_AG_VIEW_NORMAL      "Xem bình thường"
     IDS_AG_FULLSCREEN       "Toàn màn hình"
-    IDS_AG_FULLSCREEN_2     "Toàn màn hình (không thay đổi độ phân giải)"
-    IDS_AG_ZOOM_AUTO_FIT    "Thu phóng Tự động vừa khít"
-    IDS_AG_VIDFRM_HALF      "Khung video Một nửa"
-    IDS_AG_VIDFRM_NORMAL    "Khung video Bình thường"
-    IDS_AG_VIDFRM_DOUBLE    "Khung video Gấp đôi"
+    IDS_AG_FULLSCREEN_2     "Toàn màn hình (không đổi độ phân giải)"
+    IDS_AG_ZOOM_AUTO_FIT    "Thu phóng tự động vừa"
+    IDS_AG_VIDFRM_HALF      "VidFrm Một nửa"
+    IDS_AG_VIDFRM_NORMAL    "VidFrm Bình thường"
+    IDS_AG_VIDFRM_DOUBLE    "VidFrm Gấp đôi"
     IDS_AG_ALWAYS_ON_TOP    "Luôn trên cùng"
-    IDS_AG_PNS_INC_SIZE     "PanScan Tăng kích thước"
-    IDS_AG_PNS_INC_WIDTH    "PanScan Tăng chiều rộng"
-    IDS_AG_PNS_INC_HEIGHT   "PanScan Tăng chiều cao"
-    IDS_AG_PNS_DEC_SIZE     "PanScan Giảm kích thước"
-    IDS_AG_PNS_DEC_WIDTH    "PanScan Giảm chiều rộng"
-    IDS_AG_PNS_DEC_HEIGHT   "PanScan Giảm chiều cao"
+    IDS_AG_PNS_INC_SIZE     "PnS Tăng kích thước"
+    IDS_AG_PNS_INC_WIDTH    "PnS Tăng chiều rộng"
+    IDS_AG_PNS_INC_HEIGHT   "PnS Tăng chiều cao"
+    IDS_AG_PNS_DEC_SIZE     "PnS Giảm kích thước"
+    IDS_AG_PNS_DEC_WIDTH    "PnS Giảm chiều rộng"
+    IDS_AG_PNS_DEC_HEIGHT   "PnS Giảm chiều cao"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_WINDOW_TO_PRIMARYSCREEN "Di chuyển cửa sổ sang Màn hình chính"
+    IDS_AG_WINDOW_TO_PRIMARYSCREEN "Di chuyển cửa sổ sang màn hình chính"
     IDS_EXTERNAL            "bên ngoài"
     IDS_SUB_SAVE_EXTERNAL_STYLE_FILE "Lưu kiểu tùy chỉnh"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_PNS_CENTER       "PanScan Căn giữa"
-    IDS_AG_PNS_LEFT         "PanScan Trái"
-    IDS_AG_PNS_RIGHT        "PanScan Phải"
-    IDS_AG_PNS_UP           "PanScan Lên"
-    IDS_AG_PNS_DOWN         "PanScan Xuống"
-    IDS_AG_PNS_UPLEFT       "PanScan Lên/Trái"
-    IDS_AG_PNS_UPRIGHT      "PanScan Lên/Phải"
-    IDS_AG_PNS_DOWNLEFT     "PanScan Xuống/Trái"
-    IDS_AG_PNS_DOWNRIGHT    "PanScan Xuống/Phải"
+    IDS_AG_PNS_CENTER       "PnS Căn giữa"
+    IDS_AG_PNS_LEFT         "PnS Trái"
+    IDS_AG_PNS_RIGHT        "PnS Phải"
+    IDS_AG_PNS_UP           "PnS Lên"
+    IDS_AG_PNS_DOWN         "PnS Xuống"
+    IDS_AG_PNS_UPLEFT       "PnS Lên/Trái"
+    IDS_AG_PNS_UPRIGHT      "PnS Lên/Phải"
+    IDS_AG_PNS_DOWNLEFT     "PnS Xuống/Trái"
+    IDS_AG_PNS_DOWNRIGHT    "PnS Xuống/Phải"
     IDS_AG_VOLUME_UP        "Tăng âm lượng"
     IDS_AG_VOLUME_DOWN      "Giảm âm lượng"
-    IDS_AG_VOLUME_MUTE      "Tắt tiếng"
-    IDS_AG_DVD_TITLEMENU    "Menu tiêu đề DVD"
-    IDS_AG_DVD_ROOTMENU     "Menu gốc DVD"
-    IDS_AG_DVD_SUBPICTUREMENU "Menu phụ đề DVD"
-    IDS_AG_DVD_AUDIOMENU    "Menu âm thanh DVD"
+    IDS_AG_VOLUME_MUTE      "Tắt âm lượng"
+    IDS_AG_DVD_TITLEMENU    "Menu Tiêu đề DVD"
+    IDS_AG_DVD_ROOTMENU     "Menu Gốc DVD"
+    IDS_AG_DVD_SUBPICTUREMENU "Menu Phụ đề DVD"
+    IDS_AG_DVD_AUDIOMENU    "Menu Âm thanh DVD"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_DVD_ANGLEMENU    "Menu góc nhìn DVD"
-    IDS_AG_DVD_CHAPTERMENU  "Menu chương DVD"
-    IDS_AG_DVD_MENU_LEFT    "Menu DVD sang trái"
-    IDS_AG_DVD_MENU_RIGHT   "Menu DVD sang phải"
-    IDS_AG_DVD_MENU_UP      "Menu DVD lên"
-    IDS_AG_DVD_MENU_DOWN    "Menu DVD xuống"
-    IDS_AG_DVD_MENU_ACTIVATE "Kích hoạt menu DVD"
-    IDS_AG_DVD_MENU_BACK    "Quay lại menu DVD"
-    IDS_AG_DVD_MENU_LEAVE   "Rời menu DVD"
-    IDS_AG_BOSS_KEY         "Phím sếp (Boss key)"
+    IDS_AG_DVD_ANGLEMENU    "Menu Góc DVD"
+    IDS_AG_DVD_CHAPTERMENU  "Menu Chương DVD"
+    IDS_AG_DVD_MENU_LEFT    "Menu DVD Sang trái"
+    IDS_AG_DVD_MENU_RIGHT   "Menu DVD Sang phải"
+    IDS_AG_DVD_MENU_UP      "Menu DVD Lên"
+    IDS_AG_DVD_MENU_DOWN    "Menu DVD Xuống"
+    IDS_AG_DVD_MENU_ACTIVATE "Kích hoạt Menu DVD"
+    IDS_AG_DVD_MENU_BACK    "Quay lại Menu DVD"
+    IDS_AG_DVD_MENU_LEAVE   "Menu DVD Rời khỏi"
+    IDS_AG_BOSS_KEY         "Phím sếp"
     IDS_AG_MENU_PLAYER_S    "Menu trình phát (ngắn)"
     IDS_AG_MENU_PLAYER_L    "Menu trình phát (dài)"
     IDS_AG_MENU_FILTERS     "Menu bộ lọc"
     IDS_AG_OPTIONS          "Tùy chọn"
     IDS_AG_NEXT_AUDIO       "Âm thanh tiếp theo"
-    IDS_AG_PREV_AUDIO       "Âm thanh trước"
+    IDS_AG_PREV_AUDIO       "Âm thanh trước đó"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_NEXT_SUBTITLE    "Phụ đề tiếp theo"
-    IDS_AG_PREV_SUBTITLE    "Phụ đề trước"
+    IDS_AG_PREV_SUBTITLE    "Phụ đề trước đó"
     IDS_AG_SUBTITLE_ONOFF   "Bật/Tắt phụ đề"
     IDS_AG_SUBTITLE_RELOAD  "Tải lại phụ đề"
-    IDS_AG_NEXT_VIDEO       "Video/Góc nhìn DVD tiếp theo"
-    IDS_AG_PREV_VIDEO       "Video/Góc nhìn DVD trước"
+    IDS_AG_NEXT_VIDEO       "Video/Góc DVD tiếp theo"
+    IDS_AG_PREV_VIDEO       "Video/Góc DVD trước đó"
     IDS_REPEAT_FOREVER      "Lặp lại mãi mãi"
     IDS_REPEAT_FOREVER_OFF  "Lặp lại mãi mãi: Tắt"
     IDS_REPEAT_FOREVER_ON   "Lặp lại mãi mãi: Bật"
@@ -3029,12 +3029,12 @@ END
 STRINGTABLE
 BEGIN
     IDS_MPLAYERC_99         "Bật/Tắt toàn màn hình độc quyền"
-    IDS_MPLAYERC_100        "Đi đến phụ đề trước"
-    IDS_MPLAYERC_101        "Đi đến phụ đề sau"
-    IDS_MPLAYERC_102        "Dịch chuyển phụ đề sang trái"
-    IDS_MPLAYERC_103        "Dịch chuyển phụ đề sang phải"
+    IDS_MPLAYERC_100        "Tới phụ đề trước"
+    IDS_MPLAYERC_101        "Tới phụ đề sau"
+    IDS_MPLAYERC_102        "Dịch phụ đề sang trái"
+    IDS_MPLAYERC_103        "Dịch phụ đề sang phải"
     IDS_AG_DISPLAY_STATS    "Hiển thị thống kê"
-    IDS_AG_AUDIODELAY_ONOFF "Bật/Tắt trễ âm thanh"
+    IDS_AG_AUDIODELAY_ONOFF "Bật/Tắt độ trễ âm thanh"
     IDS_AG_AUTOSAVE_DISPLAY "Lưu ảnh hiển thị (tự động)"
     IDS_AG_OPEN_ISO         "Mở ảnh Iso"
     IDS_AG_OPEN_DIR         "Mở thư mục"
@@ -3046,16 +3046,16 @@ BEGIN
     IDS_AG_DEFAULT          "Mặc định"
     IDS_AG_DEFAULT_L        "mặc định"
     IDS_AG_AUTO             "Tự động"
-    IDS_AG_RECOMMENDED      "khuyến nghị"
-    IDS_AG_NOTRECOMMENDED   "không khuyến nghị"
+    IDS_AG_RECOMMENDED      "khuyến khích"
+    IDS_AG_NOTRECOMMENDED   "không khuyến khích"
     IDS_AG_ADVANCED         "Nâng cao"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_UNIT_TIME_H         "h"
-    IDS_UNIT_TIME_M         "m"
-    IDS_UNIT_TIME_S         "s"
+    IDS_UNIT_TIME_H         "giờ"
+    IDS_UNIT_TIME_M         "phút"
+    IDS_UNIT_TIME_S         "giây"
     IDS_UNIT_SIZE_KB        "KB"
     IDS_UNIT_SIZE_MB        "MB"
     IDS_UNIT_SIZE_GB        "GB"
@@ -3068,51 +3068,51 @@ STRINGTABLE
 BEGIN
     IDS_LOGO_AUTHOR         "Tác giả không xác định. Hãy liên hệ với tôi nếu bạn đã tạo logo này!"
     IDS_NO_MORE_MEDIA       "Không còn phương tiện nào trong thư mục hiện tại."
-    IDS_FIRST_IN_FOLDER     "Tệp đầu tiên trong thư mục đang được tải."
-    IDS_LAST_IN_FOLDER      "Tệp cuối cùng trong thư mục đang được tải."
-    IDS_MERGING_FILES       "Đang hợp nhất tệp..."
-    IDS_MERGE_USING_FFMPEG  "Hợp nhất các tệp bằng FFmpeg"
+    IDS_FIRST_IN_FOLDER     "Tệp đầu tiên trong thư mục hiện đang được tải."
+    IDS_LAST_IN_FOLDER      "Tệp cuối cùng trong thư mục hiện đang được tải."
+    IDS_MERGING_FILES       "Đang hợp nhất các tệp..."
+    IDS_MERGE_USING_FFMPEG  "Hợp nhất tệp bằng FFmpeg"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_FAVORITES_QUICKADD  "Thêm nhanh mục ưa thích"
-    IDS_AG_MENU_FAVORITES   "Menu mục ưa thích"
-    IDS_DVB_CHANNEL_NUMBER  "S"
+    IDS_FAVORITES_QUICKADD  "Thêm nhanh mục yêu thích"
+    IDS_AG_MENU_FAVORITES   "Menu mục yêu thích"
+    IDS_DVB_CHANNEL_NUMBER  "N"
     IDS_DVB_CHANNEL_NAME    "Tên"
     IDS_DVB_CHANNEL_FREQUENCY "Tần số"
-    IDS_DVB_CHANNEL_ENCRYPTION "Đã mã hóa"
+    IDS_DVB_CHANNEL_ENCRYPTION "Được mã hóa"
     IDS_DVB_CHANNEL_ENCRYPTED "Có"
     IDS_DVB_CHANNEL_NOT_ENCRYPTED "Không"
     IDS_DVB_CHANNEL_START_SCAN "Bắt đầu"
     IDS_DVB_CHANNEL_STOP_SCAN "Dừng"
-    IDS_DVB_TVNAV_SEERADIO  "Đài phát thanh"
-    IDS_DVB_TVNAV_SEETV     "Đài truyền hình"
+    IDS_DVB_TVNAV_SEERADIO  "Các đài phát thanh"
+    IDS_DVB_TVNAV_SEETV     "Các đài truyền hình"
     IDS_CAPTURE_CHANNEL_FREQ "Kênh %d (%.1f MHz)"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MAINFRM_2           "Tiêu điểm bị mất vào: %s - %s"
-    IDS_AG_SUBTITLES_SAVED  "Đã lưu phụ đề"
+    IDS_MAINFRM_2           "Mất tiêu điểm vào: %s - %s"
+    IDS_AG_SUBTITLES_SAVED  "Phụ đề đã được lưu"
     IDS_MAINFRM_4           "Không thể lưu phụ đề"
     IDS_AG_FRAMERATE        "Tốc độ khung hình"
-    IDS_MAINFRM_6           "đã vẽ: %d, đã bỏ qua: %d"
+    IDS_MAINFRM_6           "đã vẽ: %d, đã bỏ: %d"
     IDS_AG_FRAMES           "Khung hình"
     IDS_AG_BUFFERS          "Bộ đệm"
     IDS_MAINFRM_9           "Âm lượng: %02d/%02d, Tiêu đề: %02d/%02d, Chương: %02d/%02d"
-    IDS_MAINFRM_10          "Góc nhìn: %02d/%02d, %dx%d %dHz %d:%d"
+    IDS_MAINFRM_10          "Góc: %02d/%02d, %dx%d %dHz %d:%d"
     IDS_MAINFRM_11          "%s, %s %dHz %dbits %d %s"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ZOOM_AUTOFIT        "Tự động vừa vặn"
-    IDS_ZOOM_AUTOFITLARGE   "Tự động vừa vặn (chỉ đối với tệp lớn)"
+    IDS_ZOOM_AUTOFIT        "Vừa khít tự động"
+    IDS_ZOOM_AUTOFITLARGE   "Vừa khít tự động (chỉ cho tệp lớn hơn)"
     IDS_ADD_TO_PLAYLIST     "Thêm vào danh sách phát MPC-BE"
-    IDS_OPEN_WITH_MPC       "Phát bằng MPC-BE"
-    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE không có đủ quyền để thay đổi liên kết định dạng tệp. Vui lòng nhấp vào nút ""Sửa đổi"" để lấy quyền quản trị viên."
-    IDS_APP_DESCRIPTION     "Một trong những trình phát đa phương tiện mạnh mẽ và có khả năng tùy biến cao nhất cho hệ điều hành Windows. Ban đầu được tạo bởi một lập trình viên người Hungary tên là Gabest, phiên bản này có các tính năng bổ sung như chế độ toàn màn hình độc quyền và hỗ trợ tốt hơn cho Windows Vista/7."
+    IDS_OPEN_WITH_MPC       "Phát với MPC-BE"
+    IDS_CANNOT_CHANGE_FORMAT  "MPC-BE không đủ quyền để thay đổi liên kết định dạng tệp. Vui lòng nhấp vào nút ""Chỉnh sửa"" để lấy quyền quản trị viên."
+    IDS_APP_DESCRIPTION     "Một trong những trình phát đa phương tiện mạnh mẽ và tùy biến nhất cho hệ điều hành Windows. Ban đầu được tạo bởi một nhà phát triển người Hungary tên là Gabest, phiên bản này có các tính năng bổ sung như chế độ toàn màn hình độc quyền và hỗ trợ tốt hơn cho Windows Vista/7."
     IDS_MAINFRM_12          "kênh"
     IDS_MAINFRM_13          "kênh"
 END
@@ -3122,8 +3122,8 @@ BEGIN
     IDS_PROPSHEET_NAME      "Tên"
     IDS_PROPSHEET_MIME      "Loại MIME"
     IDS_PROPSHEET_DESC      "Mô tả"
-    IDS_PROPSHEET_FILE_IMAGE "ảnh %hs"
-    IDS_PROPSHEET_FILE_FONT "phông chữ %hs"
+    IDS_PROPSHEET_FILE_IMAGE "Ảnh %hs"
+    IDS_PROPSHEET_FILE_FONT "Phông chữ %hs"
     IDS_AUDIOWINDOW_NONE    "không thay đổi kích thước cửa sổ"
     IDS_AUDIOWINDOW_COVER   "hiển thị ảnh bìa album/ảnh đại diện"
     IDS_AUDIOWINDOW_HIDE    "ẩn vùng video"
@@ -3137,25 +3137,25 @@ BEGIN
     IDS_MAINFRM_17          "DVD: Lỗi bảo vệ sao chép"
     IDS_MAINFRM_18          "DVD: Đĩa DVD 1.x không hợp lệ"
     IDS_MAINFRM_19          "DVD: Khu vực đĩa không hợp lệ"
-    IDS_MAINFRM_20          "DVD: Mức kiểm soát của phụ huynh thấp"
+    IDS_MAINFRM_20          "DVD: Mức kiểm duyệt thấp"
     IDS_MAINFRM_21          "DVD: Lỗi Macrovision"
-    IDS_MAINFRM_22          "DVD: Khu vực hệ thống và bộ giải mã không tương thích"
-    IDS_MAINFRM_23          "DVD: Khu vực đĩa và bộ giải mã không tương thích"
+    IDS_MAINFRM_22          "DVD: Hệ thống và khu vực giải mã không tương thích"
+    IDS_MAINFRM_23          "DVD: Đĩa và khu vực giải mã không tương thích"
     IDS_AG_NAVIGATE         "Điều hướng"
     IDS_AG_OPEN_DISC        "Mở đĩa"
     IDS_AG_FILTERS          "Bộ lọc"
     IDS_AG_SUBTITLES        "Phụ đề"
     IDS_AG_AUDIOLANG        "Ngôn ngữ âm thanh"
     IDS_AG_SUBTITLELANG     "Ngôn ngữ phụ đề"
-    IDS_AG_VIDEO_ANGLE      "Góc nhìn video"
+    IDS_AG_VIDEO_ANGLE      "Góc video"
 END
 
 STRINGTABLE
 BEGIN
     IDS_ADDTOPLS_FROMDIR_SIMILAR "các tệp tương tự từ thư mục"
     IDS_ADDTOPLS_FROMDIR_ALL "tất cả tệp từ thư mục"
-    IDS_EXCLUSIVE_FS_WARNING  "Tùy chọn này được thiết kế để tránh hiện tượng xé hình. Tuy nhiên, nó cũng sẽ ngăn MPC-BE hiển thị menu ngữ cảnh và bất kỳ hộp thoại nào trong khi phát.\n\nĐể thoát toàn màn hình độc quyền, hãy sử dụng các phím: Alt+Enter, Ctrl+Enter hoặc Ctrl+C.\n\nBạn có thực sự muốn kích hoạt tùy chọn này không?"
-    IDS_MAINFRM_139         "Trễ phụ đề: %ld ms"
+    IDS_EXCLUSIVE_FS_WARNING  "Tùy chọn này được thiết kế để tránh xé hình. Tuy nhiên, nó cũng sẽ ngăn MPC-BE hiển thị menu ngữ cảnh và bất kỳ hộp thoại nào trong khi phát.\n\nĐể thoát toàn màn hình độc quyền, hãy sử dụng các phím: Alt+Enter, Ctrl+Enter hoặc Ctrl+C.\n\nBạn có thực sự muốn kích hoạt tùy chọn này?"
+    IDS_MAINFRM_139         "Độ trễ phụ đề: %ld ms"
     IDS_AG_TITLE2           "Tiêu đề: %02d/%02d"
     IDS_THUMB_ROWNUMBER     "Hàng:"
     IDS_THUMB_COLNUMBER     "Cột:"
@@ -3166,13 +3166,13 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_JUMP_TO          "Đi đến..."
-    IDS_AG_FAVORITES        "Mục ưa thích"
-    IDS_AG_SHADERS          "Shaders"
-    IDS_AG_VIDEO_FRAME      "Khung video"
+    IDS_AG_JUMP_TO          "Nhảy tới..."
+    IDS_AG_FAVORITES        "Mục yêu thích"
+    IDS_AG_SHADERS          "Shader"
+    IDS_AG_VIDEO_FRAME      "Khung hình video"
     IDS_AG_PANSCAN          "PanScan"
     IDS_AG_ASPECT_RATIO     "Tỷ lệ khung hình"
-    IDS_MAINFRM_37          ", Tổng số: %d, Đã bỏ qua: %d"
+    IDS_MAINFRM_37          ", Tổng: %d, Đã bỏ: %d"
     IDS_MAINFRM_38          ", Kích thước: %I64dKB"
     IDS_MAINFRM_39          ", Kích thước: %I64dMB"
     IDS_MAINFRM_40          ", Trống: %I64dKB"
@@ -3192,11 +3192,11 @@ BEGIN
     IDS_MAINFRM_53          "Không thể tạo tệp"
     IDS_MAINFRM_54          "Không thể tạo hình thu nhỏ cho các tệp không có thời lượng"
     IDS_MAINFRM_55          "Không lấy được kích thước khung hình video"
-    IDS_MAINFRM_56          "Hết bộ nhớ, hãy mua thêm đi!"
-    IDS_MAINFRM_57          "Định dạng ảnh không hợp lệ, không thể tạo hình thu nhỏ từ các dib %d bpp."
+    IDS_MAINFRM_56          "Hết bộ nhớ, hãy mua thêm!"
+    IDS_MAINFRM_57          "Định dạng ảnh không hợp lệ, không thể tạo hình thu nhỏ từ dib %d bpp."
     IDS_MAINFRM_58          "Kích thước tệp: %s (%s byte)\\N"
     IDS_MAINFRM_59          "{\\an7\\1c&H000000&\\fs16\\b0\\bord0\\shad0}Tên tệp: %s\\N%sĐộ phân giải: %dx%d %s\\NThời lượng: %02d:%02d:%02d"
-    IDS_MAINFRM_60          "Để tải phụ đề, bạn phải thay đổi loại bộ kết xuất video và mở lại tệp.\n"
+    IDS_MAINFRM_60          "Để tải phụ đề, bạn phải thay đổi loại trình kết xuất video và mở lại tệp.\n"
     IDS_MAINFRM_61          "- DirectShow: EVR-CP, EVR Sync, Haali, madVR hoặc MPC VR.\n"
     IDS_MAINFRM_64          "- ShockWave: n/a\n"
 END
@@ -3205,34 +3205,34 @@ STRINGTABLE
 BEGIN
     IDS_MAINFRM_68          "Tỷ lệ khung hình: %d:%d"
     IDS_MAINFRM_69          "Tỷ lệ khung hình: Mặc định"
-    IDS_MAINFRM_70          "Trễ âm thanh: %I64dms"
+    IDS_MAINFRM_70          "Độ trễ âm thanh: %I64dms"
     IDS_AG_CHAPTER          "Chương %d"
     IDS_MAINFRM_73          "Không thể tải shader: "
     IDS_AG_SHADER           "Shader: "
     IDS_AG_OUT_OF_MEMORY    "Hết bộ nhớ"
-    IDS_MAINFRM_77          "Lỗi: Cần trình phát Flash cho IE"
-    IDS_MAINFRM_80          "Không thể tạo đối tượng đồ thị bộ lọc"
-    IDS_MAINFRM_81          "Tham số không hợp lệ"
-    IDS_MAINFRM_82          "Đã hủy việc mở"
-    IDS_MAINFRM_83          "Không thể kết xuất tệp"
+    IDS_MAINFRM_77          "Lỗi: Cần có Flash player cho IE"
+    IDS_MAINFRM_80          "Không tạo được đối tượng đồ thị bộ lọc"
+    IDS_MAINFRM_81          "Đối số không hợp lệ"
+    IDS_MAINFRM_82          "Đã hủy bỏ mở tệp"
+    IDS_MAINFRM_83          "Không kết xuất được tệp"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PPSDB_BADURL        "URL sai, không thể tìm thấy cơ sở dữ liệu phụ đề ở đó!"
+    IDS_PPSDB_BADURL        "URL sai, không thể định vị cơ sở dữ liệu phụ đề tại đó!"
     IDS_AG_CHAPTER2         "Chương: "
     IDS_VOLUME_OSD          "Âm lượng: %d%%"
-    IDS_GAIN_OSD            "Độ khuếch đại: %+.1f dB"
+    IDS_GAIN_OSD            "Độ lợi: %+.1f dB"
     IDS_BALANCE_OSD         "Cân bằng: %s"
     IDS_FULLSCREENMONITOR_CURRENT "Hiện tại"
-    IDS_MPC_CRASH           "MPC-BE đã kết thúc đột ngột. Để giúp chúng tôi sửa lỗi này, vui lòng gửi tệp '%s' này đến trình theo dõi lỗi của chúng tôi.\n\nBạn có muốn mở thư mục chứa tệp minidump và truy cập trình theo dõi lỗi ngay bây giờ không?"
-    IDS_MPC_MINIDUMP_FAIL   "Không thể tạo tệp kết xuất (dump) tại '%s' (lỗi %d)"
+    IDS_MPC_CRASH           "MPC-BE đã kết thúc đột ngột. Để giúp chúng tôi sửa vấn đề này, vui lòng gửi tệp '%s' này tới trình theo dõi lỗi của chúng tôi.\n\nBạn có muốn mở thư mục chứa tệp minidump và truy cập trình theo dõi lỗi ngay bây giờ không?"
+    IDS_MPC_MINIDUMP_FAIL   "Không thể tạo tệp dump tới '%s' (lỗi %d)"
     IDS_MAINFRM_DIR_TITLE   "Chọn thư mục"
-    IDS_MAINFRM_DIR_CHECK   "Bao gồm các thư mục con"
+    IDS_MAINFRM_DIR_CHECK   "Bao gồm thư mục con"
     IDS_AG_PAUSE            "Tạm dừng"
-    IDS_AG_TOGGLE_CAPTION   "Bật/Tắt Chú thích&&Menu"
-    IDS_AG_TOGGLE_SEEKER    "Bật/Tắt thanh Tìm kiếm"
-    IDS_AG_TOGGLE_CONTROLS  "Bật/Tắt Điều khiển"
+    IDS_AG_TOGGLE_CAPTION   "Bật/Tắt Tiêu đề&&Menu"
+    IDS_AG_TOGGLE_SEEKER    "Bật/Tắt thanh tìm kiếm"
+    IDS_AG_TOGGLE_CONTROLS  "Bật/Tắt điều khiển"
 END
 
 STRINGTABLE
@@ -3240,7 +3240,7 @@ BEGIN
     IDS_MAINFRM_84          "Tên tệp không hợp lệ"
     IDS_MAINFRM_86          "Không thể kết nối các bộ lọc"
     IDS_MAINFRM_87          "Không thể tải bất kỳ bộ lọc nguồn nào"
-    IDS_MAINFRM_88          "Không thể kết xuất tệp"
+    IDS_MAINFRM_88          "Không kết xuất được tệp"
     IDS_MAINFRM_89          "Định dạng tệp không hợp lệ"
     IDS_MAINFRM_90          "Không tìm thấy tệp"
     IDS_MAINFRM_91          "Loại tệp không xác định"
@@ -3248,11 +3248,11 @@ BEGIN
     IDS_MAINFRM_93          "Không tìm thấy thư mục DVD/Blu-ray"
     IDS_MAINFRM_94          "Không thể tạo bộ lọc DVD Navigator"
     IDS_AG_FAILED           "Thất bại"
-    IDS_MAINFRM_96          "Không thể tạo bộ lọc chụp ảnh video"
-    IDS_MAINFRM_98          "Không có bộ lọc chụp ảnh"
-    IDS_MAINFRM_99          "Không thể tạo đối tượng xây dựng đồ thị chụp ảnh"
-    IDS_MAINFRM_100         "Cảnh báo: Không có giao diện IAMStreamConfig cho chụp ảnh vidcap"
-    IDS_MAINFRM_102         "Cảnh báo: Không có giao diện IAMStreamConfig cho vidcap"
+    IDS_MAINFRM_96          "Không thể tạo bộ lọc ghi video"
+    IDS_MAINFRM_98          "Không có bộ lọc ghi hình"
+    IDS_MAINFRM_99          "Không thể tạo đối tượng xây dựng đồ thị ghi hình"
+    IDS_MAINFRM_100         "Cảnh báo: Không có giao diện IAMStreamConfig để ghi vidcap"
+    IDS_MAINFRM_102         "Cảnh báo: Không có giao diện IAMStreamConfig để ghi vidcap"
 END
 
 STRINGTABLE
@@ -3262,16 +3262,16 @@ BEGIN
     IDS_MAINFRM_108         "Không thể mở bất kỳ thiết bị nào"
     IDS_AG_SOUND            "Âm thanh"
     IDS_MAINFRM_114         "Không tìm thấy %s, vui lòng chèn phương tiện chứa tệp này."
-    IDS_AG_ABORTED          "Đã hủy bỏ"
+    IDS_AG_ABORTED          "Đã hủy"
     IDS_MAINFRM_116         "&Thuộc tính..."
-    IDS_MAINFRM_117         " (pin) thuộc tính..."
+    IDS_MAINFRM_117         " thuộc tính (pin)..."
     IDS_AG_UNKNOWN_STREAM   "Luồng không xác định"
     IDS_AG_UNKNOWN          "Không xác định %d"
     IDS_AG_VSYNC            "VSync"
-    IDS_MAINFRM_121         " (Bình luận của Đạo diễn 1)"
-    IDS_MAINFRM_122         " (Bình luận của Đạo diễn 2)"
+    IDS_MAINFRM_121         " (Bình luận đạo diễn 1)"
+    IDS_MAINFRM_122         " (Bình luận đạo diễn 2)"
     IDS_AG_ENABLED          "Đã bật"
-    IDS_AG_ANGLE            "Góc nhìn %d"
+    IDS_AG_ANGLE            "Góc %d"
     IDS_AG_VSYNCOFFSET_INCREASE "Tăng độ lệch VSync"
 END
 
@@ -3279,80 +3279,80 @@ STRINGTABLE
 BEGIN
     IDS_AG_DISABLED         "Đã vô hiệu hóa"
     IDS_AG_VSYNCOFFSET_DECREASE "Giảm độ lệch VSync"
-    IDS_MAINFRM_132         "Cảnh báo (CMainFrame::SeekTo): Đang cố gắng tìm kiếm (seek) ở chế độ chụp ảnh"
+    IDS_MAINFRM_132         "Cảnh báo (CMainFrame::SeekTo): Đang cố gắng tìm kiếm ở chế độ ghi hình"
     IDS_AG_REMOVING         "Đang xóa: "
     IDS_MAINFRM_134         "CẢNH BÁO: CMainFrame::CloseMedia() được gọi hai lần trở lên\n"
-    IDS_MAINFRM_135         "LỖI NGHIÊM TRỌNG: !!! Phải tiêu diệt luồng mở tệp !!!"
-    IDS_MAINFRM_136         "MPC-BE Toàn màn hình độc quyền"
+    IDS_MAINFRM_135         "LỖI NGHIÊM TRỌNG: !!! Phải hủy luồng mở tệp !!!"
+    IDS_MAINFRM_136         "Toàn màn hình độc quyền MPC-BE"
     IDS_MAINFRM_137         "Định dạng không xác định"
-    IDS_MAINFRM_138         "Chuyển đổi phụ đề: %ld ms"
-    IDS_VOLUME_GAIN_INC     "Tăng mức tăng âm lượng"
-    IDS_VOLUME_GAIN_DEC     "Giảm mức tăng âm lượng"
-    IDS_VOLUME_GAIN_OFF     "Tắt mức tăng âm lượng"
-    IDS_VOLUME_GAIN_MAX     "Mức tăng âm lượng tối đa"
-    IDS_UNKNOWN_SWITCH      "Tìm thấy (các) tham số không nhận dạng được trong chuỗi dòng lệnh: \n\n"
+    IDS_MAINFRM_138         "Dịch chuyển phụ đề: %ld ms"
+    IDS_VOLUME_GAIN_INC     "Tăng độ lợi âm lượng"
+    IDS_VOLUME_GAIN_DEC     "Giảm độ lợi âm lượng"
+    IDS_VOLUME_GAIN_OFF     "Tắt độ lợi âm lượng"
+    IDS_VOLUME_GAIN_MAX     "Độ lợi âm lượng tối đa"
+    IDS_UNKNOWN_SWITCH      "Tìm thấy (các) tham số không xác định trong dòng lệnh: \n\n"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_BLOCK_EXTERNAL_VR   "Bạn không thể thêm %s làm bộ lọc ngoài.\nBạn nên chọn bộ kết xuất video ưu tiên trên trang cài đặt Video."
+    IDS_BLOCK_EXTERNAL_VR   "Bạn không thể thêm %s làm bộ lọc ngoài.\nBạn nên chọn trình kết xuất video yêu thích của mình trên trang cài đặt Video."
     IDS_DESC_HAALI_VR       "Giống như VMR-9, nhưng sử dụng bộ thay đổi kích thước bicubic thực sự."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Kết nối với bất kỳ loại phương tiện giống video nào và sẽ gửi các mẫu đến hư vô. Sử dụng nó khi bạn không cần hiển thị video và muốn tiết kiệm CPU khỏi công việc không cần thiết."
-    IDS_DESC_NULLVR_UNCOMP  "Giống như bộ kết xuất Null thông thường, nhưng chỉ kết nối với các loại không nén."
-    IDS_DESC_EVR            "Bộ kết xuất video hỗ trợ giải mã phần cứng."
+    IDS_DESC_NULLVR_ANY     "Kết nối với bất kỳ loại phương tiện giống video nào và không gửi mẫu đến đâu cả. Sử dụng khi bạn không cần hiển thị video và muốn tiết kiệm CPU."
+    IDS_DESC_NULLVR_UNCOMP  "Giống như trình kết xuất Null bình thường, nhưng chỉ kết nối với các loại không nén."
+    IDS_DESC_EVR            "Trình kết xuất video hỗ trợ giải mã phần cứng."
     IDS_DESC_EVR_CP         "Giống như EVR, nhưng có thêm Allocator-Presenter để phụ đề và xử lý hậu kỳ."
-    IDS_DESC_MADVR          "Bộ kết xuất chất lượng cao, yêu cầu GPU hỗ trợ D3D9 trở lên."
-    IDS_DESC_EVR_SYNC       "Giống như EVR (CP), nhưng cung cấp một số tùy chọn để đồng bộ hóa tốc độ khung hình video với tốc độ làm mới màn hình nhằm loại bỏ các khung hình video bị bỏ qua hoặc trùng lặp."
-    IDS_DESC_MPC_VR         "Bộ kết xuất video có hỗ trợ Direct3D 11."
+    IDS_DESC_MADVR          "Trình kết xuất chất lượng cao, yêu cầu GPU hỗ trợ D3D9 trở lên."
+    IDS_DESC_EVR_SYNC       "Giống như EVR (CP), nhưng cung cấp nhiều tùy chọn để đồng bộ hóa tốc độ khung hình video với tốc độ làm tươi màn hình nhằm loại bỏ việc bỏ lỡ hoặc lặp lại khung hình video."
+    IDS_DESC_MPC_VR         "Trình kết xuất video hỗ trợ Direct3D 11."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_USAGE           "Cách sử dụng: mpc-be.exe ""tên_đường_dẫn"" [tham số]"
-    IDS_CMD_PATHNAME        """tên_đường_dẫn""\tTệp hoặc thư mục chính cần tải (cho phép\nký tự đại diện)"
+    IDS_CMD_USAGE           "Cách dùng: mpc-be.exe ""pathname"" [tham số]"
+    IDS_CMD_PATHNAME        """pathname""\tTệp chính hoặc thư mục cần tải (cho phép dùng\nký tự đại diện)"
     IDS_CMD_HELP            "/help /h /?\tHiển thị trợ giúp về các tham số dòng lệnh"
-    IDS_CMD_DUB             "/dub ""tên_bản_lồng_tiếng""\tTải một tệp âm thanh bổ sung"
+    IDS_CMD_DUB             "/dub ""dubname""\tTải thêm một tệp âm thanh"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_DUBDELAY        "/dubdelay ""tệp""\tTải một tệp âm thanh bổ sung bị trễ XXms\n(nếu tệp chứa ""...DELAY XXms..."")"
+    IDS_CMD_DUBDELAY        "/dubdelay ""file""\tTải thêm một tệp âm thanh bị trễ XXms\n(nếu tệp chứa ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tBắt đầu kết xuất ở chế độ toàn màn hình độc quyền"
-    IDS_CMD_SUB             "/sub ""tên_phụ_đề""\tTải một tệp phụ đề bổ sung"
-    IDS_CMD_FILTER          "/filter ""tên_bộ_lọc""\tTải các bộ lọc DirectShow từ một thư viện\nliên kết động (cho phép ký tự đại diện)"
-    IDS_CMD_DVD             "/dvd\tChạy ở chế độ dvd, ""tên_đường_dẫn"" nghĩa là thư mục\ndvd (tùy chọn)"
+    IDS_CMD_SUB             "/sub ""subname""\tTải thêm một tệp phụ đề"
+    IDS_CMD_FILTER          "/filter ""filtername""\tTải bộ lọc DirectShow từ thư viện liên kết động\n(cho phép dùng ký tự đại diện)"
+    IDS_CMD_DVD             "/dvd\tChạy ở chế độ DVD, ""pathname"" là thư mục\nDVD (tùy chọn)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tBắt đầu phát tại tiêu đề T, chương C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tBắt đầu phát tại tiêu đề T, vị trí hh:mm:ss"
-    IDS_CMD_CD              "/cd\tTải tất cả các bản nhạc của một cd âm thanh hoặc (s)vcd,\n""tên_đường_dẫn"" nghĩa là đường dẫn ổ đĩa (tùy chọn)"
+    IDS_CMD_CD              "/cd\tTải tất cả các bản nhạc của một đĩa CD hoặc (S)VCD,\n""pathname"" là đường dẫn ổ đĩa (tùy chọn)"
     IDS_CMD_OPEN            "/open\tMở tệp, không tự động bắt đầu phát"
     IDS_CMD_PLAY            "/play\tBắt đầu phát tệp ngay khi trình phát được\nkhởi chạy"
     IDS_CMD_CLOSE           "/close\tĐóng trình phát sau khi phát xong (chỉ hoạt động khi\ndùng với /play)"
     IDS_CMD_SHUTDOWN        "/shutdown\tTắt hệ điều hành sau khi phát xong"
     IDS_CMD_FULLSCREEN      "/fullscreen\tBắt đầu ở chế độ toàn màn hình"
     IDS_CMD_MINIMIZED       "/minimized\tBắt đầu ở chế độ thu nhỏ"
-    IDS_CMD_NEW             "/new\tSử dụng một phiên bản (instance) mới của trình phát"
-    IDS_CMD_ADD             "/add\tThêm ""tên_đường_dẫn"" vào danh sách phát, có thể kết hợp\nvới /open và /play"
+    IDS_CMD_NEW             "/new\tSử dụng một phiên bản mới của trình phát"
+    IDS_CMD_ADD             "/add\tThêm ""pathname"" vào danh sách phát, có thể kết hợp\nvới /open và /play"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_CMD_RANDOMIZE       "/randomize\tNgẫu nhiên hóa danh sách phát"
+    IDS_CMD_RANDOMIZE       "/randomize\tXáo trộn danh sách phát"
     IDS_CMD_REGVID          "/regvid\tTạo liên kết tệp cho các tệp video"
     IDS_CMD_REGAUD          "/regaud\tTạo liên kết tệp cho các tệp âm thanh"
     IDS_CMD_REGPL           "/regpl\tTạo liên kết tệp cho các tệp danh sách phát"
     IDS_CMD_REGALL          "/regall\tTạo liên kết tệp cho tất cả các loại tệp được hỗ trợ"
-    IDS_CMD_UNREGALL        "/unregall\tXóa tất cả các liên kết tệp"
+    IDS_CMD_UNREGALL        "/unregall\tXóa tất cả liên kết tệp"
     IDS_CMD_START           "/start ms\tBắt đầu phát tại ""ms"" (= mili giây)"
     IDS_CMD_STARTPOS        "/startpos hh:mm:ss\tBắt đầu phát tại vị trí hh:mm:ss"
     IDS_CMD_FIXEDSIZE       "/fixedsize w,h\tĐặt kích thước cửa sổ cố định"
-    IDS_CMD_MONITOR         "/monitor N\tBắt đầu trình phát trên màn hình N, trong đó N bắt đầu từ 1"
-    IDS_CMD_AUDIORENDERER   "/audiorenderer ""tên""\tBắt đầu sử dụng audiorenderer, trong đó ""tên"" là tên\ncủa bộ kết xuất âm thanh (xem cài đặt ""Âm thanh"")"
-    IDS_CMD_VOLUME          "/volume N\tĐặt âm lượng, trong đó N nằm trong khoảng từ 0 đến 100"
-    IDS_CMD_CLIPBOARD       "/clipboard\tMở đường dẫn/liên kết từ bộ nhớ tạm"
+    IDS_CMD_MONITOR         "/monitor N\tBắt đầu trình phát trên màn hình N, với N bắt đầu từ 1"
+    IDS_CMD_AUDIORENDERER   "/audiorenderer ""name""\tBắt đầu sử dụng audiorenderer, trong đó ""name"" là tên\ncủa trình kết xuất âm thanh (xem cài đặt ""Âm thanh"")"
+    IDS_CMD_VOLUME          "/volume N\tĐặt âm lượng, với N nằm trong khoảng từ 0 đến 100"
+    IDS_CMD_CLIPBOARD       "/clipboard\tMở đường dẫn/liên kết từ bảng nhớ tạm"
     IDS_CMD_DEVICE          "/device\tMở thiết bị video mặc định"
     IDS_CMD_RESET           "/reset\tKhôi phục cài đặt mặc định"
 END
@@ -3374,7 +3374,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AVISPLITTER_NON_INTERLEAVED "Hỗ trợ các tệp Interleaved ""Xấu"""
+    IDS_AVISPLITTER_NON_INTERLEAVED "Hỗ trợ tệp xen kẽ ""xấu"""
     IDS_AVISPLITTER_REINDEX_BROKEN "Lập chỉ mục lại các tệp bị hỏng"
 END
 
@@ -3392,13 +3392,13 @@ STRINGTABLE
 BEGIN
     IDS_MPADEC_SAMPLE_FMT   "Định dạng mẫu đầu ra:"
     IDS_MPADEC_DRC          "Áp dụng DRC cho AC-3 và E-AC-3"
-    IDS_MPADEC_MIXER        "Bộ trộn (Mixer):"
+    IDS_MPADEC_MIXER        "Bộ trộn:"
     IDS_MPADEC_MIX_SPEAKERS "Loa đầu ra:"
     IDS_MPADEC_MONO         "Mono"
     IDS_MPADEC_STEREO       "Stereo"
-    IDS_MPADEC_SPDIF        "Truyền qua (Pass-through, S/PDIF, HDMI)"
+    IDS_MPADEC_SPDIF        "Truyền thẳng (S/PDIF, HDMI)"
     IDS_MPADEC_AC3ENCODE    "Mã hóa sang AC-3"
-    IDS_MPADEC_AV_SYNC      "Sửa lỗi đồng bộ A/V"
+    IDS_MPADEC_AV_SYNC      "Hiệu chỉnh đồng bộ A/V"
     IDS_MPADEC_STATUS       "Trạng thái"
     IDS_MPADEC_NOTACTIVE    "Bộ giải mã không hoạt động."
 END
@@ -3408,32 +3408,32 @@ BEGIN
     IDS_VDF_SETTINGS        "Cài đặt video"
     IDS_VDF_AUTO            "Tự động"
     IDS_VDF_THREADNUMBER    "Số luồng giải mã"
-    IDS_VDF_SKIPBFRAMES     "Bỏ qua khung hình B (B-Frames)"
+    IDS_VDF_SKIPBFRAMES     "Bỏ qua khung B-Frame"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VDF_AR_MODE         "Đọc tỷ lệ khung hình từ luồng"
+    IDS_VDF_AR_MODE         "Đọc tỷ lệ khung hình (AR) từ luồng"
     IDS_VDF_HW_ACCELERATION "Tăng tốc phần cứng"
-    IDS_VDF_HW_CODECS       "Bộ giải mã (Codecs):"
+    IDS_VDF_HW_CODECS       "Bộ giải mã:"
     IDS_VDF_HW_PREFERRED_DECODER "Bộ giải mã ưu tiên"
     IDS_VDF_HW_ADAPTER      "Bộ điều hợp"
     IDS_VDF_DXVACOMPATIBILITY "Kiểm tra tính tương thích DXVA (H.264)"
     IDS_VDF_DXVA_FULLCHECK  "Kiểm tra đầy đủ"
     IDS_VDF_DXVA_SKIP_LEVELCHECK "Bỏ qua kiểm tra cấp độ"
     IDS_VDF_DXVA_SKIP_REFCHECK "Bỏ qua kiểm tra khung tham chiếu"
-    IDS_VDF_DXVA_SKIP_ALLCHECK "Bỏ qua tất cả các kiểm tra"
-    IDS_VDF_DXVA_SD         "Vô hiệu hóa DXVA cho SD (H.264)"
+    IDS_VDF_DXVA_SKIP_ALLCHECK "Bỏ qua tất cả kiểm tra"
+    IDS_VDF_DXVA_SD         "Tắt DXVA cho SD (H.264)"
 END
 
 STRINGTABLE
 BEGIN
     IDS_VDF_SCANTYPE        "Loại quét"
-    IDS_VDF_SCANTYPE_TOP    "Quét dòng trên trước (Top-Field First)"
-    IDS_VDF_SCANTYPE_BOTTOM "Quét dòng dưới trước (Bottom-Field First)"
-    IDS_VDF_SCANTYPE_PROGRESSIVE "Quét liên tục (Progressive)"
+    IDS_VDF_SCANTYPE_TOP    "Trường trên trước"
+    IDS_VDF_SCANTYPE_BOTTOM "Trường dưới trước"
+    IDS_VDF_SCANTYPE_PROGRESSIVE "Quét liên tục"
     IDS_VDF_COLOR_OUTPUT_FORMATS "Định dạng đầu ra"
-    IDS_VDF_COLOR_PRESET    "Cài đặt trước:"
+    IDS_VDF_COLOR_PRESET    "Cài đặt sẵn:"
     IDS_VDF_COLOR_STANDARD  "Tiêu chuẩn:"
     IDS_VDF_COLOR_CONVERT_TO_RGB "Chuyển đổi sang RGB"
     IDS_VDF_COLOR_RGB_LEVELS "Mức đầu ra RGB:"
@@ -3446,7 +3446,7 @@ BEGIN
     IDS_VDF_STATUS_FRAMESIZE "Kích thước khung hình:"
     IDS_VDF_STATUS_OUTPUT   "Định dạng đầu ra:"
     IDS_VDF_STATUS_ADAPTER  "Bộ điều hợp đồ họa:"
-    IDS_VDF_TT_AR           "Đã chọn - sẽ sử dụng tỷ lệ khung hình (AR) từ luồng.\nBỏ chọn - sẽ sử dụng AR từ container.\nKhông xác định - AR từ luồng sẽ không được sử dụng trên các tệp có AR container (khuyến nghị)."
+    IDS_VDF_TT_AR           "Đã chọn - sẽ sử dụng AR từ luồng.\nBỏ chọn - sẽ sử dụng AR từ container.\nKhông xác định - AR từ luồng sẽ không được sử dụng trên các tệp có AR container (khuyên dùng)."
     IDS_VDF_TT_PRESET       "Thay đổi mối quan hệ giữa tốc độ và chất lượng."
     IDS_VDF_TT_STANDARD     "Cài đặt này chỉ được sử dụng khi bộ lọc đang thực hiện chuyển đổi YCbCr<->RGB."
     IDS_VDF_TT_RGB_LEVELS   "Cài đặt này chỉ được sử dụng khi bộ lọc đang thực hiện chuyển đổi YCbCr sang RGB."
@@ -3454,20 +3454,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPEG2_INTERLACE_FLAG "Đặt cờ đan xen trong loại phương tiện đầu ra"
+    IDS_MPEG2_INTERLACE_FLAG "Đặt cờ xen kẽ trong loại phương tiện đầu ra"
     IDS_MPEG2_FORCED_SUBS   "Luôn hiển thị phụ đề ép buộc"
-    IDS_MPEG2_DEINTERLACING "Khử đan xen (Deinterlacing)"
+    IDS_MPEG2_DEINTERLACING "Khử xen kẽ (Deinterlacing)"
 END
 
 STRINGTABLE
 BEGIN
     IDS_MPEG2_BRIGHTNESS    "Độ sáng"
     IDS_MPEG2_RESET         "Đặt lại"
-    IDS_MPEG2_NOTE1         "Lưu ý: Việc sử dụng định dạng đầu ra không phẳng, bộ khử đan xen bob, hoặc điều chỉnh thuộc tính màu sắc có thể làm giảm hiệu suất. Bộ khử đan xen ""Tự động"" sẽ chuyển sang ""Trộn"" (Blend) khi cần thiết."
+    IDS_MPEG2_NOTE1         "Lưu ý: Sử dụng định dạng đầu ra không phẳng, khử xen kẽ bob, hoặc điều chỉnh thuộc tính màu sắc có thể làm giảm hiệu suất. Bộ khử xen kẽ ""Tự động"" sẽ chuyển sang ""Trộn"" khi cần thiết."
     IDS_MPEG2_CONTRAST      "Độ tương phản"
     IDS_MPEG2_HUE           "Sắc độ"
     IDS_MPEG2_SATURATION    "Độ bão hòa"
-    IDS_MPEG2_READ_AR       "Đọc tỷ lệ khung hình từ luồng"
+    IDS_MPEG2_READ_AR       "Đọc tỷ lệ khung hình (AR) từ luồng"
 END
 
 STRINGTABLE
@@ -3475,13 +3475,13 @@ BEGIN
     IDS_ARS_WASAPI_MODE     "Chế độ WASAPI:"
     IDS_ARS_EXCLUSIVE       "Độc quyền"
     IDS_ARS_SHARED          "Chia sẻ"
-    IDS_ARS_BITEXACT_OUTPUT "Cho phép đầu ra bit-exact (chính xác từng bit)"
-    IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Sử dụng các kênh bố trí hệ thống"
+    IDS_ARS_BITEXACT_OUTPUT "Cho phép đầu ra chính xác từng bit"
+    IDS_ARS_SYSTEM_LAYOUT_CHANNELS "Sử dụng kênh bố cục hệ thống"
     IDS_ARS_SOUND_DEVICE    "Thiết bị âm thanh:"
     IDS_ARS_RELEASE_DEVICE_IDLE "Giải phóng thiết bị khi rảnh rỗi"
-    IDS_ARS_CROSSFEED       "Bật stereo crossfeed (dành cho tai nghe)"
+    IDS_ARS_CROSSFEED       "Bật stereo crossfeed (cho tai nghe)"
     IDS_ARS_DEVICE_PERIOD   "Bộ đệm thiết bị:"
-    IDS_ARS_ALT_CHECK_FORMAT "Kiểm tra thay thế các định dạng được hỗ trợ"
+    IDS_ARS_ALT_CHECK_FORMAT "Kiểm tra thay thế định dạng được hỗ trợ"
     IDS_ARS_STATUS          "Trạng thái"
     IDS_ARS_DEVICE          "Thiết bị:"
     IDS_ARS_MODE            "Chế độ:"
@@ -3497,25 +3497,25 @@ BEGIN
     IDS_ARS_WASAPI_METHOD   "Phương thức WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Không điền kênh khi trộn lên (upmixing)"
     IDS_ARS_PAUSE_KEEP_ACTIVE "Giữ thiết bị âm thanh hoạt động khi tạm dừng"
-    IDS_ARS_TIP_BITEXACT_OUTPUT  "Nếu có thể, âm thanh sẽ được gửi ra ở định dạng gốc của nó.\nNếu không, định dạng được chỉ định trong cài đặt hệ thống sẽ được sử dụng."
+    IDS_ARS_TIP_BITEXACT_OUTPUT  "Nếu có thể, âm thanh sẽ được gửi ra ở định dạng gốc.\nNếu không, định dạng được chỉ định trong cài đặt hệ thống sẽ được sử dụng."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_ARS_TIP_ALT_CHECK_FORMAT  "Bộ kết xuất sẽ cố gắng khởi tạo thiết bị bằng cách bỏ qua một số bước kiểm tra."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Bộ kết xuất sẽ gửi tiếng ồn không nghe được đến thiết bị âm thanh."
+    IDS_ARS_TIP_ALT_CHECK_FORMAT  "Trình kết xuất sẽ cố gắng khởi tạo thiết bị bằng cách bỏ qua một số kiểm tra."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Trình kết xuất sẽ gửi tiếng ồn không nghe thấy được đến thiết bị âm thanh."
 END
 
 STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Tải phông chữ nhúng"
-    IDS_MKVSPLT_CALC_DURATION "Tính toán thời lượng dựa trên dữ liệu video"
+    IDS_MKVSPLT_CALC_DURATION "Tính thời lượng dựa trên dữ liệu video"
     IDS_MKVSPLT_REINDEX     "Lập chỉ mục lại nếu cần"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_VTSREADER_LOAD_PGC  "Cho phép chọn Tiêu đề"
+    IDS_VTSREADER_LOAD_PGC  "Cho phép chọn tiêu đề"
 END
 
 STRINGTABLE
@@ -3525,63 +3525,63 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_TOGGLE_INFO      "Bật/Tắt Thông tin"
-    IDS_AG_TOGGLE_STATS     "Bật/Tắt Thống kê"
-    IDS_AG_TOGGLE_STATUS    "Bật/Tắt Trạng thái"
+    IDS_AG_TOGGLE_INFO      "Bật/Tắt thông tin"
+    IDS_AG_TOGGLE_STATS     "Bật/Tắt thống kê"
+    IDS_AG_TOGGLE_STATUS    "Bật/Tắt trạng thái"
     IDS_AG_TOGGLE_SUBRESYNC "Bật/Tắt thanh Subresync"
-    IDS_AG_TOGGLE_PLAYLIST  "Bật/Tắt thanh Danh sách phát"
-    IDS_AG_TOGGLE_CAPTURE   "Bật/Tắt thanh Chụp ảnh"
-    IDS_AG_TOGGLE_SHADER    "Bật/Tắt thanh Chỉnh sửa Shader"
+    IDS_AG_TOGGLE_PLAYLIST  "Bật/Tắt thanh danh sách phát"
+    IDS_AG_TOGGLE_CAPTURE   "Bật/Tắt thanh ghi hình"
+    IDS_AG_TOGGLE_SHADER    "Bật/Tắt thanh chỉnh sửa Shader"
     IDS_AG_ZOOM_50          "Thu phóng 50%"
     IDS_AG_ZOOM_100         "Thu phóng 100%"
     IDS_AG_ZOOM_200         "Thu phóng 200%"
-    IDS_AG_NEXT_AR_PRESET   "Cài đặt trước tỷ lệ khung hình tiếp theo"
-    IDS_AG_VIDFRM_STRETCH   "Khung video Kéo dãn"
-    IDS_AG_VIDFRM_INSIDE    "Khung video Bên trong"
-    IDS_AG_VIDFRM_OUTSIDE   "Khung video Bên ngoài"
-    IDS_AG_PNS_RESET        "PanScan Đặt lại"
+    IDS_AG_NEXT_AR_PRESET   "Cấu hình AR tiếp theo"
+    IDS_AG_VIDFRM_STRETCH   "VidFrm Kéo dãn"
+    IDS_AG_VIDFRM_INSIDE    "VidFrm Bên trong"
+    IDS_AG_VIDFRM_OUTSIDE   "VidFrm Bên ngoài"
+    IDS_AG_PNS_RESET        "PnS Đặt lại"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_VIDFRM_ZOOM1     "Khung video Thu phóng 1"
-    IDS_AG_VIDFRM_ZOOM2     "Khung video Thu phóng 2"
-    IDS_AG_VIDFRM_SWITCHZOOM "Khung video Chuyển đổi thu phóng"
+    IDS_AG_VIDFRM_ZOOM1     "VidFrm Thu phóng 1"
+    IDS_AG_VIDFRM_ZOOM2     "VidFrm Thu phóng 2"
+    IDS_AG_VIDFRM_SWITCHZOOM "VidFrm Chuyển thu phóng"
     IDS_ENABLE_ALL_FILTERS  "&Bật tất cả bộ lọc"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_NAVIGATE_TUNERSCAN  "Quét bộ thu sóng (Tuner scan)"
-    IDS_SUBTITLES_ERROR     "Phụ đề chưa được tải hoặc bộ kết xuất không được hỗ trợ."
+    IDS_NAVIGATE_TUNERSCAN  "Quét bộ dò đài"
+    IDS_SUBTITLES_ERROR     "Phụ đề chưa được tải hoặc trình kết xuất không được hỗ trợ."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_INTERLACED          "đan xen (interlaced)"
+    IDS_INTERLACED          "xen kẽ"
     IDS_HZ                  "Hz"
-    IDS_FRONT_LEFT          "Trái phía trước"
-    IDS_FRONT_RIGHT         "Phải phía trước"
+    IDS_FRONT_LEFT          "Trước trái"
+    IDS_FRONT_RIGHT         "Trước phải"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_FRONT_CENTER        "Trung tâm phía trước"
+    IDS_FRONT_CENTER        "Trước giữa"
     IDS_LOW_FREQUENCY       "Tần số thấp"
-    IDS_BACK_LEFT           "Trái phía sau"
-    IDS_BACK_RIGHT          "Phải phía sau"
-    IDS_FRONT_LEFT_OF_CENTER "Trái phía trước của trung tâm"
-    IDS_FRONT_RIGHT_OF_CENTER "Phải phía trước của trung tâm"
-    IDS_BACK_CENTER         "Trung tâm phía sau"
+    IDS_BACK_LEFT           "Sau trái"
+    IDS_BACK_RIGHT          "Sau phải"
+    IDS_FRONT_LEFT_OF_CENTER "Trước trái của trung tâm"
+    IDS_FRONT_RIGHT_OF_CENTER "Trước phải của trung tâm"
+    IDS_BACK_CENTER         "Trung tâm sau"
     IDS_SIDE_LEFT           "Bên trái"
     IDS_SIDE_RIGHT          "Bên phải"
-    IDS_TOP_CENTER          "Đỉnh trung tâm"
-    IDS_TOP_FRONT_LEFT      "Đỉnh trước trái"
-    IDS_TOP_FRONT_CENTER    "Đỉnh trước trung tâm"
-    IDS_TOP_FRONT_RIGHT     "Đỉnh trước phải"
-    IDS_TOP_BACK_LEFT       "Đỉnh sau trái"
-    IDS_TOP_BACK_CENTER     "Đỉnh sau trung tâm"
-    IDS_TOP_BACK_RIGHT      "Đỉnh sau phải"
+    IDS_TOP_CENTER          "Trên giữa"
+    IDS_TOP_FRONT_LEFT      "Trên trước trái"
+    IDS_TOP_FRONT_CENTER    "Trên trước giữa"
+    IDS_TOP_FRONT_RIGHT     "Trên trước phải"
+    IDS_TOP_BACK_LEFT       "Trên sau trái"
+    IDS_TOP_BACK_CENTER     "Trên sau giữa"
+    IDS_TOP_BACK_RIGHT      "Trên sau phải"
 END
 
 STRINGTABLE
@@ -3609,19 +3609,19 @@ BEGIN
     IDS_MFMT_MPEGTS         "MPEG-TS"
     IDS_MFMT_DVDVIDEO       "DVD-Video"
     IDS_MFMT_MKV            "Matroska"
-    IDS_MFMT_WEBM           "Video WebM"
+    IDS_MFMT_WEBM           "WebM Video"
     IDS_MFMT_MP4            "MP4"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MFMT_MOV            "Phim QuickTime"
+    IDS_MFMT_MOV            "QuickTime Movie"
     IDS_MFMT_3GP            "3GP"
     IDS_MFMT_3G2            "3G2"
     IDS_MFMT_FLV            "Flash Video"
     IDS_MFMT_OGM            "Ogg Media"
     IDS_MFMT_RM             "Real Media"
-    IDS_MFMT_WMV            "Video Windows Media"
+    IDS_MFMT_WMV            "Windows Media Video"
     IDS_MFMT_BINK           "Video Smacker/Bink"
     IDS_MFMT_FLIC           "Hoạt ảnh FLIC"
     IDS_MFMT_ROQ            "Video trò chơi Id Software"
@@ -3641,15 +3641,15 @@ END
 STRINGTABLE
 BEGIN
     IDS_MFMT_WAV            "WAV/Wave64"
-    IDS_MFMT_WMA            "Âm thanh Windows Media"
+    IDS_MFMT_WMA            "Windows Media Audio"
     IDS_MFMT_WAVPACK        "WavPack"
     IDS_MFMT_OPUS           "Opus"
     IDS_MFMT_SPEEX          "Speex"
-    IDS_MFMT_MLP            "Âm thanh MLP"
+    IDS_MFMT_MLP            "MLP audio"
     IDS_MFMT_DVDAUDIO       "DVD-Audio"
     IDS_MFMT_DSD            "DSD"
     IDS_MFMT_DTS            "DTS/DTS-HD"
-    IDS_MFMT_WEBA           "Âm thanh WebM"
+    IDS_MFMT_WEBA           "WebM Audio"
 END
 
 STRINGTABLE
@@ -3666,11 +3666,11 @@ BEGIN
     IDS_MFMT_AU             "AU/SND"
     IDS_MFMT_CDA            "Bản nhạc CD âm thanh"
     IDS_MFMT_FLAC           "FLAC"
-    IDS_MFMT_M4A            "Âm thanh MPEG-4"
+    IDS_MFMT_M4A            "MPEG-4 Audio"
     IDS_MFMT_MIDI           "MIDI"
-    IDS_MFMT_MKA            "Âm thanh Matroska"
+    IDS_MFMT_MKA            "Matroska audio"
     IDS_MFMT_MP3            "MP3"
-    IDS_MFMT_MPA            "Âm thanh MPEG"
+    IDS_MFMT_MPA            "MPEG audio"
     IDS_MFMT_MPC            "Musepack"
     IDS_MFMT_OFR            "OptimFROG"
     IDS_MFMT_OGG            "Ogg Vorbis"
@@ -3683,7 +3683,7 @@ STRINGTABLE
 BEGIN
     IDS_MFMT_PLS            "Danh sách phát"
     IDS_MFMT_BDPLS          "Danh sách phát Blu-ray"
-    IDS_MFMT_CUE            "Tệp Cue (Cue sheet)"
+    IDS_MFMT_CUE            "Tệp Cue"
 END
 
 STRINGTABLE
@@ -3696,8 +3696,8 @@ BEGIN
     IDS_OSD_RS_SYNC_TO_DISPLAY_OFF "Đồng bộ hóa Video với Màn hình: Tắt"
     IDS_OSD_RS_SYNC_TO_VIDEO_ON "Đồng bộ hóa Màn hình với Video: Bật"
     IDS_OSD_RS_SYNC_TO_VIDEO_OFF "Đồng bộ hóa Màn hình với Video: Tắt"
-    IDS_OSD_RS_PRESENT_NEAREST_ON "Trình diễn tại VSync gần nhất: Bật"
-    IDS_OSD_RS_PRESENT_NEAREST_OFF "Trình diễn tại VSync gần nhất: Tắt"
+    IDS_OSD_RS_PRESENT_NEAREST_ON "Present tại VSync gần nhất: Bật"
+    IDS_OSD_RS_PRESENT_NEAREST_OFF "Present tại VSync gần nhất: Tắt"
     IDS_OSD_RS_COLOR_MANAGEMENT_ON "Quản lý màu sắc: Bật"
     IDS_OSD_RS_COLOR_MANAGEMENT_OFF "Quản lý màu sắc: Tắt"
     IDS_OSD_RS_INPUT_TYPE_AUTO "Loại đầu vào: Tự động phát hiện"
@@ -3711,26 +3711,26 @@ BEGIN
     IDS_OSD_RS_AMBIENT_LIGHT_BRIGHT "Ánh sáng môi trường: Sáng (Gamma 2.2)"
     IDS_OSD_RS_AMBIENT_LIGHT_DIM "Ánh sáng môi trường: Mờ (Gamma 2.35)"
     IDS_OSD_RS_AMBIENT_LIGHT_DARK "Ánh sáng môi trường: Tối (Gamma 2.4)"
-    IDS_OSD_RS_REND_INTENT_PERCEPT "Mục đích kết xuất: Cảm nhận (Perceptual)"
-    IDS_OSD_RS_REND_INTENT_RELATIVE "Mục đích kết xuất: Chuyển đổi màu tương đối"
-    IDS_OSD_RS_REND_INTENT_SATUR "Mục đích kết xuất: Độ bão hòa"
-    IDS_OSD_RS_REND_INTENT_ABSOLUTE "Mục đích kết xuất: Chuyển đổi màu tuyệt đối"
+    IDS_OSD_RS_REND_INTENT_PERCEPT "Mục đích kết xuất: Perceptual"
+    IDS_OSD_RS_REND_INTENT_RELATIVE "Mục đích kết xuất: Relative Colorimetric"
+    IDS_OSD_RS_REND_INTENT_SATUR "Mục đích kết xuất: Saturation"
+    IDS_OSD_RS_REND_INTENT_ABSOLUTE "Mục đích kết xuất: Absolute Colorimetric"
     IDS_OSD_RS_OUTPUT_RANGE "Phạm vi đầu ra: %s"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "Xả (Flush) GPU trước VSync: Bật"
-    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "Xả (Flush) GPU trước VSync: Tắt"
-    IDS_OSD_RS_FLUSH_AFT_PRES_ON "Xả (Flush) GPU sau khi trình diễn: Bật"
-    IDS_OSD_RS_FLUSH_AFT_PRES_OFF "Xả (Flush) GPU sau khi trình diễn: Tắt"
-    IDS_OSD_RS_WAIT_ON      "Chờ xả GPU: Bật"
-    IDS_OSD_RS_WAIT_OFF     "Chờ xả GPU: Tắt"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_ON "Xóa bộ đệm GPU trước khi VSync: Bật"
+    IDS_OSD_RS_FLUSH_BEF_VSYNC_OFF "Xóa bộ đệm GPU trước khi VSync: Tắt"
+    IDS_OSD_RS_FLUSH_AFT_PRES_ON "Xóa bộ đệm GPU sau khi Present: Bật"
+    IDS_OSD_RS_FLUSH_AFT_PRES_OFF "Xóa bộ đệm GPU sau khi Present: Tắt"
+    IDS_OSD_RS_WAIT_ON      "Chờ xóa bộ đệm GPU: Bật"
+    IDS_OSD_RS_WAIT_OFF     "Chờ xóa bộ đệm GPU: Tắt"
     IDS_OSD_RS_EXCLUSIVE_FSCREEN_ON "Toàn màn hình độc quyền: Bật"
     IDS_OSD_RS_EXCLUSIVE_FSCREEN_OFF "Toàn màn hình độc quyền: Tắt"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_OSD_RS_NO_DESKTOP_COMP_ON "Vô hiệu hóa thành phần desktop: Bật"
-    IDS_OSD_RS_NO_DESKTOP_COMP_OFF "Vô hiệu hóa thành phần desktop: Tắt"
-    IDS_OSD_RS_RESET_DEFAULT "Đã đặt lại cài đặt bộ kết xuất về mặc định"
+    IDS_OSD_RS_NO_DESKTOP_COMP_ON "Vô hiệu hóa thành phần màn hình nền: Bật"
+    IDS_OSD_RS_NO_DESKTOP_COMP_OFF "Vô hiệu hóa thành phần màn hình nền: Tắt"
+    IDS_OSD_RS_RESET_DEFAULT "Cài đặt trình kết xuất đã được đặt lại về mặc định"
     IDS_OSD_RS_10BIT_RBG_OUT_ON "Đầu ra RGB 10-bit: Bật"
     IDS_OSD_RS_10BIT_RBG_OUT_OFF "Đầu ra RGB 10-bit: Tắt"
     IDS_OSD_RS_10BIT_RBG_IN_ON "Ép buộc đầu vào RGB 10-bit: Bật"
@@ -3750,61 +3750,61 @@ BEGIN
     IDS_HUE_DEC             "Sắc độ -"
     IDS_SATURATION_INC      "Tăng độ bão hòa"
     IDS_SATURATION_DEC      "Giảm độ bão hòa"
-    IDS_RESET_COLOR         "Đặt lại cài đặt màu sắc"
+    IDS_RESET_COLOR         "Đặt lại cài đặt màu"
     IDS_UPDATE_ERROR_DATA   "Máy chủ cập nhật cung cấp dữ liệu sai.\n\nVui lòng thử lại sau."
-    IDS_USING_NEWER_VERSION "Bạn đang sử dụng phiên bản mới nhất %s."
+    IDS_USING_NEWER_VERSION "Bạn đã sử dụng phiên bản mới nhất %s."
     IDS_NEW_UPDATE_AVAILABLE  "Đã có phiên bản mới %s.\n\nBạn có muốn truy cập trang web của MPC-BE để tải xuống không?"
     IDS_UPDATE_ERROR_CONNECT  "Không tìm thấy máy chủ cập nhật.\n\nVui lòng kiểm tra kết nối internet của bạn hoặc thử lại sau."
-    IDS_UPDATE_CLOSE        "&Đóng"
+    IDS_UPDATE_CLOSE        "Đón&g"
     IDS_OSD_ZOOM            "Thu phóng: %.0lf%%"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AFTERPLAYBACK_CLOSE "Sau khi phát xong: Thoát"
-    IDS_AFTERPLAYBACK_STANDBY "Sau khi phát xong: Chế độ chờ"
-    IDS_AFTERPLAYBACK_HIBERNATE "Sau khi phát xong: Ngủ đông"
-    IDS_AFTERPLAYBACK_SHUTDOWN "Sau khi phát xong: Tắt máy"
-    IDS_AFTERPLAYBACK_LOGOFF "Sau khi phát xong: Đăng xuất"
-    IDS_AFTERPLAYBACK_LOCK  "Sau khi phát xong: Khóa"
-    IDS_AFTERPLAYBACK_EXIT  "Sau khi phát xong: Luôn thoát"
-    IDS_AFTERPLAYBACK_DONOTHING "Sau khi phát xong: Không làm gì cả"
-    IDS_AFTERPLAYBACK_NEXT  "Sau khi phát xong: Phát tệp tiếp theo trong thư mục"
-    IDS_AFTERPLAYBACK_CLOSE_FILE "Sau khi phát xong: Luôn đóng tệp"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Sau khi phát xong: Luôn đóng tệp và thu nhỏ trình phát"
+    IDS_AFTERPLAYBACK_CLOSE "Sau khi phát: Thoát"
+    IDS_AFTERPLAYBACK_STANDBY "Sau khi phát: Chế độ chờ"
+    IDS_AFTERPLAYBACK_HIBERNATE "Sau khi phát: Ngủ đông"
+    IDS_AFTERPLAYBACK_SHUTDOWN "Sau khi phát: Tắt máy"
+    IDS_AFTERPLAYBACK_LOGOFF "Sau khi phát: Đăng xuất"
+    IDS_AFTERPLAYBACK_LOCK  "Sau khi phát: Khóa"
+    IDS_AFTERPLAYBACK_EXIT  "Sau khi phát: Luôn thoát"
+    IDS_AFTERPLAYBACK_DONOTHING "Sau khi phát: Không làm gì cả"
+    IDS_AFTERPLAYBACK_NEXT  "Sau khi phát: Phát tệp tiếp theo trong thư mục"
+    IDS_AFTERPLAYBACK_CLOSE_FILE "Sau khi phát: Luôn đóng tệp"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Sau khi phát: Luôn đóng tệp và thu nhỏ trình phát"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_BDA_ERROR_CREATE_TUNER "Không thể tạo bộ thu sóng."
-    IDS_BDA_ERROR_CREATE_RECEIVER "Không thể tạo bộ thu tín hiệu."
-    IDS_BDA_ERROR_CONNECT_NW_TUNER  "Không thể kết nối mạng và bộ thu sóng (tuner)."
-    IDS_BDA_ERROR_CONNECT_TUNER_REC  "Không thể kết nối bộ thu sóng và bộ thu tín hiệu (receiver)."
-    IDS_BDA_ERROR_CONNECT_TUNER "Không thể kết nối bộ thu sóng."
+    IDS_BDA_ERROR_CREATE_TUNER "Không thể tạo bộ dò đài."
+    IDS_BDA_ERROR_CREATE_RECEIVER "Không thể tạo bộ thu."
+    IDS_BDA_ERROR_CONNECT_NW_TUNER  "Không thể kết nối mạng và bộ dò đài."
+    IDS_BDA_ERROR_CONNECT_TUNER_REC  "Không thể kết nối bộ dò đài và bộ thu."
+    IDS_BDA_ERROR_CONNECT_TUNER "Không thể kết nối bộ dò đài."
     IDS_BDA_ERROR_DEMULTIPLEXER "Không thể tạo bộ tách kênh (demultiplexer)."
     IDS_GOTO_ERROR_PARSING_TIME "Lỗi phân tích thời gian đã nhập!"
     IDS_GOTO_ERROR_PARSING_TEXT "Lỗi phân tích văn bản đã nhập!"
     IDS_GOTO_ERROR_PARSING_FPS "Lỗi phân tích tốc độ khung hình đã nhập!"
-    IDS_FRAME_STEP_ERROR_RENDERER  "Không thể bước khung hình, hãy thử một bộ kết xuất video khác."
-    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động cho các tệp Shockwave."
-    IDS_SCREENSHOT_ERROR_OVERLAY  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động với bộ kết xuất video Overlay Mixer.\nHãy thay đổi bộ kết xuất video trong tùy chọn đầu ra của MPC và mở lại tệp."
+    IDS_FRAME_STEP_ERROR_RENDERER  "Không thể thực hiện từng khung hình, hãy thử một trình kết xuất video khác."
+    IDS_SCREENSHOT_ERROR_SHOCKWAVE  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động với các tệp Shockwave."
+    IDS_SCREENSHOT_ERROR_OVERLAY  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động với trình kết xuất video Overlay Mixer.\nHãy thay đổi trình kết xuất video trong tùy chọn đầu ra của MPC và mở lại tệp."
     IDS_SUBDL_DLG_CONNECT_ERROR  "Không thể kết nối với cơ sở dữ liệu phụ đề trực tuyến."
 END
 
 STRINGTABLE
 BEGIN
-    IDS_DVD_NAV_SOME_PINS_ERROR  "Không thể kết xuất một số chân của bộ lọc DVD Navigator"
+    IDS_DVD_NAV_SOME_PINS_ERROR  "Không kết xuất được một số pin của bộ lọc DVD Navigator"
     IDS_DVD_INTERFACES_ERROR  "Không truy vấn được các giao diện cần thiết để phát DVD"
     IDS_CAPTURE_LIVE        "Trực tiếp"
-    IDS_CAPTURE_ERROR_VID_FILTER "Không thể thêm bộ lọc chụp video vào đồ thị"
-    IDS_CAPTURE_ERROR_AUD_FILTER "Không thể thêm bộ lọc chụp âm thanh vào đồ thị"
-    IDS_CAPTURE_ERROR_DEVICE "Không thể mở thiết bị chụp."
+    IDS_CAPTURE_ERROR_VID_FILTER "Không thể thêm bộ lọc ghi video vào đồ thị"
+    IDS_CAPTURE_ERROR_AUD_FILTER "Không thể thêm bộ lọc ghi âm thanh vào đồ thị"
+    IDS_CAPTURE_ERROR_DEVICE "Không thể mở thiết bị ghi hình."
     IDS_INVALID_PARAMS_ERROR "Không thể mở, tham số đầu vào không hợp lệ"
     IDS_FILTERS_SOURCE      "Bộ lọc nguồn"
     IDS_FILTERS_VIDEO       "Bộ giải mã video"
     IDS_FILTERS_AUDIO       "Bộ giải mã âm thanh"
-    IDS_GOTO_ERROR_INVALID_TIME  "Thời gian đã nhập lớn hơn thời lượng tệp."
-    IDS_SCREENSHOT_ERROR_MADVR  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động với bộ kết xuất video madVR.\nHãy thay đổi bộ kết xuất video trong tùy chọn đầu ra của MPC và mở lại tệp."
+    IDS_GOTO_ERROR_INVALID_TIME  "Thời gian nhập vào lớn hơn thời lượng tệp."
+    IDS_SCREENSHOT_ERROR_MADVR  "Các chức năng 'Lưu ảnh' và 'Lưu hình thu nhỏ' không hoạt động với trình kết xuất video madVR.\nHãy thay đổi trình kết xuất video trong tùy chọn đầu ra của MPC và mở lại tệp."
     IDS_SUBDL_DLG_FILENAME_COL "Tệp"
     IDS_SUBDL_DLG_LANGUAGE_COL "Ngôn ngữ"
     IDS_SUBDL_DLG_FORMAT_COL "Định dạng"
@@ -3812,20 +3812,20 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_CAPTURE_ERROR       "Lỗi chụp ảnh"
+    IDS_CAPTURE_ERROR       "Lỗi ghi hình"
     IDS_CAPTURE_ERROR_VIDEO "video"
     IDS_CAPTURE_ERROR_AUDIO "âm thanh"
-    IDS_CAPTURE_ERROR_ADD_BUFFER  "Không thể thêm bộ lọc bộ đệm %s vào đồ thị."
-    IDS_CAPTURE_ERROR_CONNECT_BUFF  "Không thể kết nối bộ lọc bộ đệm %s vào đồ thị."
-    IDS_CAPTURE_ERROR_ADD_ENCODER  "Không thể thêm bộ lọc bộ mã hóa %s vào đồ thị."
-    IDS_CAPTURE_ERROR_CONNECT_ENC  "Không thể kết nối bộ lọc bộ mã hóa %s vào đồ thị."
-    IDS_CAPTURE_ERROR_COMPRESSION  "Không thể đặt định dạng nén trên bộ lọc bộ mã hóa %s."
-    IDS_CAPTURE_ERROR_MULTIPLEXER  "Không thể kết nối luồng %s vào bộ lọc bộ ghép kênh (multiplexer)."
-    IDS_CAPTURE_ERROR_VID_CAPT_PIN "Không tìm thấy pin chụp video."
-    IDS_CAPTURE_ERROR_AUD_CAPT_PIN "Không tìm thấy pin chụp âm thanh."
+    IDS_CAPTURE_ERROR_ADD_BUFFER  "Không thể thêm bộ lọc đệm %s vào đồ thị."
+    IDS_CAPTURE_ERROR_CONNECT_BUFF  "Không thể kết nối bộ lọc đệm %s vào đồ thị."
+    IDS_CAPTURE_ERROR_ADD_ENCODER  "Không thể thêm bộ lọc mã hóa %s vào đồ thị."
+    IDS_CAPTURE_ERROR_CONNECT_ENC  "Không thể kết nối bộ lọc mã hóa %s vào đồ thị."
+    IDS_CAPTURE_ERROR_COMPRESSION  "Không thể đặt định dạng nén trên bộ lọc mã hóa %s."
+    IDS_CAPTURE_ERROR_MULTIPLEXER  "Không thể kết nối luồng %s với bộ lọc ghép kênh."
+    IDS_CAPTURE_ERROR_VID_CAPT_PIN "Không tìm thấy pin ghi video."
+    IDS_CAPTURE_ERROR_AUD_CAPT_PIN "Không tìm thấy pin ghi âm thanh."
     IDS_CAPTURE_ERROR_OUT_FILE "Lỗi khởi tạo tệp đầu ra."
     IDS_CAPTURE_ERROR_AUD_OUT_FILE "Lỗi khởi tạo tệp đầu ra âm thanh."
-    IDS_SUBRESYNC_TIME_FORMAT  "Định dạng thời gian đúng là [-]hh:mm:ss.ms (ví dụ: 01:23:45.678)."
+    IDS_SUBRESYNC_TIME_FORMAT  "Định dạng thời gian chính xác là [-]hh:mm:ss.ms (ví dụ: 01:23:45.678)."
     IDS_EXTERNAL_FILTERS_ERROR_MT "Loại này đã có trong danh sách!"
     IDS_WEBSERVER_ERROR_TEST  "Bạn cần áp dụng các cài đặt mới trước khi kiểm tra chúng."
 END
@@ -3836,19 +3836,19 @@ BEGIN
     IDS_OSD_CONTRAST        "Độ tương phản: %s%%"
     IDS_OSD_HUE             "Sắc độ: %s°"
     IDS_OSD_SATURATION      "Độ bão hòa: %s%%"
-    IDS_OSD_RESET_COLOR     "Đã khôi phục cài đặt màu sắc"
-    IDS_OSD_NO_COLORCONTROL "Điều khiển màu sắc không được hỗ trợ"
+    IDS_OSD_RESET_COLOR     "Cài đặt màu đã được khôi phục"
+    IDS_OSD_NO_COLORCONTROL "Không hỗ trợ điều khiển màu sắc"
     IDS_BRIGHTNESS_INC      "Tăng độ sáng"
 END
 
 STRINGTABLE
 BEGIN
     IDS_SUBDL_DLG_DISC_COL  "Đĩa"
-    IDS_SUBDL_DLG_TITLES_COL "Tiêu đề"
-    IDS_SUBDL_DLG_DOWNLOADING "Đang tải (các) phụ đề, vui lòng đợi."
+    IDS_SUBDL_DLG_TITLES_COL "(các) Tiêu đề"
+    IDS_SUBDL_DLG_DOWNLOADING "Đang tải xuống (các) phụ đề, vui lòng đợi."
     IDS_SUBDL_DLG_PARSING   "Đang phân tích danh sách..."
     IDS_SUBDL_DLG_NOT_FOUND "Không tìm thấy phụ đề nào."
-    IDS_SUBDL_DLG_SUBS_AVAIL " %d phụ đề khả dụng."
+    IDS_SUBDL_DLG_SUBS_AVAIL " %d (các) phụ đề khả dụng."
     IDS_TOOLTIP_MINIMIZE    "Thu nhỏ"
     IDS_TOOLTIP_RESTORE     "Khôi phục"
     IDS_TOOLTIP_MAXIMIZE    "Phóng to"
@@ -3863,7 +3863,7 @@ BEGIN
     IDS_THUMB_IMAGE_QUALITY "Chất lượng"
     IDS_THUMB_QUALITY       "Chất lượng (%):"
     IDS_THUMB_THUMBNAILS    "Bố cục"
-    IDS_THUMB_PIXELS        "Điểm ảnh (Pixels):"
+    IDS_THUMB_PIXELS        "Điểm ảnh:"
     IDS_THUMB_LEVEL         "Nén (1-9):"
     IDS_SNAPSHOT_SUBTITLES  "Bao gồm phụ đề"
     IDS_REND_UNAVAILABLEMSG "%s không khả dụng. %s sẽ được sử dụng."
@@ -3879,7 +3879,7 @@ BEGIN
     IDS_HISTORY_PATH        "Đường dẫn"
     IDS_HISTORY_TITLE       "Tiêu đề"
     IDS_HISTORY_POSITION    "Vị trí"
-    IDS_HISTORY_REMOVE_SELECTED "Xóa các mục đã chọn"
+    IDS_HISTORY_REMOVE_SELECTED "Xóa mục đã chọn"
     IDS_HISTORY_REMOVE_MISSING "Xóa các tệp bị thiếu"
     IDS_HISTORY_CLEAR       "Xóa"
 END
@@ -3889,40 +3889,40 @@ BEGIN
     IDS_MOUSE_CLICK_MIDDLE  "Nhấp chuột giữa"
     IDS_MOUSE_CLICK_X1      "Nhấp chuột X1"
     IDS_MOUSE_CLICK_X2      "Nhấp chuột X2"
-    IDS_MOUSE_WHEEL_UP      "Cuộn bánh xe lên"
-    IDS_MOUSE_WHEEL_DOWN    "Cuộn bánh xe xuống"
-    IDS_MOUSE_WHEEL_LEFT    "Cuộn bánh xe sang trái"
-    IDS_MOUSE_WHEEL_RIGHT   "Cuộn bánh xe sang phải"
+    IDS_MOUSE_WHEEL_UP      "Lăn bánh xe lên"
+    IDS_MOUSE_WHEEL_DOWN    "Lăn bánh xe xuống"
+    IDS_MOUSE_WHEEL_LEFT    "Lăn bánh xe sang trái"
+    IDS_MOUSE_WHEEL_RIGHT   "Lăn bánh xe sang phải"
     IDS_MOUSE_ACTION        "Hành động"
     IDS_MOUSE_COMMAND       "Lệnh"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_MOUSE_RIGHT_BUTTON  "Nút chuột phải"
+    IDS_MOUSE_RIGHT_BUTTON  "Nút phải chuột"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SUBTITLES_STEREO    "Phụ đề lập thể (Stereoscopic)"
+    IDS_SUBTITLES_STEREO    "Phụ đề nổi"
     IDS_SUBTITLES_STEREO_DONTUSE "Không sử dụng"
-    IDS_SUBTITLES_STEREO_SIDEBYSIDE "Song song (Side by Side)"
-    IDS_SUBTITLES_STEREO_TOPANDBOTTOM "Trên và Dưới (Top and Bottom)"
-    IDS_SUB_POS_UP          "Dịch chuyển vị trí phụ đề lên"
-    IDS_SUB_POS_DOWN        "Dịch chuyển vị trí phụ đề xuống"
-    IDS_SUB_POS_LEFT        "Dịch chuyển vị trí phụ đề sang trái"
-    IDS_SUB_POS_RIGHT       "Dịch chuyển vị trí phụ đề sang phải"
+    IDS_SUBTITLES_STEREO_SIDEBYSIDE "Song song"
+    IDS_SUBTITLES_STEREO_TOPANDBOTTOM "Trên và Dưới"
+    IDS_SUB_POS_UP          "Di chuyển vị trí phụ đề lên"
+    IDS_SUB_POS_DOWN        "Di chuyển vị trí phụ đề xuống"
+    IDS_SUB_POS_LEFT        "Di chuyển vị trí phụ đề sang trái"
+    IDS_SUB_POS_RIGHT       "Di chuyển vị trí phụ đề sang phải"
     IDS_SUB_POS_RESTORE     "Khôi phục vị trí phụ đề"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_SUB_COPYTOCLIPBOARD "Sao chép phụ đề đang hiển thị vào bộ nhớ tạm"
-    IDS_SUB_SIZE_DEC        "Giảm kích thước văn bản phụ đề"
-    IDS_SUB_SIZE_INC        "Tăng kích thước văn bản phụ đề"
-    IDS_SUB_SIZE            "Kích thước văn bản phụ đề: %d"
+    IDS_SUB_COPYTOCLIPBOARD "Sao chép phụ đề đang hiển thị vào bảng nhớ tạm"
+    IDS_SUB_SIZE_DEC        "Giảm kích thước chữ phụ đề"
+    IDS_SUB_SIZE_INC        "Tăng kích thước chữ phụ đề"
+    IDS_SUB_SIZE            "Kích thước chữ phụ đề: %d"
     IDS_SUB_NOT_USE         "không hiển thị phụ đề"
-    IDS_SUB_USE_INTERNAL    "bộ kết xuất phụ đề nội bộ"
+    IDS_SUB_USE_INTERNAL    "trình kết xuất phụ đề nội bộ"
 END
 
 STRINGTABLE
@@ -3941,7 +3941,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDC_CONTROLS_SIZE_COMBO "Chỉ áp dụng cho thanh công cụ tích hợp hoặc thanh công cụ bên ngoài ở định dạng SVG, và cho thanh điều khiển nổi (flybar)"
+    IDC_CONTROLS_SIZE_COMBO "Chỉ áp dụng cho thanh công cụ tích hợp hoặc thanh công cụ bên ngoài ở định dạng SVG, và cho thanh điều khiển trượt"
 END
 
 /////////////////////////////////////////////////////////////////////////////

@@ -915,9 +915,9 @@ BEGIN
     GROUPBOX        "Setări pentru randorul video MPC (MPC Video Renderer)",IDC_STATIC,5,177,285,27
     CONTROL         "Modul ecran complet exclusiv pe o fereastră suplimentară (experimental)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "Încadrare",IDC_STATIC,5,208,210,53
-    LTEXT           "Modul implicit:",IDC_STATIC,10,220,74,8
-    COMBOBOX        IDC_COMBO8,88,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Încadrare",IDC_STATIC,5,208,212,53
+    LTEXT           "Modul implicit:",IDC_STATIC,10,220,79,8
+    COMBOBOX        IDC_COMBO8,90,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Nu scala la creșterile mici de dimensiuni de cadre",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,195,10
     CONTROL         "Nu scala la scăderile mici de dimensiuni de cadre",IDC_CHECK8,

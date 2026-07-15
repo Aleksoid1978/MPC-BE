@@ -372,9 +372,9 @@ BEGIN DIALOGEX IDD_PPAGEMOUSE LINES 22
 8		"Ha semmi nincs betöltve, nyissa meg a legutóbbi fájlt"
 10		"Dupla kattintás"
 12		"Ablak áthelyezése a videó területre"
-13		"Enable long press speed-up"
-14		"Long press speed"
-16		"Long press delay"
+13		"Hosszú megnyomásos gyorsítás engedélyezése"
+14		"Hosszú megnyomás sebessége"
+16		"Hosszú megnyomás késleltetése"
 18		"Jobb kattintás"
 21		"Alapértelmezett"
 END

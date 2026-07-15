@@ -1227,7 +1227,7 @@ CStringW YT_DLP::GetFilename() const
 	if (mTitle.GetLength()) {
 		filename = mTitle;
 		FixFilename(filename);
-	} else {
+	} else if (GetFormatsCount()) {
 		filename = L"file";
 	}
 
