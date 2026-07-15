@@ -26,6 +26,7 @@
 #include <Tlhelp32.h>
 #include "MainFrm.h"
 #include "Misc.h"
+#include "controls/DarkTheme.h"
 #include <winternl.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
@@ -1535,6 +1536,9 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 					s.iLanguage = nLanguage;
 				}
 			} else {
+				// Dark-theme this box (it fires during early startup, before the persistent message-box
+				// hook is installed in CMainFrame::OnCreate, so the RAII guard installs a scoped one).
+				DarkTheme::CDarkMessageBoxHook mbHook;
 				// This message should stay in English!
 				MessageBoxW(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
 					L"MPC-BE", MB_OK);

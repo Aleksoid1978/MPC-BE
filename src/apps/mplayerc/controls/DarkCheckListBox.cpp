@@ -82,20 +82,25 @@ void CDarkCheckListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 		// Fill to the full client width: for some lists the item rect (and the DC's
 		// clip region) does not span the whole control, which would leave the right
-		// side unpainted (white). Clear the clip so the opaque fill reaches the edge.
+		// side unpainted (white).
 		CRect rcFill(lpDrawItemStruct->rcItem);
 		CRect rcClient;
 		GetClientRect(&rcClient);
 		if (rcClient.right > rcFill.right) {
 			rcFill.right = rcClient.right;
 		}
-		// ...but bound the fill to the client bottom, and clip the text (ETO_CLIPPED): clearing the
-		// clip let a partially-visible last item paint its background/text *below* the list box, so the
-		// row spilled out of the control into the page underneath ("the list leaves its box").
 		if (rcFill.bottom > rcClient.bottom) {
 			rcFill.bottom = rcClient.bottom;
 		}
-		pDC->SelectClipRgn(nullptr);
+		// Clip to the client rect (not "no clip"): the list box reuses one DC for every row and does
+		// not reset the clip per row, so clearing it let a partially-visible last row spill below the
+		// box — both our text (bounded above + ETO_CLIPPED) AND the checkbox glyph the base
+		// CCheckListBox::PreDrawItem paints (which our clamp can't reach). A client-rect clip still
+		// lets the opaque fill reach the right edge but keeps every row's paint — glyph included —
+		// inside the box, so the next item's checkbox no longer peeks out the bottom.
+		CRgn rgnClient;
+		rgnClient.CreateRectRgnIndirect(&rcClient);
+		pDC->SelectClipRgn(&rgnClient);
 
 		pDC->ExtTextOutW(lpDrawItemStruct->rcItem.left, yText, ETO_OPAQUE | ETO_CLIPPED,
 			rcFill, strText, strText.GetLength(), nullptr);

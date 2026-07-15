@@ -844,6 +844,34 @@ namespace DarkTheme
 					}
 					return r;
 				}
+				case WM_PAINT:
+				case WM_SETFOCUS:
+				case WM_KILLFOCUS: {
+					// Combo boxes draw their border in the CLIENT area (not the non-client), and repaint it
+					// in a light 'focused' state on focus — which the WM_NCPAINT overpaint above never
+					// covers, so an active combo showed a white border (Add-to-Favorites). Only for combos,
+					// overpaint the client-edge frame dark after each WM_PAINT, and force a repaint on focus
+					// change. Gated on the ComboBox class so edits / lists / trees / statics are untouched.
+					wchar_t cls[16] = {};
+					::GetClassNameW(hWnd, cls, _countof(cls));
+					if (_wcsicmp(cls, L"ComboBox") != 0) {
+						break; // not a combo — fall through to the default handling
+					}
+					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
+					if (msg == WM_PAINT) {
+						if (HDC hdc = ::GetDC(hWnd)) {
+							RECT rc;
+							::GetClientRect(hWnd, &rc);
+							HBRUSH br = ::CreateSolidBrush(CtrlBorderColor());
+							::FrameRect(hdc, &rc, br);
+							::DeleteObject(br);
+							::ReleaseDC(hWnd, hdc);
+						}
+					} else {
+						::InvalidateRect(hWnd, nullptr, FALSE); // focus changed — repaint so the frame stays dark
+					}
+					return r;
+				}
 				case WM_NCDESTROY:
 					RemoveWindowSubclass(hWnd, BorderSubclassProc, kBorderSubclassId);
 					break;
@@ -966,7 +994,14 @@ namespace DarkTheme
 				if (est & (WS_VSCROLL | WS_HSCROLL)) {
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr); // dark scrollbar
 				} else {
-					SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
+					// Single-line edits: DISABLE the visual style (empty theme) rather than DarkMode_CFD.
+					// CFD owns a hover/hot border state and self-invalidates the edit's non-client on every
+					// mouse-move; our WM_NCPAINT overpaint then flashed light->dark on each hover repaint
+					// (About / History / Format / Keys filter / Logo fields). A style-less edit has no hover
+					// border, so nothing repaints the NC on hover — the dark overpaint below is drawn once
+					// (on show/focus/resize) and stays. Interior stays dark via WM_CTLCOLOR* (OnCtlColor),
+					// which a classic edit honours fully, so dropping CFD doesn't lighten the interior.
+					SetWindowTheme(hCtrl, L"", L"");
 				}
 				// Repaint the light client-edge dark. This self-skips on a borderless edit (NOT WS_BORDER,
 				// e.g. the MediaInfo dump) — where a drawn frame would land in the client and get dragged
