@@ -195,6 +195,7 @@ protected:
     afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
     afx_msg void OnWindowPosChanging(WINDOWPOS FAR* lpwndpos);
     afx_msg void OnPaint();
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnClose();
     afx_msg void OnSize(UINT nType, int cx, int cy);
     //}}AFX_MSG

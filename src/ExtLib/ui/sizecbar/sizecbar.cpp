@@ -106,6 +106,7 @@ BEGIN_MESSAGE_MAP(CSizingControlBar, baseCSizingControlBar)
     ON_WM_CREATE()
     ON_WM_PAINT()
     ON_WM_NCPAINT()
+    ON_WM_ERASEBKGND()
     ON_WM_NCCALCSIZE()
     ON_WM_WINDOWPOSCHANGING()
     ON_WM_CAPTURECHANGED()
@@ -629,6 +630,22 @@ void CSizingControlBar::OnPaint()
 {
     // overridden to skip border painting based on clientrect
     CPaintDC dc(this);
+}
+
+BOOL CSizingControlBar::OnEraseBkgnd(CDC* pDC)
+{
+    // The bar's own client background is otherwise erased by DefWindowProc with the shared window-class
+    // brush (light COLOR_BTNFACE), which is only swapped dark as a side effect of the dark NC paint - so
+    // when a child doesn't fully cover the client (e.g. a 2px inset), or right after a redock/resize/theme
+    // toggle before the next NC paint, the exposed strip flashed WHITE. Paint it dark deterministically.
+    if (m_bUseDarkTheme) {
+        CRect rc;
+        GetClientRect(rc);
+        pDC->FillSolidRect(rc, ColorThemeRGB(45, 50, 55)); // same shade as the NC frame fill
+        return TRUE;
+    }
+
+    return baseCSizingControlBar::OnEraseBkgnd(pDC);
 }
 
 LRESULT CSizingControlBar::OnNcHitTest(CPoint point)

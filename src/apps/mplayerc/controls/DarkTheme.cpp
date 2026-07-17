@@ -463,10 +463,12 @@ namespace DarkTheme
 			}
 			if (msg == WM_PAINT) {
 				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
-				FillListEmptyArea(hWnd);      // dark over the light empty strip / stray column separator
 				if (dwRefData) {
 					DrawListGridlines(hWnd);  // dark grid (only for lists that originally had grid lines)
 				}
+				// Fill the empty area AFTER the grid so it also backstops it: any grid line drawn past the
+				// last item ("unnecessary rows" in the empty space below a short list) is overpainted dark.
+				FillListEmptyArea(hWnd);      // dark over the light empty strip / stray column separator
 				return res;
 			}
 			if (msg == WM_HSCROLL && dwRefData) {
@@ -868,7 +870,21 @@ namespace DarkTheme
 							::ReleaseDC(hWnd, hdc);
 						}
 					} else {
-						::InvalidateRect(hWnd, nullptr, FALSE); // focus changed — repaint so the frame stays dark
+						// Focus changed: invalidate ONLY the 1px border frame, not the whole control. A full
+						// InvalidateRect(nullptr) repainted the interior + dropdown button too, which made the
+						// combo twitch each time its dropdown opened/closed (Shader Editor). The border-only
+						// invalidate still re-runs the WM_PAINT overpaint so the frame stays dark.
+						RECT rc;
+						::GetClientRect(hWnd, &rc);
+						const RECT edges[4] = {
+							{ rc.left,      rc.top,        rc.right,     rc.top + 1    }, // top
+							{ rc.left,      rc.bottom - 1, rc.right,     rc.bottom     }, // bottom
+							{ rc.left,      rc.top,        rc.left + 1,  rc.bottom     }, // left
+							{ rc.right - 1, rc.top,        rc.right,     rc.bottom     }, // right
+						};
+						for (const auto& e : edges) {
+							::InvalidateRect(hWnd, &e, FALSE);
+						}
 					}
 					return r;
 				}
@@ -989,7 +1005,11 @@ namespace DarkTheme
 				// The CFD combo border stays light on some machines (e.g. the Add-Favorite dropdown);
 				// overpaint it dark like the edits.
 				ApplyDarkBorder(hCtrl);
-			} else if (_wcsicmp(cls, L"Edit") == 0) {
+			} else if (_wcsicmp(cls, L"Edit") == 0 || _wcsicmp(cls, L"MFCMaskedEdit") == 0) {
+				// CMFCMaskedEdit (the GoTo dialog's time field) registers class "MFCMaskedEdit" by
+				// superclassing WC_EDIT, so it isn't class "Edit" and fell through un-themed (light). It
+				// doesn't reflect WM_CTLCOLOR, so the parent's WM_CTLCOLOREDIT still darkens the interior —
+				// it just needs the same single-line handling as a normal edit.
 				const LONG est = GetWindowLongW(hCtrl, GWL_STYLE);
 				if (est & (WS_VSCROLL | WS_HSCROLL)) {
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr); // dark scrollbar
