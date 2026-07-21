@@ -809,96 +809,280 @@ namespace DarkTheme
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
 		}
 
-		// Edits, tree-views and list-views keep a light sunken border under native dark
-		// mode. We repaint just the outer border frame with the shared dark border
-		// colour (not the whole non-client ring, so a control's scrollbars are left
-		// alone), matching the spin buttons, colour wells and group boxes.
-		const UINT_PTR kBorderSubclassId = 5;
+		// ---- Owning-border subclass (replaces the overpaint BorderSubclassProc) --------------------
+		// The overpaint approach let the theme draw the light client-edge, then painted dark over it =
+		// a light->dark FLASH on every non-client repaint (hover, tooltip, tab-switch, focus). Instead
+		// we REMOVE the light source: strip WS_EX_CLIENTEDGE / WS_BORDER so DefWindowProc draws no edge,
+		// re-reserve the identical band in WM_NCCALCSIZE (client metrics/text don't shift), and paint the
+		// band ourselves (fill the interior colour, then a 1px stroke). The control keeps its DarkMode_*
+		// theme only for the SCROLLBAR / dropdown, which Def still paints — but there is no border style
+		// left for it to draw light, so nothing can flash. (Mirrors Notepad++/darkmodelib.)
+		const UINT_PTR kOwnerBorderSubclassId = 13;
+		const UINT_PTR kComboBorderSubclassId = 12;
 
-		LRESULT CALLBACK BorderSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
+		enum { OB_CLIENTEDGE = 1, OB_STATICEDGE = 2, OB_WSBORDER = 4 };
+
+		struct OwnerBorderData {
+			DWORD stripped = 0; // OB_* bits we removed — so toggle-off can restore them exactly
+			int   logical  = 0; // 0 / 1 / 2 logical px of the owned border band
+			bool  hot      = false;
+			bool  focus    = false;
+		};
+
+		int OwnerBorderDpi(HWND h) {
+			const UINT dpi = ::GetDpiForWindow(h);
+			return dpi ? static_cast<int>(dpi) : 96;
+		}
+
+		int PhysBorder(HWND h, int logical) { // reserve width == stroke-band width, per-DPI
+			if (logical <= 0) {
+				return 0;
+			}
+			return logical * ::GetSystemMetricsForDpi(SM_CXBORDER, OwnerBorderDpi(h));
+		}
+
+		// Interior colour of the reserved band, matched to what OnCtlColor gives each control's client
+		// so the band blends seamlessly with the interior (edits/listbox = sunken CtrlBackColor; lists/
+		// trees/statics = FaceColor).
+		COLORREF OwnerBorderFill(HWND h) {
+			wchar_t cls[32] = {};
+			GetClassNameW(h, cls, _countof(cls));
+			const bool isEdit = (_wcsicmp(cls, L"Edit") == 0 || _wcsicmp(cls, L"MFCMaskedEdit") == 0);
+			// Editable edits and list boxes get the sunken CtrlBackColor interior (WM_CTLCOLOREDIT/LISTBOX);
+			// read-only edits (WM_CTLCOLORSTATIC) and lists/trees/statics use FaceColor. Match the band fill
+			// to each control's real interior so the reserved band blends with the client (no seam).
+			if ((isEdit && !(GetWindowLongW(h, GWL_STYLE) & ES_READONLY)) || _wcsicmp(cls, L"ListBox") == 0) {
+				return CtrlBackColor();
+			}
+			return FaceColor();
+		}
+
+		COLORREF OwnerBorderFrame(const OwnerBorderData* d, HWND h) {
+			if (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) {
+				return ThemeRGB(50, 55, 60);
+			}
+			if (d->focus) {
+				return RGB(76, 194, 255);      // celeste accent (matches buttons / trackbar thumb)
+			}
+			if (d->hot) {
+				return ThemeRGB(100, 105, 110); // subtle hover lift
+			}
+			return CtrlBorderColor();          // ThemeRGB(70, 75, 80)
+		}
+
+		void OwnerBorderRefreshFrame(HWND h) { // frame ONLY — never the client (no twitch, no flash)
+			::RedrawWindow(h, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW);
+		}
+
+		LRESULT CALLBACK OwnerBorderSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR ref) {
+			auto* d = reinterpret_cast<OwnerBorderData*>(ref);
 			switch (msg) {
-				case WM_NCPAINT: {
-					// Let the default proc paint the non-client (scroll bars + its own border), then
-					// overpaint our dark frame on top. Drawing over whatever the theme rendered keeps the
-					// border dark on every system — skipping / clipping the default looked fine locally but
-					// rendered a WHITE border on other machines (nothing dark was painted over the edge).
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
-					RECT wr;
-					::GetWindowRect(hWnd, &wr);
-					POINT org = { 0, 0 };
-					::ClientToScreen(hWnd, &org);
-					const int edge = org.y - wr.top; // NC border: 0 = none, 1 = WS_BORDER, 2 = client edge
-					// Only overpaint when the control actually reserves a non-client border. A borderless
-					// control (NOT WS_BORDER, e.g. the MediaInfo edit) has edge 0; a 1px frame there lands in
-					// the *client*, which the edit's ScrollWindowEx then drags into the middle of the text on
-					// scroll. Skip it — such controls stay borderless, as their template intends.
-					if (edge >= 1) {
-						if (HDC hdc = ::GetWindowDC(hWnd)) {
-							RECT rc = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
-							HBRUSH br = ::CreateSolidBrush(CtrlBorderColor());
-							for (int k = 0; k < edge; ++k) {
-								::FrameRect(hdc, &rc, br);
-								::InflateRect(&rc, -1, -1);
-							}
-							::DeleteObject(br);
-							::ReleaseDC(hWnd, hdc);
-						}
+				case WM_NCCALCSIZE: {
+					// Def reserves the SCROLLBAR strip FIRST (list/tree/scrolling edit); THEN we carve our
+					// band out of the client so text/rows never sit under the stroke. Def-first is mandatory
+					// (shrinking before Def mis-sizes the scrollbar). Reserve == the thickness we removed, so
+					// the client rect stays pixel-identical to the light baseline (no reflow).
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					if (w) {
+						const int t = PhysBorder(h, d->logical);
+						::InflateRect(&reinterpret_cast<NCCALCSIZE_PARAMS*>(l)->rgrc[0], -t, -t);
 					}
 					return r;
 				}
-				case WM_PAINT:
-				case WM_SETFOCUS:
-				case WM_KILLFOCUS: {
-					// Combo boxes draw their border in the CLIENT area (not the non-client), and repaint it
-					// in a light 'focused' state on focus — which the WM_NCPAINT overpaint above never
-					// covers, so an active combo showed a white border (Add-to-Favorites). Only for combos,
-					// overpaint the client-edge frame dark after each WM_PAINT, and force a repaint on focus
-					// change. Gated on the ComboBox class so edits / lists / trees / statics are untouched.
-					wchar_t cls[16] = {};
-					::GetClassNameW(hWnd, cls, _countof(cls));
-					if (_wcsicmp(cls, L"ComboBox") != 0) {
-						break; // not a combo — fall through to the default handling
+				case WM_NCPAINT: {
+					// Def paints ONLY the dark scrollbar — it CANNOT paint a light edge (we stripped the
+					// border styles), so no light state ever exists to flash from. Then we fill the reserved
+					// band with the interior colour (no sub-pixel gap can leak light on any DPI) and stroke
+					// a 1px outer border, keeping our paint OFF the scrollbar so we never touch it.
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					const int t = PhysBorder(h, d->logical);
+					if (t <= 0) {
+						return r;
 					}
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
-					if (msg == WM_PAINT) {
-						if (HDC hdc = ::GetDC(hWnd)) {
+					if (HDC hdc = ::GetWindowDC(h)) {
+						RECT wr;
+						::GetWindowRect(h, &wr);
+						RECT band = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
+						const LONG st = ::GetWindowLongW(h, GWL_STYLE);
+						const int dpi = OwnerBorderDpi(h);
+						if (st & WS_VSCROLL) {
+							const int sw = ::GetSystemMetricsForDpi(SM_CXVSCROLL, dpi);
+							::ExcludeClipRect(hdc, band.right - sw, band.top, band.right, band.bottom);
+						}
+						if (st & WS_HSCROLL) {
+							const int sh = ::GetSystemMetricsForDpi(SM_CYHSCROLL, dpi);
+							::ExcludeClipRect(hdc, band.left, band.bottom - sh, band.right, band.bottom);
+						}
+						HBRUSH fill = ::CreateSolidBrush(OwnerBorderFill(h));
+						::FillRect(hdc, &band, fill);
+						::DeleteObject(fill);
+						HBRUSH edge = ::CreateSolidBrush(OwnerBorderFrame(d, h));
+						::FrameRect(hdc, &band, edge);
+						::DeleteObject(edge);
+						::ReleaseDC(h, hdc);
+					}
+					return r;
+				}
+				case WM_MOUSEMOVE:
+					if (!d->hot) {
+						d->hot = true;
+						TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, h, 0 };
+						::TrackMouseEvent(&tme);
+						OwnerBorderRefreshFrame(h);
+					}
+					break;
+				case WM_MOUSELEAVE:
+					if (d->hot) {
+						d->hot = false;
+						OwnerBorderRefreshFrame(h);
+					}
+					break;
+				case WM_SETFOCUS:
+					d->focus = true;
+					OwnerBorderRefreshFrame(h);
+					break;
+				case WM_KILLFOCUS:
+					d->focus = false;
+					OwnerBorderRefreshFrame(h);
+					break;
+				case WM_ENABLE:
+					OwnerBorderRefreshFrame(h);
+					break;
+				case WM_DPICHANGED_AFTERPARENT:
+					::SetWindowPos(h, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+					OwnerBorderRefreshFrame(h);
+					break;
+				case WM_NCDESTROY:
+					delete d;
+					RemoveWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId);
+					break;
+			}
+			return DefSubclassProc(h, msg, w, l);
+		}
+
+		// Frees the heap OwnerBorderData and removes the subclass on a runtime toggle-OFF (where
+		// RemoveWindowSubclass does NOT send WM_NCDESTROY, so the proc's delete never runs). Restores
+		// the exact border styles we stripped, so DefWindowProc redraws the native edge and the client
+		// metrics return to the light baseline.
+		void FreeOwnerBorder(HWND h) {
+			OwnerBorderData* d = nullptr;
+			if (::GetWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId, reinterpret_cast<DWORD_PTR*>(&d))) {
+				if (d) {
+					LONG ex = ::GetWindowLongW(h, GWL_EXSTYLE);
+					LONG st = ::GetWindowLongW(h, GWL_STYLE);
+					if (d->stripped & OB_CLIENTEDGE) ex |= WS_EX_CLIENTEDGE;
+					if (d->stripped & OB_STATICEDGE) ex |= WS_EX_STATICEDGE;
+					if (d->stripped & OB_WSBORDER)   st |= WS_BORDER;
+					::SetWindowLongW(h, GWL_EXSTYLE, ex);
+					::SetWindowLongW(h, GWL_STYLE, st);
+					delete d;
+				}
+				::RemoveWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId);
+			}
+		}
+
+		void ApplyOwnerBorder(HWND h) {
+			OwnerBorderData* existing = nullptr;
+			if (::GetWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId, reinterpret_cast<DWORD_PTR*>(&existing))) {
+				return; // idempotent: never re-strip / re-capture (would lose the restore flags)
+			}
+
+			const LONG ex = ::GetWindowLongW(h, GWL_EXSTYLE);
+			const LONG st = ::GetWindowLongW(h, GWL_STYLE);
+
+			auto* d = new OwnerBorderData;
+			if (ex & WS_EX_CLIENTEDGE) { d->stripped |= OB_CLIENTEDGE; d->logical = 2; }
+			else if (st & WS_BORDER)   { d->stripped |= OB_WSBORDER;   d->logical = 1; }
+			if (ex & WS_EX_STATICEDGE)   d->stripped |= OB_STATICEDGE;
+
+			// Borderless control (e.g. the MediaInfo IDC_MIEDIT: NOT WS_BORDER, no client edge) → logical 0:
+			// reserve nothing, paint nothing, no subclass. It stays genuinely borderless, so its
+			// ScrollWindowEx has no client-drawn frame to smear into the text. (Decided from the REAL styles,
+			// never the old org.y heuristic that produced the white-border regression.)
+			if (d->logical == 0) {
+				delete d;
+				return;
+			}
+
+			::SetWindowLongW(h, GWL_EXSTYLE, ex & ~(WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
+			if (st & WS_BORDER) {
+				::SetWindowLongW(h, GWL_STYLE, st & ~WS_BORDER);
+			}
+			::SetWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId, reinterpret_cast<DWORD_PTR>(d));
+			::SetWindowPos(h, nullptr, 0, 0, 0, 0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); // re-run NCCALCSIZE + NCPAINT
+		}
+
+		// Combos draw their border in the CLIENT area (not the non-client), so they get their own
+		// subclass. Style-split: CBS_DROPDOWNLIST (no child edit) is double-buffered so its border can't
+		// flash; the editable CBS_DROPDOWN (has a self-painting child edit — WM_PRINTCLIENT would be
+		// unfaithful) keeps a post-Def client re-stroke with a border-ONLY invalidate on focus (a full
+		// InvalidateRect(nullptr) twitched the interior + dropdown button).
+		LRESULT CALLBACK ComboBorderSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR /*ref*/) {
+			const bool listType = (::GetWindowLongW(h, GWL_STYLE) & CBS_DROPDOWNLIST) == CBS_DROPDOWNLIST;
+			switch (msg) {
+				case WM_PAINT:
+					if (listType) {
+						RECT rc;
+						::GetClientRect(h, &rc);
+						PAINTSTRUCT ps;
+						HDC hdc = ::BeginPaint(h, &ps);
+						HDC mem = ::CreateCompatibleDC(hdc);
+						HBITMAP bmp = ::CreateCompatibleBitmap(hdc, rc.right, rc.bottom);
+						HBITMAP old = static_cast<HBITMAP>(::SelectObject(mem, bmp));
+						::SendMessageW(h, WM_PRINTCLIENT, reinterpret_cast<WPARAM>(mem), PRF_CLIENT | PRF_ERASEBKGND);
+						HBRUSH br = ::CreateSolidBrush((::GetFocus() == h) ? RGB(76, 194, 255) : CtrlBorderColor());
+						::FrameRect(mem, &rc, br);
+						::DeleteObject(br);
+						::BitBlt(hdc, 0, 0, rc.right, rc.bottom, mem, 0, 0, SRCCOPY);
+						::SelectObject(mem, old);
+						::DeleteObject(bmp);
+						::DeleteDC(mem);
+						::EndPaint(h, &ps);
+						return 0;
+					} else {
+						const LRESULT r = DefSubclassProc(h, msg, w, l);
+						if (HDC hdc = ::GetDC(h)) {
 							RECT rc;
-							::GetClientRect(hWnd, &rc);
-							HBRUSH br = ::CreateSolidBrush(CtrlBorderColor());
+							::GetClientRect(h, &rc);
+							HBRUSH br = ::CreateSolidBrush((::GetFocus() == h) ? RGB(76, 194, 255) : CtrlBorderColor());
 							::FrameRect(hdc, &rc, br);
 							::DeleteObject(br);
-							::ReleaseDC(hWnd, hdc);
+							::ReleaseDC(h, hdc);
 						}
+						return r;
+					}
+				case WM_SETFOCUS:
+				case WM_KILLFOCUS: {
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					if (listType) {
+						::InvalidateRect(h, nullptr, FALSE); // safe: its WM_PAINT is fully buffered
 					} else {
-						// Focus changed: invalidate ONLY the 1px border frame, not the whole control. A full
-						// InvalidateRect(nullptr) repainted the interior + dropdown button too, which made the
-						// combo twitch each time its dropdown opened/closed (Shader Editor). The border-only
-						// invalidate still re-runs the WM_PAINT overpaint so the frame stays dark.
+						// border-ONLY invalidate; never InvalidateRect(nullptr) (that twitched the dropdown).
 						RECT rc;
-						::GetClientRect(hWnd, &rc);
-						const RECT edges[4] = {
-							{ rc.left,      rc.top,        rc.right,     rc.top + 1    }, // top
-							{ rc.left,      rc.bottom - 1, rc.right,     rc.bottom     }, // bottom
-							{ rc.left,      rc.top,        rc.left + 1,  rc.bottom     }, // left
-							{ rc.right - 1, rc.top,        rc.right,     rc.bottom     }, // right
+						::GetClientRect(h, &rc);
+						const RECT e[4] = {
+							{ rc.left,      rc.top,        rc.right,     rc.top + 1 },
+							{ rc.left,      rc.bottom - 1, rc.right,     rc.bottom  },
+							{ rc.left,      rc.top,        rc.left + 1,  rc.bottom  },
+							{ rc.right - 1, rc.top,        rc.right,     rc.bottom  },
 						};
-						for (const auto& e : edges) {
-							::InvalidateRect(hWnd, &e, FALSE);
+						for (const auto& x : e) {
+							::InvalidateRect(h, &x, FALSE);
 						}
 					}
 					return r;
 				}
 				case WM_NCDESTROY:
-					RemoveWindowSubclass(hWnd, BorderSubclassProc, kBorderSubclassId);
+					RemoveWindowSubclass(h, ComboBorderSubclassProc, kComboBorderSubclassId);
 					break;
 			}
-			return DefSubclassProc(hWnd, msg, wParam, lParam);
+			return DefSubclassProc(h, msg, w, l);
 		}
 
-		void ApplyDarkBorder(HWND hCtrl) {
-			SetWindowSubclass(hCtrl, BorderSubclassProc, kBorderSubclassId, 0);
-			::SetWindowPos(hCtrl, nullptr, 0, 0, 0, 0,
-				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); // force NC repaint
+		void ApplyComboBorder(HWND h) {
+			SetWindowSubclass(h, ComboBorderSubclassProc, kComboBorderSubclassId, 0);
+			::InvalidateRect(h, nullptr, FALSE);
 		}
 
 		// The colour-well buttons on the Interface / OSD / Subtitle-style pages are push buttons
@@ -1001,10 +1185,11 @@ namespace DarkTheme
 					SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 				}
 			} else if (_wcsicmp(cls, L"ComboBox") == 0) {
-				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr);
-				// The CFD combo border stays light on some machines (e.g. the Add-Favorite dropdown);
-				// overpaint it dark like the edits.
-				ApplyDarkBorder(hCtrl);
+				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr); // dark dropdown list + interior
+				// A combo paints its border in the CLIENT area (not the non-client), so it gets its own
+				// subclass that re-strokes the border dark flash-free (buffered for CBS_DROPDOWNLIST,
+				// border-only invalidate for the editable CBS_DROPDOWN).
+				ApplyComboBorder(hCtrl);
 			} else if (_wcsicmp(cls, L"Edit") == 0 || _wcsicmp(cls, L"MFCMaskedEdit") == 0) {
 				// CMFCMaskedEdit (the GoTo dialog's time field) registers class "MFCMaskedEdit" by
 				// superclassing WC_EDIT, so it isn't class "Edit" and fell through un-themed (light). It
@@ -1023,11 +1208,11 @@ namespace DarkTheme
 					// which a classic edit honours fully, so dropping CFD doesn't lighten the interior.
 					SetWindowTheme(hCtrl, L"", L"");
 				}
-				// Repaint the light client-edge dark. This self-skips on a borderless edit (NOT WS_BORDER,
-				// e.g. the MediaInfo dump) — where a drawn frame would land in the client and get dragged
-				// into the text on scroll — so only edits with a real border (the Details/Clip multiline
-				// field, single-line value boxes) get the dark frame. No white edge, no scroll drag.
-				ApplyDarkBorder(hCtrl);
+				// Own the border dark: ApplyOwnerBorder strips the light client-edge/border, reserves the
+				// same band in WM_NCCALCSIZE, and paints it itself — there is no light source, so no
+				// hover/tab-switch flash. Self-skips a borderless edit (the MediaInfo dump), which stays
+				// borderless so nothing gets dragged into the text on scroll.
+				ApplyOwnerBorder(hCtrl);
 			} else if (_wcsicmp(cls, L"SysListView32") == 0) {
 				// List-view controls ignore WM_CTLCOLOR: their background (the area
 				// not covered by columns/rows) must be set explicitly, otherwise it
@@ -1056,14 +1241,14 @@ namespace DarkTheme
 				if (HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hCtrl, LVM_GETHEADER, 0, 0))) {
 					InvalidateRect(hHeader, nullptr, TRUE);
 				}
-				ApplyDarkBorder(hCtrl); // dark outer border to match everything else
+				ApplyOwnerBorder(hCtrl); // owned dark border (scrollbar stays DarkMode_Explorer)
 			} else if (_wcsicmp(cls, L"SysTreeView32") == 0) {
 				// Tree-views, like list-views, need their background/text colors set
 				// explicitly (SetWindowTheme only handles the glyphs and scrollbar).
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
 				::SendMessageW(hCtrl, TVM_SETBKCOLOR,   0, static_cast<LPARAM>(FaceColor()));
 				::SendMessageW(hCtrl, TVM_SETTEXTCOLOR, 0, static_cast<LPARAM>(TextColor()));
-				ApplyDarkBorder(hCtrl); // dark outer border to match everything else
+				ApplyOwnerBorder(hCtrl); // owned dark border (scrollbar stays DarkMode_Explorer)
 			} else if (_wcsicmp(cls, UPDOWN_CLASSW) == 0) {
 				// Spin buttons: fully owner-drawn (native dark mode leaves them light).
 				SetWindowSubclass(hCtrl, SpinSubclassProc, kSpinSubclassId, 0);
@@ -1075,7 +1260,7 @@ namespace DarkTheme
 				// on scroll, so keep the custom border even when it scrolls (the theme's own border
 				// rendered white on some machines).
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
-				ApplyDarkBorder(hCtrl);
+				ApplyOwnerBorder(hCtrl); // owned dark border (scrollbar stays DarkMode_Explorer)
 			} else if (_wcsicmp(cls, L"Static") == 0) {
 				// Sunken value boxes (e.g. Brightness/Contrast/Hue/Saturation on the
 				// Color correction page are SS_SUNKEN RTEXT statics) keep a light 3D edge
@@ -1085,7 +1270,7 @@ namespace DarkTheme
 				const LONG ex = GetWindowLongW(hCtrl, GWL_EXSTYLE);
 				const LONG sType = st & SS_TYPEMASK;
 				if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
-					ApplyDarkBorder(hCtrl);
+					ApplyOwnerBorder(hCtrl);
 				} else if (sType == SS_LEFT || sType == SS_CENTER || sType == SS_RIGHT
 						|| sType == SS_LEFTNOWORDWRAP || sType == SS_SIMPLE) {
 					// Plain text labels: owner-draw disabled ones flat (Windows would emboss them,
@@ -1124,7 +1309,8 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, GroupBoxSubclassProc, kGroupBoxSubclassId);
 			RemoveWindowSubclass(hChild, ButtonSubclassProc,   kButtonSubclassId);
 			RemoveWindowSubclass(hChild, SpinSubclassProc,     kSpinSubclassId);
-			RemoveWindowSubclass(hChild, BorderSubclassProc,   kBorderSubclassId);
+			FreeOwnerBorder(hChild); // owning border: restores the stripped WS_EX_CLIENTEDGE/WS_BORDER + frees the heap data
+			RemoveWindowSubclass(hChild, ComboBorderSubclassProc, kComboBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
 
