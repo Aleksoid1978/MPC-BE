@@ -857,21 +857,18 @@ namespace DarkTheme
 			return FaceColor();
 		}
 
-		COLORREF OwnerBorderFrame(const OwnerBorderData* d, HWND h) {
-			if (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) {
-				return ThemeRGB(50, 55, 60);
-			}
-			if (d->focus) {
-				return RGB(76, 194, 255);      // celeste accent (matches buttons / trackbar thumb)
-			}
-			if (d->hot) {
-				return ThemeRGB(100, 105, 110); // subtle hover lift
-			}
-			return CtrlBorderColor();          // ThemeRGB(70, 75, 80)
+		COLORREF OwnerBorderFrame(const OwnerBorderData* /*d*/, HWND h) {
+			// A consistent dark border in every state. (A hover/focus accent was tried to restore the
+			// hover/click feedback, but a bright celeste frame around a big focused panel — the Options
+			// nav tree — read as garish and "followed" the focus around, so it's dropped.)
+			return (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) ? ThemeRGB(50, 55, 60) : CtrlBorderColor();
 		}
 
-		void OwnerBorderRefreshFrame(HWND h) { // frame ONLY — never the client (no twitch, no flash)
-			::RedrawWindow(h, nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW);
+		void OwnerBorderRefreshFrame(HWND h) {
+			// Frame ONLY — SWP_FRAMECHANGED re-runs WM_NCCALCSIZE + WM_NCPAINT WITHOUT invalidating the
+			// CLIENT, so a hover/focus border repaint never touches (nor flickers) the list/edit content.
+			::SetWindowPos(h, nullptr, 0, 0, 0, 0,
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 		}
 
 		LRESULT CALLBACK OwnerBorderSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR ref) {
@@ -903,15 +900,37 @@ namespace DarkTheme
 						RECT wr;
 						::GetWindowRect(h, &wr);
 						RECT band = { 0, 0, wr.right - wr.left, wr.bottom - wr.top };
+						// CRITICAL: GetWindowDC is the WHOLE window (client included). Exclude the CLIENT rect
+						// so our fill/stroke only touch the reserved border band — otherwise FillRect(band)
+						// paints the interior colour over the whole control (blanking the list content on every
+						// hover repaint). Map the client rect into window coordinates first.
+						RECT client;
+						::GetClientRect(h, &client);
+						::MapWindowPoints(h, nullptr, reinterpret_cast<POINT*>(&client), 2); // client -> screen
+						::OffsetRect(&client, -wr.left, -wr.top);                            // screen -> window
+						::ExcludeClipRect(hdc, client.left, client.top, client.right, client.bottom);
 						const LONG st = ::GetWindowLongW(h, GWL_STYLE);
 						const int dpi = OwnerBorderDpi(h);
+						// Exclude the scrollbar so we don't overpaint it, but leave its INNER 2px unexcluded so
+						// our dark fill covers the light edge DarkMode_Explorer draws between the list and the
+						// scrollbar. Use the scrollbar's REAL rect from GetScrollBarInfo — the earlier
+						// band.right - sw guess was wrong after our custom WM_NCCALCSIZE, so it never covered it.
+						const int inner = 2 * ::GetSystemMetricsForDpi(SM_CXBORDER, dpi);
 						if (st & WS_VSCROLL) {
-							const int sw = ::GetSystemMetricsForDpi(SM_CXVSCROLL, dpi);
-							::ExcludeClipRect(hdc, band.right - sw, band.top, band.right, band.bottom);
+							SCROLLBARINFO sbi = { sizeof(sbi) };
+							if (::GetScrollBarInfo(h, OBJID_VSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
+								RECT sb = sbi.rcScrollBar;
+								::OffsetRect(&sb, -wr.left, -wr.top); // screen -> window
+								::ExcludeClipRect(hdc, sb.left + inner, sb.top, sb.right, sb.bottom);
+							}
 						}
 						if (st & WS_HSCROLL) {
-							const int sh = ::GetSystemMetricsForDpi(SM_CYHSCROLL, dpi);
-							::ExcludeClipRect(hdc, band.left, band.bottom - sh, band.right, band.bottom);
+							SCROLLBARINFO sbi = { sizeof(sbi) };
+							if (::GetScrollBarInfo(h, OBJID_HSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
+								RECT sb = sbi.rcScrollBar;
+								::OffsetRect(&sb, -wr.left, -wr.top);
+								::ExcludeClipRect(hdc, sb.left, sb.top + inner, sb.right, sb.bottom);
+							}
 						}
 						HBRUSH fill = ::CreateSolidBrush(OwnerBorderFill(h));
 						::FillRect(hdc, &band, fill);
@@ -923,34 +942,11 @@ namespace DarkTheme
 					}
 					return r;
 				}
-				case WM_MOUSEMOVE:
-					if (!d->hot) {
-						d->hot = true;
-						TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, h, 0 };
-						::TrackMouseEvent(&tme);
-						OwnerBorderRefreshFrame(h);
-					}
-					break;
-				case WM_MOUSELEAVE:
-					if (d->hot) {
-						d->hot = false;
-						OwnerBorderRefreshFrame(h);
-					}
-					break;
-				case WM_SETFOCUS:
-					d->focus = true;
-					OwnerBorderRefreshFrame(h);
-					break;
-				case WM_KILLFOCUS:
-					d->focus = false;
-					OwnerBorderRefreshFrame(h);
-					break;
 				case WM_ENABLE:
 					OwnerBorderRefreshFrame(h);
 					break;
 				case WM_DPICHANGED_AFTERPARENT:
-					::SetWindowPos(h, nullptr, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
-					OwnerBorderRefreshFrame(h);
+					OwnerBorderRefreshFrame(h); // SWP_FRAMECHANGED re-runs NCCALCSIZE (new-DPI reserve) + NCPAINT
 					break;
 				case WM_NCDESTROY:
 					delete d;
@@ -1031,7 +1027,7 @@ namespace DarkTheme
 						HBITMAP bmp = ::CreateCompatibleBitmap(hdc, rc.right, rc.bottom);
 						HBITMAP old = static_cast<HBITMAP>(::SelectObject(mem, bmp));
 						::SendMessageW(h, WM_PRINTCLIENT, reinterpret_cast<WPARAM>(mem), PRF_CLIENT | PRF_ERASEBKGND);
-						HBRUSH br = ::CreateSolidBrush((::GetFocus() == h) ? RGB(76, 194, 255) : CtrlBorderColor());
+						HBRUSH br = ::CreateSolidBrush(CtrlBorderColor()); // consistent dark border in every state (incl. focused)
 						::FrameRect(mem, &rc, br);
 						::DeleteObject(br);
 						::BitBlt(hdc, 0, 0, rc.right, rc.bottom, mem, 0, 0, SRCCOPY);
@@ -1045,7 +1041,7 @@ namespace DarkTheme
 						if (HDC hdc = ::GetDC(h)) {
 							RECT rc;
 							::GetClientRect(h, &rc);
-							HBRUSH br = ::CreateSolidBrush((::GetFocus() == h) ? RGB(76, 194, 255) : CtrlBorderColor());
+							HBRUSH br = ::CreateSolidBrush(CtrlBorderColor()); // consistent dark border in every state (incl. focused)
 							::FrameRect(hdc, &rc, br);
 							::DeleteObject(br);
 							::ReleaseDC(h, hdc);
@@ -1354,7 +1350,10 @@ namespace DarkTheme
 	COLORREF FaceColor()       { return ThemeRGB(22, 27, 32); }
 	COLORREF TextColor()       { return RGB(165, 170, 175); }
 	COLORREF CtrlBackColor()   { return ThemeRGB(10, 14, 18); }
-	COLORREF CtrlBorderColor() { return ThemeRGB(70, 75, 80); }
+	// Kept close to FaceColor(22,27,32) on purpose: ThemeRGB is (brightness + value) * tint / 256, so a
+	// high base like 70/75/80 renders as a LIGHT (near-white, tinted) line once the user's theme
+	// brightness/colour sliders are up — which is what made every control border read as white.
+	COLORREF CtrlBorderColor() { return ThemeRGB(35, 40, 45); }
 	COLORREF GridlineColor()   { return ThemeRGB(40, 45, 50); }
 
 	void AllowDarkModeForApp() {
