@@ -82,6 +82,7 @@ CSizingControlBar::CSizingControlBar()
     
     m_hBrush_orig = nullptr;
     m_hBrush = nullptr;
+    m_hBrushClient = nullptr;
     m_dwBrushColor = 0;
     m_bUseDarkTheme = false;
 
@@ -90,13 +91,15 @@ CSizingControlBar::CSizingControlBar()
 
 CSizingControlBar::~CSizingControlBar()
 {
+    // (m_hBrush was deleted twice here and m_hBrushFrame was guarded by m_hBrush_orig, so the frame brush
+    // leaked while a freed handle was passed to DeleteObject a second time. Each brush is freed once now.)
     if (m_hBrush) {
         ::DeleteObject(m_hBrush);
     }
-    if (m_hBrush_orig) {
-        ::DeleteObject(m_hBrush);
+    if (m_hBrushClient) {
+        ::DeleteObject(m_hBrushClient);
     }
-    if (m_hBrush_orig) {
+    if (m_hBrushFrame) {
         ::DeleteObject(m_hBrushFrame);
     }
 }
@@ -574,15 +577,30 @@ void CSizingControlBar::OnNcPaint()
     //MPC-BE custom code start
     if (m_bUseDarkTheme) {
         const auto dwBrushColor = ColorThemeRGB(45, 50, 55);
-        if (m_dwBrushColor != dwBrushColor && m_hBrush) {
-            ::DeleteObject(m_hBrush);
-            m_hBrush = nullptr;
+        if (m_dwBrushColor != dwBrushColor) {
+            // the theme sliders moved - drop both cached brushes so they re-tint
+            if (m_hBrush) {
+                ::DeleteObject(m_hBrush);
+                m_hBrush = nullptr;
+            }
+            if (m_hBrushClient) {
+                ::DeleteObject(m_hBrushClient);
+                m_hBrushClient = nullptr;
+            }
         }
         m_dwBrushColor = dwBrushColor;
         if (!m_hBrush) {
             m_hBrush = ::CreateSolidBrush(dwBrushColor);
 		}
-        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG_PTR)m_hBrush); //MPC-BE patch
+        // The CLASS background brush is what DefWindowProc uses to erase a client strip that gets exposed
+        // during a redock/resize (before the child dialog catches up). It must be the DARK CONTENT shade,
+        // not the lighter NC/caption shade above: ColorThemeRGB scales with the brightness slider, so
+        // (45,50,55) reads as a pale/near-white rectangle at high brightness while the hosted content
+        // (shader editor dialog, lists) is (22,27,32). Keep the NC frame fill below on m_hBrush.
+        if (!m_hBrushClient) {
+            m_hBrushClient = ::CreateSolidBrush(ColorThemeRGB(22, 27, 32));
+        }
+        ::SetClassLongPtrW(m_hWnd, GCLP_HBRBACKGROUND, (LONG_PTR)m_hBrushClient); //MPC-BE patch
 
         mdc.FrameRect(rcDraw, CBrush::FromHandle(m_hBrushFrame)); // Draw Black Frame
 
@@ -641,7 +659,10 @@ BOOL CSizingControlBar::OnEraseBkgnd(CDC* pDC)
     if (m_bUseDarkTheme) {
         CRect rc;
         GetClientRect(rc);
-        pDC->FillSolidRect(rc, ColorThemeRGB(45, 50, 55)); // same shade as the NC frame fill
+        // Match the DARK content the bar hosts (22,27,32), NOT the lighter NC/caption shade: ColorThemeRGB
+        // scales with the brightness slider, so the old (45,50,55) fill showed up as a pale/near-white
+        // rectangle whenever a strip was briefly exposed on redock/resize.
+        pDC->FillSolidRect(rc, ColorThemeRGB(22, 27, 32));
         return TRUE;
     }
 

@@ -820,7 +820,7 @@ namespace DarkTheme
 		const UINT_PTR kOwnerBorderSubclassId = 13;
 		const UINT_PTR kComboBorderSubclassId = 12;
 
-		enum { OB_CLIENTEDGE = 1, OB_STATICEDGE = 2, OB_WSBORDER = 4 };
+		enum { OB_CLIENTEDGE = 1, OB_STATICEDGE = 2, OB_WSBORDER = 4, OB_SSSUNKEN = 8 };
 
 		struct OwnerBorderData {
 			DWORD stripped = 0; // OB_* bits we removed — so toggle-off can restore them exactly
@@ -935,8 +935,25 @@ namespace DarkTheme
 						HBRUSH fill = ::CreateSolidBrush(OwnerBorderFill(h));
 						::FillRect(hdc, &band, fill);
 						::DeleteObject(fill);
+						// Stroke the border. GDI FrameRect is always 1px, so a 2px reserved band (WS_EX_CLIENTEDGE
+						// lists/trees/listboxes, logical=2) showed only a 1px line with 1px of interior fill — half
+						// the native client-edge thickness ("borders too thin"). Stroke the FULL band with
+						// concentric 1px frames so the visible border matches what it replaced. Keep single-line
+						// edits and the small value-box statics at 1px (a 2px frame reads heavy on a one-line field);
+						// their inner band keeps the interior fill. The inner frames stay strictly inside the
+						// reserved band (client is ExcludeClipRect'd) and the scrollbar strip is still excluded, so
+						// no list content or scrollbar is touched — SWP_FRAMECHANGED keeps it flicker-free.
+						wchar_t obcls[32] = {};
+						GetClassNameW(h, obcls, _countof(obcls));
+						const bool thinBorder = (_wcsicmp(obcls, L"Edit") == 0 || _wcsicmp(obcls, L"MFCMaskedEdit") == 0
+											|| _wcsicmp(obcls, L"Static") == 0);
+						const int stroke = thinBorder ? ::GetSystemMetricsForDpi(SM_CXBORDER, dpi) : t;
 						HBRUSH edge = ::CreateSolidBrush(OwnerBorderFrame(d, h));
-						::FrameRect(hdc, &band, edge);
+						RECT fr = band;
+						for (int i = 0; i < stroke; ++i) {
+							::FrameRect(hdc, &fr, edge);
+							::InflateRect(&fr, -1, -1);
+						}
 						::DeleteObject(edge);
 						::ReleaseDC(h, hdc);
 					}
@@ -969,6 +986,7 @@ namespace DarkTheme
 					if (d->stripped & OB_CLIENTEDGE) ex |= WS_EX_CLIENTEDGE;
 					if (d->stripped & OB_STATICEDGE) ex |= WS_EX_STATICEDGE;
 					if (d->stripped & OB_WSBORDER)   st |= WS_BORDER;
+					if (d->stripped & OB_SSSUNKEN)   st |= SS_SUNKEN;
 					::SetWindowLongW(h, GWL_EXSTYLE, ex);
 					::SetWindowLongW(h, GWL_STYLE, st);
 					delete d;
@@ -989,7 +1007,18 @@ namespace DarkTheme
 			auto* d = new OwnerBorderData;
 			if (ex & WS_EX_CLIENTEDGE) { d->stripped |= OB_CLIENTEDGE; d->logical = 2; }
 			else if (st & WS_BORDER)   { d->stripped |= OB_WSBORDER;   d->logical = 1; }
-			if (ex & WS_EX_STATICEDGE)   d->stripped |= OB_STATICEDGE;
+			if (ex & WS_EX_STATICEDGE) { d->stripped |= OB_STATICEDGE; if (d->logical == 0) { d->logical = 1; } }
+
+			// A light 1px edge that is NOT WS_EX_CLIENTEDGE/WS_BORDER still needs owning, or it stays light
+			// under dark mode: the Color Correction value boxes (Brightness/Contrast/Hue/Saturation, IDC_STATIC1..4)
+			// are RTEXT SS_SUNKEN statics. Their sunken edge is drawn in the CLIENT (not the non-client), so we
+			// STRIP SS_SUNKEN (below) — else it keeps painting itself light under our band — and own a 1px band.
+			// SS_SUNKEN (0x1000) aliases ES_WANTRETURN on edits, so gate it to the Static class.
+			if (d->logical == 0 && (st & SS_SUNKEN)) {
+				wchar_t cls[32] = {};
+				GetClassNameW(h, cls, _countof(cls));
+				if (_wcsicmp(cls, L"Static") == 0) { d->stripped |= OB_SSSUNKEN; d->logical = 1; }
+			}
 
 			// Borderless control (e.g. the MediaInfo IDC_MIEDIT: NOT WS_BORDER, no client edge) → logical 0:
 			// reserve nothing, paint nothing, no subclass. It stays genuinely borderless, so its
@@ -1001,22 +1030,65 @@ namespace DarkTheme
 			}
 
 			::SetWindowLongW(h, GWL_EXSTYLE, ex & ~(WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-			if (st & WS_BORDER) {
-				::SetWindowLongW(h, GWL_STYLE, st & ~WS_BORDER);
+			LONG newSt = st;
+			if (st & WS_BORDER)            { newSt &= ~WS_BORDER; }
+			if (d->stripped & OB_SSSUNKEN) { newSt &= ~SS_SUNKEN; } // its edge is client-drawn; remove it so only our band shows
+			if (newSt != st) {
+				::SetWindowLongW(h, GWL_STYLE, newSt);
 			}
 			::SetWindowSubclass(h, OwnerBorderSubclassProc, kOwnerBorderSubclassId, reinterpret_cast<DWORD_PTR>(d));
 			::SetWindowPos(h, nullptr, 0, 0, 0, 0,
 				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED); // re-run NCCALCSIZE + NCPAINT
 		}
 
-		// Combos draw their border in the CLIENT area (not the non-client), so they get their own
-		// subclass. Style-split: CBS_DROPDOWNLIST (no child edit) is double-buffered so its border can't
-		// flash; the editable CBS_DROPDOWN (has a self-painting child edit — WM_PRINTCLIENT would be
-		// unfaithful) keeps a post-Def client re-stroke with a border-ONLY invalidate on focus (a full
-		// InvalidateRect(nullptr) twitched the interior + dropdown button).
+		// Dark-theme a combo's dropdown LIST popup (class ComboLBox) directly. It is a WS_POPUP owned by the
+		// combo, NOT a child of the page, so ApplyThemeToChildren's EnumChildWindows never reaches it — it
+		// only looked dark because comctl32 propagated the combo's DarkMode_CFD theme when it built the list.
+		// A disable->enable cycle (Color-Correction Reset, Audio Sound-processing Default, which toggle the
+		// combo's WS_DISABLED) makes comctl32 rebuild the list and drop that theme, so it repaints in a second
+		// shade. Assert the theme on the list ourselves so its shade is the same in every state.
+		void ThemeComboDropList(HWND hCombo) {
+			COMBOBOXINFO cbi = { sizeof(cbi) };
+			if (::GetComboBoxInfo(hCombo, &cbi) && cbi.hwndList) {
+				if (pAllowDarkModeForWindow) { pAllowDarkModeForWindow(cbi.hwndList, true); }
+				::SetWindowTheme(cbi.hwndList, L"DarkMode_CFD", nullptr);
+			}
+		}
+
+		// Invalidate ONLY the 1px border ring of a combo (never InvalidateRect(nullptr) — that twitched the
+		// interior + dropdown button). The WM_PAINT re-stroke then repaints the dark border over it.
+		void InvalidateComboBorderEdges(HWND h) {
+			RECT rc;
+			::GetClientRect(h, &rc);
+			const RECT e[4] = {
+				{ rc.left,      rc.top,        rc.right,     rc.top + 1 },
+				{ rc.left,      rc.bottom - 1, rc.right,     rc.bottom  },
+				{ rc.left,      rc.top,        rc.left + 1,  rc.bottom  },
+				{ rc.right - 1, rc.top,        rc.right,     rc.bottom  },
+			};
+			for (const auto& x : e) {
+				::InvalidateRect(h, &x, FALSE);
+			}
+		}
+
+		// Combos draw their border in the CLIENT area (not the non-client), so they get their own subclass.
+		// Style-split: CBS_DROPDOWNLIST (no child edit) is double-buffered so its border can't flash; the
+		// editable CBS_DROPDOWN (has a self-painting child edit — WM_PRINTCLIENT would be unfaithful) keeps a
+		// post-Def client re-stroke with a border-ONLY invalidate on focus/hover.
 		LRESULT CALLBACK ComboBorderSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR /*ref*/) {
 			const bool listType = (::GetWindowLongW(h, GWL_STYLE) & CBS_DROPDOWNLIST) == CBS_DROPDOWNLIST;
 			switch (msg) {
+				case WM_CTLCOLOREDIT: {
+					// The editable combo's child Edit sends WM_CTLCOLOREDIT to the combo (its parent), not to
+					// the page, so the page's dark handler never sees it and the edit interior renders light
+					// ("highlighted" the moment the sheet opens). Give it the same dark edit brush a standalone
+					// edit gets. Mirrors the list-view in-place edit handler (WM_CTLCOLOREDIT above).
+					CDC* pDC = CDC::FromHandle(reinterpret_cast<HDC>(w));
+					if (HBRUSH hbr = OnCtlColor(pDC, CTLCOLOR_EDIT)) {
+						return reinterpret_cast<LRESULT>(hbr);
+					}
+					break;
+				}
 				case WM_PAINT:
 					if (listType) {
 						RECT rc;
@@ -1051,25 +1123,42 @@ namespace DarkTheme
 				case WM_SETFOCUS:
 				case WM_KILLFOCUS: {
 					const LRESULT r = DefSubclassProc(h, msg, w, l);
-					if (listType) {
-						::InvalidateRect(h, nullptr, FALSE); // safe: its WM_PAINT is fully buffered
-					} else {
-						// border-ONLY invalidate; never InvalidateRect(nullptr) (that twitched the dropdown).
-						RECT rc;
-						::GetClientRect(h, &rc);
-						const RECT e[4] = {
-							{ rc.left,      rc.top,        rc.right,     rc.top + 1 },
-							{ rc.left,      rc.bottom - 1, rc.right,     rc.bottom  },
-							{ rc.left,      rc.top,        rc.left + 1,  rc.bottom  },
-							{ rc.right - 1, rc.top,        rc.right,     rc.bottom  },
-						};
-						for (const auto& x : e) {
-							::InvalidateRect(h, &x, FALSE);
-						}
+					if (!listType) {
+						// editable: border-only re-stroke on focus change.
+						InvalidateComboBorderEdges(h);
 					}
+					// listType: NO explicit invalidate. Windows already repaints the combo on focus (to show
+					// its focus indicator), which re-runs our buffered WM_PAINT and redraws the dark border.
+					// An extra full InvalidateRect here double-painted and TWITCHED the dropdown as it opened
+					// (the Shader-editor combos). The border is state-independent, so none is needed.
+					return r;
+				}
+				case WM_MOUSEMOVE:
+					// DarkMode_CFD repaints the editable combo's border in a light "hot" colour on hover (the
+					// white line xLn2 saw). Overpaint it dark by re-stroking the border once per hover-enter.
+					// One-shot prop so we don't invalidate on every move (that would churn/flicker).
+					if (!listType && !::GetPropW(h, L"MPC_CB_HOT")) {
+						::SetPropW(h, L"MPC_CB_HOT", reinterpret_cast<HANDLE>(1));
+						TRACKMOUSEEVENT tme = { sizeof(tme), TME_LEAVE, h, 0 };
+						::TrackMouseEvent(&tme); // so we get WM_MOUSELEAVE to clear the flag
+						InvalidateComboBorderEdges(h);
+					}
+					break; // pass through so the combo still handles the move
+				case WM_MOUSELEAVE:
+					if (::GetPropW(h, L"MPC_CB_HOT")) {
+						::RemovePropW(h, L"MPC_CB_HOT");
+						InvalidateComboBorderEdges(h); // re-stroke dark once the CFD hot border clears
+					}
+					break;
+				case WM_ENABLE: {
+					// Reset/Default toggle the combo's WS_DISABLED, which makes comctl32 rebuild the drop list
+					// and lose its theme -> it reopens in a different shade. Re-assert the dark theme on it.
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					ThemeComboDropList(h);
 					return r;
 				}
 				case WM_NCDESTROY:
+					::RemovePropW(h, L"MPC_CB_HOT");
 					RemoveWindowSubclass(h, ComboBorderSubclassProc, kComboBorderSubclassId);
 					break;
 			}
@@ -1154,6 +1243,46 @@ namespace DarkTheme
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
 		}
 
+		// Separator statics (SS_ETCHEDHORZ / SS_ETCHEDVERT / SS_ETCHEDFRAME). The base (English) .rc draws
+		// the Options-page dividers as SS_OWNERDRAW statics that CPPageBase::OnDrawItem paints dark. But the
+		// per-language resources (mpcresources.<lang>.dll) still carry the OLD SS_ETCHEDHORZ dividers, which
+		// draw their own light 3D etched line from the system colours — a "white bar" on the dark background
+		// in every non-English UI (Player/History, Web Interface, Online services, Frame sync, External
+		// Filters, Priority, File Properties...). Those never reach OnDrawItem (they aren't owner-draw), so we
+		// own their paint here and draw the same flat dark line OnDrawItem uses. Self-contained, so it also
+		// covers aux dialogs / File Properties whose parent doesn't handle WM_DRAWITEM.
+		const UINT_PTR kEtchedStaticSubclassId = 14;
+
+		LRESULT CALLBACK EtchedStaticSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
+			switch (msg) {
+				case WM_ERASEBKGND:
+					return 1; // painted whole in WM_PAINT
+				case WM_PAINT: {
+					PAINTSTRUCT ps;
+					CDC* pDC = CDC::FromHandle(::BeginPaint(hWnd, &ps));
+					CRect rc;
+					::GetClientRect(hWnd, &rc);
+					pDC->FillSolidRect(rc, FaceColor());
+					const LONG t = ::GetWindowLongW(hWnd, GWL_STYLE) & SS_TYPEMASK;
+					const COLORREF line = CtrlBorderColor();
+					if (t == SS_ETCHEDFRAME) {
+						CBrush br(line);
+						pDC->FrameRect(rc, &br);
+					} else if (t == SS_ETCHEDVERT) {
+						pDC->FillSolidRect(rc.left + rc.Width() / 2, rc.top, 1, rc.Height(), line);
+					} else { // SS_ETCHEDHORZ
+						pDC->FillSolidRect(rc.left, rc.top + rc.Height() / 2, rc.Width(), 1, line);
+					}
+					::EndPaint(hWnd, &ps);
+					return 0;
+				}
+				case WM_NCDESTROY:
+					RemoveWindowSubclass(hWnd, EtchedStaticSubclassProc, kEtchedStaticSubclassId);
+					break;
+			}
+			return DefSubclassProc(hWnd, msg, wParam, lParam);
+		}
+
 		void ThemeControl(HWND hCtrl) {
 			if (pAllowDarkModeForWindow) {
 				pAllowDarkModeForWindow(hCtrl, true);
@@ -1182,6 +1311,7 @@ namespace DarkTheme
 				}
 			} else if (_wcsicmp(cls, L"ComboBox") == 0) {
 				SetWindowTheme(hCtrl, L"DarkMode_CFD", nullptr); // dark dropdown list + interior
+				ThemeComboDropList(hCtrl); // theme the ComboLBox popup directly (EnumChildWindows never reaches it)
 				// A combo paints its border in the CLIENT area (not the non-client), so it gets its own
 				// subclass that re-strokes the border dark flash-free (buffered for CBS_DROPDOWNLIST,
 				// border-only invalidate for the editable CBS_DROPDOWN).
@@ -1265,7 +1395,11 @@ namespace DarkTheme
 				const LONG st = GetWindowLongW(hCtrl, GWL_STYLE);
 				const LONG ex = GetWindowLongW(hCtrl, GWL_EXSTYLE);
 				const LONG sType = st & SS_TYPEMASK;
-				if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
+				if (sType == SS_ETCHEDHORZ || sType == SS_ETCHEDVERT || sType == SS_ETCHEDFRAME) {
+					// Localized-resource dividers (SS_ETCHEDHORZ) draw a light 3D line; owner-draw it dark.
+					SetWindowSubclass(hCtrl, EtchedStaticSubclassProc, kEtchedStaticSubclassId, 0);
+					InvalidateRect(hCtrl, nullptr, TRUE);
+				} else if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
 					ApplyOwnerBorder(hCtrl);
 				} else if (sType == SS_LEFT || sType == SS_CENTER || sType == SS_RIGHT
 						|| sType == SS_LEFTNOWORDWRAP || sType == SS_SIMPLE) {
@@ -1309,6 +1443,7 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, ComboBorderSubclassProc, kComboBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
+			RemoveWindowSubclass(hChild, EtchedStaticSubclassProc, kEtchedStaticSubclassId);
 
 			DWORD_PTR gridFlag = 0;
 			const bool hadGrid = GetWindowSubclass(hChild, ListViewSubclassProc, kListViewSubclassId, &gridFlag) && gridFlag;
