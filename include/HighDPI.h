@@ -81,7 +81,7 @@ public:
     inline void ScaleSize(__inout SIZE* pSize)
     {
         pSize->cx = ScaleX(pSize->cx);
-        pSize->cy = ScaleX(pSize->cy);
+        pSize->cy = ScaleY(pSize->cy);
     }
 
     // Scale rectangle from raw pixels to relative pixels.
