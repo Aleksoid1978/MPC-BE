@@ -33,9 +33,6 @@
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/thread.h"
-#if ARCH_X86
-#include "libavutil/x86/asm.h"
-#endif
 
 #include "avcodec.h"
 #include "idctdsp.h"
@@ -231,7 +228,7 @@ int ff_msmpeg4_pred_dc(MpegEncContext *s, int n,
        necessitate to modify mpegvideo.c. The problem comes from the
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
-#if ARCH_X86 && HAVE_7REGS && HAVE_EBX_AVAILABLE
+#if ARCH_X86 && HAVE_X86_7REGS && HAVE_EBX_AVAILABLE
     __asm__ volatile(
         "movl %3, %%eax         \n\t"
         "shrl $1, %%eax         \n\t"

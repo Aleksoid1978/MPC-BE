@@ -1375,7 +1375,7 @@ static inline void planar2x_mmxext(const uint8_t *src, uint8_t *dst, int srcWidt
  * others are ignored in the C version.
  * FIXME: Write HQ version.
  */
-#if ARCH_X86_32 && HAVE_7REGS
+#if ARCH_X86_32 && HAVE_X86_7REGS
 DECLARE_ASM_CONST(8, uint64_t, bgr2YOffset)  = 0x1010101010101010ULL;
 DECLARE_ASM_CONST(8, uint64_t, bgr2UVOffset) = 0x8080808080808080ULL;
 DECLARE_ASM_CONST(8, uint64_t, w1111)        = 0x0001000100010001ULL;
@@ -1574,7 +1574,7 @@ static inline void rgb24toyv12_mmxext(const uint8_t *src, uint8_t *ydst, uint8_t
 
      ff_rgb24toyv12_c(src, ydst, udst, vdst, width, height-y, lumStride, chromStride, srcStride, rgb2yuv);
 }
-#endif /* HAVE_7REGS */
+#endif /* HAVE_X86_7REGS */
 
 static void extract_even_mmxext(const uint8_t *src, uint8_t *dst, x86_reg count)
 {
@@ -1977,9 +1977,9 @@ static av_cold void rgb2rgb_init_mmxext(void)
     yuyvtoyuv422       = yuyvtoyuv422_mmxext;
 
     planar2x           = planar2x_mmxext;
-#if ARCH_X86_32 && HAVE_7REGS
+#if ARCH_X86_32 && HAVE_X86_7REGS
     ff_rgb24toyv12     = rgb24toyv12_mmxext;
-#endif /* ARCH_X86_32 && HAVE_7REGS */
+#endif /* ARCH_X86_32 && HAVE_X86_7REGS */
 
     yuyvtoyuv420       = yuyvtoyuv420_mmxext;
     uyvytoyuv420       = uyvytoyuv420_mmxext;

@@ -33,7 +33,7 @@
 #include "fpel.h"
 #include "vc1dsp.h"
 
-#if HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
+#if HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
 
 void ff_vc1_put_ver_16b_shift2_mmx(int16_t *dst,
                                    const uint8_t *src, x86_reg stride,
@@ -349,4 +349,4 @@ av_cold void ff_vc1dsp_init_mmxext(VC1DSPContext *dsp)
     FN_ASSIGN(avg_, 3, 2, _mmxext);
     FN_ASSIGN(avg_, 3, 3, _mmxext);
 }
-#endif /* HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */
+#endif /* HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */

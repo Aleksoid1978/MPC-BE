@@ -498,7 +498,7 @@ av_cold void ff_sws_init_swscale_x86(SwsInternal *c)
                 if (!(c->opts.flags & SWS_FULL_CHR_H_INT)) {
                     switch (c->opts.dst_format) {
                     case AV_PIX_FMT_RGB32:   c->yuv2packedX = yuv2rgb32_X_ar_mmxext;   break;
-#if HAVE_6REGS
+#if HAVE_X86_6REGS
                     case AV_PIX_FMT_BGR24:   c->yuv2packedX = yuv2bgr24_X_ar_mmxext;   break;
 #endif
                     case AV_PIX_FMT_RGB555:  c->yuv2packedX = yuv2rgb555_X_ar_mmxext;  break;
@@ -528,7 +528,7 @@ av_cold void ff_sws_init_swscale_x86(SwsInternal *c)
                     switch (c->opts.dst_format) {
                     case AV_PIX_FMT_RGB32:   c->yuv2packedX = yuv2rgb32_X_mmxext;   break;
                     case AV_PIX_FMT_BGR32:   c->yuv2packedX = yuv2bgr32_X_mmxext;   break;
-#if HAVE_6REGS
+#if HAVE_X86_6REGS
                     case AV_PIX_FMT_BGR24:   c->yuv2packedX = yuv2bgr24_X_mmxext;   break;
 #endif
                     case AV_PIX_FMT_RGB555:  c->yuv2packedX = yuv2rgb555_X_mmxext;  break;

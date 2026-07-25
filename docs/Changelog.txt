@@ -29,7 +29,7 @@ Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
 	Detours v4.0.1-131-gd644ce9;
-	ffmpeg n8.2-dev-2385-g0869e710e6;
+	ffmpeg n8.2-dev-2493-g2a06abd2d7;
 	nanosvg git-48120e9.
 
 

@@ -24,9 +24,9 @@
 #ifndef AVCODEC_X86_VPX_ARITH_H
 #define AVCODEC_X86_VPX_ARITH_H
 
-#include "libavutil/x86/asm.h"
+#include "config.h"
 
-#if HAVE_INLINE_ASM && HAVE_FAST_CMOV && HAVE_6REGS
+#if HAVE_INLINE_ASM && HAVE_FAST_CMOV && HAVE_X86_6REGS
 #include "libavutil/attributes.h"
 
 #define vpx_rac_get_prob vpx_rac_get_prob

@@ -192,7 +192,7 @@ static void gmc_ssse3(uint8_t *dst, const uint8_t *src,
         "decl                %[h]             \n\t"
         "jnz                   1b             \n\t"
         : [dst]"+r"(dst), [src]"+r"(src),
-#if HAVE_6REGS || HAVE_INLINE_ASM_DIRECT_SYMBOL_REFS
+#if HAVE_X86_6REGS || HAVE_INLINE_ASM_DIRECT_SYMBOL_REFS
         [h]"+r"(h)
 #else
         [h]"+m"(h)

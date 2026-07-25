@@ -21,14 +21,14 @@
 #ifndef AVCODEC_X86_VC1DSP_H
 #define AVCODEC_X86_VC1DSP_H
 
-#include "libavutil/x86/asm.h"
+#include "config.h"
 #include "libavcodec/vc1dsp.h"
 
-#if HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
+#if HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
 
 void ff_vc1dsp_init_mmx(VC1DSPContext *dsp);
 void ff_vc1dsp_init_mmxext(VC1DSPContext *dsp);
 
-#endif /* HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */
+#endif /* HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */
 
 #endif /* AVCODEC_X86_VC1DSP_H */

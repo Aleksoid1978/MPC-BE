@@ -44,7 +44,6 @@
 #include "libavutil/thread.h"
 #include "libavutil/aarch64/cpu.h"
 #include "libavutil/ppc/cpu.h"
-#include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
 #include "libavutil/loongarch/cpu.h"
 

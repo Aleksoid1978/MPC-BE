@@ -27,7 +27,6 @@
 #include "libavutil/attributes.h"
 #include "libavutil/cpu.h"
 #include "libavutil/x86/cpu.h"
-#include "libavutil/x86/asm.h"
 #include "libavcodec/vc1dsp.h"
 #include "fpel.h"
 #include "vc1dsp.h"
@@ -105,15 +104,15 @@ av_cold void ff_vc1dsp_init_x86(VC1DSPContext *dsp)
 {
     int cpu_flags = av_get_cpu_flags();
 
-#if HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
-    if (HAVE_6REGS && INLINE_MMX(cpu_flags))
+#if HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL
+    if (HAVE_X86_6REGS && INLINE_MMX(cpu_flags))
         if (EXTERNAL_MMX(cpu_flags))
         ff_vc1dsp_init_mmx(dsp);
 
-    if (HAVE_6REGS && INLINE_MMXEXT(cpu_flags))
+    if (HAVE_X86_6REGS && INLINE_MMXEXT(cpu_flags))
         if (EXTERNAL_MMXEXT(cpu_flags))
         ff_vc1dsp_init_mmxext(dsp);
-#endif /* HAVE_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */
+#endif /* HAVE_X86_6REGS && HAVE_INLINE_ASM && HAVE_MMX_EXTERNAL */
 
 #define ASSIGN_LF4(EXT) \
         dsp->vc1_v_loop_filter4  = ff_vc1_v_loop_filter4_ ## EXT; \

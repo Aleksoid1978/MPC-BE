@@ -44,37 +44,7 @@ typedef struct CUDADeviceContext {
     AVCUDADeviceContextInternal internal;
 } CUDADeviceContext;
 
-static const enum AVPixelFormat supported_formats[] = {
-    AV_PIX_FMT_NV12,
-    AV_PIX_FMT_NV16,
-    AV_PIX_FMT_YUV420P,
-    AV_PIX_FMT_YUVA420P,
-    AV_PIX_FMT_YUV444P,
-    AV_PIX_FMT_NV24,
-    AV_PIX_FMT_P010,
-    AV_PIX_FMT_P012,
-    AV_PIX_FMT_P016,
-    AV_PIX_FMT_P210,
-    AV_PIX_FMT_P212,
-    AV_PIX_FMT_P216,
-    AV_PIX_FMT_P410,
-    AV_PIX_FMT_P412,
-    AV_PIX_FMT_P416,
-    AV_PIX_FMT_YUV422P,
-    AV_PIX_FMT_YUV420P10,
-    AV_PIX_FMT_YUV422P10,
-    AV_PIX_FMT_YUV444P10,
-    AV_PIX_FMT_YUV444P10MSB,
-    AV_PIX_FMT_YUV444P12MSB,
-    AV_PIX_FMT_YUV444P16,
-    AV_PIX_FMT_0RGB32,
-    AV_PIX_FMT_0BGR32,
-    AV_PIX_FMT_RGB32,
-    AV_PIX_FMT_BGR32,
-#if CONFIG_VULKAN
-    AV_PIX_FMT_VULKAN,
-#endif
-};
+
 
 #define CHECK_CU(x) FF_CUDA_CHECK_DL(device_ctx, cu, x)
 
@@ -86,20 +56,7 @@ static int cuda_frames_get_constraints(AVHWDeviceContext *ctx,
 {
     const AVCUDAHWConfig *config = hwconfig;
     enum AVPixelFormat req_fmt = config ? config->hw_format : AV_PIX_FMT_NONE;
-    int i, nb_sw_formats = 0;
-
-    constraints->valid_sw_formats = av_malloc_array(FF_ARRAY_ELEMS(supported_formats) + 1,
-                                                    sizeof(*constraints->valid_sw_formats));
-    if (!constraints->valid_sw_formats)
-        return AVERROR(ENOMEM);
-
-    for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++) {
-        if (req_fmt == AV_PIX_FMT_CUARRAY &&
-            !cuda_array_format_for_pix_fmt(supported_formats[i]))
-            continue;
-        constraints->valid_sw_formats[nb_sw_formats++] = supported_formats[i];
-    }
-    constraints->valid_sw_formats[nb_sw_formats] = AV_PIX_FMT_NONE;
+    int n = 0;
 
     if (req_fmt == AV_PIX_FMT_CUDA || req_fmt == AV_PIX_FMT_CUARRAY) {
         constraints->valid_hw_formats = av_malloc_array(2, sizeof(*constraints->valid_hw_formats));
@@ -121,6 +78,31 @@ static int cuda_frames_get_constraints(AVHWDeviceContext *ctx,
         constraints->valid_hw_formats[1] = AV_PIX_FMT_NONE;
 #endif
     }
+
+    constraints->valid_sw_formats = av_malloc_array(AV_PIX_FMT_NB + 1,
+                                                    sizeof(*constraints->valid_sw_formats));
+    if (!constraints->valid_sw_formats)
+        return AVERROR(ENOMEM);
+
+    n = 0;
+    for (int i = 0; i < AV_PIX_FMT_NB; i++) {
+        if (req_fmt == AV_PIX_FMT_CUARRAY) {
+            if (cuda_array_format_for_pix_fmt(i))
+                constraints->valid_sw_formats[n++] = i;
+        } else {
+            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(i);
+            /* Palette formats carry their palette in a separate zero-linesize
+             * data[1] plane that the transfer path does not handle, so exclude
+             * them along with the hwaccel formats. */
+            if (desc && !(desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL)))
+                constraints->valid_sw_formats[n++] = i;
+        }
+    }
+#if CONFIG_VULKAN
+    if (req_fmt != AV_PIX_FMT_CUARRAY)
+        constraints->valid_sw_formats[n++] = AV_PIX_FMT_VULKAN;
+#endif
+    constraints->valid_sw_formats[n] = AV_PIX_FMT_NONE;
 
     return 0;
 }
@@ -290,15 +272,18 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
     CUDAFramesContext       *priv = ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
-    int err, i;
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(ctx->sw_format);
+    int err;
 
-    for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++) {
-        if (ctx->sw_format == supported_formats[i])
-            break;
+    if (!desc) {
+        av_log(ctx, AV_LOG_ERROR, "Invalid pixel format\n");
+        return AVERROR(EINVAL);
     }
-    if (i == FF_ARRAY_ELEMS(supported_formats)) {
-        av_log(ctx, AV_LOG_ERROR, "Pixel format '%s' is not supported\n",
-               av_get_pix_fmt_name(ctx->sw_format));
+
+    /* Palette formats keep their palette in a separate zero-linesize plane
+     * that the transfer path does not copy, so they are not supported. */
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
+        av_log(ctx, AV_LOG_ERROR, "Palette formats are not supported\n");
         return AVERROR(ENOSYS);
     }
 
@@ -367,7 +352,7 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
             return err;
         }
 
-        for (i = 0; i < priv->p.cuarray_num_surfaces; i++) {
+        for (int i = 0; i < priv->p.cuarray_num_surfaces; i++) {
             err = CHECK_CU(cu->cuArray3DCreate(&priv->p.cuarray_surfaces[i], &priv->p.cuarray_desc));
             if (err < 0) {
                 for (i = i - 1; i >= 0; i--)
@@ -544,7 +529,7 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
 
     CUcontext dummy;
-    int i, ret;
+    int i, ret, copy_queued = 0;
 
     {
         enum AVPixelFormat src_fmt = cuda_frame_hw_format(src);
@@ -603,7 +588,7 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
                 src_is_nonplanar_cuarray = 1;
             } else if (cures != CUDA_SUCCESS) {
                 ret = CHECK_CU(cures);
-                goto exit;
+                goto fail;
             }
 
             cpy.srcMemoryType = CU_MEMORYTYPE_ARRAY;
@@ -631,7 +616,7 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
                 dst_is_nonplanar_cuarray = 1;
             } else if (cures != CUDA_SUCCESS) {
                 ret = CHECK_CU(cures);
-                goto exit;
+                goto fail;
             }
 
             cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
@@ -647,7 +632,8 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
 
         ret = CHECK_CU(cu->cuMemcpy2DAsync(&cpy, hwctx->stream));
         if (ret < 0)
-            goto exit;
+            goto fail;
+        copy_queued = 1;
 
         if (src_is_nonplanar_cuarray || dst_is_nonplanar_cuarray)
             break;
@@ -659,6 +645,9 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             goto exit;
     }
 
+fail:
+    if (ret < 0 && copy_queued)
+        CHECK_CU(cu->cuStreamSynchronize(hwctx->stream));
 exit:
     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
 

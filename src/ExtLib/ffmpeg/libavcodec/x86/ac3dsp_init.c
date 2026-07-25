@@ -20,7 +20,6 @@
  */
 
 #include "libavutil/attributes.h"
-#include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/ac3dsp.h"
 
