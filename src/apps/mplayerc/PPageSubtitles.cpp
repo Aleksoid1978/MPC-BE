@@ -102,6 +102,8 @@ BOOL CPPageSubtitles::OnInitDialog()
 
 	UpdateData(FALSE);
 
+	OnSubtitleRendererChange();
+
 	CreateToolTip();
 
 	return TRUE;
@@ -191,7 +193,7 @@ void CPPageSubtitles::UpdateSubRenderersList(int select)
 BEGIN_MESSAGE_MAP(CPPageSubtitles, CPPageBase)
 	ON_BN_CLICKED(IDC_BUTTON1, OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, OnSubRendPropClick)
-	ON_CBN_SELCHANGE(IDC_COMBO2, OnSubRendModified)
+	ON_CBN_SELCHANGE(IDC_COMBO2, OnSubtitleRendererChange)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK2, OnUpdateISRSelect)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK3, OnUpdateISRSelect)
 	ON_UPDATE_COMMAND_UI(IDC_CHECK_SUBRESYNC, OnUpdateISRSelect)
@@ -206,22 +208,24 @@ void CPPageSubtitles::OnBnClickedButton1()
 	SetModified();
 }
 
-void CPPageSubtitles::OnSubRendModified()
+void CPPageSubtitles::OnSubtitleRendererChange()
 {
-	GetDlgItem(IDC_BUTTON2)->EnableWindow(FALSE);
+	BOOL EnablePropButton = FALSE;
 
 	switch (m_cbSubtitleRenderer.GetCurSel()) {
 	case 2:
 		if (IsCLSIDRegistered(CLSID_VSFilter_autoloading)) {
-			GetDlgItem(IDC_BUTTON2)->EnableWindow(TRUE);
+			EnablePropButton = TRUE;
 		}
 		break;
 	case 3:
 		if (IsCLSIDRegistered(CLSID_XySubFilter)) {
-			GetDlgItem(IDC_BUTTON2)->EnableWindow(TRUE);
+			EnablePropButton = TRUE;
 		}
 		break;
 	}
+
+	GetDlgItem(IDC_BUTTON2)->EnableWindow(EnablePropButton);
 
 	SetModified();
 }
