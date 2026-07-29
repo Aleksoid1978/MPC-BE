@@ -802,6 +802,21 @@ namespace DarkTheme
 					pDC->FillSolidRect(rc, FaceColor());
 					return 1;
 				}
+				case WM_DRAWITEM: {
+					// Draw the separators ThemeControl converted from SS_ETCHED* to SS_OWNERDRAW. CPPageBase
+					// pages draw these via their own OnDrawItem, but pages/dialogs themed through ThemeDialog
+					// (File Properties Details/Clip, aux dialogs) reach US instead. Guard on the conversion prop
+					// so we ONLY touch our own separators and never clobber a dialog's real owner-drawn controls.
+					const DRAWITEMSTRUCT* dis = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
+					if (dis && dis->CtlType == ODT_STATIC && dis->hwndItem && ::GetPropW(dis->hwndItem, L"MPC_ETCHED_ORIG")) {
+						CDC* pDC = CDC::FromHandle(dis->hDC);
+						CRect rc(dis->rcItem);
+						pDC->FillSolidRect(rc, FaceColor());
+						pDC->FillSolidRect(rc.left, rc.top + rc.Height() / 2, rc.Width(), 1, CtrlBorderColor());
+						return TRUE;
+					}
+					break;
+				}
 				case WM_NCDESTROY:
 					RemoveWindowSubclass(hWnd, DialogSubclassProc, kDialogSubclassId);
 					break;
@@ -1243,45 +1258,11 @@ namespace DarkTheme
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
 		}
 
-		// Separator statics (SS_ETCHEDHORZ / SS_ETCHEDVERT / SS_ETCHEDFRAME). The base (English) .rc draws
-		// the Options-page dividers as SS_OWNERDRAW statics that CPPageBase::OnDrawItem paints dark. But the
-		// per-language resources (mpcresources.<lang>.dll) still carry the OLD SS_ETCHEDHORZ dividers, which
-		// draw their own light 3D etched line from the system colours — a "white bar" on the dark background
-		// in every non-English UI (Player/History, Web Interface, Online services, Frame sync, External
-		// Filters, Priority, File Properties...). Those never reach OnDrawItem (they aren't owner-draw), so we
-		// own their paint here and draw the same flat dark line OnDrawItem uses. Self-contained, so it also
-		// covers aux dialogs / File Properties whose parent doesn't handle WM_DRAWITEM.
-		const UINT_PTR kEtchedStaticSubclassId = 14;
-
-		LRESULT CALLBACK EtchedStaticSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
-			switch (msg) {
-				case WM_ERASEBKGND:
-					return 1; // painted whole in WM_PAINT
-				case WM_PAINT: {
-					PAINTSTRUCT ps;
-					CDC* pDC = CDC::FromHandle(::BeginPaint(hWnd, &ps));
-					CRect rc;
-					::GetClientRect(hWnd, &rc);
-					pDC->FillSolidRect(rc, FaceColor());
-					const LONG t = ::GetWindowLongW(hWnd, GWL_STYLE) & SS_TYPEMASK;
-					const COLORREF line = CtrlBorderColor();
-					if (t == SS_ETCHEDFRAME) {
-						CBrush br(line);
-						pDC->FrameRect(rc, &br);
-					} else if (t == SS_ETCHEDVERT) {
-						pDC->FillSolidRect(rc.left + rc.Width() / 2, rc.top, 1, rc.Height(), line);
-					} else { // SS_ETCHEDHORZ
-						pDC->FillSolidRect(rc.left, rc.top + rc.Height() / 2, rc.Width(), 1, line);
-					}
-					::EndPaint(hWnd, &ps);
-					return 0;
-				}
-				case WM_NCDESTROY:
-					RemoveWindowSubclass(hWnd, EtchedStaticSubclassProc, kEtchedStaticSubclassId);
-					break;
-			}
-			return DefSubclassProc(hWnd, msg, wParam, lParam);
-		}
+		// Separator statics: see the SS_ETCHED* handling in ThemeControl. The base (English) .rc draws the
+		// Options-page dividers as SS_OWNERDRAW statics that CPPageBase::OnDrawItem paints dark; the
+		// per-language resources still carry the OLD SS_ETCHEDHORZ dividers. We convert those to SS_OWNERDRAW
+		// at theme time so the SAME OnDrawItem path draws them and there is NO native etched line to leak
+		// (a WM_PAINT-only subclass couldn't suppress the native etched — it bled through at the ends).
 
 		void ThemeControl(HWND hCtrl) {
 			if (pAllowDarkModeForWindow) {
@@ -1396,8 +1377,20 @@ namespace DarkTheme
 				const LONG ex = GetWindowLongW(hCtrl, GWL_EXSTYLE);
 				const LONG sType = st & SS_TYPEMASK;
 				if (sType == SS_ETCHEDHORZ || sType == SS_ETCHEDVERT || sType == SS_ETCHEDFRAME) {
-					// Localized-resource dividers (SS_ETCHEDHORZ) draw a light 3D line; owner-draw it dark.
-					SetWindowSubclass(hCtrl, EtchedStaticSubclassProc, kEtchedStaticSubclassId, 0);
+					// Localized-resource dividers use SS_ETCHEDHORZ (a light 3D line native dark mode never
+					// darkens) where the base .rc uses SS_OWNERDRAW. Convert to SS_OWNERDRAW so there is NO
+					// native rendering to leak and the page's CPPageBase::OnDrawItem paints the same flat dark
+					// line it draws for the English separators. Remember the original type so a toggle-off
+					// restores the native etched look. (A WM_PAINT subclass was tried first but the native
+					// etched still bled through at the ends — the owner-draw conversion removes it entirely.)
+					if (!::GetPropW(hCtrl, L"MPC_ETCHED_ORIG")) {
+						::SetPropW(hCtrl, L"MPC_ETCHED_ORIG", reinterpret_cast<HANDLE>(static_cast<INT_PTR>(sType) + 1));
+					}
+					::SetWindowLongW(hCtrl, GWL_STYLE, (st & ~SS_TYPEMASK) | SS_OWNERDRAW);
+					// SWP_FRAMECHANGED so the static re-evaluates its (now owner-draw) style and starts sending
+					// WM_DRAWITEM instead of self-drawing the etched line.
+					::SetWindowPos(hCtrl, nullptr, 0, 0, 0, 0,
+						SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 					InvalidateRect(hCtrl, nullptr, TRUE);
 				} else if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
 					ApplyOwnerBorder(hCtrl);
@@ -1406,6 +1399,11 @@ namespace DarkTheme
 					// Plain text labels: owner-draw disabled ones flat (Windows would emboss them,
 					// which looks bad on dark). Enabled ones keep the default painting.
 					SetWindowSubclass(hCtrl, StaticSubclassProc, kStaticSubclassId, 0);
+					// Force a repaint so a label that is ALREADY disabled when we theme it (e.g. Sound
+					// Processing disables its Level/Release labels in OnInitDialog, before OnSetActive themes
+					// the page) gets owner-drawn now. Without this it keeps Windows' light disabled text — which
+					// under force-dark reads as near-white — until some later invalidate that may never come.
+					InvalidateRect(hCtrl, nullptr, TRUE);
 				}
 			} else if (_wcsicmp(cls, TRACKBAR_CLASSW) == 0) {
 				// Owner-draw every slider (dark groove + celeste thumb with hover / pressed states).
@@ -1443,7 +1441,13 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, ComboBorderSubclassProc, kComboBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
-			RemoveWindowSubclass(hChild, EtchedStaticSubclassProc, kEtchedStaticSubclassId);
+			// Restore a separator we converted from SS_ETCHED* to SS_OWNERDRAW, so it draws its native
+			// (light) etched line again in the light theme.
+			if (HANDLE p = ::GetPropW(hChild, L"MPC_ETCHED_ORIG")) {
+				const LONG origType = static_cast<LONG>(reinterpret_cast<INT_PTR>(p) - 1);
+				::SetWindowLongW(hChild, GWL_STYLE, (::GetWindowLongW(hChild, GWL_STYLE) & ~SS_TYPEMASK) | origType);
+				::RemovePropW(hChild, L"MPC_ETCHED_ORIG");
+			}
 
 			DWORD_PTR gridFlag = 0;
 			const bool hadGrid = GetWindowSubclass(hChild, ListViewSubclassProc, kListViewSubclassId, &gridFlag) && gridFlag;
