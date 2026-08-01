@@ -89,7 +89,7 @@ namespace Logger
 				std::unique_ptr<char[]> buf(new(std::nothrow) char[size]);
 				if (buf) {
 					_snprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
-					fwprintf_s(f, L"%s : %hs\n", GetLocalTime(), buf.get());
+					fwprintf_s(f, L"%s : %hs\n", GetLocalTime().GetString(), buf.get());
 				}
 			}
 			fclose(f);
