@@ -71,7 +71,7 @@ namespace Logger
 				std::unique_ptr<wchar_t[]> buf(new(std::nothrow) wchar_t[size]);
 				if (buf) {
 					_snwprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
-					fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buf.get());
+					fwprintf_s(f, L"%s : %s\n", GetLocalTime().GetString(), buf.get());
 				}
 			}
 			fclose(f);
