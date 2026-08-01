@@ -53,14 +53,14 @@ extern IBaseFilter*		FindFilter(LPCWSTR clsid, IFilterGraph* pFG);
 extern IBaseFilter*		FindFilter(const CLSID& clsid, IFilterGraph* pFG);
 extern IPin*			FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const AM_MEDIA_TYPE* pRequestedMT);
 extern IPin*			FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const GUID majortype);
-extern CString			GetFilterName(IBaseFilter* pBF);
-extern CString			GetPinName(IPin* pPin);
+extern CStringW			GetFilterName(IBaseFilter* pBF);
+extern CStringW			GetPinName(IPin* pPin);
 extern IFilterGraph*	GetGraphFromFilter(IBaseFilter* pBF);
 extern IBaseFilter*		GetFilterFromPin(IPin* pPin);
-extern IPin*			AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB);
+extern IPin*			AppendFilter(IPin* pPin, CStringW DisplayName, IGraphBuilder* pGB);
 extern IBaseFilter*		AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB);
-extern IPin*			InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB);
-extern bool				CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName);
+extern IPin*			InsertFilter(IPin* pPin, CStringW DisplayName, IGraphBuilder* pGB);
+extern bool				CreateFilter(CStringW DisplayName, IBaseFilter** ppBF, CStringW& FriendlyName);
 extern bool				HasMediaType(IFilterGraph *pFilterGraph, const GUID &mediaType);
 
 extern void				ExtractMediaTypes(IPin* pPin, std::vector<GUID>& types);
@@ -83,8 +83,8 @@ extern bool				IsCLSIDRegistered(const CLSID& clsid);
 // return S_OK if installed and available, S_FALSE if installed but not available, E_FAIL if not installed
 extern HRESULT			CheckFilterCLSID(const CLSID& clsid);
 
-extern void				CStringToBin(CString str, std::vector<BYTE>& data);
-extern CString			BinToCString(const BYTE* ptr, size_t len);
+extern void				CStringToBin(CStringW str, std::vector<BYTE>& data);
+extern CStringW			BinToCString(const BYTE* ptr, size_t len);
 
 inline bool				HourOrMore(const REFERENCE_TIME rt) { return (rt > UNITS * 3600); };
 TimeCode_t				ReftimeToTimecode(const REFERENCE_TIME rt);
@@ -100,7 +100,7 @@ extern CStringW				DVDtimeToString(const DVD_HMSF_TIMECODE dvd_tc, bool showZero
 extern REFERENCE_TIME		StringToReftime(LPCWSTR strVal);
 extern REFERENCE_TIME		StringToReftime2(LPCWSTR strVal);
 
-extern CString			GetFriendlyName(CString DisplayName);
+extern CStringW			GetFriendlyName(CStringW DisplayName);
 extern HRESULT			LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv);
 extern HRESULT			LoadExternalFilter(LPCWSTR path, REFCLSID clsid, IBaseFilter** ppBF);
 extern HRESULT			LoadExternalPropertyPage(IPersist* pP, REFCLSID clsid, IPropertyPage** ppPP);
@@ -110,8 +110,8 @@ extern CStringW			MakeFullPath(LPCWSTR path);
 // simple file system path detector
 extern bool				IsLikelyFilePath(const CStringW &str);
 
-extern GUID				GUIDFromCString(CString str);
-extern HRESULT			GUIDFromCString(CString str, GUID& guid);
+extern GUID				GUIDFromCString(CStringW str);
+extern HRESULT			GUIDFromCString(CStringW str, GUID& guid);
 extern CStringW			CStringFromGUID(const GUID& guid);
 
 extern bool				DeleteRegKey(LPCWSTR pszKey, LPCWSTR pszSubkey);
@@ -119,7 +119,7 @@ extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValu
 extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValue);
 
 extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkbytes, LPCWSTR ext = nullptr, ...);
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CString>& chkbytes, LPCWSTR ext = nullptr, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CStringW>& chkbytes, LPCWSTR ext = nullptr, ...);
 extern void				UnRegisterSourceFilter(const GUID& subtype);
 
 extern CStringW			GetDXVAModeString(const GUID& guidDecoder);
@@ -173,12 +173,12 @@ static CUnknown* WINAPI CreateInstance(LPUNKNOWN lpunk, HRESULT* phr)
 namespace CStringUtils
 {
 	struct IgnoreCaseLess {
-		bool operator()(const CString& str1, const CString& str2) const {
+		bool operator()(const CStringW& str1, const CStringW& str2) const {
 			return str1.CompareNoCase(str2) < 0;
 		}
 	};
 	struct LogicalLess {
-		bool operator()(const CString& str1, const CString& str2) const {
+		bool operator()(const CStringW& str1, const CStringW& str2) const {
 			return StrCmpLogicalW(str1, str2) < 0;
 		}
 	};
