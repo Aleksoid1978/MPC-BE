@@ -369,6 +369,8 @@ static int decode_remap(FFV1Context *f, FFV1SliceContext *sc)
             }
             lu ^= !run;
         }
+        if (!j)
+            return AVERROR_INVALIDDATA;
         sc->remap_count[p] = j;
     }
     return 0;
@@ -488,8 +490,10 @@ static int decode_slice(AVCodecContext *c, void *arg)
 
     if (sc->remap) {
         ret = decode_remap(f, sc);
-        if (ret < 0)
+        if (ret < 0) {
+            slice_set_damaged(f, sc);
             return ret;
+        }
     }
 
     if (ac == AC_GOLOMB_RICE) {
