@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2021 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,7 +42,7 @@ static UINT16 const gk_au16CodePage437ForEDIDLookup[256] = {
 	0x2261, 0x00B1, 0x2265, 0x2264, 0x2320, 0x2321, 0x00F7, 0x2248, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x207F, 0x00B2, 0x25A0, 0x00A0
 };
 
-bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes)
+bool ReadDisplay(CStringW szDevice, CStringW* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes)
 {
 	wchar_t szMonitorName[14] = { 0 };
 	UINT16 nMonitorHorRes = 0;

@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,7 +20,7 @@
 
 #pragma once
 
-extern CString ResStr(UINT nID);
+extern CStringW ResStr(UINT nID);
 
 extern void SetCursor(HWND m_hWnd, LPCWSTR lpCursorName);
 extern void SetCursor(HWND m_hWnd, UINT nID, LPCWSTR lpCursorName);

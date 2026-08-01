@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2021 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -20,4 +20,4 @@
 
 #pragma once
 
-bool ReadDisplay(CString szDevice, CString* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);
+bool ReadDisplay(CStringW szDevice, CStringW* MonitorName, UINT16* MonitorHorRes, UINT16* MonitorVerRes);

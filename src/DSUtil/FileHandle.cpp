@@ -432,7 +432,7 @@ void AddExistDirPaths(const CStringW& curentdir, const CStringW& str, std::vecto
 
 		do {
 			if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && wcscmp(fd.cFileName, L".") && wcscmp(fd.cFileName, L"..")) {
-				CString folder = parentdir + fd.cFileName + '\\';
+				CStringW folder = parentdir + fd.cFileName + '\\';
 
 				size_t index = 0;
 				size_t count = existDirs.size();
