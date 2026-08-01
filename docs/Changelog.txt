@@ -18,6 +18,9 @@ Fixed text in the file name field in saved thumbnails.
 Added the ability to use the Ctrl+BackSpace keyboard shortcut to delete the last word in the command, history, and playlist filter fields.
 Various interface fixes.
 
+Installer
+Updated MPC Video Renderer 0.10.7.
+
 Added Vietnamese translation (by vuanhvu11982-afk).
 Updated German translation (by Klaus1189).
 Updated Romanian translation (by Andrei Miloiu).
