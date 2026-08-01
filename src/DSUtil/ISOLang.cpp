@@ -1,5 +1,5 @@
 /*
- * (C) 2023 see Authors.txt
+ * (C) 2023-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -562,7 +562,7 @@ static struct {
 	{"No subtitles",                "---", "", (LCID)LCID_NOSUBTITLES},
 };
 
-CString ISO6391ToLanguage(LPCSTR code)
+CStringW ISO6391ToLanguage(LPCSTR code)
 {
 	CHAR tmp[2+1];
 	if (strncpy_s(tmp, code, 2) == 0 && tmp[0]) {
@@ -574,14 +574,14 @@ CString ISO6391ToLanguage(LPCSTR code)
 				if (k > 0) {
 					ret.Truncate(k);
 				}
-				return CString(ret);
+				return CStringW(ret);
 			}
 		}
 	}
 	return L"";
 }
 
-CString ISO6392ToLanguage(LPCSTR code)
+CStringW ISO6392ToLanguage(LPCSTR code)
 {
 	CHAR tmp[3+1];
 	if (strncpy_s(tmp, code, 3) == 0 && tmp[0]) {
@@ -593,11 +593,11 @@ CString ISO6392ToLanguage(LPCSTR code)
 				if (k > 0) {
 					ret.Truncate(k);
 				}
-				return CString(ret);
+				return CStringW(ret);
 			}
 		}
 	}
-	return CString(code);
+	return CStringW(code);
 }
 
 bool IsISO639Language(LPCSTR code)
@@ -626,9 +626,9 @@ bool IsISO639Language(LPCSTR code)
 	return bFound;
 }
 
-CString ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
+CStringW ISO639XToLanguage(LPCSTR code, bool bCheckForFullLangName /*= false*/)
 {
-	CString lang;
+	CStringW lang;
 
 	switch (size_t nLen = strlen(code)) {
 		case 2:
@@ -707,16 +707,16 @@ LPCSTR ISO6392To6391(LPCSTR code)
 	return "";
 }
 
-CString LanguageToISO6392(LPCWSTR lang)
+CStringW LanguageToISO6392(LPCWSTR lang)
 {
-	CString str = lang;
+	CStringW str = lang;
 	str.MakeLower();
 	for (const auto& isolang : s_isolangs) {
-		std::list<CString> sl;
-		Explode(CString(isolang.name), sl, L';');
+		std::list<CStringW> sl;
+		Explode(CStringW(isolang.name), sl, L';');
 		for (const auto& s : sl) {
 			if (!str.CompareNoCase(s)) {
-				return CString(isolang.iso6392);
+				return CStringW(isolang.iso6392);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -24,18 +24,18 @@
 //#include <winver.h>
 
 struct FullFileInfo {
-	CString strCompanyName;
-	CString strFileDescription;
-	CString strFileVersion;
-	CString strInternalName;
-	CString strLegalCopyright;
-	CString strOriginalFileName;
-	CString strProductName;
-	CString strProductVersion;
-	CString strComments;
-	CString strLegalTrademarks;
-	CString strPrivateBuild;
-	CString strSpecialBuild;
+	CStringW strCompanyName;
+	CStringW strFileDescription;
+	CStringW strFileVersion;
+	CStringW strInternalName;
+	CStringW strLegalCopyright;
+	CStringW strOriginalFileName;
+	CStringW strProductName;
+	CStringW strProductVersion;
+	CStringW strComments;
+	CStringW strLegalTrademarks;
+	CStringW strPrivateBuild;
+	CStringW strSpecialBuild;
 };
 
 class CFileVersionInfo
@@ -44,12 +44,12 @@ public:
 	CFileVersionInfo();
 	virtual ~CFileVersionInfo();
 
-	static BOOL    Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo);
-	static BOOL    Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo);
+	static BOOL     Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo);
+	static BOOL     Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, FullFileInfo& fullFileInfo);
 
-	static CString GetFileVersionEx(LPCWSTR lpszFileName);
-	static CString GetFileVersionExShort(LPCWSTR lpszFileName);
-	static UINT64  GetFileVersion(LPCWSTR lpszFileName);
+	static CStringW GetFileVersionEx(LPCWSTR lpszFileName);
+	static CStringW GetFileVersionExShort(LPCWSTR lpszFileName);
+	static UINT64   GetFileVersion(LPCWSTR lpszFileName);
 
 protected:
 	static BOOL GetTranslationId(LPVOID lpData, UINT unBlockSize, WORD wLangId, DWORD &dwId, BOOL bPrimaryEnough = FALSE);
