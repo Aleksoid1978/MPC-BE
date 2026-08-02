@@ -33,7 +33,8 @@ yt-dlp
 Обновлены библиотеки:
 	Detours v4.0.1-131-gd644ce9;
 	ffmpeg n8.2-dev-2608-g946272b79a;
-	nanosvg git-48120e9.
+	nanosvg git-48120e9;
+	vvdec v3.2.0.
 
 
 1.9.0 - 2026-06-27

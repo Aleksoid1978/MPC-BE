@@ -6,7 +6,7 @@ the Software are granted under this license.
 
 The Clear BSD License
 
-Copyright (c) 2018-2025, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
+Copyright (c) 2018-2026, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -46,6 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #include "vvdec/sei.h"
 
@@ -136,6 +137,9 @@ typedef enum
 /*
   \enum SIMD_Extension
   The enum SIMD_Extension enumerates the supported simd optimizations.
+
+  The VVDEC_SIMD_LEGACY value is there to ensure the existing mappings don't get changed accidentally,
+  so the ABI stays compatible. It maps internally to the the VVDEC_SIMD_DEFAULT level.
 */
 typedef enum
 {
@@ -148,17 +152,24 @@ typedef enum
   VVDEC_SIMD_AVX2     = 5,
   VVDEC_SIMD_MAX      = VVDEC_SIMD_AVX2
 #elif defined( VVDEC_ARCH_ARM )
+  VVDEC_SIMD_LEGACY   = 2,
   VVDEC_SIMD_NEON     = 3,
-  VVDEC_SIMD_MAX      = VVDEC_SIMD_NEON
+  VVDEC_SIMD_NEON_RDM = 4,
+  VVDEC_SIMD_SVE      = 5,
+  VVDEC_SIMD_SVE2     = 6,
+  VVDEC_SIMD_MAX      = VVDEC_SIMD_SVE2
 #elif defined( VVDEC_ARCH_WASM )
+  VVDEC_SIMD_LEGACY   = 2,
   VVDEC_SIMD_WASM     = 3,
   VVDEC_SIMD_MAX      = VVDEC_SIMD_WASM
 #elif defined( VVDEC_ARCH_LOONGARCH )
+  VVDEC_SIMD_LEGACY   = 2,
   VVDEC_SIMD_LSX      = 3,
   VVDEC_SIMD_MAX      = VVDEC_SIMD_LSX
 #else
-  VVDEC_SIMD_SIMDE_ANY= 3,
-  VVDEC_SIMD_MAX      = VVDEC_SIMD_SIMDE_ANY
+  VVDEC_SIMD_LEGACY    = 2,
+  VVDEC_SIMD_SIMDE_ANY = 3,
+  VVDEC_SIMD_MAX       = VVDEC_SIMD_SIMDE_ANY
 #endif
 } vvdecSIMD_Extension;
 
