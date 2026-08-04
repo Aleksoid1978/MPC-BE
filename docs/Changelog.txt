@@ -31,6 +31,7 @@ Updated Hungarian translation (by mickey).
 Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
+	dav1d 1.5.4;
 	Detours v4.0.1-131-gd644ce9;
 	ffmpeg n8.2-dev-2608-g946272b79a;
 	nanosvg git-239e102;
