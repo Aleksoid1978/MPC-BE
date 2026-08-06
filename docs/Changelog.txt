@@ -2,6 +2,9 @@
 
 1.9.0.x dev
 =============================
+Source filters
+Added support for network streams whose "Content-Type" field contains an additional "codecs" parameter.
+
 MPCVideoDec
 Fixed hardware decoding for older Intel graphics.
 
