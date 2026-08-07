@@ -445,6 +445,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
     CONTROL         "Utiliser la barre de titre sombre (Windows 10 and above)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
+    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Utiliser l'info-bulle temporelle :",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -459,8 +461,6 @@ BEGIN
     LTEXT           "Taille de la police de la Playlist:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
-    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Utiliser les fonctionnalités de la barre des tâches de Windows 7 (et supérieur)",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
