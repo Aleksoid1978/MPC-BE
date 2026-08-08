@@ -532,6 +532,7 @@ const AP4_Atom::Type AP4_ATOM_TYPE_vp09 = AP4_ATOM_TYPE('v','p','0','9');
 const AP4_Atom::Type AP4_ATOM_TYPE_VPCC = AP4_ATOM_TYPE('v','p','c','C');
 // AV1
 const AP4_Atom::Type AP4_ATOM_TYPE_av01 = AP4_ATOM_TYPE('a','v','0','1');
+const AP4_Atom::Type AP4_ATOM_TYPE_dav1 = AP4_ATOM_TYPE('d','a','v','1');
 const AP4_Atom::Type AP4_ATOM_TYPE_AV1C = AP4_ATOM_TYPE('a','v','1','C');
 // Vidvox Hap
 const AP4_Atom::Type AP4_ATOM_TYPE_Hap1 = AP4_ATOM_TYPE('H','a','p','1');

@@ -1420,6 +1420,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 							case AP4_ATOM_TYPE_av01:
+							case AP4_ATOM_TYPE_dav1:
 								{
 									bool bReadAV1C = false;
 									// https://aomediacodec.github.io/av1-isobmff/#av1codecconfigurationbox-section
