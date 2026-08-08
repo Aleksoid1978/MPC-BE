@@ -276,14 +276,14 @@ cglobal add_left_pred_int16_unaligned, 4,4,7, dst, src, mask, w, left
 ; void add_gradient_pred(uint8_t *src, const ptrdiff_t stride, const ptrdiff_t width)
 ;---------------------------------------------------------------------------------------------
 %macro ADD_GRADIENT_PRED 0
-cglobal add_gradient_pred, 3,4,5, src, stride, width, tmp
+cglobal add_gradient_pred, 3,3,4, src, stride, width
     mova         xm0, [pb_15]
 
 ;load src - 1 in xm1
-    movd         xm1, [srcq-1]
 %if cpuflag(avx2)
-    vpbroadcastb xm1, xm1
+    vpbroadcastb xm1, [srcq-1]
 %else
+    movd         xm1, [srcq-1]
     pxor         xm2, xm2
     pshufb       xm1, xm2
 %endif
@@ -291,16 +291,17 @@ cglobal add_gradient_pred, 3,4,5, src, stride, width, tmp
     add    srcq, widthq
     neg  widthq
     neg strideq
+    add strideq, srcq
+    DEFINE_ARGS src, top, width
 
 .loop:
-    lea    tmpq, [srcq + strideq]
-    mova     m2, [tmpq + widthq] ; A = src[x-stride]
-    movu     m3, [tmpq + widthq - 1] ; B = src[x - (stride + 1)]
-    mova     m4, [srcq + widthq] ; current val (src[x])
+    mova     m2, [srcq + widthq]     ; current val (src[x])
+    paddb    m2, [topq + widthq]     ; add A = src[x-stride]
+    movu     m3, [topq + widthq - 1] ; B = src[x - (stride + 1)]
 
-    psubb    m2, m3; A - B
+    psubb    m2, m3                  ; cur + A - B
 
-; prefix sum A-B
+; prefix sum
     pslldq   m3, m2, 1
     paddb    m2, m3
     pslldq   m3, m2, 2
@@ -309,19 +310,6 @@ cglobal add_gradient_pred, 3,4,5, src, stride, width, tmp
     paddb    m2, m3
     pslldq   m3, m2, 8
     paddb    m2, m3
-
-; prefix sum current val
-    pslldq   m3, m4, 1
-    paddb    m4, m3
-    pslldq   m3, m4, 2
-    paddb    m4, m3
-    pslldq   m3, m4, 4
-    paddb    m4, m3
-    pslldq   m3, m4, 8
-    paddb    m4, m3
-
-; last sum
-    paddb                    m2, m4 ; current + (A - B)
 
     paddb                   xm1, xm2 ; += C
     mova        [srcq + widthq], xm1 ; store

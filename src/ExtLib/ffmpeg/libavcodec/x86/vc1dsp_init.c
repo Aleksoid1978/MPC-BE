@@ -28,7 +28,6 @@
 #include "libavutil/cpu.h"
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/vc1dsp.h"
-#include "fpel.h"
 #include "vc1dsp.h"
 #include "config.h"
 
@@ -63,30 +62,18 @@ static void vc1_h_loop_filter16_sse4(uint8_t *src, ptrdiff_t stride, int pq)
     ff_vc1_h_loop_filter8_sse4(src+8*stride, stride, pq);
 }
 
-#define DECLARE_FUNCTION(OP, DEPTH, INSN)                       \
-    static void OP##vc1_mspel_mc00_##DEPTH##INSN(uint8_t *dst,          \
-                             const uint8_t *src, ptrdiff_t stride, int rnd) \
-    {                                                                       \
-        ff_ ## OP ## pixels ## DEPTH ## INSN(dst, src, stride, DEPTH);     \
-    }
-
-DECLARE_FUNCTION(put_,  8, _sse2)
-DECLARE_FUNCTION(avg_,  8, _sse2)
-DECLARE_FUNCTION(put_, 16, _sse2)
-DECLARE_FUNCTION(avg_, 16, _sse2)
-
 void ff_put_vc1_chroma_mc8_nornd_ssse3(uint8_t *dst, const uint8_t *src,
                                        ptrdiff_t stride, int h, int x, int y);
 void ff_avg_vc1_chroma_mc8_nornd_ssse3(uint8_t *dst, const uint8_t *src,
                                        ptrdiff_t stride, int h, int x, int y);
-void ff_vc1_inv_trans_4x4_dc_mmxext(uint8_t *dest, ptrdiff_t linesize,
-                                    int16_t *block);
-void ff_vc1_inv_trans_4x8_dc_mmxext(uint8_t *dest, ptrdiff_t linesize,
-                                    int16_t *block);
-void ff_vc1_inv_trans_8x4_dc_mmxext(uint8_t *dest, ptrdiff_t linesize,
-                                    int16_t *block);
-void ff_vc1_inv_trans_8x8_dc_mmxext(uint8_t *dest, ptrdiff_t linesize,
-                                    int16_t *block);
+void ff_vc1_inv_trans_4x4_dc_sse2(uint8_t *dest, ptrdiff_t linesize,
+                                  int16_t *block);
+void ff_vc1_inv_trans_4x8_dc_sse2(uint8_t *dest, ptrdiff_t linesize,
+                                  int16_t *block);
+void ff_vc1_inv_trans_8x4_dc_sse2(uint8_t *dest, ptrdiff_t linesize,
+                                  int16_t *block);
+void ff_vc1_inv_trans_8x8_dc_sse2(uint8_t *dest, ptrdiff_t linesize,
+                                  int16_t *block);
 
 #define MSPEL_FUNC(OP, X, Y, SIZE, XMM)                                     \
     void ff_vc1_ ## OP ## _mspel_mc ## X ## Y ## _ ## SIZE ##_ ## XMM       \
@@ -123,19 +110,15 @@ av_cold void ff_vc1dsp_init_x86(VC1DSPContext *dsp)
         dsp->vc1_v_loop_filter16 = vc1_v_loop_filter16_ ## EXT; \
         dsp->vc1_h_loop_filter16 = vc1_h_loop_filter16_ ## EXT
 
-    if (EXTERNAL_MMXEXT(cpu_flags)) {
-        dsp->vc1_inv_trans_8x8_dc                = ff_vc1_inv_trans_8x8_dc_mmxext;
-        dsp->vc1_inv_trans_4x8_dc                = ff_vc1_inv_trans_4x8_dc_mmxext;
-        dsp->vc1_inv_trans_8x4_dc                = ff_vc1_inv_trans_8x4_dc_mmxext;
-        dsp->vc1_inv_trans_4x4_dc                = ff_vc1_inv_trans_4x4_dc_mmxext;
-    }
     if (EXTERNAL_SSE2(cpu_flags)) {
+        dsp->vc1_inv_trans_8x8_dc                = ff_vc1_inv_trans_8x8_dc_sse2;
+        dsp->vc1_inv_trans_4x8_dc                = ff_vc1_inv_trans_4x8_dc_sse2;
+        dsp->vc1_inv_trans_8x4_dc                = ff_vc1_inv_trans_8x4_dc_sse2;
+        dsp->vc1_inv_trans_4x4_dc                = ff_vc1_inv_trans_4x4_dc_sse2;
+
         ASSIGN_LF816(sse2);
 
-        dsp->put_vc1_mspel_pixels_tab[0][0]      = put_vc1_mspel_mc00_16_sse2;
-        dsp->put_vc1_mspel_pixels_tab[1][0]      = put_vc1_mspel_mc00_8_sse2;
-        dsp->avg_vc1_mspel_pixels_tab[0][0]      = avg_vc1_mspel_mc00_16_sse2;
-        dsp->avg_vc1_mspel_pixels_tab[1][0]      = avg_vc1_mspel_mc00_8_sse2;
+        MSPEL_FUNCS(0, 0, sse2);
     }
     if (EXTERNAL_SSSE3(cpu_flags)) {
         ASSIGN_LF4(ssse3);

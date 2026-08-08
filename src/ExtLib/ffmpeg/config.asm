@@ -406,3 +406,5 @@
 %define HAVE_XLIB 0
 %define HAVE_OPENVINO2 0
 %define HAVE_X86ASM 1
+
+%define CONFIG_VC1DSP 1

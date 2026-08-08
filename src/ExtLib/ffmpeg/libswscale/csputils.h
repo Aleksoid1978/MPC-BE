@@ -65,10 +65,6 @@ SwsMatrix3x3 ff_sws_get_adaptation(const AVPrimaryCoefficients *prim,
                                    AVWhitepointCoefficients to);
 
 /* Integer math definitions / helpers */
-typedef struct v3u8_t {
-    uint8_t x, y, z;
-} v3u8_t;
-
 typedef struct v2u16_t {
     uint16_t x, y;
 } v2u16_t;
@@ -76,6 +72,10 @@ typedef struct v2u16_t {
 typedef struct v3u16_t {
     uint16_t x, y, z;
 } v3u16_t;
+
+typedef struct v3f32_t {
+    float x, y, z;
+} v3f32_t;
 
 /* Fast perceptual quantizer */
 static const float PQ_M1 = 2610./4096 * 1./4,
