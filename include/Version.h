@@ -45,12 +45,12 @@
 
 #define MPC_VERSION_MAJOR       1
 #define MPC_VERSION_MINOR       9
-#define MPC_VERSION_PATCH       0
+#define MPC_VERSION_PATCH       1
 
-#define MPC_VERSION_STATUS      0
+#define MPC_VERSION_STATUS      1
 // MPC_VERSION_STATUS: 0 - dev; 1 - stable
 
-#define MPC_YEAR_COMMENTS       "2002-2025"
+#define MPC_YEAR_COMMENTS       "2002-2026"
 #define MPC_VERSION_COMMENTS    "https://sourceforge.net/projects/mpcbe/"
 
 #ifndef ISPP_INVOKED
