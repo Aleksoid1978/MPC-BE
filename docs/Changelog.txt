@@ -8,6 +8,9 @@ Added support for network streams whose "Content-Type" field contains an additio
 MP4Splitter
 Added support for Dolby Vision in AV1 ('dav1').
 
+MpaDecFilter
+Added support for MS ADPCM and IMA ADPCM.
+
 MPCVideoDec
 Fixed hardware decoding for older Intel graphics.
 Expanded support for Dolby Vision in AV1 ('dav1').

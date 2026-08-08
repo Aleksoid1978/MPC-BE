@@ -8,6 +8,9 @@ Source filters
 MP4Splitter
 Добавлена поддержка Dolby Vision в AV1 ('dav1').
 
+MpaDecFilter
+Добавлена поддержка MS ADPCM и IMA ADPCM.
+
 MPCVideoDec
 Исправлено аппаратное декодирование для старой графики Intel.
 Расширена поддержка Dolby Vision в AV1 ('dav1').
