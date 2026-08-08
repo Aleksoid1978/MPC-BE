@@ -145,9 +145,9 @@ static filter_t s_audio_decoders[] = {
 	{L"Other PCM/ADPCM",			AUDIO_DECODER, ADEC_PCM_ADPCM,		0},
 };
 
-IMPLEMENT_DYNAMIC(CPPageInternalFiltersListBox, CCheckListBox)
+IMPLEMENT_DYNAMIC(CPPageInternalFiltersListBox, CDarkCheckListBox)
 CPPageInternalFiltersListBox::CPPageInternalFiltersListBox(int n)
-	: CCheckListBox()
+	: CDarkCheckListBox()
 	, m_n(n)
 {
 	for (int i = 0; i < FILTER_TYPE_NB; i++) {
@@ -181,7 +181,7 @@ INT_PTR CPPageInternalFiltersListBox::OnToolHitTest(CPoint point, TOOLINFO* pTI)
 	return pTI->uId;
 }
 
-BEGIN_MESSAGE_MAP(CPPageInternalFiltersListBox, CCheckListBox)
+BEGIN_MESSAGE_MAP(CPPageInternalFiltersListBox, CDarkCheckListBox)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipNotify)
 	ON_WM_RBUTTONDOWN()
 END_MESSAGE_MAP()

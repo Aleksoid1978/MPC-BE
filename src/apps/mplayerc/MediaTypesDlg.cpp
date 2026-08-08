@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "MediaTypesDlg.h"
+#include "controls/DarkTheme.h"
 #include <moreuuids.h>
 
 
@@ -76,6 +77,8 @@ BOOL CMediaTypesDlg::OnInitDialog()
 	AddAnchor(IDOK, BOTTOM_RIGHT);
 
 	SetMinTrackSize(CSize(300, 200));
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

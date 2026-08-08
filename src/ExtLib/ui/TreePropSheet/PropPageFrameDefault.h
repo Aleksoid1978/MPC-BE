@@ -46,6 +46,15 @@ public:
 	CPropPageFrameDefault();
 	virtual ~CPropPageFrameDefault();
 
+// <MPC-BE Custom Code>
+// Dark theme palette, set by the host (CPPageSheet) before the frame paints.
+// When s_bDarkMode is false the classic (system-colored) appearance is used.
+public:
+	static bool     s_bDarkMode;
+	static COLORREF s_clrFace;
+	static COLORREF s_clrText;
+// </MPC-BE Custom Code>
+
 // operations
 public:
 

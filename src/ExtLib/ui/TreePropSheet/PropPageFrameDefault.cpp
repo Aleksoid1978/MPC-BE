@@ -175,6 +175,12 @@ BEGIN_MESSAGE_MAP(CPropPageFrameDefault, CWnd)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
+// <MPC-BE Custom Code>
+bool     CPropPageFrameDefault::s_bDarkMode = false;
+COLORREF CPropPageFrameDefault::s_clrFace   = RGB(37, 42, 47);
+COLORREF CPropPageFrameDefault::s_clrText   = RGB(179, 184, 189);
+// </MPC-BE Custom Code>
+
 
 CPropPageFrameDefault::CPropPageFrameDefault()
 {
@@ -299,9 +305,22 @@ CRect CPropPageFrameDefault::CalcCaptionArea()
 void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaption, HICON hIcon)
 {
 	// <MPC-BE Custom Code>
-	COLORREF	clrLeft = GetSysColor(COLOR_ACTIVECAPTION);
+	auto Lighten = [](COLORREF c, int d) -> COLORREF {
+		int r = GetRValue(c) + d; if (r > 255) { r = 255; }
+		int g = GetGValue(c) + d; if (g > 255) { g = 255; }
+		int b = GetBValue(c) + d; if (b > 255) { b = 255; }
+		return RGB(r, g, b);
+	};
+
+	COLORREF	clrLeft;
+	COLORREF	clrRight;
+	if (s_bDarkMode) {
+		clrLeft = clrRight = Lighten(s_clrFace, 14); // subtle header band above the page
+	} else {
+		clrLeft = GetSysColor(COLOR_ACTIVECAPTION);
+		clrRight = pDc->GetPixel(rect.right-1, rect.top);
+	}
 	// </MPC-BE Custom Code>
-	COLORREF	clrRight = pDc->GetPixel(rect.right-1, rect.top);
 	FillGradientRectH(pDc, rect, clrLeft, clrRight);
 
 	// draw icon
@@ -317,7 +336,7 @@ void CPropPageFrameDefault::DrawCaption(CDC *pDc, CRect rect, LPCTSTR lpszCaptio
 	// draw text
 	rect.left += 2;
 
-	COLORREF	clrPrev = pDc->SetTextColor(GetSysColor(COLOR_CAPTIONTEXT));
+	COLORREF	clrPrev = pDc->SetTextColor(s_bDarkMode ? s_clrText : GetSysColor(COLOR_CAPTIONTEXT));
 	int				nBkStyle = pDc->SetBkMode(TRANSPARENT);
 	CFont			*pFont = (CFont*)pDc->SelectStockObject(SYSTEM_FONT);
 
@@ -405,6 +424,15 @@ void CPropPageFrameDefault::OnPaint()
 
 BOOL CPropPageFrameDefault::OnEraseBkgnd(CDC* pDC)
 {
+	// <MPC-BE Custom Code>
+	if (s_bDarkMode) {
+		CRect rect;
+		GetClientRect(rect);
+		pDC->FillSolidRect(rect, s_clrFace);
+		return TRUE;
+	}
+	// </MPC-BE Custom Code>
+
 	if (g_ThemeLib.IsAvailable() && g_ThemeLib.IsThemeActive())
 	{
 		HTHEME	hTheme = g_ThemeLib.OpenThemeData(m_hWnd, L"Tab");

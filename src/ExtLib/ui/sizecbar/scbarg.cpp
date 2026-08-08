@@ -116,36 +116,36 @@ void CSizingControlBarG::NcPaintGripper(CDC* pDC, CRect rcClient)
     if (!HasGripper())
         return;
 
-    if (!m_bUseDarkTheme) {
-        // paints a simple "two raised lines" gripper
-        // override this if you want a more sophisticated gripper
-        CRect gripper = rcClient;
-        CRect rcbtn = m_biHide.GetRect(CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
-        BOOL bHorz = IsHorzDocked();
+    // paints a simple "two raised lines" gripper
+    // override this if you want a more sophisticated gripper
+    CRect gripper = rcClient;
+    CRect rcbtn = m_biHide.GetRect(CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
+    BOOL bHorz = IsHorzDocked();
 
-        gripper.DeflateRect(1, 1);
-        const auto sizeX = ScaleX(m_cyGripper) / 4;
-        const auto sizeY = ScaleY(m_cyGripper) / 4;
-        if (bHorz)
-        {   // gripper at left
-            gripper.left -= (ScaleX(m_cyGripper) / 2 + sizeX * 2);
-            gripper.right = gripper.left + sizeX;
-            gripper.top = rcbtn.bottom + 3;
-        }
-        else
-        {   // gripper at top
-            gripper.top -= (ScaleY(m_cyGripper) / 2 + sizeY * 2);
-            gripper.bottom = gripper.top + sizeY;
-            gripper.right = rcbtn.left - 3;
-        }
-        pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
-            ::GetSysColor(COLOR_BTNSHADOW));
-
-        gripper.OffsetRect(bHorz ? sizeX : 0, bHorz ? 0 : sizeY);
-
-        pDC->Draw3dRect(gripper, ::GetSysColor(COLOR_BTNHIGHLIGHT),
-            ::GetSysColor(COLOR_BTNSHADOW));
+    gripper.DeflateRect(1, 1);
+    const auto sizeX = ScaleX(m_cyGripper) / 4;
+    const auto sizeY = ScaleY(m_cyGripper) / 4;
+    if (bHorz)
+    {   // gripper at left
+        gripper.left -= (ScaleX(m_cyGripper) / 2 + sizeX * 2);
+        gripper.right = gripper.left + sizeX;
+        gripper.top = rcbtn.bottom + 3;
     }
+    else
+    {   // gripper at top
+        gripper.top -= (ScaleY(m_cyGripper) / 2 + sizeY * 2);
+        gripper.bottom = gripper.top + sizeY;
+        gripper.right = rcbtn.left - 3;
+    }
+
+    // In the dark theme the system 3D colours are near-black on the dark frame (the gripper lines
+    // vanished); use themed light/dark greys so the two raised lines stay visible.
+    const COLORREF clrHi = m_bUseDarkTheme ? ColorThemeRGB(95, 100, 105) : ::GetSysColor(COLOR_BTNHIGHLIGHT);
+    const COLORREF clrLo = m_bUseDarkTheme ? ColorThemeRGB(20, 25, 30)   : ::GetSysColor(COLOR_BTNSHADOW);
+
+    pDC->Draw3dRect(gripper, clrHi, clrLo);
+    gripper.OffsetRect(bHorz ? sizeX : 0, bHorz ? 0 : sizeY);
+    pDC->Draw3dRect(gripper, clrHi, clrLo);
 
     m_biHide.Paint(pDC, this, CSize(ScaleX(m_cyGripper), ScaleY(m_cyGripper)));
 }
