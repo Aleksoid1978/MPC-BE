@@ -5,8 +5,12 @@
 Source filters
 Added support for network streams whose "Content-Type" field contains an additional "codecs" parameter.
 
+MP4Splitter
+Added support for Dolby Vision in AV1 ('dav1').
+
 MPCVideoDec
 Fixed hardware decoding for older Intel graphics.
+Expanded support for Dolby Vision in AV1 ('dav1').
 
 yt-dlp
 Fixed detection of the VP9 video codec for some video hosting services.
