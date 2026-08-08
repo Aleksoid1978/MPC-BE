@@ -3879,7 +3879,7 @@ BEGIN
     IDS_SHADER_FOLDER       "シェーダー フォルダーを開く"
     IDS_HISTORY_PATH        "パス"
     IDS_HISTORY_TITLE       "タイトル"
-    IDS_HISTORY_POSITION    "場所"
+    IDS_HISTORY_POSITION    "再生位置"
     IDS_HISTORY_REMOVE_SELECTED "選択項目を除去"
     IDS_HISTORY_REMOVE_MISSING "見つからないファイルを除去"
     IDS_HISTORY_CLEAR       "クリア"
