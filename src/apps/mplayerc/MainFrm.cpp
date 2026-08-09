@@ -5752,9 +5752,35 @@ LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 {
 	if (m_bTrayIcon) {
 		if (!IsWindowVisible()) {
+			// Rebuild the frame/view layout before exposing the hidden window.
+			RecalcLayout();
+
+			// Keep the frame compositor-cloaked on Windows 8+ until its final child
+			// layout and renderer destination have been painted.
+			bool bCloakedForRestore = false;
+			if (SysVersion::IsWin8orLater()) {
+				const BOOL bCloak = TRUE;
+				bCloakedForRestore = SUCCEEDED(DwmSetWindowAttribute(
+					m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+			}
+
 			ShowWindow(SW_SHOW);
+
+			// Showing the frame can change the effective client metrics.
+			RecalcLayout();
+			MoveVideoWindow(false, true);
+			RepaintVideo(true);
+			RedrawWindow(nullptr, nullptr,
+				RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
+
+			if (bCloakedForRestore) {
+				// Present only the completed frame, never the intermediate restore state.
+				DwmFlush();
+				const BOOL bCloak = FALSE;
+				DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+			}
+
 			CreateThumbnailToolbar();
-			MoveVideoWindow();
 			SetForegroundWindow();
 
 			for (const auto& pDockingBar : m_dockingbarsVisible) {
