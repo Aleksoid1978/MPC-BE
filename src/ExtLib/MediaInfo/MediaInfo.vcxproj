@@ -449,7 +449,12 @@
     <ClCompile Include="MediaInfo\Multiple\File_Mk.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Mpeg4.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_Mpeg4_Descriptors.cpp" />
-    <ClCompile Include="MediaInfo\Multiple\File_Mpeg4_Elements.cpp" />
+    <ClCompile Include="MediaInfo\Multiple\File_Mpeg4_Elements.cpp">
+      <!-- VS 2026 18.8.x can ICE in the LTCG backend for File_Mpeg4::Data_Parse.
+           Keep normal /O2 file-level optimization, but emit native code for this TU
+           instead of deferring it to the final /LTCG pass. -->
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
     <ClCompile Include="MediaInfo\Multiple\File_Mpeg4_TimeCode.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_MpegPs.cpp" />
     <ClCompile Include="MediaInfo\Multiple\File_MpegTs.cpp" />
