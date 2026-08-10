@@ -1268,8 +1268,14 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 	}
 }
 
-void CMainFrame::SetTrayTip(CString str)
+void CMainFrame::SetTrayTip(const CStringW& str)
 {
+	static CStringW TrayTipStr;
+	if (TrayTipStr == str) {
+		return;
+	}
+	TrayTipStr = str;
+
 	NOTIFYICONDATAW tnid;
 	tnid.cbSize = sizeof(NOTIFYICONDATAW);
 	tnid.hWnd = m_hWnd;
