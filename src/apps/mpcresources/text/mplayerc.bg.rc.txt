@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"За програмата"
 7		"MPC-BE"
 8		"Copyright © 2002-2026, вижте файла Authors.txt"
@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 21		"Използване на тъмно меню"
 22		"Използвай замъгляне за фон на меню (Windows 10 и нови)"
 24		"Използвай тъмна заглавка (Windows 10 и нови)"
-26		"Controls size:"
+26		"Контрол размери:"
 29		"Показване на времето"
 31		"Използване предварителен преглед при търсене на видео фрагмент"
 32		"Размер спрямо размера на екрана:"
