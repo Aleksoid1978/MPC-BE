@@ -5761,13 +5761,127 @@ LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 			// Rebuild the frame/view layout before exposing the hidden window.
 			RecalcLayout();
 
-			// Keep the frame compositor-cloaked on Windows 8+ until its final child
-			// layout and renderer destination have been painted.
-			bool bCloakedForRestore = false;
+			HWND hRestoreTransitionCover = nullptr;
+			HDC hRestoreTransitionCoverDC = nullptr;
+			HBITMAP hRestoreTransitionCoverBitmap = nullptr;
+			HGDIOBJ hRestoreTransitionCoverOldBitmap = nullptr;
+
+			auto CleanupRestoreTransitionCover = [&]() {
+				if (hRestoreTransitionCover) {
+					::ShowWindow(hRestoreTransitionCover, SW_HIDE);
+					::DestroyWindow(hRestoreTransitionCover);
+					hRestoreTransitionCover = nullptr;
+				}
+
+				if (hRestoreTransitionCoverDC) {
+					if (hRestoreTransitionCoverOldBitmap) {
+						::SelectObject(hRestoreTransitionCoverDC, hRestoreTransitionCoverOldBitmap);
+						hRestoreTransitionCoverOldBitmap = nullptr;
+					}
+
+					if (hRestoreTransitionCoverBitmap) {
+						::DeleteObject(hRestoreTransitionCoverBitmap);
+						hRestoreTransitionCoverBitmap = nullptr;
+					}
+
+					::DeleteDC(hRestoreTransitionCoverDC);
+					hRestoreTransitionCoverDC = nullptr;
+				}
+			};
+
 			if (SysVersion::IsWin8orLater()) {
-				const BOOL bCloak = TRUE;
-				bCloakedForRestore = SUCCEEDED(DwmSetWindowAttribute(
-					m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+				CRect restoreRect;
+				GetWindowRect(&restoreRect);
+
+				if (!restoreRect.IsRectEmpty()) {
+					HDC hScreenDC = ::GetDC(nullptr);
+					if (hScreenDC) {
+						hRestoreTransitionCoverDC = ::CreateCompatibleDC(hScreenDC);
+						if (hRestoreTransitionCoverDC) {
+							BITMAPINFO bmi = {};
+							bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+							bmi.bmiHeader.biWidth = restoreRect.Width();
+							bmi.bmiHeader.biHeight = -restoreRect.Height();
+							bmi.bmiHeader.biPlanes = 1;
+							bmi.bmiHeader.biBitCount = 32;
+							bmi.bmiHeader.biCompression = BI_RGB;
+
+							void* pBits = nullptr;
+							hRestoreTransitionCoverBitmap = ::CreateDIBSection(
+								hScreenDC,
+								&bmi,
+								DIB_RGB_COLORS,
+								&pBits,
+								nullptr,
+								0);
+
+							if (hRestoreTransitionCoverBitmap && pBits) {
+								hRestoreTransitionCoverOldBitmap = ::SelectObject(
+									hRestoreTransitionCoverDC,
+									hRestoreTransitionCoverBitmap);
+
+								if (hRestoreTransitionCoverOldBitmap) {
+									const SIZE_T bitmapBytes =
+										static_cast<SIZE_T>(restoreRect.Width())
+										* static_cast<SIZE_T>(restoreRect.Height())
+										* 4;
+									::ZeroMemory(pBits, bitmapBytes);
+
+									hRestoreTransitionCover = ::CreateWindowExW(
+										WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+										L"STATIC",
+										nullptr,
+										WS_POPUP,
+										restoreRect.left,
+										restoreRect.top,
+										restoreRect.Width(),
+										restoreRect.Height(),
+										m_hWnd,
+										nullptr,
+										AfxGetInstanceHandle(),
+										nullptr);
+
+									if (hRestoreTransitionCover) {
+										POINT ptDst = { restoreRect.left, restoreRect.top };
+										POINT ptSrc = { 0, 0 };
+										SIZE coverSize = { restoreRect.Width(), restoreRect.Height() };
+
+										if (::UpdateLayeredWindow(
+												hRestoreTransitionCover,
+												hScreenDC,
+												&ptDst,
+												&coverSize,
+												hRestoreTransitionCoverDC,
+												&ptSrc,
+												0,
+												nullptr,
+												ULW_OPAQUE)
+												&& ::SetWindowPos(
+													hRestoreTransitionCover,
+													HWND_TOPMOST,
+													restoreRect.left,
+													restoreRect.top,
+													restoreRect.Width(),
+													restoreRect.Height(),
+													SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOSENDCHANGING)) {
+											if (FAILED(DwmFlush())) {
+												CleanupRestoreTransitionCover();
+											}
+										} else {
+											CleanupRestoreTransitionCover();
+										}
+									}
+								}
+							}
+						}
+
+						::ReleaseDC(nullptr, hScreenDC);
+					}
+				}
+
+				if (!hRestoreTransitionCover) {
+					CleanupRestoreTransitionCover();
+				}
 			}
 
 			ShowWindow(SW_SHOW);
@@ -5779,11 +5893,9 @@ LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 			RedrawWindow(nullptr, nullptr,
 				RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
 
-			if (bCloakedForRestore) {
-				// Present only the completed frame, never the intermediate restore state.
+			if (hRestoreTransitionCover) {
 				DwmFlush();
-				const BOOL bCloak = FALSE;
-				DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+				CleanupRestoreTransitionCover();
 			}
 
 			CreateThumbnailToolbar();
