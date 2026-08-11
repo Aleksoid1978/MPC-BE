@@ -2,6 +2,7 @@
 
 1.9.1.x dev
 =============================
+Updated Bulgarian translation (by jekovcar).
 
 
 1.9.1 - 2026-08-08
