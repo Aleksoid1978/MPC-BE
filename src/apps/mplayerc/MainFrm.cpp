@@ -11128,15 +11128,515 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreen = !m_bFullScreen;
 
-	// Keep the main HWND logically visible so the normal MFC/child layout runs
-	// during the fullscreen resize, but temporarily remove it from DWM
-	// presentation while its frame and geometry are being rewritten.  Cloaking
-	// is Windows 8+, so Windows 7 and earlier retain the original code path.
-	bool bCloakedForFullscreenTransition = false;
+	// Preserve the exact pre-transition MPC-BE image in an independent layered
+	// snapshot while the real player is cloaked and its geometry is rewritten.
+	// The complete old-to-new region is opaque black, then only the currently
+	// visible player rectangle is copied into its proper position. This avoids
+	// exposing the desktop outside the old player bounds while retaining the
+	// compositor-isolated handoff that prevented stale-frame corruption.
+	// Reuse only the CPU/GDI backing surface between rapid F repeats. The
+	// layered HWND itself is still created/destroyed for every transition, so
+	// D13's DWM lifetime and synchronization ordering remain unchanged.
+	struct FullscreenTransitionBitmapCache {
+		HDC hDC = nullptr;
+		HBITMAP hBitmap = nullptr;
+		HGDIOBJ hOldBitmap = nullptr;
+		void* pBits = nullptr;
+		int width = 0;
+		int height = 0;
+		CRect contentRect;
+
+		~FullscreenTransitionBitmapCache()
+		{
+			if (hDC) {
+				if (hBitmap && hOldBitmap) {
+					::SelectObject(hDC, hOldBitmap);
+				}
+				if (hBitmap) {
+					::DeleteObject(hBitmap);
+				}
+				::DeleteDC(hDC);
+			}
+		}
+
+		bool Ensure(HDC hScreenDC, const int newWidth, const int newHeight)
+		{
+			if (!hScreenDC || newWidth <= 0 || newHeight <= 0) {
+				return false;
+			}
+
+			if (!hDC) {
+				hDC = ::CreateCompatibleDC(hScreenDC);
+				if (!hDC) {
+					return false;
+				}
+			}
+
+			if (hBitmap
+					&& pBits
+					&& width == newWidth
+					&& height == newHeight) {
+				return true;
+			}
+
+			if (hBitmap) {
+				if (hOldBitmap) {
+					::SelectObject(hDC, hOldBitmap);
+				}
+				::DeleteObject(hBitmap);
+				hBitmap = nullptr;
+				pBits = nullptr;
+				width = 0;
+				height = 0;
+				contentRect.SetRectEmpty();
+			}
+
+			BITMAPINFO bmi = {};
+			bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+			bmi.bmiHeader.biWidth = newWidth;
+			bmi.bmiHeader.biHeight = -newHeight;
+			bmi.bmiHeader.biPlanes = 1;
+			bmi.bmiHeader.biBitCount = 32;
+			bmi.bmiHeader.biCompression = BI_RGB;
+
+			hBitmap = ::CreateDIBSection(
+				hScreenDC,
+				&bmi,
+				DIB_RGB_COLORS,
+				&pBits,
+				nullptr,
+				0);
+			if (!hBitmap || !pBits) {
+				if (hBitmap) {
+					::DeleteObject(hBitmap);
+					hBitmap = nullptr;
+				}
+				pBits = nullptr;
+				return false;
+			}
+
+			hOldBitmap = ::SelectObject(hDC, hBitmap);
+			if (!hOldBitmap) {
+				::DeleteObject(hBitmap);
+				hBitmap = nullptr;
+				pBits = nullptr;
+				return false;
+			}
+
+			width = newWidth;
+			height = newHeight;
+			contentRect.SetRectEmpty();
+
+			const SIZE_T bitmapBytes =
+				static_cast<SIZE_T>(width)
+				* static_cast<SIZE_T>(height)
+				* 4;
+			::ZeroMemory(pBits, bitmapBytes);
+			return true;
+		}
+
+		void ClearPreviousContent()
+		{
+			if (!hDC || contentRect.IsRectEmpty()) {
+				return;
+			}
+
+			const CRect bounds(0, 0, width, height);
+			CRect clearRect;
+			clearRect.IntersectRect(&bounds, &contentRect);
+			if (!clearRect.IsRectEmpty()) {
+				::PatBlt(
+					hDC,
+					clearRect.left,
+					clearRect.top,
+					clearRect.Width(),
+					clearRect.Height(),
+					BLACKNESS);
+			}
+
+			contentRect.SetRectEmpty();
+		}
+
+		void RememberContent(
+			const int x,
+			const int y,
+			const int contentWidth,
+			const int contentHeight)
+		{
+			const CRect bounds(0, 0, width, height);
+			const CRect newContent(
+				x,
+				y,
+				x + contentWidth,
+				y + contentHeight);
+			contentRect.IntersectRect(&bounds, &newContent);
+		}
+	};
+
+	static thread_local FullscreenTransitionBitmapCache
+		s_fullscreenTransitionBitmapCache;
+
+	HWND hFullscreenTransitionSnapshot = nullptr;
+	HDC hFullscreenTransitionSnapshotDC = nullptr;
+	bool bFullscreenTransitionSnapshotReady = false;
+
+	auto CleanupFullscreenTransitionSnapshot = [&]() {
+		if (hFullscreenTransitionSnapshot) {
+			::ShowWindow(hFullscreenTransitionSnapshot, SW_HIDE);
+			::DestroyWindow(hFullscreenTransitionSnapshot);
+			hFullscreenTransitionSnapshot = nullptr;
+		}
+
+		// Keep the backing DIB/DC alive for the next queued/repeated F toggle.
+		hFullscreenTransitionSnapshotDC = nullptr;
+		bFullscreenTransitionSnapshotReady = false;
+	};
+
 	if (SysVersion::IsWin8orLater() && IsWindowVisible()) {
+		CRect currentRect;
+		GetWindowRect(&currentRect);
+
+		CRect transitionRect(currentRect);
+		if (m_bFullScreen) {
+			// At this point ToggleFullscreen() has toggled the state, but the
+			// normal code below has not finalized the target rectangle r yet.
+			// Build the entry quarantine from the actual monitor bounds instead
+			// of accidentally retaining the old window-sized rectangle.
+			MONITORINFO transitionMonitorInfo = { sizeof(transitionMonitorInfo) };
+			const HMONITOR hTransitionMonitor =
+				MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+			if (GetMonitorInfoW(hTransitionMonitor, &transitionMonitorInfo)) {
+				const CRect monitorRect(transitionMonitorInfo.rcMonitor);
+				transitionRect.UnionRect(&currentRect, &monitorRect);
+			}
+		} else if (!r.IsRectEmpty()) {
+			transitionRect.UnionRect(&currentRect, &r);
+		}
+
+		if (!currentRect.IsRectEmpty() && !transitionRect.IsRectEmpty()) {
+			HDC hScreenDC = ::GetDC(nullptr);
+
+			if (hScreenDC) {
+				hFullscreenTransitionSnapshotDC =
+					s_fullscreenTransitionBitmapCache.Ensure(
+						hScreenDC,
+						transitionRect.Width(),
+						transitionRect.Height())
+					? s_fullscreenTransitionBitmapCache.hDC
+					: nullptr;
+
+				if (hFullscreenTransitionSnapshotDC) {
+					HBITMAP hFullscreenTransitionSnapshotBitmap =
+						s_fullscreenTransitionBitmapCache.hBitmap;
+					void* pBits =
+						s_fullscreenTransitionBitmapCache.pBits;
+
+					if (hFullscreenTransitionSnapshotBitmap && pBits) {
+						HGDIOBJ hFullscreenTransitionSnapshotOldBitmap =
+							s_fullscreenTransitionBitmapCache.hOldBitmap;
+
+						if (hFullscreenTransitionSnapshotOldBitmap) {
+							// The rest of the cached DIB is already black. Erase only
+							// the content copied by the preceding transition rather than
+							// zeroing the full monitor-sized surface again.
+							s_fullscreenTransitionBitmapCache.ClearPreviousContent();
+
+							// Capture the actually presented video rectangle for loaded video,
+							// rather than the whole CChildView (which includes the current
+							// letterbox/pillarbox margins). Static/audio states still capture
+							// the whole view so their logo/album art remains intact.
+							//
+							// Keep plain SRCCOPY: CAPTUREBLT can recursively include a
+							// still-composited layered snapshot from the previous rapid toggle.
+							CRect sourceRect;
+							if (m_wndView.GetSafeHwnd() && m_wndView.IsWindowVisible()) {
+								if (!fAudioOnly && m_eMediaLoadState == MLS_LOADED) {
+									sourceRect = m_wndView.GetVideoRect();
+									if (!sourceRect.IsRectEmpty()) {
+										m_wndView.ClientToScreen(&sourceRect);
+									}
+								}
+
+								if (sourceRect.IsRectEmpty()) {
+									m_wndView.GetWindowRect(&sourceRect);
+								}
+							}
+							if (sourceRect.IsRectEmpty()) {
+								sourceRect = currentRect;
+							}
+
+							const int sourceWidth = sourceRect.Width();
+							const int sourceHeight = sourceRect.Height();
+							const bool bSnapshotHasActiveVideo =
+								!fAudioOnly && m_eMediaLoadState == MLS_LOADED;
+
+							int snapshotWidth = sourceWidth;
+							int snapshotHeight = sourceHeight;
+							int snapshotX =
+								sourceRect.left - transitionRect.left;
+							int snapshotY =
+								sourceRect.top - transitionRect.top;
+							bool bSnapshotCopied = false;
+
+							if (sourceWidth > 0 && sourceHeight > 0) {
+								if (bSnapshotHasActiveVideo && m_bFullScreen) {
+									// The snapshot must be born at the same destination rectangle
+									// that MoveVideoWindow() will use after the fullscreen geometry
+									// is installed. If we first show an aspect-fit approximation and
+									// correct it later, DWM necessarily presents that approximation
+									// as an intermediate frame.
+									const int wnd_w = transitionRect.Width();
+									const int wnd_h = transitionRect.Height();
+									const CSize szVideo = GetVideoSize();
+
+									double videoW = wnd_w;
+									double videoH = wnd_h;
+
+									if (szVideo.cx > 0 && szVideo.cy > 0) {
+										const long wy = wnd_w * szVideo.cy;
+										const long hx = wnd_h * szVideo.cx;
+
+										switch (m_iVideoSize) {
+											case DVS_HALF:
+												videoW = szVideo.cx / 2.0;
+												videoH = szVideo.cy / 2.0;
+												break;
+											case DVS_NORMAL:
+												videoW = szVideo.cx;
+												videoH = szVideo.cy;
+												break;
+											case DVS_DOUBLE:
+												videoW = szVideo.cx * 2.0;
+												videoH = szVideo.cy * 2.0;
+												break;
+											case DVS_FROMINSIDE:
+												if (!m_bShockwaveGraph) {
+													if (wy > hx) {
+														videoW = static_cast<double>(hx) / szVideo.cy;
+													} else {
+														videoH = static_cast<double>(wy) / szVideo.cx;
+													}
+
+													const double factor =
+														(wy > hx)
+															? videoW / szVideo.cx
+															: videoH / szVideo.cy;
+													if ((s.bNoSmallUpscale
+																&& factor > 1.0
+																&& factor < 1.02)
+															|| (s.bNoSmallDownscale
+																&& factor > 0.937
+																&& factor < 1.0)) {
+														videoW = szVideo.cx;
+														videoH = szVideo.cy;
+													}
+												}
+												break;
+											case DVS_FROMOUTSIDE:
+												if (!m_bShockwaveGraph) {
+													if (wy < hx) {
+														videoW = static_cast<double>(hx) / szVideo.cy;
+													} else {
+														videoH = static_cast<double>(wy) / szVideo.cx;
+													}
+												}
+												break;
+											case DVS_ZOOM1:
+												if (!m_bShockwaveGraph) {
+													if (wy > hx) {
+														videoW =
+															(static_cast<double>(hx)
+																+ (wy - hx) * 0.333)
+															/ szVideo.cy;
+														videoH = videoW * szVideo.cy / szVideo.cx;
+													} else {
+														videoH =
+															(static_cast<double>(wy)
+																+ (hx - wy) * 0.333)
+															/ szVideo.cx;
+														videoW = videoH * szVideo.cx / szVideo.cy;
+													}
+												}
+												break;
+											case DVS_ZOOM2:
+												if (!m_bShockwaveGraph) {
+													if (wy > hx) {
+														videoW =
+															(static_cast<double>(hx)
+																+ (wy - hx) * 0.667)
+															/ szVideo.cy;
+														videoH = videoW * szVideo.cy / szVideo.cx;
+													} else {
+														videoH =
+															(static_cast<double>(wy)
+																+ (hx - wy) * 0.667)
+															/ szVideo.cx;
+														videoW = videoH * szVideo.cx / szVideo.cy;
+													}
+												}
+												break;
+										}
+
+										const double shift2X =
+											wnd_w * (m_PosX * 2 - 1);
+										const double shift2Y =
+											wnd_h * (m_PosY * 2 - 1);
+
+										snapshotX = static_cast<int>(std::round(
+											((shift2X - videoW) * m_ZoomX + wnd_w) / 2));
+										snapshotY = static_cast<int>(std::round(
+											((shift2Y - videoH) * m_ZoomY + wnd_h) / 2));
+										const int snapshotRight =
+											static_cast<int>(std::round(
+												((shift2X + videoW) * m_ZoomX + wnd_w) / 2));
+										const int snapshotBottom =
+											static_cast<int>(std::round(
+												((shift2Y + videoH) * m_ZoomY + wnd_h) / 2));
+
+										snapshotWidth = snapshotRight - snapshotX;
+										snapshotHeight = snapshotBottom - snapshotY;
+									}
+
+									::SetStretchBltMode(
+										hFullscreenTransitionSnapshotDC,
+										COLORONCOLOR);
+
+									bSnapshotCopied =
+										snapshotWidth > 0
+										&& snapshotHeight > 0
+										&& !!::StretchBlt(
+											hFullscreenTransitionSnapshotDC,
+											snapshotX,
+											snapshotY,
+											snapshotWidth,
+											snapshotHeight,
+											hScreenDC,
+											sourceRect.left,
+											sourceRect.top,
+											sourceWidth,
+											sourceHeight,
+											SRCCOPY);
+								} else {
+									if (!bSnapshotHasActiveVideo) {
+										// Static/audio placeholders are already rendered at their
+										// intended pixel size. On fullscreen entry, center the old
+										// view 1:1 on the black monitor-sized quarantine instead of
+										// magnifying it. On exit, a fullscreen source already fills
+										// the quarantine and is preserved 1:1.
+										snapshotX =
+											(transitionRect.Width() - snapshotWidth) / 2;
+										snapshotY =
+											(transitionRect.Height() - snapshotHeight) / 2;
+									}
+
+									bSnapshotCopied = !!::BitBlt(
+										hFullscreenTransitionSnapshotDC,
+										snapshotX,
+										snapshotY,
+										snapshotWidth,
+										snapshotHeight,
+										hScreenDC,
+										sourceRect.left,
+										sourceRect.top,
+										SRCCOPY);
+								}
+							}
+
+							if (bSnapshotCopied) {
+								s_fullscreenTransitionBitmapCache.RememberContent(
+									snapshotX,
+									snapshotY,
+									snapshotWidth,
+									snapshotHeight);
+
+								DWORD dwSnapshotExStyle =
+									WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE;
+								if (GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) {
+									dwSnapshotExStyle |= WS_EX_TOPMOST;
+								}
+
+								hFullscreenTransitionSnapshot = ::CreateWindowExW(
+									dwSnapshotExStyle,
+									L"STATIC",
+									L"",
+									WS_POPUP,
+									transitionRect.left,
+									transitionRect.top,
+									transitionRect.Width(),
+									transitionRect.Height(),
+									nullptr,
+									nullptr,
+									AfxGetInstanceHandle(),
+									nullptr);
+
+								if (hFullscreenTransitionSnapshot) {
+									POINT ptDst = { transitionRect.left, transitionRect.top };
+									POINT ptSrc = { 0, 0 };
+									SIZE snapshotSize = {
+										transitionRect.Width(), transitionRect.Height()
+									};
+
+									if (::UpdateLayeredWindow(
+											hFullscreenTransitionSnapshot,
+											hScreenDC,
+											&ptDst,
+											&snapshotSize,
+											hFullscreenTransitionSnapshotDC,
+											&ptSrc,
+											0,
+											nullptr,
+											ULW_OPAQUE)) {
+										const HWND hSnapshotInsertAfter =
+											(dwSnapshotExStyle & WS_EX_TOPMOST)
+											? HWND_TOPMOST
+											: HWND_TOP;
+
+										if (::SetWindowPos(
+												hFullscreenTransitionSnapshot,
+												hSnapshotInsertAfter,
+												transitionRect.left,
+												transitionRect.top,
+												transitionRect.Width(),
+												transitionRect.Height(),
+												SWP_NOACTIVATE
+													| SWP_SHOWWINDOW
+													| SWP_NOSENDCHANGING)) {
+											// The snapshot must be compositor-visible before
+											// cloaking the real HWND; otherwise the desktop can
+											// occupy an intermediate composition.
+											bFullscreenTransitionSnapshotReady =
+												SUCCEEDED(DwmFlush());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+
+				::ReleaseDC(nullptr, hScreenDC);
+			}
+
+			if (!bFullscreenTransitionSnapshotReady) {
+				CleanupFullscreenTransitionSnapshot();
+			}
+		}
+	}
+
+	// Never cloak without a committed independent snapshot. A failed snapshot
+	// therefore falls back to the stock visible transition instead of deliberately
+	// exposing a frame in which the main HWND is absent.
+	bool bCloakedForFullscreenTransition = false;
+	if (bFullscreenTransitionSnapshotReady
+			&& SysVersion::IsWin8orLater()
+			&& IsWindowVisible()) {
 		const BOOL bCloak = TRUE;
 		bCloakedForFullscreenTransition = SUCCEEDED(DwmSetWindowAttribute(
 			m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+
+		if (!bCloakedForFullscreenTransition) {
+			CleanupFullscreenTransitionSnapshot();
+		}
 	}
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
@@ -11252,16 +11752,82 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	m_bFullScreenChangingMode = false;
 	MoveVideoWindow();
 
-	// Reveal only after the final top-level and video-child geometry has been
-	// processed. Wait for the compositor to reach the transition's final
-	// presentation point first; unlike a forced RedrawWindow this does not
-	// synchronously repaint a stale pre-WM_SIZE child surface.
+	// Use the compositor ordering that is appropriate for the surface being
+	// revealed.
+	//
+	// Active video already has a renderer continuously publishing its final
+	// presentation surface. Keep the D4-style handoff there: uncloak first, then
+	// wait for DWM while the layered snapshot remains in front. A pre-uncloak
+	// flush only holds the frozen transition image on screen for an extra frame.
+	//
+	// Audio-only and empty/static states do not continuously republish a video
+	// surface. Keep the C3-style geometry barrier there: commit the final hidden
+	// geometry before uncloak, but do NOT force a post-uncloak composition of a
+	// potentially stale saved frame. The already-committed layered snapshot
+	// covers the desktop during that pre-uncloak barrier.
+	const bool bFullscreenTransitionHasActiveVideo =
+		!fAudioOnly && m_eMediaLoadState == MLS_LOADED;
+
+	// The real fullscreen SetWindowPos() above can change the main HWND's Z-order
+	// after the transition snapshot was originally shown. While the main HWND is
+	// cloaked this is invisible, but uncloaking it above the snapshot defeats the
+	// quarantine and exposes the stale frame/video child. Reassert the snapshot at
+	// the top of the same Z-order band only after all real-window geometry work is
+	// complete and immediately before the reveal.
+	if (bFullscreenTransitionSnapshotReady && hFullscreenTransitionSnapshot) {
+		const bool bMainWindowIsTopMost =
+			(GetWindowLongPtrW(m_hWnd, GWL_EXSTYLE) & WS_EX_TOPMOST) != 0;
+		::SetWindowPos(
+			hFullscreenTransitionSnapshot,
+			bMainWindowIsTopMost ? HWND_TOPMOST : HWND_TOP,
+			0,
+			0,
+			0,
+			0,
+			SWP_NOMOVE
+				| SWP_NOSIZE
+				| SWP_NOACTIVATE
+				| SWP_NOSENDCHANGING);
+	}
+
 	if (bCloakedForFullscreenTransition) {
-		DwmFlush();
+		if (!bFullscreenTransitionHasActiveVideo) {
+			// Static/audio still need the C3 geometry barrier before reveal.
+			DwmFlush();
+		}
 
 		const BOOL bCloak = FALSE;
 		DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+
+		if (!bFullscreenTransitionHasActiveVideo
+				&& bFullscreenTransitionSnapshotReady) {
+			// DwmFlush alone cannot service MPC-BE's pending client/non-client
+			// paint on this UI thread. Repaint only after the final geometry is
+			// installed and the HWND has been uncloaked, while the independent
+			// layered snapshot is still above it. This avoids the earlier C2
+			// failure mode where synchronous repaint happened during the hidden
+			// geometry transaction.
+			::RedrawWindow(
+				m_hWnd,
+				nullptr,
+				nullptr,
+				RDW_INVALIDATE
+					| RDW_ERASE
+					| RDW_FRAME
+					| RDW_ALLCHILDREN
+					| RDW_UPDATENOW);
+		}
+
+		// D9 reasserts the layered snapshot above the real HWND immediately
+		// before this handoff. Keep it there through one completed uncloaked
+		// composition for every state, so cleanup cannot expose DWM's cached
+		// pre-transition frame/non-client representation.
+		if (bFullscreenTransitionSnapshotReady) {
+			DwmFlush();
+		}
 	}
+
+	CleanupFullscreenTransitionSnapshot();
 
 	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
