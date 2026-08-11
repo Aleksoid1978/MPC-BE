@@ -11128,15 +11128,154 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreen = !m_bFullScreen;
 
-	// Keep the main HWND logically visible so the normal MFC/child layout runs
-	// during the fullscreen resize, but temporarily remove it from DWM
-	// presentation while its frame and geometry are being rewritten.  Cloaking
-	// is Windows 8+, so Windows 7 and earlier retain the original code path.
-	bool bCloakedForFullscreenTransition = false;
+	// Keep the real window visible while an owned layered snapshot covers the transition.
+	HWND hFullscreenTransitionSnapshot = nullptr;
+	HDC hFullscreenTransitionSnapshotDC = nullptr;
+	HBITMAP hFullscreenTransitionSnapshotBitmap = nullptr;
+	HGDIOBJ hFullscreenTransitionSnapshotOldBitmap = nullptr;
+	CRect fullscreenTransitionRect;
+
+	auto CleanupFullscreenTransitionSnapshot = [&]() {
+		if (hFullscreenTransitionSnapshot) {
+			::ShowWindow(hFullscreenTransitionSnapshot, SW_HIDE);
+			::DestroyWindow(hFullscreenTransitionSnapshot);
+			hFullscreenTransitionSnapshot = nullptr;
+		}
+
+		if (hFullscreenTransitionSnapshotDC) {
+			if (hFullscreenTransitionSnapshotOldBitmap) {
+				::SelectObject(hFullscreenTransitionSnapshotDC, hFullscreenTransitionSnapshotOldBitmap);
+				hFullscreenTransitionSnapshotOldBitmap = nullptr;
+			}
+
+			if (hFullscreenTransitionSnapshotBitmap) {
+				::DeleteObject(hFullscreenTransitionSnapshotBitmap);
+				hFullscreenTransitionSnapshotBitmap = nullptr;
+			}
+
+			::DeleteDC(hFullscreenTransitionSnapshotDC);
+			hFullscreenTransitionSnapshotDC = nullptr;
+		}
+	};
+
 	if (SysVersion::IsWin8orLater() && IsWindowVisible()) {
-		const BOOL bCloak = TRUE;
-		bCloakedForFullscreenTransition = SUCCEEDED(DwmSetWindowAttribute(
-			m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+		CRect currentRect;
+		GetWindowRect(&currentRect);
+
+		fullscreenTransitionRect = currentRect;
+		if (!r.IsRectEmpty()) {
+			fullscreenTransitionRect.UnionRect(&currentRect, &r);
+		}
+
+		if (!currentRect.IsRectEmpty() && !fullscreenTransitionRect.IsRectEmpty()) {
+			HDC hScreenDC = ::GetDC(nullptr);
+			if (hScreenDC) {
+				hFullscreenTransitionSnapshotDC = ::CreateCompatibleDC(hScreenDC);
+				if (hFullscreenTransitionSnapshotDC) {
+					BITMAPINFO bmi = {};
+					bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+					bmi.bmiHeader.biWidth = fullscreenTransitionRect.Width();
+					bmi.bmiHeader.biHeight = -fullscreenTransitionRect.Height();
+					bmi.bmiHeader.biPlanes = 1;
+					bmi.bmiHeader.biBitCount = 32;
+					bmi.bmiHeader.biCompression = BI_RGB;
+
+					void* pBits = nullptr;
+					hFullscreenTransitionSnapshotBitmap = ::CreateDIBSection(
+						hScreenDC,
+						&bmi,
+						DIB_RGB_COLORS,
+						&pBits,
+						nullptr,
+						0);
+
+					if (hFullscreenTransitionSnapshotBitmap && pBits) {
+						hFullscreenTransitionSnapshotOldBitmap = ::SelectObject(
+							hFullscreenTransitionSnapshotDC,
+							hFullscreenTransitionSnapshotBitmap);
+
+						if (hFullscreenTransitionSnapshotOldBitmap) {
+							const SIZE_T bitmapBytes =
+								static_cast<SIZE_T>(fullscreenTransitionRect.Width())
+								* static_cast<SIZE_T>(fullscreenTransitionRect.Height())
+								* 4;
+							::ZeroMemory(pBits, bitmapBytes);
+
+							// Capture only the current player area; the rest stays black.
+							const int snapshotX = currentRect.left - fullscreenTransitionRect.left;
+							const int snapshotY = currentRect.top - fullscreenTransitionRect.top;
+							::BitBlt(
+								hFullscreenTransitionSnapshotDC,
+								snapshotX,
+								snapshotY,
+								currentRect.Width(),
+								currentRect.Height(),
+								hScreenDC,
+								currentRect.left,
+								currentRect.top,
+								SRCCOPY | CAPTUREBLT);
+
+							hFullscreenTransitionSnapshot = ::CreateWindowExW(
+								WS_EX_LAYERED | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
+								L"STATIC",
+								nullptr,
+								WS_POPUP,
+								fullscreenTransitionRect.left,
+								fullscreenTransitionRect.top,
+								fullscreenTransitionRect.Width(),
+								fullscreenTransitionRect.Height(),
+								m_hWnd,
+								nullptr,
+								AfxGetInstanceHandle(),
+								nullptr);
+
+							if (hFullscreenTransitionSnapshot) {
+								POINT ptDst = {
+									fullscreenTransitionRect.left,
+									fullscreenTransitionRect.top
+								};
+								POINT ptSrc = { 0, 0 };
+								SIZE snapshotSize = {
+									fullscreenTransitionRect.Width(),
+									fullscreenTransitionRect.Height()
+								};
+
+								if (::UpdateLayeredWindow(
+										hFullscreenTransitionSnapshot,
+										hScreenDC,
+										&ptDst,
+										&snapshotSize,
+										hFullscreenTransitionSnapshotDC,
+										&ptSrc,
+										0,
+										nullptr,
+										ULW_OPAQUE)
+										&& ::SetWindowPos(
+											hFullscreenTransitionSnapshot,
+											HWND_TOPMOST,
+											fullscreenTransitionRect.left,
+											fullscreenTransitionRect.top,
+											fullscreenTransitionRect.Width(),
+											fullscreenTransitionRect.Height(),
+											SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOSENDCHANGING)) {
+									if (FAILED(DwmFlush())) {
+										CleanupFullscreenTransitionSnapshot();
+									}
+								} else {
+									CleanupFullscreenTransitionSnapshot();
+								}
+							}
+						}
+					}
+				}
+
+				::ReleaseDC(nullptr, hScreenDC);
+			}
+		}
+
+		if (!hFullscreenTransitionSnapshot) {
+			CleanupFullscreenTransitionSnapshot();
+		}
 	}
 
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
@@ -11252,15 +11391,24 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	m_bFullScreenChangingMode = false;
 	MoveVideoWindow();
 
-	// Reveal only after the final top-level and video-child geometry has been
-	// processed. Wait for the compositor to reach the transition's final
-	// presentation point first; unlike a forced RedrawWindow this does not
-	// synchronously repaint a stale pre-WM_SIZE child surface.
-	if (bCloakedForFullscreenTransition) {
+	if (hFullscreenTransitionSnapshot) {
+		::UpdateWindow(m_hWnd);
+		if (m_wndView.GetSafeHwnd()) {
+			::UpdateWindow(m_wndView.GetSafeHwnd());
+		}
+
+		// Remove the snapshot only after the final player geometry reaches DWM.
+		::SetWindowPos(
+			hFullscreenTransitionSnapshot,
+			HWND_TOPMOST,
+			0,
+			0,
+			0,
+			0,
+			SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW | SWP_NOSENDCHANGING);
 		DwmFlush();
 
-		const BOOL bCloak = FALSE;
-		DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+		CleanupFullscreenTransitionSnapshot();
 	}
 
 	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
