@@ -312,11 +312,8 @@ STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSize()
 {
 	SIZE size = {};
 	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
-		__int64 sizei64;
-		if (SUCCEEDED(pIExFilterConfig->Flt_GetInt64("originalVideoSize", &sizei64))) {
-			size.cx = static_cast<long>(sizei64 >> 32);
-			size.cy = static_cast<long>(sizei64 & 0xFFFFFFFF);
-
+		static_assert(sizeof(__int64) == sizeof(size));
+		if (SUCCEEDED(pIExFilterConfig->Flt_GetInt64("originalVideoSize", (__int64*)&size))) {
 			return size;
 		}
 	}
