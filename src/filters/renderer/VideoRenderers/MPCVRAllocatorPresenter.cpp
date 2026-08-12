@@ -310,13 +310,30 @@ STDMETHODIMP_(bool) CMPCVRAllocatorPresenter::GetFlip()
 
 STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSize()
 {
-	SIZE size = {0, 0};
+	SIZE Size = {};
+	if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pMPCVR.p) {
+		unsigned size = 0;
+		LPVOID pSize = nullptr;
+		if (SUCCEEDED(pIExFilterConfig->Flt_GetBin("originalVideoSize", &pSize, &size))) {
+			bool bOk = false;
+			if (size == sizeof(long) * 2) {
+				bOk = true;
+				memcpy(&Size.cx, pSize, sizeof(Size.cx));
+				memcpy(&Size.cy, reinterpret_cast<BYTE*>(pSize) + sizeof(Size.cx), sizeof(Size.cy));
+			}
+			LocalFree(pSize);
+
+			if (bOk) {
+				return Size;
+			}
+		}
+	}
 	if (CComQIPtr<IBasicVideo> pBV = m_pMPCVR.p) {
 		// Final size of the video, after all scaling and cropping operations
 		// This is also aspect ratio adjusted
-		pBV->GetVideoSize(&size.cx, &size.cy);
+		pBV->GetVideoSize(&Size.cx, &Size.cy);
 	}
-	return size;
+	return Size;
 }
 
 STDMETHODIMP_(SIZE) CMPCVRAllocatorPresenter::GetVideoSizeAR()
