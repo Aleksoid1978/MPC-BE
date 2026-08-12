@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -212,7 +212,12 @@ STDMETHODIMP_(int) CmadVRAllocatorPresenter::GetRotation()
 
 STDMETHODIMP_(SIZE) CmadVRAllocatorPresenter::GetVideoSize()
 {
-	SIZE size = {0, 0};
+	SIZE size = {};
+	if (CComQIPtr<IMadVRInfo> pMVRI = m_pMVR.p) {
+		if (SUCCEEDED(pMVRI->GetSize("originalVideoSize", &size))) {
+			return size;
+		}
+	}
 	if (CComQIPtr<IBasicVideo> pBV = m_pMVR.p) {
 		// Final size of the video, after all scaling and cropping operations
 		// This is also aspect ratio adjusted
