@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageAccelTbl.h"
+#include "Misc.h"
 
 //#define MASK_NUMBER  0xFFF
 #define DUP_KEY      (1<<12)
@@ -632,7 +633,7 @@ BOOL CPPageAccelTbl::OnApply()
 	if (s.hAccel) {
 		DestroyAcceleratorTable(s.hAccel);
 	}
-	s.hAccel = CreateAcceleratorTableW(Accel.data(), Accel.size());
+	s.hAccel = HandlerForCreateAcceleratorTable(Accel);
 
 	GetParentFrame()->m_hAccelTable = s.hAccel;
 

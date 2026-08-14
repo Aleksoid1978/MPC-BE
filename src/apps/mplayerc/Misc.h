@@ -36,6 +36,8 @@ void ConvertLongPath(CStringW& path);
 
 WORD AssignedKeyToCmd(UINT keyValue);
 
+HACCEL HandlerForCreateAcceleratorTable(std::vector<ACCEL>& Accel);
+
 enum :UINT {
 	MOUSE_CLICK_LEFT = 1,
 	MOUSE_CLICK_LEFT_DBL,
