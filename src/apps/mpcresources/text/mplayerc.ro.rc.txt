@@ -45,7 +45,7 @@ BEGIN DIALOGEX IDD_CAPTURE_DLG LINES 41
 26		"Înregistrează audio"
 27		"Previzualizare"
 32		"Preîncăr. V/A:"
-38		"Audio către wav"
+38		"Sunet către wav"
 39		"Înregistrează"
 END
 
@@ -300,9 +300,9 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 6		"Folosește tema „întunecată” (în mod implicit)"
-7		"Luminozitate: "
-9		"Setarea culorii indicatorului de sunet:"
-10		"Umplere:"
+7		"Luminozitatea:"
+9		"Culorile indicatorului de volum:"
+10		"Umplerea:"
 11		"B"
 12		"Fundalul:"
 13		"O"
@@ -314,14 +314,14 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 22		"Folosește efectul fundalului estompat (pentru Windows 10 și versiunile mai noi)"
 24		"Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)"
 26		"Dimensiunea controalelor:"
-29		"Folosește un indiciu de timp:"
+29		"Folosește indiciile de timp:"
 31		"Folosește previzualizarea în căutare"
 32		"Dimensiunea raportată la lățimea ecranului:"
 36		"Online"
-37		"Arată semne pentru capitole în bara de căutare"
+37		"Afișează semnele pentru capitole în bara de căutare"
 38		"Folosește bara pentru sărituri"
 39		"Dimensiunea scrisului (fontului) listei de redare:"
-42		"Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare)."
+42		"Folosește funcțiile din bara de activități din Windows 7 (și din versiunile ulterioare)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
