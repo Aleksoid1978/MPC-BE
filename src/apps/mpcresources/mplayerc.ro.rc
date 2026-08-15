@@ -106,7 +106,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,236,110,1
     EDITTEXT        IDC_EDIT4,10,239,91,13,ES_AUTOHSCROLL | ES_READONLY
     PUSHBUTTON      "...",IDC_BUTTON3,103,239,14,13
-    CONTROL         "Audio către wav",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
+    CONTROL         "Sunet către wav",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,272,65,9
     PUSHBUTTON      "Înregistrează",IDC_BUTTON2,75,270,45,13,WS_DISABLED | WS_GROUP
     COMBOBOX        IDC_COMBO14,10,254,107,18,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 END
@@ -426,10 +426,10 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "",IDC_STATIC,7,5,282,105
     CONTROL         "Folosește tema „întunecată” (în mod implicit)",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,5,114,9,WS_EX_TRANSPARENT
-    LTEXT           "Luminozitate: ",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Luminozitatea:",IDC_STATIC1,14,19,46,8,0,WS_EX_TRANSPARENT
     CONTROL         "",IDC_SLIDER1,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,58,19,165,12
-    LTEXT           "Setarea culorii indicatorului de sunet:",IDC_STATIC2,14,31,165,8
-    LTEXT           "Umplere:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
+    LTEXT           "Culorile indicatorului de volum:",IDC_STATIC2,14,31,165,8
+    LTEXT           "Umplerea:",IDC_STATIC_CLRFACE,14,43,46,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "B",IDC_BUTTON_CLRFACE,64,41,20,14
     LTEXT           "Fundalul:",IDC_STATIC_CLROUTLINE,94,43,44,8,0,WS_EX_TRANSPARENT
     PUSHBUTTON      "O",IDC_BUTTON_CLROUTLINE,140,41,20,14
@@ -441,14 +441,14 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Activează meniul întunecat",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Folosește efectul fundalului estompat (pentru Windows 10 și versiunile mai noi)",IDC_CHECK7,
+    CONTROL         "Folosește efectul fundalului estompat (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
-    CONTROL         "Activează titlul întunecat (pentru Windows 10 și versiunile ulterioare)",IDC_CHECK5,
+    CONTROL         "Activează titlul întunecat (pentru Windows 10 sau versiunile ulterioare)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,112,282,91
-    CONTROL         "Folosește un indiciu de timp:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
+    CONTROL         "Folosește indiciile de timp:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Folosește previzualizarea în căutare",IDC_CHECK_PRV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,135,224,9
     LTEXT           "Dimensiunea raportată la lățimea ecranului:",IDC_STATIC6,24,149,138,8
@@ -456,12 +456,12 @@ BEGIN
     LTEXT           "%",IDC_STATIC7,194,149,10,8
     COMBOBOX        IDC_COMBO4,207,148,42,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Online",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,241,135,47,9,WS_EX_TRANSPARENT
-    CONTROL         "Arată semne pentru capitole în bara de căutare",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
+    CONTROL         "Afișează semnele pentru capitole în bara de căutare",IDC_CHECK_CHM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,161,182,9
     CONTROL         "Folosește bara pentru sărituri",IDC_CHECK_FLYBAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,174,182,9
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și versiunile ulterioare).",IDC_CHECK_WIN7,
+    CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și din versiunile ulterioare).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
 

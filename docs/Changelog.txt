@@ -9,6 +9,7 @@ Player
 Fixed the issue with the Space bar when Japanese character input is active.
 
 Updated Bulgarian translation (by jekovcar).
+Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
 	ffmpeg n9.1-dev-861-gb16b5f2a01;
