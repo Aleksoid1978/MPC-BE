@@ -45,18 +45,17 @@ SECTION .text
     punpcklbw    m1, m7
     psubw        m1, m2
     psllw        m1, 2
+    movd         m2, %5
     paddw        m1, m0
     pxor         m6, m6
     pcmpgtw      m6, m1
+    punpcklbw    m2, m2
     pxor         m1, m6
     psubw        m1, m6
     psrlw        m1, 3
     packuswb     m1, m7
+    pshuflw      m2, m2, 0
     packsswb     m6, m7
-    movd         m2, %5
-    punpcklbw    m2, m2
-    punpcklbw    m2, m2
-    punpcklbw    m2, m2
     psubusb      m2, m1
     mova         m7, m2
     psubusb      m7, m1
@@ -86,9 +85,8 @@ SECTION .text
 %endmacro
 
 INIT_XMM sse2
-; void ff_h263_v_loop_filter_sse2(uint8_t *src, int stride, int qscale)
+; void ff_h263_v_loop_filter_sse2(uint8_t *src, ptrdiff_t stride, int qscale)
 cglobal h263_v_loop_filter, 3,5,8
-    movsxdifnidn r1, r1d
     movsxdifnidn r2, r2d
 
     lea          r3, [h263_loop_filter_strength]
@@ -118,10 +116,9 @@ cglobal h263_v_loop_filter, 3,5,8
 %endmacro
 
 
-; void ff_h263_h_loop_filter_sse2(uint8_t *src, int stride, int qscale)
+; void ff_h263_h_loop_filter_sse2(uint8_t *src, ptrdiff_t stride, int qscale)
 INIT_XMM sse2
 cglobal h263_h_loop_filter, 3,5,8,32
-    movsxdifnidn r1, r1d
     movsxdifnidn r2, r2d
 
     lea          r4, [h263_loop_filter_strength]

@@ -54,8 +54,9 @@ int ff_sws_pass_aligned_width(const SwsPass *pass, int width)
     return aligned_w <= INT_MAX ? aligned_w : width;
 }
 
-/* Allocates one buffer per plane */
-static int frame_alloc_planes(AVFrame *dst)
+/* Allocates (or refs) one buffer per plane */
+static int frame_alloc_planes_ref(AVFrame *dst, const AVFrame *src,
+                                  const int plane_copy[4])
 {
     int ret = av_image_check_size2(dst->width, dst->height, INT64_MAX,
                                    dst->format, 0, NULL);
@@ -63,7 +64,7 @@ static int frame_alloc_planes(AVFrame *dst)
         return ret;
 
     const int align = av_cpu_max_align();
-    const int aligned_w = FFALIGN(dst->width, align);
+    const int aligned_w = FFALIGN(dst->width + 1, align); /* add space for over-write */
     ret = av_image_fill_linesizes(dst->linesize, dst->format, aligned_w);
     if (ret < 0)
         return ret;
@@ -80,6 +81,17 @@ static int frame_alloc_planes(AVFrame *dst)
     for (int i = 0; i < 4; i++) {
         if (!sizes[i])
             break;
+        int src_idx = plane_copy[i];
+        if (src_idx >= 0 && src) {
+            /* Ref the source plane instead of allocating a new buffer */
+            dst->buf[i] = av_buffer_ref(src->buf[src_idx]);
+            if (!dst->buf[i])
+                return AVERROR(ENOMEM);
+            dst->data[i]     = src->data[src_idx];
+            dst->linesize[i] = src->linesize[src_idx];
+            continue;
+        }
+
         AVBufferRef *buf = av_buffer_alloc(sizes[i]);
         if (!buf)
             return AVERROR(ENOMEM);
@@ -143,8 +155,12 @@ static int pass_alloc_output(SwsPass *pass)
     }
 #endif
 
+    const AVFrame *src = NULL;
+    if (pass->input)
+        src = pass->input->output->avframe;
+
     avframe->format = pass->format;
-    ret = frame_alloc_planes(avframe);
+    ret = frame_alloc_planes_ref(avframe, src, buffer->plane_copy);
     if (ret < 0) {
         av_frame_free(&avframe);
         return ret;
@@ -207,6 +223,7 @@ int ff_sws_graph_add_pass(SwsGraph *graph, enum AVPixelFormat fmt,
     pass->output->height = height;
     pass->output->width  = width;
     pass->output->width_align = 1;
+    memset(pass->output->plane_copy, -1, sizeof(pass->output->plane_copy));
 
     if (!align) {
         pass->slice_h = pass->lines;
@@ -241,6 +258,13 @@ void ff_sws_pass_link_output(SwsPass *dst, const SwsPass *src)
     av_assert1(keep->height == drop->height);
     keep->width_align = FFMAX(keep->width_align, drop->width_align);
     keep->width_pad   = FFMAX(keep->width_pad,   drop->width_pad);
+
+    for (int i = 0; i < FF_ARRAY_ELEMS(keep->plane_copy); i++) {
+        if (keep->plane_copy[i] < 0)
+            keep->plane_copy[i] = drop->plane_copy[i];
+        else if (drop->plane_copy[i] >= 0)
+            av_assert1(keep->plane_copy[i] == drop->plane_copy[i]);
+    }
 
     av_refstruct_replace(&dst->output, src->output);
 }
@@ -790,19 +814,45 @@ static int init_passes(SwsGraph *graph)
             return ret;
     }
 
-    if (pass)
-        return 0;
+    if (!pass) {
+        /* No passes were added, so no operations were necessary */
+        graph->noop = 1;
 
-    /* No passes were added, so no operations were necessary */
-    graph->noop = 1;
+        const int nb_planes = av_pix_fmt_count_planes(dst.format);
+        for (int i = 0; i < nb_planes; i++)
+            graph->plane_copy[i] = i;
 
-    /* Add threaded memcpy pass */
-    return ff_sws_graph_add_pass(graph, dst.format, dst.width, dst.height,
-                                 pass, 0, 1, run_copy, NULL, NULL, NULL, &pass);
+        /* Add threaded memcpy pass */
+        return ff_sws_graph_add_pass(graph, dst.format, dst.width, dst.height,
+                                    pass, 0, 1, run_copy, NULL, NULL, NULL, &pass);
+    }
+
+    /* Compute end-to-end plane copy map */
+    for (int n = 0; n < graph->num_passes; n++) {
+        const SwsPass *pass = graph->passes[n];
+        /* This pass writes to an output buffer other than the image
+         * output, or copies from the output of a different pass */
+        if (pass->output->avframe || pass->input)
+            continue;
+        for (int i = 0; i < FF_ARRAY_ELEMS(graph->plane_copy); i++) {
+            const int idx = pass->output->plane_copy[i];
+            if (idx < 0)
+                continue;
+            if (graph->plane_copy[i] < 0) {
+                graph->plane_copy[i] = idx;
+                av_log(graph->ctx, AV_LOG_DEBUG, "Plane %d passthrough from "
+                       "plane %d\n", i, idx);
+            } else {
+                av_assert0(graph->plane_copy[i] == idx);
+            }
+        }
+    }
+
+    return 0;
 }
 
-static void sws_graph_worker(void *priv, int jobnr, int threadnr, int nb_jobs,
-                             int nb_threads)
+static int sws_graph_worker(void *priv, int jobnr, int threadnr, int nb_jobs,
+                            int nb_threads)
 {
     SwsGraph *graph = priv;
     const SwsPass *pass = graph->exec.pass;
@@ -810,6 +860,7 @@ static void sws_graph_worker(void *priv, int jobnr, int threadnr, int nb_jobs,
     const int slice_h = FFMIN(pass->slice_h, pass->lines - slice_y);
 
     pass->run(graph->exec.output, graph->exec.input, slice_y, slice_h, pass);
+    return 0;
 }
 
 SwsGraph *ff_sws_graph_alloc(void)
@@ -845,12 +896,13 @@ int ff_sws_graph_init(SwsGraph *graph, SwsContext *ctx, const SwsFormat *dst,
     graph->opts_copy = *ctx;
     av_assert0(src->interlaced == dst->interlaced);
     av_assert0(src->field      == dst->field);
+    memset(graph->plane_copy, -1, sizeof(graph->plane_copy));
 
     if (ctx->threads == 1) {
         graph->num_threads = 1;
     } else {
-        ret = avpriv_slicethread_create(&graph->slicethread, (void *) graph,
-                                        sws_graph_worker, NULL, ctx->threads);
+        ret = avpriv_slicethread_create2(&graph->slicethread, (void *) graph,
+                                         sws_graph_worker, NULL, ctx->threads);
         if (ret == AVERROR(ENOSYS)) {
             /* Fall back to single threaded operation */
             graph->num_threads = 1;
@@ -994,7 +1046,7 @@ int ff_sws_graph_run(SwsGraph *graph, const AVFrame *dst, const AVFrame *src)
         if (pass->num_slices == 1) {
             pass->run(graph->exec.output, graph->exec.input, 0, pass->lines, pass);
         } else {
-            avpriv_slicethread_execute(graph->slicethread, pass->num_slices, 0);
+            avpriv_slicethread_execute2(graph->slicethread, pass->num_slices, 0);
         }
     }
 

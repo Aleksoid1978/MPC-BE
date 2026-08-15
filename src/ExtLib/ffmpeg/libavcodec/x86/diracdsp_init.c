@@ -22,24 +22,33 @@
 #include "libavcodec/diracdsp.h"
 #include "fpel.h"
 
-void ff_add_rect_clamped_sse2(uint8_t *, const uint16_t *, int, const int16_t *, int, int, int);
+void ff_add_rect_clamped_sse2(uint8_t *dst, const uint16_t *src, ptrdiff_t stride,
+                              const int16_t *idwt, ptrdiff_t idwt_stride,
+                              int width, int height);
 
-void ff_add_dirac_obmc8_sse2(uint16_t *dst, const uint8_t *src, int stride, const uint8_t *obmc_weight, int yblen);
-void ff_add_dirac_obmc16_sse2(uint16_t *dst, const uint8_t *src, int stride, const uint8_t *obmc_weight, int yblen);
-void ff_add_dirac_obmc32_sse2(uint16_t *dst, const uint8_t *src, int stride, const uint8_t *obmc_weight, int yblen);
+void ff_add_dirac_obmc8_sse2(uint16_t *dst, const uint8_t *src, ptrdiff_t stride,
+                             const uint8_t *obmc_weight, int yblen);
+void ff_add_dirac_obmc16_sse2(uint16_t *dst, const uint8_t *src, ptrdiff_t stride,
+                              const uint8_t *obmc_weight, int yblen);
+void ff_add_dirac_obmc32_sse2(uint16_t *dst, const uint8_t *src, ptrdiff_t stride,
+                              const uint8_t *obmc_weight, int yblen);
 
-void ff_put_rect_clamped_sse2(uint8_t *dst, int dst_stride, const int16_t *src, int src_stride, int width, int height);
-void ff_put_signed_rect_clamped_sse2(uint8_t *dst, int dst_stride, const int16_t *src, int src_stride, int width, int height);
-void ff_put_signed_rect_clamped_10_sse4(uint8_t *dst, int dst_stride, const uint8_t *src, int src_stride, int width, int height);
+void ff_put_rect_clamped_sse2(uint8_t *dst, ptrdiff_t dst_stride, const int16_t *src,
+                              ptrdiff_t src_stride, int width, int height);
+void ff_put_signed_rect_clamped_sse2(uint8_t *dst, ptrdiff_t dst_stride, const uint8_t *src,
+                                     ptrdiff_t src_stride, int width, int height);
+void ff_put_signed_rect_clamped_10_sse4(uint8_t *dst, ptrdiff_t dst_stride, const uint8_t *src,
+                                        ptrdiff_t src_stride, int width, int height);
 
 void ff_dequant_subband_32_sse4(uint8_t *src, uint8_t *dst, ptrdiff_t stride, const int qf, const int qs, int tot_v, int tot_h);
 
 #define HPEL_FILTER(MMSIZE, EXT)                                                             \
-    void ff_dirac_hpel_filter_v_ ## EXT(uint8_t *, const uint8_t *, int, int);               \
-    void ff_dirac_hpel_filter_h_ ## EXT(uint8_t *, const uint8_t *, int);                    \
+    void ff_dirac_hpel_filter_v_ ## EXT(uint8_t *dst, const uint8_t *src,                    \
+                                        ptrdiff_t stride, int width);                        \
+    void ff_dirac_hpel_filter_h_ ## EXT(uint8_t *dst, const uint8_t *src, int width);        \
                                                                                              \
     static void dirac_hpel_filter_ ## EXT(uint8_t *dsth, uint8_t *dstv, uint8_t *dstc,       \
-                                          const uint8_t *src, int stride, int width, int height)   \
+                                          const uint8_t *src, ptrdiff_t stride, int width, int height)   \
     {                                                                                        \
         while( height-- )                                                                    \
         {                                                                                    \
@@ -56,7 +65,7 @@ void ff_dequant_subband_32_sse4(uint8_t *src, uint8_t *dst, ptrdiff_t stride, co
 
 #define DIRAC_PIXOP(OPNAME, EXT)\
 static void OPNAME ## _dirac_pixels16_ ## EXT(uint8_t *dst, const uint8_t *src[5], \
-                                              int stride, int h) \
+                                              ptrdiff_t stride, int h) \
 {\
     if (h&3)\
         ff_ ## OPNAME ## _dirac_pixels16_c(dst, src, stride, h);\
@@ -64,7 +73,7 @@ static void OPNAME ## _dirac_pixels16_ ## EXT(uint8_t *dst, const uint8_t *src[5
         ff_ ## OPNAME ## _pixels16_ ## EXT(dst, src[0], stride, h);\
 }\
 static void OPNAME ## _dirac_pixels32_ ## EXT(uint8_t *dst, const uint8_t *src[5], \
-                                              int stride, int h) \
+                                              ptrdiff_t stride, int h) \
 {\
     if (h&3) {\
         ff_ ## OPNAME ## _dirac_pixels32_c(dst, src, stride, h);\
@@ -86,7 +95,7 @@ void ff_diracdsp_init_x86(DiracDSPContext* c)
     if (EXTERNAL_SSE2(mm_flags)) {
         c->dirac_hpel_filter = dirac_hpel_filter_sse2;
         c->add_rect_clamped = ff_add_rect_clamped_sse2;
-        c->put_signed_rect_clamped[0] = (void *)ff_put_signed_rect_clamped_sse2;
+        c->put_signed_rect_clamped[0] = ff_put_signed_rect_clamped_sse2;
 
         c->add_dirac_obmc[0] = ff_add_dirac_obmc8_sse2;
         c->add_dirac_obmc[1] = ff_add_dirac_obmc16_sse2;

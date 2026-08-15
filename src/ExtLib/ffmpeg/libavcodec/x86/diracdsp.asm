@@ -37,21 +37,21 @@ SECTION .text
     mov%6   m5, %4
     mova    m4, %1
     mova    %2, m5
-    punpcklbw %1, m7
-    punpcklbw m5, m7
-    punpckhbw m4, m7
-    punpckhbw %2, m7
+    punpcklbw %1, m6
+    punpcklbw m5, m6
+    punpckhbw m4, m6
+    punpckhbw %2, m6
     paddw   %1, m5
     paddw   %2, m4
 %endmacro
 
-%macro HPEL_FILTER 1
-; dirac_hpel_filter_v_sse2(uint8_t *dst, uint8_t *src, int stride, int width);
-cglobal dirac_hpel_filter_v_%1, 4,6,8, dst, src, stride, width, src0, stridex3
+INIT_XMM sse2
+; ff_dirac_hpel_filter_v_sse2(uint8_t *dst, const uint8_t *src, ptrdiff_t stride, int width);
+cglobal dirac_hpel_filter_v, 4,6,7, dst, src, stride, width, src0, stridex3
     mov     src0q, srcq
     lea     stridex3q, [3*strideq]
     sub     src0q, stridex3q
-    pxor    m7, m7
+    pxor    m6, m6
 .loop:
     ; 7*(src[0] + src[1])
     UNPACK_ADD m0, m1, [srcq], [srcq + strideq], a,a
@@ -90,10 +90,10 @@ cglobal dirac_hpel_filter_v_%1, 4,6,8, dst, src, stride, width, src0, stridex3
     jg      .loop
     RET
 
-; dirac_hpel_filter_h_sse2(uint8_t *dst, uint8_t *src, int width);
-cglobal dirac_hpel_filter_h_%1, 3,3,8, dst, src, width
+; ff_dirac_hpel_filter_h_sse2(uint8_t *dst, const uint8_t *src, int width);
+cglobal dirac_hpel_filter_h, 3,3,7, dst, src, width
     dec     widthd
-    pxor    m7, m7
+    pxor    m6, m6
     and     widthd, ~(mmsize-1)
 .loop:
     ; 7*(src[0] + src[1])
@@ -129,18 +129,17 @@ cglobal dirac_hpel_filter_h_%1, 3,3,8, dst, src, width
     sub     widthd, mmsize
     jge     .loop
     RET
-%endmacro
 
-%macro PUT_RECT 1
-; void put_rect_clamped(uint8_t *dst, int dst_stride, int16_t *src, int src_stride, int width, int height)
-cglobal put_signed_rect_clamped_%1, 5,9,3, dst, dst_stride, src, src_stride, w, dst2, src2
+; void ff_put_signed_rect_clamped_sse2(uint8_t *dst, ptrdiff_t dst_stride,
+;                                      const uint8_t *src, ptrdiff_t src_stride,
+;                                      int width, int height)
+; note: src actually points to int16_t
+cglobal put_signed_rect_clamped, 5,9,3, dst, dst_stride, src, src_stride, w, dst2, src2
     mova    m0, [pb_80]
     add     wd, (mmsize-1)
     and     wd, ~(mmsize-1)
 
 %if ARCH_X86_64
-    movsxd   dst_strideq, dst_strided
-    movsxd   src_strideq, src_strided
     mov   r7d, r5m
     mov   r8d, wd
     %define wspill r8d
@@ -172,18 +171,16 @@ cglobal put_signed_rect_clamped_%1, 5,9,3, dst, dst_stride, src, src_stride, w, 
     mov     wd, wspill
     jg      .loopy
     RET
-%endm
 
-%macro ADD_RECT 1
-; void add_rect_clamped(uint8_t *dst, uint16_t *src, int stride, int16_t *idwt, int idwt_stride, int width, int height)
-cglobal add_rect_clamped_%1, 7,9,3, dst, src, stride, idwt, idwt_stride, w, h
+; void ff_add_rect_clamped_sse2(uint8_t *dst, const uint16_t *src, ptrdiff_t stride,
+;                               const int16_t *idwt, ptrdiff_t idwt_stride,
+;                               int width, int height)
+cglobal add_rect_clamped, 7,9,3, dst, src, stride, idwt, idwt_stride, w, h
     mova    m0, [pw_32]
     add     wd, (mmsize-1)
     and     wd, ~(mmsize-1)
 
 %if ARCH_X86_64
-    movsxd   strideq, strided
-    movsxd   idwt_strideq, idwt_strided
     mov   r8d, wd
     %define wspill r8d
 %else
@@ -212,13 +209,12 @@ cglobal add_rect_clamped_%1, 7,9,3, dst, src, stride, idwt, idwt_stride, w, h
     mov     wd, wspill
     jg      .loop
     RET
-%endm
 
-%macro ADD_OBMC 2
-; void add_obmc(uint16_t *dst, uint8_t *src, int stride, uint8_t *obmc_weight, int yblen)
-cglobal add_dirac_obmc%1_%2, 5,5,5, dst, src, stride, obmc, yblen
+%macro ADD_OBMC 1
+; void ff_add_dirac_obmc16/32_sse2(uint16_t *dst, const uint8_t *src,
+;                                  ptrdiff_t stride, const uint8_t *obmc_weight, int yblen)
+cglobal add_dirac_obmc%1, 5,5,5, dst, src, stride, obmc, yblen
     pxor        m4, m4
-    movsxdifnidn strideq, strided
 .loop:
 %assign i 0
 %rep %1 / mmsize
@@ -248,17 +244,11 @@ cglobal add_dirac_obmc%1_%2, 5,5,5, dst, src, stride, obmc, yblen
     RET
 %endm
 
-INIT_XMM
-PUT_RECT sse2
-ADD_RECT sse2
+ADD_OBMC 32
+ADD_OBMC 16
 
-HPEL_FILTER sse2
-ADD_OBMC 32, sse2
-ADD_OBMC 16, sse2
-
-cglobal add_dirac_obmc8_sse2, 5,5,4, dst, src, stride, obmc, yblen
+cglobal add_dirac_obmc8, 5,5,4, dst, src, stride, obmc, yblen
     pxor        m3, m3
-    movsxdifnidn strideq, strided
 .loop:
     movh        m0, [srcq]
     punpcklbw   m0, m3
@@ -314,7 +304,9 @@ cglobal dequant_subband_32, 7, 7, 4, src, dst, stride, qf, qs, tot_v, tot_h
     RET
 
 INIT_XMM sse4
-; void put_signed_rect_clamped_10(uint8_t *dst, int dst_stride, const uint8_t *src, int src_stride, int width, int height)
+; void ff_put_signed_rect_clamped_10_sse4(uint8_t *dst, ptrdiff_t dst_stride,
+;                                         const uint8_t *src, ptrdiff_t src_stride,
+;                                         int width, int height)
 %if ARCH_X86_64
 cglobal put_signed_rect_clamped_10, 6, 8, 5, dst, dst_stride, src, src_stride, w, h, t1, t2
 %else
@@ -326,7 +318,6 @@ cglobal put_signed_rect_clamped_10, 5, 7, 5, dst, dst_stride, src, src_stride, w
     neg      wq
     mov     t2q, dstq
     mov     t1q, wq
-    pxor     m2, m2
     mova     m3, [clip_10bit]
     mova     m4, [convert_to_unsigned_10bit]
 
@@ -341,7 +332,7 @@ cglobal put_signed_rect_clamped_10, 5, 7, 5, dst, dst_stride, src, src_stride, w
     paddd    m0, m4
     paddd    m1, m4
     packusdw m0, m0, m1
-    CLIPW    m0, m2, m3 ; packusdw saturates so it's fine
+    pminuw   m0, m3
 
     movu     [dstq], m0
 
