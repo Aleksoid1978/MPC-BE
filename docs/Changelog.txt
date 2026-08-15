@@ -2,6 +2,12 @@
 
 1.9.1.x dev
 =============================
+VideoRenderers
+Fixed retrieval of the original video frame size for MPC VR and madVR.
+
+Player
+Fixed the issue with the Space bar when Japanese character input is active.
+
 Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
