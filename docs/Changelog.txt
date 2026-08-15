@@ -5,7 +5,8 @@
 Updated Bulgarian translation (by jekovcar).
 
 Updated libraries:
-	ffmpeg n9.1-dev-861-gb16b5f2a01.
+	ffmpeg n9.1-dev-861-gb16b5f2a01;
+	nv-codec-headers n11.1.5.4.
 
 
 1.9.1 - 2026-08-08
