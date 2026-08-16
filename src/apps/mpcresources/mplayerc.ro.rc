@@ -180,7 +180,7 @@ END
 
 IDD_GOTO_DLG DIALOGEX 0, 0, 186, 120
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Mergi la..."
+CAPTION "Mergi la (Du-te la)..."
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Introdu un cod de timp folosind formatul [hh:]mm:ss.ms ([oo:]mm:ss.ms) pentru a sări la un timp specificat. Nu e nevoie să introduci separatorii în mod explicit.",IDC_STATIC,5,5,173,27
@@ -417,7 +417,7 @@ BEGIN
     CONTROL         "CD Audio",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,61,241,47,9
     GROUPBOX        "Meniul contextual pentru Explorator (pentru Explorer)",IDC_STATIC,117,217,118,24
     CONTROL         "Directoare",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,122,229,50,9
-    CONTROL         "Fișier(e)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
+    CONTROL         "Fișier (Fișiere)",IDC_CHECK7,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,176,229,55,9
 END
 
 IDD_PPAGEINTERFACE DIALOGEX 0, 0, 296, 264
@@ -443,7 +443,7 @@ BEGIN
     CONTROL         "Activează meniul întunecat",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
     CONTROL         "Folosește efectul fundalului estompat (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
-    CONTROL         "Activează titlul întunecat (pentru Windows 10 sau versiunile ulterioare)",IDC_CHECK5,
+    CONTROL         "Activează titlul întunecat (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -461,7 +461,7 @@ BEGIN
     LTEXT           "Dimensiunea scrisului (fontului) listei de redare:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și din versiunile ulterioare).",IDC_CHECK_WIN7,
+    CONTROL         "Folosește funcțiile din bara de activități din Windows 7 (și din versiunile mai noi).",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
 
@@ -1747,7 +1747,7 @@ BEGIN
         MENUITEM "R&edă/Pune pe pauză (Întrerupe)",            ID_PLAY_PLAYPAUSE
         MENUITEM "&Oprește",                 ID_PLAY_STOP
         MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
-        MENUITEM "&Mergi la...",             ID_PLAY_GOTO
+        MENUITEM "&Mergi la (Du-te la)...",             ID_PLAY_GOTO
         POPUP "&Repetă"
         BEGIN
             MENUITEM "La nesfârșit (&Pentru totdeauna)", ID_REPEAT_FOREVER
@@ -2015,7 +2015,7 @@ BEGIN
             MENUITEM "R&edă/Pune pe pauză (Întrerupe)",            ID_PLAY_PLAYPAUSE
             MENUITEM "&Oprește",                 ID_PLAY_STOP
             MENUITEM "Pas de cad&ru",            ID_PLAY_FRAMESTEP
-            MENUITEM "&Mergi la...",             ID_PLAY_GOTO
+            MENUITEM "&Mergi la (Du-te la)...",             ID_PLAY_GOTO
             POPUP "&Repetă"
             BEGIN
                 MENUITEM "La nesfârșit (Pentru &totdeauna)", ID_REPEAT_FOREVER
@@ -2545,7 +2545,7 @@ BEGIN
     IDS_AG_SUBDELAY_DEC     "Întârzie subtitrarea -"
     IDS_AG_SUBDELAY_INC     "Întârzie subtitrarea +"
     IDS_FILE_SAVE_THUMBNAILS "Salvează miniaturi"
-    IDS_OSD_TEST            "Test pentru OSD (On Screen Diplay / Afișare pe ecran)"
+    IDS_OSD_TEST            "Test pentru OSD (Test pentru On Screen Diplay / Test pentru afișarea pe ecran)"
     IDS_ADDITIONAL_AUDIO_PATHS ".\\fandub;"
 END
 
@@ -2838,8 +2838,8 @@ STRINGTABLE
 BEGIN
     IDS_OSD_ZOOM_AUTO       "Scalare: Automată"
     IDS_CUSTOM_CHANNEL_MAPPING "Comută repartizarea particularizată a canalelor"
-    IDS_OSD_CUSTOM_CH_MAPPING_ON "Repartizare particularizată a canalelor: Pornită"
-    IDS_OSD_CUSTOM_CH_MAPPING_OFF "Repartizare particularizată a canalelor: Oprită"
+    IDS_OSD_CUSTOM_CH_MAPPING_ON "Repartizarea particularizată a canalelor: Pornită"
+    IDS_OSD_CUSTOM_CH_MAPPING_OFF "Repartizarea particularizată a canalelor: Oprită"
     IDS_TOGGLE_AUTOVOLUMECONTROL "Comută controlul automat al volumului"
     IDS_OSD_AUTOVOLUMECONTROL_ON "Controlul volumului automat: Pornit"
     IDS_OSD_AUTOVOLUMECONTROL_OFF "Controlul automat al volumului: Oprit"
@@ -2865,7 +2865,7 @@ BEGIN
     IDS_AG_STOP             "Oprește"
     IDS_AG_FRAMESTEP        "Deplasează cu un cadru"
     IDS_AG_FRAMESTEP_BACK   "Deplasează-te cu un cadru înapoi"
-    IDS_AG_GO_TO            "Mergi la"
+    IDS_AG_GO_TO            "Mergi la (Du-te la)"
     IDS_AG_INCREASE_RATE    "Mărește rata de redare (Crește viteza)"
 END
 
@@ -3019,13 +3019,13 @@ BEGIN
     IDS_REPEAT_FOREVER      "Repetă la nesfârșit (Repetă pentru totdeauna)"
     IDS_REPEAT_FOREVER_OFF  "Repetă la nesfârșit (Repetă pentru totdeauna): Oprit"
     IDS_REPEAT_FOREVER_ON   "Repetă la nesfârșit (Repetă pentru totdeauna): Pornit"
-    IDS_MPLAYERC_98         "OSD: Timpul rămas"
+    IDS_MPLAYERC_98         "OSD (On Screen Diplay / Afișare pe ecran): Timpul rămas"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_AG_OSD_LOCAL_TIME   "OSD: ora locală"
-    IDS_AG_OSD_FILE_NAME    "OSD: numele fișierului"
+    IDS_AG_OSD_LOCAL_TIME   "OSD (On Screen Diplay / Afișare pe ecran): ora locală"
+    IDS_AG_OSD_FILE_NAME    "OSD (On Screen Diplay / Afișare pe ecran): numele fișierului"
 END
 
 STRINGTABLE
