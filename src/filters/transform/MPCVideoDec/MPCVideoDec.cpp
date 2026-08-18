@@ -3515,9 +3515,11 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 	switch(color_trc) {
 		case AVCOL_TRC_BT709:
 		case AVCOL_TRC_SMPTE170M:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_709;
+			break;
 		case AVCOL_TRC_BT2020_10:
 		case AVCOL_TRC_BT2020_12:
-			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_709;
+			fmt.VideoTransferFunction = (colorspace == AVCOL_SPC_BT2020_CL) ? MFVideoTransFunc_2020_const : MFVideoTransFunc_2020;
 			break;
 		case AVCOL_TRC_GAMMA22:
 			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_22;
