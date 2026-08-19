@@ -2384,6 +2384,17 @@ int ff_dca_core_filter_frame(DCACoreDecoder *s, AVFrame *frame)
     else
         avctx->bit_rate = 0;
 
+    if (s->request_mask == s->ch_mask && s->prim_dmix_embedded &&
+        !s->sumdiff_front && !s->sumdiff_surround &&
+        !(s->ext_audio_mask & (DCA_CSS_XXCH | DCA_CSS_XCH | DCA_EXSS_XXCH)) &&
+        s->audio_mode >= DCA_AMODE_2F2R && (s->prim_dmix_type == DCA_DMIX_TYPE_LoRo ||
+                                            s->prim_dmix_type == DCA_DMIX_TYPE_LtRt)) {
+        ret = ff_dca_export_downmix_matrix(avctx, frame, s->prim_dmix_type, s->ch_mask,
+                                           s->prim_dmix_coeff);
+        if (ret < 0)
+            return ret;
+    }
+
     if (s->audio_mode == DCA_AMODE_STEREO_TOTAL || (s->request_mask != s->ch_mask &&
                                                     s->prim_dmix_type == DCA_DMIX_TYPE_LtRt))
         matrix_encoding = AV_MATRIX_ENCODING_DOLBY;

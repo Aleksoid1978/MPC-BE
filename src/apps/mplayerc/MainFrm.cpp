@@ -1278,8 +1278,14 @@ void CMainFrame::ShowTrayIcon(bool fShow)
 	}
 }
 
-void CMainFrame::SetTrayTip(CString str)
+void CMainFrame::SetTrayTip(const CStringW& str)
 {
+	static CStringW TrayTipStr;
+	if (TrayTipStr == str) {
+		return;
+	}
+	TrayTipStr = str;
+
 	NOTIFYICONDATAW tnid;
 	tnid.cbSize = sizeof(NOTIFYICONDATAW);
 	tnid.hWnd = m_hWnd;
@@ -5762,9 +5768,35 @@ LRESULT CMainFrame::OnRestore(WPARAM wParam, LPARAM lParam)
 {
 	if (m_bTrayIcon) {
 		if (!IsWindowVisible()) {
+			// Rebuild the frame/view layout before exposing the hidden window.
+			RecalcLayout();
+
+			// Keep the frame compositor-cloaked on Windows 8+ until its final child
+			// layout and renderer destination have been painted.
+			bool bCloakedForRestore = false;
+			if (SysVersion::IsWin8orLater()) {
+				const BOOL bCloak = TRUE;
+				bCloakedForRestore = SUCCEEDED(DwmSetWindowAttribute(
+					m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+			}
+
 			ShowWindow(SW_SHOW);
+
+			// Showing the frame can change the effective client metrics.
+			RecalcLayout();
+			MoveVideoWindow(false, true);
+			RepaintVideo(true);
+			RedrawWindow(nullptr, nullptr,
+				RDW_INVALIDATE | RDW_ERASE | RDW_FRAME | RDW_ALLCHILDREN | RDW_UPDATENOW);
+
+			if (bCloakedForRestore) {
+				// Present only the completed frame, never the intermediate restore state.
+				DwmFlush();
+				const BOOL bCloak = FALSE;
+				DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+			}
+
 			CreateThumbnailToolbar();
-			MoveVideoWindow();
 			SetForegroundWindow();
 
 			for (const auto& pDockingBar : m_dockingbarsVisible) {
@@ -11106,6 +11138,17 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreen = !m_bFullScreen;
 
+	// Keep the main HWND logically visible so the normal MFC/child layout runs
+	// during the fullscreen resize, but temporarily remove it from DWM
+	// presentation while its frame and geometry are being rewritten.  Cloaking
+	// is Windows 8+, so Windows 7 and earlier retain the original code path.
+	bool bCloakedForFullscreenTransition = false;
+	if (SysVersion::IsWin8orLater() && IsWindowVisible()) {
+		const BOOL bCloak = TRUE;
+		bCloakedForFullscreenTransition = SUCCEEDED(DwmSetWindowAttribute(
+			m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
+	}
+
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 
 	static bool bChangeMonitor = false;
@@ -11218,6 +11261,17 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreenChangingMode = false;
 	MoveVideoWindow();
+
+	// Reveal only after the final top-level and video-child geometry has been
+	// processed. Wait for the compositor to reach the transition's final
+	// presentation point first; unlike a forced RedrawWindow this does not
+	// synchronously repaint a stale pre-WM_SIZE child surface.
+	if (bCloakedForFullscreenTransition) {
+		DwmFlush();
+
+		const BOOL bCloak = FALSE;
+		DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
+	}
 
 	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();

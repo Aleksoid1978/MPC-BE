@@ -834,6 +834,7 @@ SRCS_LS = \
 	libswscale/hscale.c \
 	libswscale/hscale_fast_bilinear.c \
 	libswscale/input.c \
+	libswscale/jit.c \
 	libswscale/lut3d.c \
 	libswscale/options.c \
 	libswscale/output.c \

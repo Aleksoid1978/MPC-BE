@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include <stdint.h>
 #include <string.h>
 
@@ -165,11 +167,20 @@ static int nvdec_h264_decode_slice(AVCodecContext *avctx, const uint8_t *buffer,
 }
 
 static int nvdec_h264_frame_params(AVCodecContext *avctx,
-                                   AVBufferRef *hw_frames_ctx)
+                                   AVBufferRef *hw_frames_ctx,
+                                   enum AVPixelFormat hw_format)
 {
     const H264Context *h = avctx->priv_data;
     const SPS       *sps = h->ps.sps;
-    return ff_nvdec_frame_params(avctx, hw_frames_ctx, sps->ref_frame_count + sps->num_reorder_frames, 0);
+    return ff_nvdec_frame_params(avctx, hw_frames_ctx, hw_format,
+                                 sps->ref_frame_count + sps->num_reorder_frames, 0);
+}
+
+#if CONFIG_H264_NVDEC_HWACCEL
+static int nvdec_h264_cuda_frame_params(AVCodecContext *avctx,
+                                        AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_h264_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUDA);
 }
 
 const FFHWAccel ff_h264_nvdec_hwaccel = {
@@ -180,8 +191,31 @@ const FFHWAccel ff_h264_nvdec_hwaccel = {
     .start_frame          = nvdec_h264_start_frame,
     .end_frame            = ff_nvdec_end_frame,
     .decode_slice         = nvdec_h264_decode_slice,
-    .frame_params         = nvdec_h264_frame_params,
+    .frame_params         = nvdec_h264_cuda_frame_params,
     .init                 = ff_nvdec_decode_init,
     .uninit               = ff_nvdec_decode_uninit,
     .priv_data_size       = sizeof(NVDECContext),
 };
+#endif
+
+#if CONFIG_H264_NVDEC_CUARRAY_HWACCEL
+static int nvdec_h264_cuarray_frame_params(AVCodecContext *avctx,
+                                           AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_h264_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUARRAY);
+}
+
+const FFHWAccel ff_h264_nvdec_cuarray_hwaccel = {
+    .p.name               = "h264_nvdec_cuarray",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_H264,
+    .p.pix_fmt            = AV_PIX_FMT_CUARRAY,
+    .start_frame          = nvdec_h264_start_frame,
+    .end_frame            = ff_nvdec_end_frame,
+    .decode_slice         = nvdec_h264_decode_slice,
+    .frame_params         = nvdec_h264_cuarray_frame_params,
+    .init                 = ff_nvdec_decode_init,
+    .uninit               = ff_nvdec_decode_uninit,
+    .priv_data_size       = sizeof(NVDECContext),
+};
+#endif

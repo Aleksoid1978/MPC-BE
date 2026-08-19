@@ -1,9 +1,5 @@
 /*
- * Format Conversion Utils
- * Copyright (c) 2000, 2001 Fabrice Bellard
- * Copyright (c) 2002-2004 Michael Niedermayer <michaelni@gmx.at>
- *
- * MMX optimization by Nick Kurshev <nickols_k@mail.ru>
+ * Copyright (C) 2026 Ramiro Polla <ramiro.polla@gmail.com>
  *
  * This file is part of FFmpeg.
  *
@@ -22,18 +18,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "libavutil/attributes.h"
-#include "libavutil/cpu.h"
-#include "libavutil/x86/cpu.h"
-#include "libavcodec/fmtconvert.h"
+#ifndef SWSCALE_JIT_H
+#define SWSCALE_JIT_H
 
-void ff_int32_to_float_fmul_scalar_sse2(float *dst, const int32_t *src, float mul, int len);
+#include <stddef.h>
 
-av_cold void ff_fmt_convert_init_x86(FmtConvertContext *c)
-{
-    int cpu_flags = av_get_cpu_flags();
+/* Allocate size bytes of writable memory for JIT code generation. */
+void *ff_sws_jit_alloc(size_t size);
 
-    if (EXTERNAL_SSE2(cpu_flags)) {
-        c->int32_to_float_fmul_scalar = ff_int32_to_float_fmul_scalar_sse2;
-    }
-}
+/* Protect JIT memory from further writes. */
+int ff_sws_jit_protect(void *ptr, size_t size);
+
+/* Free memory allocated by ff_sws_jit_alloc(). */
+void ff_sws_jit_free(void *ptr, size_t size);
+
+#endif /* SWSCALE_JIT_H */

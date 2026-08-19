@@ -22,21 +22,10 @@
 #include "config.h"
 
 #define _DEFAULT_SOURCE
-#define _SVID_SOURCE // needed for MAP_ANONYMOUS
-#define _DARWIN_C_SOURCE // needed for MAP_ANON
 #include <inttypes.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#if HAVE_MMAP
-#include <sys/mman.h>
-#if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
-#define MAP_ANONYMOUS MAP_ANON
-#endif
-#endif
-#if HAVE_VIRTUALALLOC
-#include <windows.h>
-#endif
 
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
@@ -55,7 +44,6 @@
 #include "libavutil/thread.h"
 #include "libavutil/aarch64/cpu.h"
 #include "libavutil/ppc/cpu.h"
-#include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
 #include "libavutil/loongarch/cpu.h"
 
@@ -63,6 +51,7 @@
 #include "swscale.h"
 #include "swscale_internal.h"
 #include "graph.h"
+#include "jit.h"
 
 #if CONFIG_VULKAN
 #include "vulkan/ops.h"
@@ -1647,12 +1636,6 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
         }
     }
 
-#if HAVE_MMAP && HAVE_MPROTECT && defined(MAP_ANONYMOUS)
-#define USE_MMAP 1
-#else
-#define USE_MMAP 0
-#endif
-
     /* precalculate horizontal scaler filter coefficients */
     {
 #if HAVE_MMXEXT_INLINE
@@ -1663,35 +1646,9 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
             c->chrMmxextFilterCodeSize = ff_init_hscaler_mmxext(c->chrDstW, c->chrXInc,
                                                              NULL, NULL, NULL, 4);
 
-#if USE_MMAP
-            c->lumMmxextFilterCode = mmap(NULL, c->lumMmxextFilterCodeSize,
-                                          PROT_READ | PROT_WRITE,
-                                          MAP_PRIVATE | MAP_ANONYMOUS,
-                                          -1, 0);
-            c->chrMmxextFilterCode = mmap(NULL, c->chrMmxextFilterCodeSize,
-                                          PROT_READ | PROT_WRITE,
-                                          MAP_PRIVATE | MAP_ANONYMOUS,
-                                          -1, 0);
-#elif HAVE_VIRTUALALLOC
-            c->lumMmxextFilterCode = VirtualAlloc(NULL,
-                                                  c->lumMmxextFilterCodeSize,
-                                                  MEM_COMMIT,
-                                                  PAGE_EXECUTE_READWRITE);
-            c->chrMmxextFilterCode = VirtualAlloc(NULL,
-                                                  c->chrMmxextFilterCodeSize,
-                                                  MEM_COMMIT,
-                                                  PAGE_EXECUTE_READWRITE);
-#else
-            c->lumMmxextFilterCode = av_malloc(c->lumMmxextFilterCodeSize);
-            c->chrMmxextFilterCode = av_malloc(c->chrMmxextFilterCodeSize);
-#endif
-
-#ifdef MAP_ANONYMOUS
-            if (c->lumMmxextFilterCode == MAP_FAILED || c->chrMmxextFilterCode == MAP_FAILED)
-#else
-            if (!c->lumMmxextFilterCode || !c->chrMmxextFilterCode)
-#endif
-            {
+            c->lumMmxextFilterCode = ff_sws_jit_alloc(c->lumMmxextFilterCodeSize);
+            c->chrMmxextFilterCode = ff_sws_jit_alloc(c->chrMmxextFilterCodeSize);
+            if (!c->lumMmxextFilterCode || !c->chrMmxextFilterCode) {
                 av_log(c, AV_LOG_ERROR, "Failed to allocate MMX2FilterCode\n");
                 return AVERROR(ENOMEM);
             }
@@ -1707,14 +1664,11 @@ av_cold int ff_sws_init_single_context(SwsContext *sws, SwsFilter *srcFilter,
             ff_init_hscaler_mmxext(c->chrDstW, c->chrXInc, c->chrMmxextFilterCode,
                                 c->hChrFilter, (uint32_t*)c->hChrFilterPos, 4);
 
-#if USE_MMAP
-            if (   mprotect(c->lumMmxextFilterCode, c->lumMmxextFilterCodeSize, PROT_EXEC | PROT_READ) == -1
-                || mprotect(c->chrMmxextFilterCode, c->chrMmxextFilterCodeSize, PROT_EXEC | PROT_READ) == -1) {
+            if ((ret = ff_sws_jit_protect(c->lumMmxextFilterCode, c->lumMmxextFilterCodeSize)) < 0 ||
+                (ret = ff_sws_jit_protect(c->chrMmxextFilterCode, c->chrMmxextFilterCodeSize)) < 0) {
                 av_log(c, AV_LOG_ERROR, "mprotect failed, cannot use fast bilinear scaler\n");
-                ret = AVERROR(EINVAL);
                 goto fail;
             }
-#endif
         } else
 #endif /* HAVE_MMXEXT_INLINE */
         {
@@ -1886,8 +1840,8 @@ static int context_init_threaded(SwsContext *sws,
     SwsInternal *c = sws_internal(sws);
     int ret;
 
-    ret = avpriv_slicethread_create(&c->slicethread, (void*) sws,
-                                    ff_sws_slice_worker, NULL, sws->threads);
+    ret = avpriv_slicethread_create2(&c->slicethread, (void*) sws,
+                                     ff_sws_slice_worker, NULL, sws->threads);
     if (ret == AVERROR(ENOSYS)) {
         sws->threads = 1;
         return 0;
@@ -1897,8 +1851,7 @@ static int context_init_threaded(SwsContext *sws,
     sws->threads = ret;
 
     c->slice_ctx = av_calloc(sws->threads, sizeof(*c->slice_ctx));
-    c->slice_err = av_calloc(sws->threads, sizeof(*c->slice_err));
-    if (!c->slice_ctx || !c->slice_err)
+    if (!c->slice_ctx)
         return AVERROR(ENOMEM);
 
     for (int i = 0; i < sws->threads; i++) {
@@ -2310,7 +2263,6 @@ void sws_freeContext(SwsContext *sws)
     for (i = 0; i < c->nb_slice_ctx; i++)
         sws_freeContext(c->slice_ctx[i]);
     av_freep(&c->slice_ctx);
-    av_freep(&c->slice_err);
 
     avpriv_slicethread_free(&c->slicethread);
 
@@ -2336,20 +2288,8 @@ void sws_freeContext(SwsContext *sws)
     av_freep(&c->hChrFilterPos);
 
 #if HAVE_MMX_INLINE
-#if USE_MMAP
-    if (c->lumMmxextFilterCode)
-        munmap(c->lumMmxextFilterCode, c->lumMmxextFilterCodeSize);
-    if (c->chrMmxextFilterCode)
-        munmap(c->chrMmxextFilterCode, c->chrMmxextFilterCodeSize);
-#elif HAVE_VIRTUALALLOC
-    if (c->lumMmxextFilterCode)
-        VirtualFree(c->lumMmxextFilterCode, 0, MEM_RELEASE);
-    if (c->chrMmxextFilterCode)
-        VirtualFree(c->chrMmxextFilterCode, 0, MEM_RELEASE);
-#else
-    av_free(c->lumMmxextFilterCode);
-    av_free(c->chrMmxextFilterCode);
-#endif
+    ff_sws_jit_free(c->lumMmxextFilterCode, c->lumMmxextFilterCodeSize);
+    ff_sws_jit_free(c->chrMmxextFilterCode, c->chrMmxextFilterCodeSize);
     c->lumMmxextFilterCode = NULL;
     c->chrMmxextFilterCode = NULL;
 #endif /* HAVE_MMX_INLINE */
@@ -2499,4 +2439,27 @@ int ff_range_add(RangeList *rl, unsigned int start, unsigned int len)
     }
 
     return 0;
+}
+
+int ff_sws_thread_exec(void *priv,
+                       int (*func)(void *priv, int jobnr, int threadnr, int nb_jobs, int nb_threads),
+                       int nb_threads, int nb_jobs)
+{
+    AVSliceThread *slicethread;
+    int ret = avpriv_slicethread_create2(&slicethread, priv, func, NULL, nb_threads);
+    if (ret == AVERROR(ENOSYS)) {
+        /* Fallback for build configurations without threading */
+        for (int i = 0; i < nb_jobs; i++) {
+            int ret = func(priv, i, 0, nb_jobs, 1);
+            if (ret)
+                return ret;
+        }
+        return 0;
+    } else if (ret < 0) {
+        return ret;
+    }
+
+    ret = avpriv_slicethread_execute2(slicethread, nb_jobs, 0);
+    avpriv_slicethread_free(&slicethread);
+    return ret;
 }

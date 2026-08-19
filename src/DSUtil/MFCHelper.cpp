@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,9 +23,9 @@
 
 #include <utility>
 
-CString ResStr(UINT nID)
+CStringW ResStr(UINT nID)
 {
-	CString id;
+	CStringW id;
 	if (!id.LoadStringW(nID)) {
 		std::ignore = id.LoadStringW(AfxGetApp()->m_hInstance, nID);
 	}
@@ -45,15 +45,16 @@ void SetCursor(HWND m_hWnd, UINT nID, LPCWSTR lpCursorName)
 
 void CorrectComboListWidth(CComboBox& ComboBox)
 {
-	if (ComboBox.GetCount() <= 0)
+	if (ComboBox.GetCount() <= 0) {
 		return;
+	}
 
-	CString    str;
-	CSize      sz;
-	TEXTMETRIC tm;
-	int        dx		= 0;
-	CDC*       pDC		= ComboBox.GetDC();
-	CFont*     pFont	= ComboBox.GetFont();
+	CStringW    str;
+	CSize       sz;
+	TEXTMETRICW tm;
+	int         dx		= 0;
+	CDC*        pDC		= ComboBox.GetDC();
+	CFont*      pFont	= ComboBox.GetFont();
 
 	// Select the listbox font, save the old font
 	CFont* pOldFont = pDC->SelectObject(pFont);
@@ -98,11 +99,11 @@ void CorrectCWndWidth(CWnd* pWnd)
 	CFont* pFont = pWnd->GetFont();
 	CFont* pOldFont = pDC->SelectObject(pFont);
 
-	CString str;
+	CStringW str;
 	pWnd->GetWindowTextW(str);
 	CSize szText = pDC->GetTextExtent(str);
 
-	TEXTMETRIC tm;
+	TEXTMETRICW tm;
 	pDC->GetTextMetricsW(&tm);
 	pDC->SelectObject(pOldFont);
 	pWnd->ReleaseDC(pDC);
@@ -118,7 +119,7 @@ void CorrectCWndWidth(CWnd* pWnd)
 extern void SetMenuRadioCheck(CCmdUI* pCmdUI, bool bCheck)
 {
 	if (IsMenu(*pCmdUI->m_pMenu)) {
-		MENUITEMINFO mii = { sizeof(mii) };
+		MENUITEMINFOW mii = { sizeof(mii) };
 		mii.fMask = MIIM_FTYPE | MIIM_STATE;
 		mii.fType = bCheck ? MFT_RADIOCHECK : MFT_STRING;
 		mii.fState = bCheck ? MFS_CHECKED : MFS_UNCHECKED;

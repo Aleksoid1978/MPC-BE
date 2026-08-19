@@ -29,6 +29,7 @@
 
 #include "graph.h"
 #include "filters.h"
+#include "lut3d.h"
 #include "rational64.h"
 #include "uops.h"
 
@@ -62,6 +63,9 @@ typedef enum SwsOpType {
     SWS_OP_FILTER_H,        /* horizontal filtering */
     SWS_OP_FILTER_V,        /* vertical filtering */
 
+    /* Table-based operations. Defined for floating point types only. */
+    SWS_OP_LUT_3D,          /* apply a SwsLut3D */
+
     SWS_OP_TYPE_NB,
 } SwsOpType;
 
@@ -85,6 +89,9 @@ typedef struct SwsComps {
     /* Keeps track of the known possible value range, or {0, 0} for undefined
      * or (unknown range) floating point inputs */
     AVRational64 min[4], max[4];
+
+    /* Keeps track of input (forward) and output (reverse) dependencies */
+    SwsCompMask dep_in[4], dep_out[4];
 } SwsComps;
 
 typedef enum SwsReadWriteMode {
@@ -189,23 +196,43 @@ typedef struct SwsLinearOp {
      *   [ Out.y ] = [ F G H I J ] * [ x y z w 1 ]
      *   [ Out.z ] = [ K L M N O ]
      *   [ Out.w ] = [ P Q R S T ]
-     *
-     * The mask keeps track of which components differ from an identity matrix.
-     * There may be more efficient implementations of particular subsets, for
-     * example the common subset of {A, E, G, J, M, O} can be implemented with
-     * just three fused multiply-add operations.
      */
     AVRational64 m[4][5];
-    uint32_t mask; /* m[i][j] <-> 1 << (5 * i + j) */
 } SwsLinearOp;
 
-/* Helper function to compute the correct mask */
+/* m[i][j] <-> 1 << (5 * i + j) */
 uint32_t ff_sws_linear_mask(const SwsLinearOp *c);
 
 typedef struct SwsFilterOp {
     SwsFilterWeights *kernel; /* filter kernel (refstruct) */
     SwsPixelType type;        /* pixel type to store result as */
 } SwsFilterOp;
+
+typedef struct SwsLut3dOp {
+    /**
+     * Reference to the external LUT3D to apply. This is managed by the caller,
+     * and must remain valid for the lifetime of the SwsOp and any compiled
+     * functions derived from it.
+     *
+     * *lut is never dereferenced by the SwsOp code itself, only at runtime by
+     * the actual dispatched implementation, and may be freely modified even
+     * after op compilation to place new values for dynamic tone-mapping.
+     *
+     * The reference algorithm for this operation lives in lut3d.c, and
+     * includes a tetrahedral interpolation component for the input LUT, and
+     * then an optional linear tone mapping LUT plus trilinear output LUT
+     * (when lut->dynamic is true).
+     *
+     * All linear interpolations are performed in the pixel value's native
+     * representation, even though the LUTs themselves are stored as unsigned
+     * packed 16-bit integers. The input value range is assumed to be scaled
+     * and clamped to the LUT's domain (i.e. [0, INPUT_LUT_SIZE - 1]), and the
+     * output value range will be [0, 2^16-1], except for the alpha channel,
+     * which is passed through untouched.
+     */
+    const SwsLut3D *lut; /* refstruct */
+    bool dynamic;
+} SwsLut3dOp;
 
 typedef struct SwsOp {
     SwsOpType op;      /* operation to perform */
@@ -222,6 +249,7 @@ typedef struct SwsOp {
         SwsScaleOp      scale;
         SwsDitherOp     dither;
         SwsFilterOp     filter;
+        SwsLut3dOp      lut3d;
     };
 
     /**

@@ -4102,6 +4102,9 @@ const FFCodec ff_mpeg4_decoder = {
 #if CONFIG_MPEG4_NVDEC_HWACCEL
                                HWACCEL_NVDEC(mpeg4),
 #endif
+#if CONFIG_MPEG4_NVDEC_CUARRAY_HWACCEL
+                               HWACCEL_NVDEC_CUARRAY(mpeg4),
+#endif
 #if CONFIG_MPEG4_VAAPI_HWACCEL
                                HWACCEL_VAAPI(mpeg4),
 #endif

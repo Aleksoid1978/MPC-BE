@@ -265,7 +265,8 @@ static const DWORD GetFourcc(AP4_VisualSampleEntry* vse)
 		fourcc = FCC('VP90');
 		break;
 	case AP4_ATOM_TYPE_av01:
-		fourcc = FCC('AV01');
+	case AP4_ATOM_TYPE_dav1:
+		fourcc = FCC('AV01'); // fix for LAV Video Decoder
 		break;
 	default:
 		fourcc = _byteswap_ulong(type);
@@ -1420,6 +1421,7 @@ HRESULT CMP4SplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 								}
 								break;
 							case AP4_ATOM_TYPE_av01:
+							case AP4_ATOM_TYPE_dav1:
 								{
 									bool bReadAV1C = false;
 									// https://aomediacodec.github.io/av1-isobmff/#av1codecconfigurationbox-section

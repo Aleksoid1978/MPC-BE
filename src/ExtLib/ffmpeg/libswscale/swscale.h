@@ -118,13 +118,11 @@ typedef enum SwsBackend {
     SWS_BACKEND_X86         = (1 << 3), ///< Chained x86 SIMD kernels
     SWS_BACKEND_AARCH64     = (1 << 4), ///< Chained AArch64 NEON kernels
     SWS_BACKEND_SPIRV       = (1 << 5), ///< Vulkan SPIR-V backend
-    SWS_BACKEND_GLSL        = (1 << 6), ///< Vulkan GLSL backend
     SWS_BACKEND_UNSTABLE    = SWS_BACKEND_C |
                               SWS_BACKEND_MEMCPY |
                               SWS_BACKEND_X86 |
                               SWS_BACKEND_AARCH64 |
-                              SWS_BACKEND_SPIRV |
-                              SWS_BACKEND_GLSL,
+                              SWS_BACKEND_SPIRV,
 
     SWS_BACKEND_ALL = SWS_BACKEND_STABLE | SWS_BACKEND_UNSTABLE,
     SWS_BACKEND_MAX_ENUM = 0x7FFFFFFF, ///< force size to 32 bits, not a valid backend

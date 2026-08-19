@@ -6,7 +6,7 @@ the Software are granted under this license.
 
 The Clear BSD License
 
-Copyright (c) 2018-2025, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
+Copyright (c) 2018-2026, Fraunhofer-Gesellschaft zur Förderung der angewandten Forschung e.V. & The VVdeC Authors.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
@@ -42,15 +42,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #if !defined( VVDEC_VERSION )
 
-#define VVDEC_VERSION "3.1.0"
+#define VVDEC_VERSION "3.2.0"
 
 #define VVDEC_VERSION_MAJOR 3
-#define VVDEC_VERSION_MINOR 1
+#define VVDEC_VERSION_MINOR 2
 #define VVDEC_VERSION_PATCH 0
 
 #ifdef _WIN32
-#define VVDEC_VS_VERSION      3,1,0
-#define VVDEC_VS_VERSION_STR "3.1.0"
+#define VVDEC_VS_VERSION      3,2,0
+#define VVDEC_VS_VERSION_STR "3.2.0"
 #endif
 
 #endif

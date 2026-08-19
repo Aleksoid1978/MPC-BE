@@ -35,6 +35,16 @@ pw_64_m64: times 4 dw 64, -64
 pw_83_36: times 4 dw 83, 36
 pw_36_m83: times 4 dw 36, -83
 
+; 4x4 luma (DST-VII) transform coeffs, paired as (src0, src2) and (src1, src3)
+pw_29_84:   times 4 dw  29,  84
+pw_74_55:   times 4 dw  74,  55
+pw_55_m29:  times 4 dw  55, -29
+pw_74_m84:  times 4 dw  74, -84
+pw_74_m74:  times 4 dw  74, -74
+pw_0_74:    times 4 dw   0,  74
+pw_84_55:   times 4 dw  84,  55
+pw_m74_m29: times 4 dw -74, -29
+
 ; 8x8 transform coeffs
 pw_89_75: times 4 dw 89, 75
 pw_50_18: times 4 dw 50, 18
@@ -360,6 +370,71 @@ cglobal hevc_idct_4x4_%1, 1, 1, 5, coeffs
 
     TR_4x4 7, 1, 1
     TR_4x4 20 - %1, 1, 1
+
+    mova [coeffsq],      m0
+    mova [coeffsq + 16], m1
+    RET
+%endmacro
+
+; 4x4 luma inverse transform (DST-VII), one pass over 4 columns at once.
+; Unlike the DCT, DST-VII has no even/odd symmetry, so every output is a full
+; dot product of the 4 inputs; we pair them as (src0, src2) and (src1, src3)
+; and accumulate with pmaddwd, then scale, clip16 and transpose for the next pass.
+; expects input rows in m0 (rows 0, 1) and m1 (rows 2, 3)
+; %1 - shift
+; %2 - rounding constant (label of a pd_* array)
+%macro TR_4x4_LUMA 2
+    ; m0: (s0, s2) per column     m1: (s1, s3) per column
+    SBUTTERFLY wd, 0, 1, 2
+
+    pmaddwd m2, m0, [pw_29_84]    ; dst0
+    pmaddwd m3, m1, [pw_74_55]
+    paddd   m2, m3
+    pmaddwd m3, m0, [pw_55_m29]   ; dst1
+    pmaddwd m4, m1, [pw_74_m84]
+    paddd   m3, m4
+    pmaddwd m4, m0, [pw_74_m74]   ; dst2
+    pmaddwd m5, m1, [pw_0_74]
+    paddd   m4, m5
+    pmaddwd m5, m0, [pw_84_55]    ; dst3
+    pmaddwd m0, m1, [pw_m74_m29]
+    paddd   m5, m0
+
+    mova  m0, [%2]
+    paddd m2, m0
+    paddd m3, m0
+    paddd m4, m0
+    paddd m5, m0
+
+    psrad m2, %1
+    psrad m3, %1
+    psrad m4, %1
+    psrad m5, %1
+
+    ; clip16
+    packssdw m2, m3              ; dst0 | dst1
+    packssdw m4, m5              ; dst2 | dst3
+
+    ; transpose the 4x4 block for the next pass
+    SBUTTERFLY wd, 2, 4, 0
+    SBUTTERFLY wd, 2, 4, 0
+    SWAP 0, 2
+    SWAP 1, 4
+%endmacro
+
+; void ff_hevc_transform_4x4_luma_{8,10}_<opt>(int16_t *coeffs)
+; %1 = bitdepth
+%macro TRANSFORM_4x4_LUMA 1
+cglobal hevc_transform_4x4_luma_%1, 1, 1, 6, coeffs
+    mova m0, [coeffsq]
+    mova m1, [coeffsq + 16]
+
+    TR_4x4_LUMA 7, pd_64
+%if %1 == 8
+    TR_4x4_LUMA 12, pd_2048
+%elif %1 == 10
+    TR_4x4_LUMA 10, pd_512
+%endif
 
     mova [coeffsq],      m0
     mova [coeffsq + 16], m1
@@ -832,6 +907,7 @@ INIT_XMM %2
 %endif
 IDCT_8x8 %1
 IDCT_4x4 %1
+TRANSFORM_4x4_LUMA %1
 %endmacro
 
 INIT_IDCT_DC 8

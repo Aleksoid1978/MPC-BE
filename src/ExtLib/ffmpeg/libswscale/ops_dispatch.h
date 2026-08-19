@@ -25,6 +25,7 @@
 
 #include "libavutil/frame.h"
 #include "graph.h"
+#include "uops.h"
 
 /**
  * Global execution context for all compiled functions.
@@ -135,12 +136,16 @@ typedef struct SwsOpBackend {
     SwsBackend flags; /* Set of SWS_BACKEND_* */
 
     /**
-     * Compile an operation list to an implementation chain. May modify `ops`
-     * freely; the original list will be freed automatically by the caller.
+     * Compile an operation list to an implementation chain.
      *
      * Returns 0 or a negative error code.
      */
     int (*compile)(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out);
+
+    /**
+     * Alternative to `compile` that takes a list of micro-ops directly.
+     */
+    int (*compile_uops)(SwsContext *ctx, const SwsUOpList *uops, SwsCompiledOp *out);
 
     /**
      * If NONE, backend only supports software frames.

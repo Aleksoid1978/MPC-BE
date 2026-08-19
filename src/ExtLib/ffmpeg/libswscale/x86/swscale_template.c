@@ -534,7 +534,7 @@ static void RENAME(yuv2rgb555_X)(SwsInternal *c, const int16_t *lumFilter,
 #undef WRITEBGR24
 #define WRITEBGR24(dst, dstw, index)  WRITEBGR24MMXEXT(dst, dstw, index)
 
-#if HAVE_6REGS
+#if HAVE_X86_6REGS
 static void RENAME(yuv2bgr24_X_ar)(SwsInternal *c, const int16_t *lumFilter,
                                    const int16_t **lumSrc, int lumFilterSize,
                                    const int16_t *chrFilter, const int16_t **chrUSrc,
@@ -584,7 +584,7 @@ static void RENAME(yuv2bgr24_X)(SwsInternal *c, const int16_t *lumFilter,
     : "%"FF_REG_a, "%"FF_REG_c, "%"FF_REG_d, "%"FF_REG_S
     );
 }
-#endif /* HAVE_6REGS */
+#endif /* HAVE_X86_6REGS */
 
 #define REAL_WRITEYUY2(dst, dstw, index) \
     "packuswb  %%mm3, %%mm3     \n\t"\

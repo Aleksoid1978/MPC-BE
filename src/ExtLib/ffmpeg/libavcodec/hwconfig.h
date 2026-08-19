@@ -69,6 +69,8 @@ void ff_hwaccel_uninit(AVCodecContext *avctx);
 // ==> End patch MPC
 #define HWACCEL_NVDEC(codec) \
     HW_CONFIG_HWACCEL(1, 1, 0, CUDA,         CUDA,         ff_ ## codec ## _nvdec_hwaccel)
+#define HWACCEL_NVDEC_CUARRAY(codec) \
+    HW_CONFIG_HWACCEL(1, 1, 0, CUARRAY,      CUDA,         ff_ ## codec ## _nvdec_cuarray_hwaccel)
 #define HWACCEL_VAAPI(codec) \
     HW_CONFIG_HWACCEL(1, 1, 1, VAAPI,        VAAPI,        ff_ ## codec ## _vaapi_hwaccel)
 #define HWACCEL_VDPAU(codec) \

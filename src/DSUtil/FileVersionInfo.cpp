@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -107,44 +107,44 @@ BOOL CFileVersionInfo::Create(LPCWSTR lpszFileName, VS_FIXEDFILEINFO& FileInfo, 
 			}
 		}
 
-		CString strSubBlock;
+		CStringW strSubBlock;
 		strSubBlock.Format(L"\\StringFileInfo\\%04X%04X\\", dwLangCode&0x0000FFFF, (dwLangCode&0xFFFF0000)>>16);
 
 		if (VerQueryValueW(lpData, strSubBlock + L"CompanyName", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strCompanyName = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strCompanyName = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"FileDescription", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strFileDescription = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strFileDescription = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"FileVersion", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strFileVersion = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strFileVersion = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"InternalName", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strInternalName = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strInternalName = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"LegalCopyright", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strLegalCopyright = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strLegalCopyright = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"OriginalFileName", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strOriginalFileName = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strOriginalFileName = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"ProductName", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strProductName = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strProductName = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"ProductVersion", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strProductVersion = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strProductVersion = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"Comments", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strComments = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strComments = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"LegalTrademarks", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strLegalTrademarks = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strLegalTrademarks = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"PrivateBuild", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strPrivateBuild = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strPrivateBuild = (LPCWSTR)lpInfo;
 		}
 		if (VerQueryValueW(lpData, strSubBlock + L"SpecialBuild", &lpInfo, &unInfoLen)) {
-			fullFileInfo.strSpecialBuild = CString((LPCWSTR)lpInfo);
+			fullFileInfo.strSpecialBuild = (LPCWSTR)lpInfo;
 		}
 
 		delete[] lpData;
@@ -191,9 +191,9 @@ WORD CFileVersionInfo::GetProductVersion(int nIndex)
 }
 */
 
-CString CFileVersionInfo::GetFileVersionEx(LPCWSTR lpszFileName)
+CStringW CFileVersionInfo::GetFileVersionEx(LPCWSTR lpszFileName)
 {
-	CString          strFileVersion;
+	CStringW         strFileVersion;
 	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
 		strFileVersion.Format(L"%d.%d.%d.%d",
@@ -206,9 +206,9 @@ CString CFileVersionInfo::GetFileVersionEx(LPCWSTR lpszFileName)
 	return strFileVersion;
 }
 
-CString CFileVersionInfo::GetFileVersionExShort(LPCWSTR lpszFileName)
+CStringW CFileVersionInfo::GetFileVersionExShort(LPCWSTR lpszFileName)
 {
-	CString          strFileVersion;
+	CStringW         strFileVersion;
 	VS_FIXEDFILEINFO FileInfo;
 	if (Create(lpszFileName, FileInfo)) {
 		strFileVersion.Format(L"%d.%d.%d",

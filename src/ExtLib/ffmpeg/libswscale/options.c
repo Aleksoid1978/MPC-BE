@@ -117,7 +117,6 @@ static const AVOption swscale_options[] = {
         { "x86",         "x86 SIMD kernels",              0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_X86      }, .flags = VE, .unit = "sws_backend" },
         { "aarch64",     "AArch64 NEON kernels",          0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_AARCH64  }, .flags = VE, .unit = "sws_backend" },
         { "spirv",       "Vulkan SPIR-V backend",         0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_SPIRV    }, .flags = VE, .unit = "sws_backend" },
-        { "glsl",        "Vulkan GLSL backend",           0,                 AV_OPT_TYPE_CONST,  { .i64  = SWS_BACKEND_GLSL     }, .flags = VE, .unit = "sws_backend" },
 
     { NULL }
 };

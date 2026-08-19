@@ -138,7 +138,7 @@ static int decode_plane(FFV1Context *f, FFV1SliceContext *sc,
                 return ret;
             if (sc->remap)
                 for (x = 0; x < w; x++)
-                    sample[1][x] = sc->fltmap[remap_index][sample[1][x]];
+                    sample[1][x] = sc->fltmap[remap_index][sample[1][x] & mask];
             for (x = 0; x < w; x++)
                 src[x*pixel_stride + stride * y] = sample[1][x];
         } else {
@@ -369,6 +369,8 @@ static int decode_remap(FFV1Context *f, FFV1SliceContext *sc)
             }
             lu ^= !run;
         }
+        if (!j)
+            return AVERROR_INVALIDDATA;
         sc->remap_count[p] = j;
     }
     return 0;
@@ -488,8 +490,10 @@ static int decode_slice(AVCodecContext *c, void *arg)
 
     if (sc->remap) {
         ret = decode_remap(f, sc);
-        if (ret < 0)
+        if (ret < 0) {
+            slice_set_damaged(f, sc);
             return ret;
+        }
     }
 
     if (ac == AC_GOLOMB_RICE) {

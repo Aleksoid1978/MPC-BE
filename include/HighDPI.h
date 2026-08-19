@@ -1,5 +1,5 @@
 /*
- * (C) 2015-2025 see Authors.txt
+ * (C) 2015-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -78,12 +78,18 @@ public:
     inline int ScaleSystemToMonitorX(int x) const { return MulDiv(x, m_dpiX, m_sdpiX); }
     inline int ScaleSystemToMonitorY(int y) const { return MulDiv(y, m_dpiY, m_sdpiY); }
 
+    inline void ScaleSize(__inout SIZE* pSize)
+    {
+        pSize->cx = ScaleX(pSize->cx);
+        pSize->cy = ScaleY(pSize->cy);
+    }
+
     // Scale rectangle from raw pixels to relative pixels.
     inline void ScaleRect(__inout RECT *pRect)
     {
-        pRect->left = ScaleX(pRect->left);
-        pRect->right = ScaleX(pRect->right);
-        pRect->top = ScaleY(pRect->top);
+        pRect->left   = ScaleX(pRect->left);
+        pRect->right  = ScaleX(pRect->right);
+        pRect->top    = ScaleY(pRect->top);
         pRect->bottom = ScaleY(pRect->bottom);
     }
 

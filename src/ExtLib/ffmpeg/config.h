@@ -340,6 +340,7 @@
 #define HAVE_FAST_CLZ 1
 #define HAVE_FAST_FLOAT16 0
 #define HAVE_FCNTL 0
+#define HAVE_FFNVCODEC_CUARRAY 0
 #define HAVE_FLT_LIM 1
 #define HAVE_FORK 0
 #define HAVE_GETADDRINFO 0
@@ -505,10 +506,6 @@
 #define CONFIG_LIBVPL 0
 #define CONFIG_OPENCL 0
 #define CONFIG_VULKAN 0
-#define CONFIG_CUDA 1
-#define CONFIG_CUDA_NVCC 0
-#define CONFIG_CUDA_SDK 0
-#define CONFIG_CUDA_LLVM 0
 #define CONFIG_ICONV 0
 #define CONFIG_JNI 0
 #define HAVE_X86ASM 1
@@ -613,12 +610,12 @@ Note: when adding a new codec, you have to:
 #define CONFIG_MACOS_KPERF 0
 #define CONFIG_BSFS 1
 
-#define CONFIG_VDPAU 0
-
 #define CONFIG_DXVA2 1
-#define CONFIG_NVDEC 1
 #define CONFIG_D3D11VA 1
 #define CONFIG_D3D12VA 1
+#define CONFIG_NVDEC 1
+#define CONFIG_CUDA 1
+#define CONFIG_VDPAU 0
 
 #define CONFIG_DIRAC_PARSE 1
 

@@ -31,6 +31,7 @@ typedef struct AudioFrame {
 
 typedef struct AudioFrameQueue {
     AVCodecContext *avctx;
+    int output_delay;
     int remaining_delay;
     int remaining_samples;
     AudioFrame *frames;
@@ -74,10 +75,9 @@ int ff_af_queue_add(AudioFrameQueue *afq, const AVFrame *f);
  *
  * @param afq           queue context
  * @param nb_samples    number of samples to remove from the queue
- * @param[out] pts      output packet pts
- * @param[out] duration output packet duration
+ * @param[out] pkt      output packet
+ * @return              0 on success, negative AVERROR code on failure
  */
-void ff_af_queue_remove(AudioFrameQueue *afq, int nb_samples, int64_t *pts,
-                        int64_t *duration);
+int ff_af_queue_remove(AudioFrameQueue *afq, int nb_samples, AVPacket *pkt);
 
 #endif /* AVCODEC_AUDIO_FRAME_QUEUE_H */

@@ -1,5 +1,5 @@
 /*
- * (C) 2012-2020 see Authors.txt
+ * (C) 2012-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -41,6 +41,7 @@ private:
 	CRect	m_videorect;
 
 	CFont m_font;
+	COLORREF m_crText;
 
 	struct t_color {
 		int R1, G1, B1;
@@ -48,7 +49,7 @@ private:
 	};
 	t_color m_cr1, m_cr2, m_cr3, m_cr4, m_cr5, m_cr6, m_cr7, m_cr8, m_cr9;
 
-	COLORREF m_crText;
+	static COLORREF RGBFill(const t_color& c, int i, int k);
 
 public:
 	CPreView(CMainFrame* pMainFrame);

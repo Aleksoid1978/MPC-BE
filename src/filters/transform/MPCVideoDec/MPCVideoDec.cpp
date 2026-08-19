@@ -536,6 +536,7 @@ FFMPEG_CODECS ffCodecs[] = {
 	// AV1
 	{ &MEDIASUBTYPE_AV01, AV_CODEC_ID_AV1, VDEC_AV1, HWCodec_AV1 },
 	{ &MEDIASUBTYPE_av01, AV_CODEC_ID_AV1, VDEC_AV1, HWCodec_AV1 },
+	{ &MEDIASUBTYPE_dav1, AV_CODEC_ID_AV1, VDEC_AV1, HWCodec_AV1 },
 
 	// SpeedHQ
 	{ &MEDIASUBTYPE_SHQ0, AV_CODEC_ID_SPEEDHQ, VDEC_SHQ, HWCodec_None },
@@ -922,6 +923,7 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	// AV1
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_AV01 },
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_av01 },
+	{ &MEDIATYPE_Video, &MEDIASUBTYPE_dav1 },
 
 	// SpeedHQ
 	{ &MEDIATYPE_Video, &MEDIASUBTYPE_SHQ0 },
@@ -3513,9 +3515,11 @@ DXVA2_ExtendedFormat CMPCVideoDecFilter::GetDXVA2ExtendedFormat(const AVCodecCon
 	switch(color_trc) {
 		case AVCOL_TRC_BT709:
 		case AVCOL_TRC_SMPTE170M:
+			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_709;
+			break;
 		case AVCOL_TRC_BT2020_10:
 		case AVCOL_TRC_BT2020_12:
-			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_709;
+			fmt.VideoTransferFunction = (colorspace == AVCOL_SPC_BT2020_CL) ? MFVideoTransFunc_2020_const : MFVideoTransFunc_2020;
 			break;
 		case AVCOL_TRC_GAMMA22:
 			fmt.VideoTransferFunction = DXVA2_VideoTransFunc_22;

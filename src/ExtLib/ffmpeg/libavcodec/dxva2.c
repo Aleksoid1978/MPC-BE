@@ -55,6 +55,9 @@ DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main10,0x107af0e0, 0xef1a,0x4d19,0xab,0xa8,0x6
 DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_Profile0,0x463707f8,0xa1d0,0x4585,0x87,0x6d,0x83,0xaa,0x6d,0x60,0xb8,0x9e);
 DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_10bit_Profile2,0xa4c749ef,0x6ecf,0x48aa,0x84,0x48,0x50,0xa7,0xa1,0x16,0x5f,0xf7);
 DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile0,0xb8be4ccb,0xcf53,0x46ba,0x8d,0x59,0xd6,0xb8,0xa6,0xda,0x5d,0x2a);
+DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_Profile2,0x0c5f2aa1,0xe541,0x4089,0xbb,0x7b,0x98,0x11,0x0a,0x19,0xd7,0xc8);
+DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_12bit_Profile2,0x17127009,0xa00f,0x4ce1,0x99,0x4e,0xbf,0x40,0x81,0xf6,0xf3,0xf0);
+DEFINE_GUID(ff_DXVA2_ModeAV1_VLD_12bit_Profile2_420,0x2d80bed6,0x9cac,0x4835,0x9e,0x91,0x32,0x7b,0xbc,0x4f,0x9e,0xe8);
 DEFINE_GUID(ff_DXVA2_NoEncrypt,          0x1b81beD0, 0xa0c7,0x11d3,0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5);
 DEFINE_GUID(ff_GUID_NULL,                0x00000000, 0x0000,0x0000,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
 DEFINE_GUID(ff_IID_IDirectXVideoDecoderService, 0xfc51a551,0xd5e7,0x11d9,0xaf,0x55,0x00,0x05,0x4e,0x43,0xff,0x02);
@@ -103,6 +106,8 @@ static const int prof_vp9_profile2[] = {AV_PROFILE_VP9_2,
                                         AV_PROFILE_UNKNOWN};
 static const int prof_av1_profile0[] = {AV_PROFILE_AV1_MAIN,
                                         AV_PROFILE_UNKNOWN};
+static const int prof_av1_profile2[] = {AV_PROFILE_AV1_PROFESSIONAL,
+                                        AV_PROFILE_UNKNOWN};
 
 // ==> Start patch MPC
 static const int prof_hevc_rext[]    = {AV_PROFILE_HEVC_REXT,
@@ -135,7 +140,10 @@ static const dxva_mode dxva_modes[] = {
     { &ff_DXVA2_ModeVP9_VLD_10bit_Profile2, AV_CODEC_ID_VP9, prof_vp9_profile2 },
 
     /* AV1 */
-    { &ff_DXVA2_ModeAV1_VLD_Profile0,       AV_CODEC_ID_AV1, prof_av1_profile0 },
+    { &ff_DXVA2_ModeAV1_VLD_Profile0,            AV_CODEC_ID_AV1, prof_av1_profile0 },
+    { &ff_DXVA2_ModeAV1_VLD_12bit_Profile2_420,  AV_CODEC_ID_AV1, prof_av1_profile2 },
+    { &ff_DXVA2_ModeAV1_VLD_12bit_Profile2,      AV_CODEC_ID_AV1, prof_av1_profile2 },
+    { &ff_DXVA2_ModeAV1_VLD_Profile2,            AV_CODEC_ID_AV1, prof_av1_profile2 },
 
     // ==> Start patch MPC
     /* HEVC/H.265 Rext */
@@ -517,6 +525,7 @@ static DXGI_FORMAT d3d11va_map_sw_to_hw_format(enum AVPixelFormat pix_fmt)
     switch (pix_fmt) {
     case AV_PIX_FMT_NV12:       return DXGI_FORMAT_NV12;
     case AV_PIX_FMT_P010:       return DXGI_FORMAT_P010;
+    case AV_PIX_FMT_P012:       return DXGI_FORMAT_P016;
     case AV_PIX_FMT_YUV420P:    return DXGI_FORMAT_420_OPAQUE;
     // ==> Start patch MPC
     case AV_PIX_FMT_P016:       return DXGI_FORMAT_P016;
@@ -666,30 +675,24 @@ static enum AVPixelFormat map_sw_pix_format(enum AVPixelFormat pix_fmt, enum AVP
         switch (pix_fmt)
         {
         case AV_PIX_FMT_YUV420P10:
-        case AV_PIX_FMT_P010:
-            return AV_PIX_FMT_P010;
-        case AV_PIX_FMT_YUV420P12:
-            return AV_PIX_FMT_P016;
-        case AV_PIX_FMT_YUV422P:
-            return AV_PIX_FMT_YUYV422;
-        case AV_PIX_FMT_YUV422P10:
-            return AV_PIX_FMT_Y210;
-        case AV_PIX_FMT_YUV444P:
-            return AV_PIX_FMT_VUYX;
-        case AV_PIX_FMT_YUV444P10:
-            return AV_PIX_FMT_XV30;
-        case AV_PIX_FMT_YUV422P12:
-            return AV_PIX_FMT_Y212;
-        case AV_PIX_FMT_YUV444P12:
-            return AV_PIX_FMT_XV36;
+        case AV_PIX_FMT_P010:      return AV_PIX_FMT_P010;
+        case AV_PIX_FMT_YUV420P12: return AV_PIX_FMT_P016;
+        case AV_PIX_FMT_YUV422P:   return AV_PIX_FMT_YUYV422;
+        case AV_PIX_FMT_YUV422P10: return AV_PIX_FMT_Y210;
+        case AV_PIX_FMT_YUV444P:   return AV_PIX_FMT_VUYX;
+        case AV_PIX_FMT_YUV444P10: return AV_PIX_FMT_XV30;
+        case AV_PIX_FMT_YUV422P12: return AV_PIX_FMT_Y212;
+        case AV_PIX_FMT_YUV444P12: return AV_PIX_FMT_XV36;
         case AV_PIX_FMT_NV12:
-        default:
-            return AV_PIX_FMT_NV12;
+        default:                   return AV_PIX_FMT_NV12;
         }
     }
 #endif
-    return pix_fmt == AV_PIX_FMT_YUV420P10 ?
-        AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
+    switch (pix_fmt) {
+    case AV_PIX_FMT_YUV420P10: return AV_PIX_FMT_P010;
+    case AV_PIX_FMT_YUV420P12: return AV_PIX_FMT_P012;
+    default:                   return AV_PIX_FMT_NV12;
+    }
 }
 // ==> End patch MPC
 
@@ -732,8 +735,11 @@ int ff_dxva2_common_frame_params(AVCodecContext *avctx,
 
     // ==> Start patch MPC
     /*
-    frames_ctx->sw_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
-                            AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
+    switch (avctx->sw_pix_fmt) {
+    case AV_PIX_FMT_YUV420P10: frames_ctx->sw_format = AV_PIX_FMT_P010; break;
+    case AV_PIX_FMT_YUV420P12: frames_ctx->sw_format = AV_PIX_FMT_P012; break;
+    default:                   frames_ctx->sw_format = AV_PIX_FMT_NV12; break;
+    }
     */
     frames_ctx->sw_format = map_sw_pix_format(avctx->sw_pix_fmt, frames_ctx->format);
     // ==> End patch MPC

@@ -146,6 +146,30 @@ static int config_output(AVFilterLink *outlink)
         return ret;
 
     sd = av_frame_side_data_get(inlink->side_data, inlink->nb_side_data,
+                                AV_FRAME_DATA_DOWNMIX_MATRIX);
+    if (sd) {
+        const AVDownmixMatrix *dm = (AVDownmixMatrix *)sd->data;
+
+        if (inlink->ch_layout.nb_channels == dm->in_ch_count &&
+            !av_channel_layout_compare(&outlink->ch_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO)) {
+            swr_set_matrix(aresample->swr,
+                           (double *)((uint8_t *)dm + dm->coeffs_offset),
+                           dm->in_ch_count);
+
+            switch (dm->downmix_type) {
+            case AV_DOWNMIX_TYPE_LTRT:
+                matrix_encoding = AV_MATRIX_ENCODING_DOLBY;
+                break;
+            case AV_DOWNMIX_TYPE_DPLII:
+                matrix_encoding = AV_MATRIX_ENCODING_DPLII;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    sd = av_frame_side_data_get(inlink->side_data, inlink->nb_side_data,
                                 AV_FRAME_DATA_DOWNMIX_INFO);
     if (sd) {
         const AVDownmixInfo *di = (AVDownmixInfo *)sd->data;

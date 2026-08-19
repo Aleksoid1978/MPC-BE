@@ -395,6 +395,20 @@ WORD AssignedKeyToCmd(UINT keyValue)
 	return 0;
 }
 
+HACCEL HandlerForCreateAcceleratorTable(std::vector<ACCEL>& Accel)
+{
+	for (const auto& accel : Accel) {
+		if (accel.key == VK_SPACE) {
+			auto accelCopy = accel;
+			accelCopy.key = VK_PROCESSKEY;
+			Accel.emplace_back(accelCopy);
+			break;
+		}
+	}
+
+	return CreateAcceleratorTableW(Accel.data(), Accel.size());
+}
+
 WORD AssignedMouseToCmd(UINT mouseValue, UINT nFlags)
 {
 	CAppSettings& s = AfxGetAppSettings();

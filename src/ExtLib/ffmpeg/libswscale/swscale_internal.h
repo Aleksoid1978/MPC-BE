@@ -343,7 +343,6 @@ struct SwsInternal {
 
     AVSliceThread      *slicethread;
     SwsContext        **slice_ctx;
-    int                *slice_err;
     int              nb_slice_ctx;
 
     /* Scaling graph, reinitialized dynamically as needed. */
@@ -1189,13 +1188,21 @@ void ff_init_vscale_pfn(SwsInternal *c, yuv2planar1_fn yuv2plane1, yuv2planarX_f
     yuv2interleavedX_fn yuv2nv12cX, yuv2packed1_fn yuv2packed1, yuv2packed2_fn yuv2packed2,
     yuv2packedX_fn yuv2packedX, yuv2anyX_fn yuv2anyX, int use_mmx);
 
-void ff_sws_slice_worker(void *priv, int jobnr, int threadnr,
-                         int nb_jobs, int nb_threads);
+int ff_sws_slice_worker(void *priv, int jobnr, int threadnr,
+                        int nb_jobs, int nb_threads);
 
 int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[],
                int srcSliceY, int srcSliceH, uint8_t *const dst[],
                const int dstStride[], int dstSliceY, int dstSliceH);
 
+/**
+ * Helper for dispatching a single function across multiple threads. This is
+ * a wrapper around avpriv_slicethread_create2() + avpriv_slicethread_execute2(),
+ * falling back to direct invocation if threading is not available.
+ */
+int ff_sws_thread_exec(void *priv,
+                       int (*func)(void *priv, int jobnr, int threadnr, int nb_jobs, int nb_threads),
+                       int nb_threads, int nb_jobs);
 
 //number of extra lines to process
 #define MAX_LINES_AHEAD 4

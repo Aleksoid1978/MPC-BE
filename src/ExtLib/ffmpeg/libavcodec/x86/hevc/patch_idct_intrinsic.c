@@ -85,8 +85,8 @@ void ff_hevc_transform_4x4_luma ## _ ## D ## _sse2(int16_t *res) {             \
     _mm_store_si128((__m128i *) (res + 8), res1);                              \
 }
 
-TRANSFORM_LUMA( 8);
-TRANSFORM_LUMA( 10);
+//TRANSFORM_LUMA( 8);
+//TRANSFORM_LUMA( 10);
 TRANSFORM_LUMA( 12);
 
 #endif

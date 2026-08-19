@@ -221,7 +221,7 @@ void av_bprint_get_buffer(AVBPrint *buf, unsigned size,
     if (size > av_bprint_room(buf))
         av_bprint_alloc(buf, size);
     *actual_size = av_bprint_room(buf);
-    *mem = *actual_size ? buf->str + buf->len : NULL;
+    *mem = *actual_size ? (unsigned char *) (buf->str + buf->len) : NULL;
 }
 
 void av_bprint_clear(AVBPrint *buf)

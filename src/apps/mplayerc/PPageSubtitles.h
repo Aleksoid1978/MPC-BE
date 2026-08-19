@@ -55,7 +55,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton1();
-	afx_msg void OnSubRendModified();
+	afx_msg void OnSubtitleRendererChange();
 	afx_msg void OnSubRendPropClick();
 	afx_msg void OnUpdateISRSelect(CCmdUI* pCmdUI);
 };

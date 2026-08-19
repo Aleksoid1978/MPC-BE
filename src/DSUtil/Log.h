@@ -1,5 +1,5 @@
 /*
- * (C) 2011-2025 see Authors.txt
+ * (C) 2011-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,9 +28,9 @@
 #include <ShlObj_core.h>
 #include <KnownFolders.h>
 
-static const CString GetLogFileName()
+static const CStringW GetLogFileName()
 {
-	CString ret;
+	CStringW ret;
 
 	PWSTR pathDesktop = nullptr;
 	HRESULT hr = SHGetKnownFolderPath(FOLDERID_Desktop, 0, nullptr, &pathDesktop);
@@ -44,12 +44,12 @@ static const CString GetLogFileName()
 	return ret;
 }
 
-static const CString GetLocalTime()
+static const CStringW GetLocalTime()
 {
 	SYSTEMTIME st;
 	::GetLocalTime(&st);
 
-	CString time;
+	CStringW time;
 	time.Format(L"%04u.%02u.%02u %02u:%02u:%02u.%03u", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
 	return time;
@@ -58,7 +58,7 @@ static const CString GetLocalTime()
 namespace Logger
 {
 	static std::mutex log_mutex;
-	static const CString logFileName = GetLogFileName();
+	static const CStringW logFileName = GetLogFileName();
 
 	template<typename ... Args>
 	inline void Log2File(LPCWSTR fmt, Args ... args)
@@ -71,7 +71,7 @@ namespace Logger
 				std::unique_ptr<wchar_t[]> buf(new(std::nothrow) wchar_t[size]);
 				if (buf) {
 					_snwprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
-					fwprintf_s(f, L"%s : %s\n", GetLocalTime(), buf.get());
+					fwprintf_s(f, L"%s : %s\n", GetLocalTime().GetString(), buf.get());
 				}
 			}
 			fclose(f);
@@ -89,7 +89,7 @@ namespace Logger
 				std::unique_ptr<char[]> buf(new(std::nothrow) char[size]);
 				if (buf) {
 					_snprintf_s(buf.get(), size, _TRUNCATE, fmt, args ...);
-					fwprintf_s(f, L"%s : %hs\n", GetLocalTime(), buf.get());
+					fwprintf_s(f, L"%s : %hs\n", GetLocalTime().GetString(), buf.get());
 				}
 			}
 			fclose(f);
@@ -118,7 +118,7 @@ namespace Logger
 	#define DLogError(...) __noop
 #endif
 
-inline void HexDump(const CString& fileName, BYTE* buf, int size)
+inline void HexDump(const CStringW& fileName, BYTE* buf, int size)
 {
 	if (size <= 0) {
 		return;

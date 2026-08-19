@@ -314,15 +314,6 @@
 %endif
 %endmacro
 
-%macro PSIGNW 2
-%if cpuflag(ssse3)
-    psignw     %1, %2
-%else
-    pxor       %1, %2
-    psubw      %1, %2
-%endif
-%endmacro
-
 %macro ABS1 2
 %if cpuflag(ssse3)
     pabsw   %1, %1
@@ -359,41 +350,6 @@
     psubw      %1, %3
     psubw      %2, %4
 %endif
-%endmacro
-
-%macro ABSB 2 ; source mmreg, temp mmreg (unused for SSSE3)
-%if cpuflag(ssse3)
-    pabsb   %1, %1
-%else
-    pxor    %2, %2
-    psubb   %2, %1
-    pminub  %1, %2
-%endif
-%endmacro
-
-%macro ABSB2 4 ; src1, src2, tmp1, tmp2 (tmp1/2 unused for SSSE3)
-%if cpuflag(ssse3)
-    pabsb   %1, %1
-    pabsb   %2, %2
-%else
-    pxor    %3, %3
-    pxor    %4, %4
-    psubb   %3, %1
-    psubb   %4, %2
-    pminub  %1, %3
-    pminub  %2, %4
-%endif
-%endmacro
-
-%macro ABSD2 4
-    pxor    %3, %3
-    pxor    %4, %4
-    pcmpgtd %3, %1
-    pcmpgtd %4, %2
-    pxor    %1, %3
-    pxor    %2, %4
-    psubd   %1, %3
-    psubd   %2, %4
 %endmacro
 
 %macro ABS4 6
@@ -438,12 +394,7 @@
     paddd   %1, %2
 %endif
 %if notcpuflag(xop) || sizeof%1 != 16
-%if cpuflag(mmxext)
-    PSHUFLW %2, %1, q0032
-%else ; mmx
-    mova    %2, %1
-    psrlq   %2, 32
-%endif
+    pshuflw %2, %1, q0032
     paddd   %1, %2
 %endif
 %undef %1
@@ -498,42 +449,6 @@
     psrldq  %4, %3
 %endif
     por     %%dst, %4
-%endif
-%endmacro
-
-%macro PAVGB 2-4
-%if cpuflag(mmxext)
-    pavgb   %1, %2
-%elif cpuflag(3dnow)
-    pavgusb %1, %2
-%elif cpuflag(mmx)
-    movu   %3, %2
-    por    %3, %1
-    pxor   %1, %2
-    pand   %1, %4
-    psrlq  %1, 1
-    psubb  %3, %1
-    SWAP   %1, %3
-%endif
-%endmacro
-
-%macro PSHUFLW 1+
-    %if mmsize == 8
-        pshufw %1
-    %else
-        pshuflw %1
-    %endif
-%endmacro
-
-%macro PSWAPD 2
-%if cpuflag(mmxext)
-    pshufw    %1, %2, q1032
-%elif cpuflag(3dnowext)
-    pswapd    %1, %2
-%elif cpuflag(3dnow)
-    movq      %1, %2
-    psrlq     %1, 32
-    punpckldq %1, %2
 %endif
 %endmacro
 
@@ -748,16 +663,6 @@
     movh  [%7+%8], %4
 %endmacro
 
-%macro PMINUB 3 ; dst, src, ignored
-%if cpuflag(mmxext)
-    pminub   %1, %2
-%else ; dst, src, tmp
-    mova     %3, %1
-    psubusb  %3, %2
-    psubb    %1, %3
-%endif
-%endmacro
-
 %macro SPLATW 2-3 0
 %if cpuflag(avx2) && %3 == 0
     vpbroadcastw %1, %2
@@ -933,22 +838,6 @@
         mulps   %1, %2, %3
         addps   %1, %4
     %endif
-%endmacro
-
-%macro LSHIFT 2
-%if mmsize > 8
-    pslldq  %1, %2
-%else
-    psllq   %1, 8*(%2)
-%endif
-%endmacro
-
-%macro RSHIFT 2
-%if mmsize > 8
-    psrldq  %1, %2
-%else
-    psrlq   %1, 8*(%2)
-%endif
 %endmacro
 
 %macro MOVHL 2 ; dst, src

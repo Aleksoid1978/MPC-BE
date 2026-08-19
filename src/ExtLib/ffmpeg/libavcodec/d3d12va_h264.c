@@ -105,6 +105,7 @@ static int d3d12va_h264_decode_slice(AVCodecContext *avctx, const uint8_t *buffe
 #define START_CODE_SIZE 3
 static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPUT_STREAM_ARGUMENTS *input_args, ID3D12Resource *buffer)
 {
+    D3D12VADecodeContext     *ctx             = D3D12VA_DECODE_CONTEXT(avctx);
     const H264Context        *h               = avctx->priv_data;
     const H264Picture        *current_picture = h->cur_pic_ptr;
     H264DecodePictureContext *ctx_pic         = current_picture->hwaccel_picture_private;
@@ -113,6 +114,7 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
     uint8_t *mapped_data, *mapped_ptr;
     DXVA_Slice_H264_Short *slice;
     D3D12_VIDEO_DECODE_FRAME_ARGUMENT *args;
+    UINT bitstream_size = ctx->bitstream_size;
 
     if (FAILED(ID3D12Resource_Map(buffer, 0, NULL, (void **)&mapped_data))) {
         av_log(avctx, AV_LOG_ERROR, "Failed to map D3D12 Buffer resource!\n");
@@ -127,14 +129,22 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
         position = slice->BSNALunitDataLocation;
         size     = slice->SliceBytesInBuffer;
 
+        if (START_CODE_SIZE + (uint64_t)size > bitstream_size) {
+            av_log(avctx, AV_LOG_ERROR, "Input frame bitstream size exceeds internal buffer!\n");
+            ID3D12Resource_Unmap(buffer, 0, NULL);
+            return AVERROR(EINVAL);
+        }
+
         slice->SliceBytesInBuffer += START_CODE_SIZE;
         slice->BSNALunitDataLocation = mapped_ptr - mapped_data;
 
         *(uint32_t *)mapped_ptr = START_CODE;
         mapped_ptr += START_CODE_SIZE;
+        bitstream_size -= START_CODE_SIZE;
 
         memcpy(mapped_ptr, &ctx_pic->bitstream[position], size);
         mapped_ptr += size;
+        bitstream_size -= size;
     }
 
     ID3D12Resource_Unmap(buffer, 0, NULL);

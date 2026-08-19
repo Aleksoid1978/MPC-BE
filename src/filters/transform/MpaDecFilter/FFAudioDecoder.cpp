@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,10 @@ static const struct {
 	{ &MEDIASUBTYPE_Vorbis2,           AV_CODEC_ID_VORBIS },
 	// NellyMoser
 	{ &MEDIASUBTYPE_NELLYMOSER,        AV_CODEC_ID_NELLYMOSER },
+	// MS ADPCM
+	{ &MEDIASUBTYPE_MS_ADPCM,          AV_CODEC_ID_ADPCM_MS },
+	// IMA ADPCM
+	{ &MEDIASUBTYPE_IMA_ADPCM,         AV_CODEC_ID_ADPCM_IMA_WAV },
 	// Qt ADPCM
 	{ &MEDIASUBTYPE_IMA4,              AV_CODEC_ID_ADPCM_IMA_QT },
 	// FLV ADPCM

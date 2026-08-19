@@ -1438,6 +1438,9 @@ const FFCodec ff_vc1_decoder = {
 #if CONFIG_VC1_NVDEC_HWACCEL
                         HWACCEL_NVDEC(vc1),
 #endif
+#if CONFIG_VC1_NVDEC_CUARRAY_HWACCEL
+                        HWACCEL_NVDEC_CUARRAY(vc1),
+#endif
 #if CONFIG_VC1_VAAPI_HWACCEL
                         HWACCEL_VAAPI(vc1),
 #endif
@@ -1478,6 +1481,9 @@ const FFCodec ff_wmv3_decoder = {
 #endif
 #if CONFIG_WMV3_NVDEC_HWACCEL
                         HWACCEL_NVDEC(wmv3),
+#endif
+#if CONFIG_WMV3_NVDEC_CUARRAY_HWACCEL
+                        HWACCEL_NVDEC_CUARRAY(wmv3),
 #endif
 #if CONFIG_WMV3_VAAPI_HWACCEL
                         HWACCEL_VAAPI(wmv3),

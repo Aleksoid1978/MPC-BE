@@ -28,6 +28,7 @@
 
 #include "swscale.h"
 #include "format.h"
+#include "lut3d.h"
 
 static av_always_inline av_const int ff_fmt_vshift(enum AVPixelFormat fmt, int plane)
 {
@@ -65,6 +66,15 @@ typedef struct SwsPassBuffer {
     /* Optional allocation hints for optimal performance */
     int width_align;   /* Align width to multiple of this */
     int width_pad;     /* Extra padding pixels */
+
+    /**
+     * Map of planes which are directly copied from the pass input. These
+     * may be promoted from a memcpy to a refcopy.
+     *
+     * Each entry maps the output index to the corresponding input plane
+     * index, or -1 for no copythrough.
+     */
+    int plane_copy[4];
 } SwsPassBuffer;
 
 /**
@@ -129,6 +139,16 @@ typedef struct SwsGraph {
 
     AVBufferRef *hw_frames_ref;
 
+    /**
+     * Map of planes which directly copied from the input. These may be
+     * promoted from a memcpy to a refcopy. This requires special handling
+     * by the caller.
+     *
+     * Each entry maps the output index to the corresponding input plane
+     * index, or -1 for no copythrough.
+     */
+    int plane_copy[4];
+
     /** Sorted sequence of filter passes to apply */
     SwsPass **passes;
     int num_passes;
@@ -143,6 +163,11 @@ typedef struct SwsGraph {
      * Currently active format and processing parameters.
      */
     SwsFormat src, dst;
+
+    /**
+     * 3DLUT state used for gamut/tone mapping. (Optional)
+     */
+    SwsLut3D *lut3d; /* refstruct */
 
     /**
      * Temporary execution state inside ff_sws_graph_run(); used to pass

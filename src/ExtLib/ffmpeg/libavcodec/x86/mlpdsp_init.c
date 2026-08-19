@@ -45,7 +45,7 @@ void ff_mlp_rematrix_channel_##opt(int32_t *samples, \
 REMATRIX_CHANNEL_FUNC(sse4)
 REMATRIX_CHANNEL_FUNC(avx2_bmi2)
 
-#if HAVE_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
+#if HAVE_X86_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
 
 extern char ff_mlp_firorder_8;
 extern char ff_mlp_firorder_7;
@@ -191,12 +191,12 @@ static void mlp_filter_channel_x86(int32_t *state, const int32_t *coeff,
     );
 }
 
-#endif /* HAVE_7REGS && HAVE_INLINE_ASM */
+#endif /* HAVE_X86_7REGS && HAVE_INLINE_ASM */
 
 av_cold void ff_mlpdsp_init_x86(MLPDSPContext *c)
 {
     int cpu_flags = av_get_cpu_flags();
-#if HAVE_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
+#if HAVE_X86_7REGS && HAVE_INLINE_ASM && HAVE_INLINE_ASM_NONLOCAL_LABELS
     if (INLINE_MMX(cpu_flags))
         c->mlp_filter_channel = mlp_filter_channel_x86;
 #endif

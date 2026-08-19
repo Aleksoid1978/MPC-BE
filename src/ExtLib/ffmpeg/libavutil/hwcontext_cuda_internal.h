@@ -35,4 +35,25 @@ struct AVCUDADeviceContextInternal {
     int flags;
 };
 
+/**
+ * Return the element size in bytes for a CUarray_format, or 0 for unknown.
+ *
+ * Used to compute frame->linesize[] for CUarray frames (block-linear).
+ * Callers that need a fallback should treat a 0 return as an error.
+ */
+static inline int ff_cuda_cuarray_elem_size(CUarray_format fmt)
+{
+    switch (fmt) {
+    case CU_AD_FORMAT_UNSIGNED_INT8:
+    case CU_AD_FORMAT_SIGNED_INT8:   return 1;
+    case CU_AD_FORMAT_UNSIGNED_INT16:
+    case CU_AD_FORMAT_SIGNED_INT16:
+    case CU_AD_FORMAT_HALF:          return 2;
+    case CU_AD_FORMAT_UNSIGNED_INT32:
+    case CU_AD_FORMAT_SIGNED_INT32:
+    case CU_AD_FORMAT_FLOAT:         return 4;
+    default:                         return 0;
+    }
+}
+
 #endif /* AVUTIL_HWCONTEXT_CUDA_INTERNAL_H */

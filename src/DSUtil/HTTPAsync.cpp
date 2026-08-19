@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2025 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -289,6 +289,9 @@ HRESULT CHTTPAsync::Connect(LPCWSTR lpszURL, DWORD dwTimeOut/* = INFINITE*/, LPC
 #endif
 
 	m_contentType = QueryInfoStr(HTTP_QUERY_CONTENT_TYPE).MakeLower();
+	if (int k = m_contentType.Find(";"); k >= 0) {
+		m_contentType.Truncate(k); // discard ";codecs=" and other stuff
+	}
 	m_contentEncoding = QueryInfoStr(HTTP_QUERY_CONTENT_ENCODING).MakeLower();
 	m_bSupportsRanges = QueryInfoStr(HTTP_QUERY_ACCEPT_RANGES).MakeLower() == L"bytes";
 

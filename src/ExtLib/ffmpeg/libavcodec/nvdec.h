@@ -46,6 +46,11 @@
 #define NVDEC_HAVE_422_SUPPORT
 #endif
 
+// SDK 13.1 compile time feature checks
+#if NVDECAPI_CHECK_VERSION(13, 1)
+#define NVDEC_HAVE_OPAQUE_OUTPUT_SUPPORT
+#endif
+
 typedef struct NVDECFrame {
     unsigned int idx;
     unsigned int ref_idx;
@@ -83,8 +88,15 @@ int ff_nvdec_simple_decode_slice(AVCodecContext *avctx, const uint8_t *buffer,
                                  uint32_t size);
 int ff_nvdec_frame_params(AVCodecContext *avctx,
                           AVBufferRef *hw_frames_ctx,
+                          enum AVPixelFormat hw_format,
                           int dpb_size,
                           int supports_444);
 int ff_nvdec_get_ref_idx(AVFrame *frame);
+
+#ifdef NVDEC_HAVE_OPAQUE_OUTPUT_SUPPORT
+void ff_nvdec_fill_cuarray_desc(CUDA_ARRAY3D_DESCRIPTOR *desc,
+                                AVCodecContext *avctx,
+                                cudaVideoSurfaceFormat output_format);
+#endif
 
 #endif /* AVCODEC_NVDEC_H */

@@ -499,6 +499,12 @@ enum AVPixelFormat {
 
     AV_PIX_FMT_OHCODEC, /// hardware decoding through openharmony
 
+    /**
+     * CUDA block-linear (opaque). data[0] is a CUarray in block-linear layout,
+     * e.g. from NVDEC opaque decode. Use for zero-copy to NVENC (CUDA array input).
+     */
+    AV_PIX_FMT_CUARRAY,
+
     AV_PIX_FMT_NB         ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
 };
 

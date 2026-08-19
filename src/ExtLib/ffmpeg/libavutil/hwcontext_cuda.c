@@ -31,8 +31,12 @@
 #include "imgutils.h"
 
 typedef struct CUDAFramesContext {
+    AVCUDAFramesContext p;
+
     int shift_width, shift_height;
     int tex_alignment;
+
+    int cuarray_num_surfaces_used;
 } CUDAFramesContext;
 
 typedef struct CUDADeviceContext {
@@ -40,57 +44,65 @@ typedef struct CUDADeviceContext {
     AVCUDADeviceContextInternal internal;
 } CUDADeviceContext;
 
-static const enum AVPixelFormat supported_formats[] = {
-    AV_PIX_FMT_NV12,
-    AV_PIX_FMT_NV16,
-    AV_PIX_FMT_YUV420P,
-    AV_PIX_FMT_YUVA420P,
-    AV_PIX_FMT_YUV444P,
-    AV_PIX_FMT_P010,
-    AV_PIX_FMT_P012,
-    AV_PIX_FMT_P016,
-    AV_PIX_FMT_P210,
-    AV_PIX_FMT_P212,
-    AV_PIX_FMT_P216,
-    AV_PIX_FMT_YUV422P,
-    AV_PIX_FMT_YUV420P10,
-    AV_PIX_FMT_YUV422P10,
-    AV_PIX_FMT_YUV444P10,
-    AV_PIX_FMT_YUV444P10MSB,
-    AV_PIX_FMT_YUV444P12MSB,
-    AV_PIX_FMT_YUV444P16,
-    AV_PIX_FMT_0RGB32,
-    AV_PIX_FMT_0BGR32,
-    AV_PIX_FMT_RGB32,
-    AV_PIX_FMT_BGR32,
-#if CONFIG_VULKAN
-    AV_PIX_FMT_VULKAN,
-#endif
-};
+
 
 #define CHECK_CU(x) FF_CUDA_CHECK_DL(device_ctx, cu, x)
+
+static CUarray_format cuda_array_format_for_pix_fmt(enum AVPixelFormat fmt);
 
 static int cuda_frames_get_constraints(AVHWDeviceContext *ctx,
                                        const void *hwconfig,
                                        AVHWFramesConstraints *constraints)
 {
-    int i;
+    const AVCUDAHWConfig *config = hwconfig;
+    enum AVPixelFormat req_fmt = config ? config->hw_format : AV_PIX_FMT_NONE;
+    int n = 0;
 
-    constraints->valid_sw_formats = av_malloc_array(FF_ARRAY_ELEMS(supported_formats) + 1,
+    if (req_fmt == AV_PIX_FMT_CUDA || req_fmt == AV_PIX_FMT_CUARRAY) {
+        constraints->valid_hw_formats = av_malloc_array(2, sizeof(*constraints->valid_hw_formats));
+        if (!constraints->valid_hw_formats)
+            return AVERROR(ENOMEM);
+
+        constraints->valid_hw_formats[0] = req_fmt;
+        constraints->valid_hw_formats[1] = AV_PIX_FMT_NONE;
+    } else {
+        constraints->valid_hw_formats = av_malloc_array(2 + HAVE_FFNVCODEC_CUARRAY, sizeof(*constraints->valid_hw_formats));
+        if (!constraints->valid_hw_formats)
+            return AVERROR(ENOMEM);
+
+        constraints->valid_hw_formats[0] = AV_PIX_FMT_CUDA;
+#if HAVE_FFNVCODEC_CUARRAY
+        constraints->valid_hw_formats[1] = AV_PIX_FMT_CUARRAY;
+        constraints->valid_hw_formats[2] = AV_PIX_FMT_NONE;
+#else
+        constraints->valid_hw_formats[1] = AV_PIX_FMT_NONE;
+#endif
+    }
+
+    constraints->valid_sw_formats = av_malloc_array(AV_PIX_FMT_NB + 1,
                                                     sizeof(*constraints->valid_sw_formats));
     if (!constraints->valid_sw_formats)
         return AVERROR(ENOMEM);
 
-    for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++)
-        constraints->valid_sw_formats[i] = supported_formats[i];
-    constraints->valid_sw_formats[FF_ARRAY_ELEMS(supported_formats)] = AV_PIX_FMT_NONE;
-
-    constraints->valid_hw_formats = av_malloc_array(2, sizeof(*constraints->valid_hw_formats));
-    if (!constraints->valid_hw_formats)
-        return AVERROR(ENOMEM);
-
-    constraints->valid_hw_formats[0] = AV_PIX_FMT_CUDA;
-    constraints->valid_hw_formats[1] = AV_PIX_FMT_NONE;
+    n = 0;
+    for (int i = 0; i < AV_PIX_FMT_NB; i++) {
+        if (req_fmt == AV_PIX_FMT_CUARRAY) {
+            if (cuda_array_format_for_pix_fmt(i))
+                constraints->valid_sw_formats[n++] = i;
+        } else {
+            const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(i);
+            /* Palette formats carry their palette in a separate zero-linesize
+             * data[1] plane that the transfer path does not handle, so exclude
+             * them along with the hwaccel formats. */
+            if (desc && !(desc->flags & (AV_PIX_FMT_FLAG_HWACCEL | AV_PIX_FMT_FLAG_PAL)))
+                constraints->valid_sw_formats[n++] = i;
+        }
+    }
+#if CONFIG_VULKAN
+    if (req_fmt != AV_PIX_FMT_CUARRAY)
+        constraints->valid_sw_formats[n++] = AV_PIX_FMT_VULKAN;
+#endif
+    constraints->valid_sw_formats[n] = AV_PIX_FMT_NONE;
 
     return 0;
 }
@@ -106,7 +118,13 @@ static void cuda_buffer_free(void *opaque, uint8_t *data)
 
     CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
 
-    CHECK_CU(cu->cuMemFree((CUdeviceptr)data));
+    if (ctx->format == AV_PIX_FMT_CUARRAY) {
+        AVCUDAArrayFrameDescriptor *desc = (AVCUDAArrayFrameDescriptor*)data;
+        CHECK_CU(cu->cuArrayDestroy(desc->array));
+        av_free(desc);
+    } else {
+        CHECK_CU(cu->cuMemFree((CUdeviceptr)data));
+    }
 
     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
 }
@@ -114,6 +132,7 @@ static void cuda_buffer_free(void *opaque, uint8_t *data)
 static AVBufferRef *cuda_pool_alloc(void *opaque, size_t size)
 {
     AVHWFramesContext        *ctx = opaque;
+    CUDAFramesContext       *priv = ctx->hwctx;
     AVHWDeviceContext *device_ctx = ctx->device_ctx;
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
@@ -127,20 +146,125 @@ static AVBufferRef *cuda_pool_alloc(void *opaque, size_t size)
     if (err < 0)
         return NULL;
 
+    if (ctx->format == AV_PIX_FMT_CUARRAY) {
+        AVCUDAArrayFrameDescriptor *desc = av_mallocz(sizeof(*desc));
+        if (!desc)
+            goto done;
+
+        if (priv->p.cuarray_num_surfaces > 0) {
+            if (priv->cuarray_num_surfaces_used >= priv->p.cuarray_num_surfaces) {
+                av_log(ctx, AV_LOG_ERROR, "Static surface pool size exceeded.\n");
+                av_free(desc);
+                goto done;
+            }
+            desc->index = priv->cuarray_num_surfaces_used++;
+            desc->array = priv->p.cuarray_surfaces[desc->index];
+        } else {
+            err = CHECK_CU(cu->cuArray3DCreate(&desc->array, &priv->p.cuarray_desc));
+            if (err < 0) {
+                av_free(desc);
+                goto done;
+            }
+        }
+
+        ret = av_buffer_create((uint8_t*)desc, sizeof(*desc), cuda_buffer_free, ctx, 0);
+        if (!ret) {
+            // It is okay (and necessary) to free a pool array here,
+            // since cuarray_num_surfaces_used is already incremented.
+            CHECK_CU(cu->cuArrayDestroy(desc->array));
+            av_free(desc);
+            goto done;
+        }
+
+        goto done;
+    }
+
     err = CHECK_CU(cu->cuMemAlloc(&data, size));
     if (err < 0)
-        goto fail;
+        goto done;
 
     ret = av_buffer_create((uint8_t*)data, size, cuda_buffer_free, ctx, 0);
     if (!ret) {
         CHECK_CU(cu->cuMemFree(data));
-        goto fail;
+        goto done;
     }
 
-fail:
+    // Common exit: reached on both success (ret holds the buffer) and
+    // failure (ret == NULL); restores the CUDA context and returns ret.
+done:
     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
     return ret;
 }
+
+static void cuda_frames_uninit(AVHWFramesContext *ctx)
+{
+    AVHWDeviceContext *device_ctx = ctx->device_ctx;
+    AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
+    CUDAFramesContext       *priv = ctx->hwctx;
+    CudaFunctions             *cu = hwctx->internal->cuda_dl;
+
+    if (priv->p.cuarray_surfaces) {
+        CUcontext dummy;
+        CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
+
+        // Make sure we don't free surfaces that have been adopted by the pool already
+        for (int i = priv->cuarray_num_surfaces_used; i < priv->p.cuarray_num_surfaces; i++)
+            if (priv->p.cuarray_surfaces[i])
+                CHECK_CU(cu->cuArrayDestroy(priv->p.cuarray_surfaces[i]));
+
+        CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+
+        av_freep(&priv->p.cuarray_surfaces);
+        priv->p.cuarray_num_surfaces = 0;
+    }
+}
+
+static CUarray_format cuda_array_format_for_pix_fmt(enum AVPixelFormat fmt)
+{
+    switch (fmt) {
+#if HAVE_FFNVCODEC_CUARRAY
+    case AV_PIX_FMT_NV12:      return CU_AD_FORMAT_NV12;
+    case AV_PIX_FMT_P010:
+    case AV_PIX_FMT_P012:
+    case AV_PIX_FMT_P016:      return CU_AD_FORMAT_P016;
+    case AV_PIX_FMT_NV16:      return CU_AD_FORMAT_NV16;
+    case AV_PIX_FMT_P210:
+    case AV_PIX_FMT_P212:
+    case AV_PIX_FMT_P216:      return CU_AD_FORMAT_P216;
+    case AV_PIX_FMT_NV24:      return CU_AD_FORMAT_YUV444_8BIT_SEMIPLANAR;
+    case AV_PIX_FMT_P410:
+    case AV_PIX_FMT_P412:
+    case AV_PIX_FMT_P416:      return CU_AD_FORMAT_YUV444_16BIT_SEMIPLANAR;
+    case AV_PIX_FMT_YUV420P:   return CU_AD_FORMAT_UINT8_PLANAR_420;
+    case AV_PIX_FMT_YUV422P:   return CU_AD_FORMAT_UINT8_PLANAR_422;
+    case AV_PIX_FMT_YUV444P:   return CU_AD_FORMAT_UINT8_PLANAR_444;
+    case AV_PIX_FMT_YUV420P10: return CU_AD_FORMAT_UINT16_PLANAR_420;
+    case AV_PIX_FMT_YUV422P10: return CU_AD_FORMAT_UINT16_PLANAR_422;
+    case AV_PIX_FMT_YUV444P10:
+    case AV_PIX_FMT_YUV444P10MSB:
+    case AV_PIX_FMT_YUV444P12MSB:
+    case AV_PIX_FMT_YUV444P16: return CU_AD_FORMAT_UINT16_PLANAR_444;
+    case AV_PIX_FMT_0RGB32:
+    case AV_PIX_FMT_0BGR32:
+    case AV_PIX_FMT_RGB32:
+    case AV_PIX_FMT_BGR32:     return CU_AD_FORMAT_UNSIGNED_INT8;
+#endif
+    default:                   return 0;
+    }
+}
+
+#if HAVE_FFNVCODEC_CUARRAY
+static unsigned int cuda_array_numchannels_for_pix_fmt(enum AVPixelFormat fmt)
+{
+    switch (fmt) {
+    case AV_PIX_FMT_0RGB32:
+    case AV_PIX_FMT_0BGR32:
+    case AV_PIX_FMT_RGB32:
+    case AV_PIX_FMT_BGR32:     return 4;
+    default:                   return 3;
+    }
+}
+#endif
 
 static int cuda_frames_init(AVHWFramesContext *ctx)
 {
@@ -148,17 +272,32 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
     CUDAFramesContext       *priv = ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
-    int err, i;
+    const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(ctx->sw_format);
+    int err;
 
-    for (i = 0; i < FF_ARRAY_ELEMS(supported_formats); i++) {
-        if (ctx->sw_format == supported_formats[i])
-            break;
+    if (!desc) {
+        av_log(ctx, AV_LOG_ERROR, "Invalid pixel format\n");
+        return AVERROR(EINVAL);
     }
-    if (i == FF_ARRAY_ELEMS(supported_formats)) {
-        av_log(ctx, AV_LOG_ERROR, "Pixel format '%s' is not supported\n",
-               av_get_pix_fmt_name(ctx->sw_format));
+
+    /* Palette formats keep their palette in a separate zero-linesize plane
+     * that the transfer path does not copy, so they are not supported. */
+    if (desc->flags & AV_PIX_FMT_FLAG_PAL) {
+        av_log(ctx, AV_LOG_ERROR, "Palette formats are not supported\n");
         return AVERROR(ENOSYS);
     }
+
+#if HAVE_FFNVCODEC_CUARRAY
+    if (ctx->format == AV_PIX_FMT_CUARRAY && !cu->cuArrayGetPlane) {
+        av_log(ctx, AV_LOG_ERROR, "cuArrayGetPlane not available, update your driver\n");
+        return AVERROR(ENOSYS);
+    }
+#else
+    if (ctx->format == AV_PIX_FMT_CUARRAY) {
+        av_log(ctx, AV_LOG_ERROR, "Missing support for cuarray frames. Rebuild with newer ffnvcodec headers.\n");
+        return AVERROR(ENOSYS);
+    }
+#endif
 
     err = CHECK_CU(cu->cuDeviceGetAttribute(&priv->tex_alignment,
                                             14 /* CU_DEVICE_ATTRIBUTE_TEXTURE_ALIGNMENT */,
@@ -176,47 +315,191 @@ static int cuda_frames_init(AVHWFramesContext *ctx)
 
     av_pix_fmt_get_chroma_sub_sample(ctx->sw_format, &priv->shift_width, &priv->shift_height);
 
+#if HAVE_FFNVCODEC_CUARRAY
+    if (ctx->format == AV_PIX_FMT_CUARRAY) {
+        if (!priv->p.cuarray_desc.Width)
+            priv->p.cuarray_desc.Width = ctx->width;
+        if (!priv->p.cuarray_desc.Height)
+            priv->p.cuarray_desc.Height = ctx->height;
+        if (!priv->p.cuarray_desc.NumChannels)
+            priv->p.cuarray_desc.NumChannels = cuda_array_numchannels_for_pix_fmt(ctx->sw_format);
+
+        if (priv->p.cuarray_desc.Depth) {
+            av_log(ctx, AV_LOG_ERROR, "CUarrays with non-zero depth are not supported.\n");
+            return AVERROR(EINVAL);
+        }
+
+        if (!priv->p.cuarray_desc.Format)
+            priv->p.cuarray_desc.Format = cuda_array_format_for_pix_fmt(ctx->sw_format);
+        if (!priv->p.cuarray_desc.Format) {
+            av_log(ctx, AV_LOG_ERROR, "Invalid CUarray pixel format\n");
+            return AVERROR_BUG;
+        }
+
+        priv->p.cuarray_desc.Flags |= CUDA_ARRAY3D_SURFACE_LDST | CUDA_ARRAY3D_VIDEO_ENCODE_DECODE;
+    }
+
+    if (ctx->format == AV_PIX_FMT_CUARRAY && priv->p.cuarray_num_surfaces > 0) {
+        CUcontext dummy;
+
+        priv->p.cuarray_surfaces = av_calloc(priv->p.cuarray_num_surfaces, sizeof(*priv->p.cuarray_surfaces));
+        if (!priv->p.cuarray_surfaces)
+            return AVERROR(ENOMEM);
+
+        err = CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
+        if (err < 0) {
+            av_freep(&priv->p.cuarray_surfaces);
+            return err;
+        }
+
+        for (int i = 0; i < priv->p.cuarray_num_surfaces; i++) {
+            err = CHECK_CU(cu->cuArray3DCreate(&priv->p.cuarray_surfaces[i], &priv->p.cuarray_desc));
+            if (err < 0) {
+                for (i = i - 1; i >= 0; i--)
+                    CHECK_CU(cu->cuArrayDestroy(priv->p.cuarray_surfaces[i]));
+                CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+
+                av_freep(&priv->p.cuarray_surfaces);
+                return err;
+            }
+        }
+
+        err = CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+        if (err < 0)
+            goto fail;
+
+        av_log(ctx, AV_LOG_DEBUG, "allocated %d CUarray surfaces (%zux%zu)\n",
+               priv->p.cuarray_num_surfaces, priv->p.cuarray_desc.Width, priv->p.cuarray_desc.Height);
+    }
+#endif
+
     if (!ctx->pool) {
         int size = av_image_get_buffer_size(ctx->sw_format, ctx->width, ctx->height, priv->tex_alignment);
-        if (size < 0)
-            return size;
+        if (size < 0) {
+            err = size;
+            goto fail;
+        }
 
         ffhwframesctx(ctx)->pool_internal =
             av_buffer_pool_init2(size, ctx, cuda_pool_alloc, NULL);
-        if (!ffhwframesctx(ctx)->pool_internal)
-            return AVERROR(ENOMEM);
+        if (!ffhwframesctx(ctx)->pool_internal) {
+            err = AVERROR(ENOMEM);
+            goto fail;
+        }
     }
 
     return 0;
+
+fail:
+    cuda_frames_uninit(ctx);
+    return err;
 }
 
 static int cuda_get_buffer(AVHWFramesContext *ctx, AVFrame *frame)
 {
-    CUDAFramesContext *priv = ctx->hwctx;
+    CUDAFramesContext       *priv = ctx->hwctx;
+#if HAVE_FFNVCODEC_CUARRAY
+    AVHWDeviceContext *device_ctx = ctx->device_ctx;
+    AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
+    CudaFunctions             *cu = hwctx->internal->cuda_dl;
+
+    CUcontext dummy;
+#endif
     int res;
 
     frame->buf[0] = av_buffer_pool_get(ctx->pool);
     if (!frame->buf[0])
         return AVERROR(ENOMEM);
 
-    res = av_image_fill_arrays(frame->data, frame->linesize, frame->buf[0]->data,
-                               ctx->sw_format, ctx->width, ctx->height, priv->tex_alignment);
-    if (res < 0)
-        return res;
+    if (ctx->format == AV_PIX_FMT_CUARRAY) {
+#if HAVE_FFNVCODEC_CUARRAY
+        AVCUDAArrayFrameDescriptor *desc = (AVCUDAArrayFrameDescriptor*)frame->buf[0]->data;
+        if (!desc) {
+            frame->format = ctx->format;
+            frame->width  = ctx->width;
+            frame->height = ctx->height;
+            return 0;
+        }
+        frame->data[0] = (uint8_t*)desc->array;
+        frame->data[1] = (uint8_t*)desc->index;
 
-    // YUV420P is a special case.
-    // Nvenc expects the U/V planes in swapped order from how ffmpeg expects them, also chroma is half-aligned
-    if (ctx->sw_format == AV_PIX_FMT_YUV420P) {
-        frame->linesize[1] = frame->linesize[2] = frame->linesize[0] / 2;
-        frame->data[2]     = frame->data[1];
-        frame->data[1]     = frame->data[2] + frame->linesize[2] * AV_CEIL_RSHIFT(ctx->height, 1);
+        res = CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
+        if (res < 0)
+            return res;
+
+        for (int i = 0; i < FF_ARRAY_ELEMS(frame->linesize); i++) {
+            CUDA_ARRAY3D_DESCRIPTOR plane_desc = { 0 };
+            CUarray plane_array;
+            CUresult arr_plane_res = cu->cuArrayGetPlane(&plane_array, desc->array, i);
+
+            if (arr_plane_res == CUDA_ERROR_INVALID_VALUE) {
+                if (i > 0)
+                    break;
+                /* Non-planar format (e.g. UNSIGNED_INT8 x4 for packed RGB):
+                 * cuArrayGetPlane is unsupported, query the array directly. */
+                res = CHECK_CU(cu->cuArray3DGetDescriptor(&plane_desc, desc->array));
+                if (res < 0)
+                    goto fail;
+            } else if (arr_plane_res != CUDA_SUCCESS) {
+                res = CHECK_CU(arr_plane_res);
+                goto fail;
+            } else {
+                res = CHECK_CU(cu->cuArray3DGetDescriptor(&plane_desc, plane_array));
+                if (res < 0)
+                    goto fail;
+            }
+
+            int elem_size = ff_cuda_cuarray_elem_size(plane_desc.Format);
+            if (elem_size <= 0) {
+                res = AVERROR_BUG;
+                goto fail;
+            }
+
+            frame->linesize[i] = plane_desc.Width * plane_desc.NumChannels * elem_size;
+
+            if (arr_plane_res == CUDA_ERROR_INVALID_VALUE)
+                break;
+        }
+
+        res = CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+        if (res < 0)
+            return res;
+#else
+        return AVERROR(ENOSYS);
+#endif
+    } else {
+        res = av_image_fill_arrays(frame->data, frame->linesize, frame->buf[0]->data,
+                                   ctx->sw_format, ctx->width, ctx->height, priv->tex_alignment);
+        if (res < 0)
+            return res;
+
+        // YUV420P is a special case.
+        // Nvenc expects the U/V planes in swapped order from how ffmpeg expects them, also chroma is half-aligned
+        if (ctx->sw_format == AV_PIX_FMT_YUV420P) {
+            frame->linesize[1] = frame->linesize[2] = frame->linesize[0] / 2;
+            frame->data[2]     = frame->data[1];
+            frame->data[1]     = frame->data[2] + frame->linesize[2] * AV_CEIL_RSHIFT(ctx->height, 1);
+        }
     }
 
-    frame->format = AV_PIX_FMT_CUDA;
+    frame->format = ctx->format;
     frame->width  = ctx->width;
     frame->height = ctx->height;
 
     return 0;
+
+#if HAVE_FFNVCODEC_CUARRAY
+fail:
+    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+    return res;
+#endif
+}
+
+static enum AVPixelFormat cuda_frame_hw_format(const AVFrame *frame)
+{
+    if (!frame->hw_frames_ctx)
+        return AV_PIX_FMT_NONE;
+    return ((AVHWFramesContext *)frame->hw_frames_ctx->data)->format;
 }
 
 static int cuda_transfer_get_formats(AVHWFramesContext *ctx,
@@ -246,17 +529,44 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
 
     CUcontext dummy;
-    int i, ret;
+    int i, ret, copy_queued = 0;
 
-    if ((src->hw_frames_ctx && ((AVHWFramesContext*)src->hw_frames_ctx->data)->format != AV_PIX_FMT_CUDA) ||
-        (dst->hw_frames_ctx && ((AVHWFramesContext*)dst->hw_frames_ctx->data)->format != AV_PIX_FMT_CUDA))
-        return AVERROR(ENOSYS);
+    {
+        enum AVPixelFormat src_fmt = cuda_frame_hw_format(src);
+        enum AVPixelFormat dst_fmt = cuda_frame_hw_format(dst);
+        if ((src_fmt != AV_PIX_FMT_NONE &&
+             src_fmt != AV_PIX_FMT_CUDA && src_fmt != AV_PIX_FMT_CUARRAY) ||
+            (dst_fmt != AV_PIX_FMT_NONE &&
+             dst_fmt != AV_PIX_FMT_CUDA && dst_fmt != AV_PIX_FMT_CUARRAY))
+            return AVERROR(ENOSYS);
+    }
 
     ret = CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
     if (ret < 0)
         return ret;
 
-    for (i = 0; i < FF_ARRAY_ELEMS(src->data) && src->data[i]; i++) {
+    /*
+     * Copy one plane per iteration, bounded by the AVFrame linesizes. src and
+     * dst always share the same sw_format (this path never converts), so they
+     * are either both multi-planar or both single-plane.
+     *
+     * For a CUARRAY side, cuArrayGetPlane() returns the sub-array for plane i
+     * of a multi-planar CUarray (NV12, P0xx, NV24, planar 4:4:4, ...).
+     * cuArrayGetPlane() returns CUDA_ERROR_INVALID_VALUE either when the array
+     * is not multi-planar or when the plane index exceeds its plane count:
+     *   - i == 0: the array is packed (e.g. RGB), i.e. a single plane, so the
+     *     whole array is used as that plane.
+     *   - i  > 0: the planes of a multi-planar array always have a non-zero
+     *     linesize, so a valid plane is never skipped by the loop bound;
+     *     getting INVALID_VALUE here means src/dst disagree on the plane count,
+     *     which is an inconsistency and is treated as an error (handled by the
+     *     generic cures != CUDA_SUCCESS branch) rather than silently copying a
+     *     subset of the planes.
+     */
+    for (i = 0; i < FF_ARRAY_ELEMS(src->data) && src->linesize[i]; i++) {
+        int src_is_nonplanar_cuarray = 0;
+        int dst_is_nonplanar_cuarray = 0;
+
         CUDA_MEMCPY2D cpy = {
             .srcPitch      = src->linesize[i],
             .dstPitch      = dst->linesize[i],
@@ -264,17 +574,57 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             .Height        = AV_CEIL_RSHIFT(src->height, ((i == 0 || i == 3) ? 0 : priv->shift_height)),
         };
 
-        if (src->hw_frames_ctx) {
+        if (src->format == AV_PIX_FMT_CUDA) {
             cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
             cpy.srcDevice     = (CUdeviceptr)src->data[i];
+        } else if (src->format == AV_PIX_FMT_CUARRAY) {
+#if HAVE_FFNVCODEC_CUARRAY
+            CUarray array;
+            CUresult cures = cu->cuArrayGetPlane(&array, (CUarray)src->data[0], i);
+            if (cures == CUDA_ERROR_INVALID_VALUE && i == 0) {
+                /* Not a multi-planar array (packed format): the whole array is
+                 * the single plane. */
+                array = (CUarray)src->data[0];
+                src_is_nonplanar_cuarray = 1;
+            } else if (cures != CUDA_SUCCESS) {
+                ret = CHECK_CU(cures);
+                goto fail;
+            }
+
+            cpy.srcMemoryType = CU_MEMORYTYPE_ARRAY;
+            cpy.srcArray      = array;
+#else
+            ret = AVERROR(ENOSYS);
+            goto exit;
+#endif
         } else {
             cpy.srcMemoryType = CU_MEMORYTYPE_HOST;
             cpy.srcHost       = src->data[i];
         }
 
-        if (dst->hw_frames_ctx) {
+        if (dst->format == AV_PIX_FMT_CUDA) {
             cpy.dstMemoryType = CU_MEMORYTYPE_DEVICE;
             cpy.dstDevice     = (CUdeviceptr)dst->data[i];
+        } else if (dst->format == AV_PIX_FMT_CUARRAY) {
+#if HAVE_FFNVCODEC_CUARRAY
+            CUarray array;
+            CUresult cures = cu->cuArrayGetPlane(&array, (CUarray)dst->data[0], i);
+            if (cures == CUDA_ERROR_INVALID_VALUE && i == 0) {
+                /* Not a multi-planar array (packed format): the whole array is
+                 * the single plane. */
+                array = (CUarray)dst->data[0];
+                dst_is_nonplanar_cuarray = 1;
+            } else if (cures != CUDA_SUCCESS) {
+                ret = CHECK_CU(cures);
+                goto fail;
+            }
+
+            cpy.dstMemoryType = CU_MEMORYTYPE_ARRAY;
+            cpy.dstArray      = array;
+#else
+            ret = AVERROR(ENOSYS);
+            goto exit;
+#endif
         } else {
             cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
             cpy.dstHost       = dst->data[i];
@@ -282,7 +632,11 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
 
         ret = CHECK_CU(cu->cuMemcpy2DAsync(&cpy, hwctx->stream));
         if (ret < 0)
-            goto exit;
+            goto fail;
+        copy_queued = 1;
+
+        if (src_is_nonplanar_cuarray || dst_is_nonplanar_cuarray)
+            break;
     }
 
     if (!dst->hw_frames_ctx) {
@@ -291,10 +645,13 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             goto exit;
     }
 
+fail:
+    if (ret < 0 && copy_queued)
+        CHECK_CU(cu->cuStreamSynchronize(hwctx->stream));
 exit:
     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
 
-    return 0;
+    return ret;
 }
 
 static void cuda_device_uninit(AVHWDeviceContext *device_ctx)
@@ -557,6 +914,7 @@ static int cuda_device_derive(AVHWDeviceContext *device_ctx,
 
     if (hwctx->internal->cuda_device == -1) {
         av_log(device_ctx, AV_LOG_ERROR, "Could not derive CUDA device.\n");
+        ret = AVERROR(ENODEV);
         goto error;
     }
 
@@ -584,10 +942,15 @@ const HWContextType ff_hwcontext_type_cuda = {
     .device_uninit        = cuda_device_uninit,
     .frames_get_constraints = cuda_frames_get_constraints,
     .frames_init          = cuda_frames_init,
+    .frames_uninit        = cuda_frames_uninit,
     .frames_get_buffer    = cuda_get_buffer,
     .transfer_get_formats = cuda_transfer_get_formats,
     .transfer_data_to     = cuda_transfer_data,
     .transfer_data_from   = cuda_transfer_data,
 
-    .pix_fmts             = (const enum AVPixelFormat[]){ AV_PIX_FMT_CUDA, AV_PIX_FMT_NONE },
+    .pix_fmts             = (const enum AVPixelFormat[]){ AV_PIX_FMT_CUDA,
+#if HAVE_FFNVCODEC_CUARRAY
+                                                          AV_PIX_FMT_CUARRAY,
+#endif
+                                                          AV_PIX_FMT_NONE },
 };

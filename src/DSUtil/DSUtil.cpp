@@ -109,7 +109,7 @@ bool IsVideoDecoder(IBaseFilter* pBF, bool fCountConnectedOnly)
 		return false;
 	}
 
-	const CString filterName = GetFilterName(pBF).MakeLower();
+	const CStringW filterName = GetFilterName(pBF).MakeLower();
 
 	if (StartsWith(filterName, L"directvobsub")) {
 		return true;
@@ -406,9 +406,9 @@ IPin* FindPin(IBaseFilter* pBF, PIN_DIRECTION direction, const GUID majortype)
 	return nullptr;
 }
 
-CString GetFilterName(IBaseFilter* pBF)
+CStringW GetFilterName(IBaseFilter* pBF)
 {
-	CString name;
+	CStringW name;
 
 	if (pBF) {
 		CFilterInfo fi;
@@ -420,9 +420,9 @@ CString GetFilterName(IBaseFilter* pBF)
 	return name;
 }
 
-CString GetPinName(IPin* pPin)
+CStringW GetPinName(IPin* pPin)
 {
-	CString name;
+	CStringW name;
 	CPinInfo pi;
 	if (pPin && SUCCEEDED(pPin->QueryPinInfo(&pi))) {
 		name = pi.achName;
@@ -453,7 +453,7 @@ IBaseFilter* GetFilterFromPin(IPin* pPin)
 	return nullptr;
 }
 
-IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
+IPin* AppendFilter(IPin* pPin, CStringW DisplayName, IGraphBuilder* pGB)
 {
 	IPin* pRet = pPin;
 
@@ -539,7 +539,7 @@ IPin* AppendFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
 	return pRet;
 }
 
-IPin* InsertFilter(IPin* pPin, CString DisplayName, IGraphBuilder* pGB)
+IPin* InsertFilter(IPin* pPin, CStringW DisplayName, IGraphBuilder* pGB)
 {
 	do {
 		if (!pPin || DisplayName.IsEmpty() || !pGB) {
@@ -711,8 +711,8 @@ CLSID GetCLSID(IPin* pPin)
 
 bool IsCLSIDRegistered(LPCWSTR clsid)
 {
-	CString rootkey1(L"CLSID\\");
-	CString rootkey2(L"CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance\\");
+	CStringW rootkey1(L"CLSID\\");
+	CStringW rootkey2(L"CLSID\\{083863F1-70DE-11d0-BD40-00A0C911CE86}\\Instance\\");
 
 	return ERROR_SUCCESS == CRegKey().Open(HKEY_CLASSES_ROOT, rootkey1 + clsid, KEY_READ)
 		   || ERROR_SUCCESS == CRegKey().Open(HKEY_CLASSES_ROOT, rootkey2 + clsid, KEY_READ);
@@ -724,7 +724,7 @@ bool IsCLSIDRegistered(const CLSID& clsid)
 
 	LPOLESTR pStr = nullptr;
 	if (S_OK == StringFromCLSID(clsid, &pStr) && pStr) {
-		fRet = IsCLSIDRegistered(CString(pStr));
+		fRet = IsCLSIDRegistered(CStringW(pStr));
 		CoTaskMemFree(pStr);
 	}
 
@@ -735,7 +735,7 @@ HRESULT CheckFilterCLSID(const CLSID& clsid)
 {
 	LPOLESTR pStr = nullptr;
 	if (S_OK == StringFromCLSID(clsid, &pStr) && pStr) {
-		CString str_clsid(pStr);
+		CStringW str_clsid(pStr);
 		CoTaskMemFree(pStr);
 
 		CRegKey key;
@@ -756,7 +756,7 @@ HRESULT CheckFilterCLSID(const CLSID& clsid)
 	return E_FAIL; // not installed
 }
 
-void CStringToBin(CString str, std::vector<BYTE>& data)
+void CStringToBin(CStringW str, std::vector<BYTE>& data)
 {
 	str.Trim();
 	ASSERT((str.GetLength()&1) == 0);
@@ -787,9 +787,9 @@ void CStringToBin(CString str, std::vector<BYTE>& data)
 	}
 }
 
-CString BinToCString(const BYTE* ptr, size_t len)
+CStringW BinToCString(const BYTE* ptr, size_t len)
 {
-	CString ret;
+	CStringW ret;
 	WCHAR high, low;
 
 	while (len-- > 0) {
@@ -1140,7 +1140,7 @@ bool MakeMPEG2MediaType(CMediaType& mt, BYTE* seqhdr, DWORD len, int w, int h)
 	return true;
 }
 
-bool CreateFilter(CString DisplayName, IBaseFilter** ppBF, CString& FriendlyName)
+bool CreateFilter(CStringW DisplayName, IBaseFilter** ppBF, CStringW& FriendlyName)
 {
 	if (!ppBF) {
 		return false;
@@ -1258,9 +1258,9 @@ IBaseFilter* AppendFilter(IPin* pPin, IMoniker* pMoniker, IGraphBuilder* pGB)
 	return nullptr;
 }
 
-CString GetFriendlyName(CString DisplayName)
+CStringW GetFriendlyName(CStringW DisplayName)
 {
-	CString FriendlyName;
+	CStringW FriendlyName;
 
 	CComPtr<IBindCtx> pBindCtx;
 	CreateBindCtx(0, &pBindCtx);
@@ -1282,7 +1282,7 @@ CString GetFriendlyName(CString DisplayName)
 }
 
 struct ExternalObject {
-	CString path;
+	CStringW path;
 	HINSTANCE hInst;
 	CLSID clsid;
 };
@@ -1293,7 +1293,7 @@ HRESULT LoadExternalObject(LPCWSTR path, REFCLSID clsid, REFIID iid, void** ppv)
 {
 	CheckPointer(ppv, E_POINTER);
 
-	CString fullpath = MakeFullPath(path);
+	CStringW fullpath = MakeFullPath(path);
 
 	HINSTANCE hInst = nullptr;
 	bool fFound = false;
@@ -1415,7 +1415,7 @@ bool IsLikelyFilePath(const CStringW& str) // simple file system path detector
 
 //
 
-GUID GUIDFromCString(CString str)
+GUID GUIDFromCString(CStringW str)
 {
 	GUID guid = GUID_NULL;
 	HRESULT hr = CLSIDFromString(CComBSTR(str), &guid);
@@ -1424,7 +1424,7 @@ GUID GUIDFromCString(CString str)
 	return guid;
 }
 
-HRESULT GUIDFromCString(CString str, GUID& guid)
+HRESULT GUIDFromCString(CStringW str, GUID& guid)
 {
 	guid = GUID_NULL;
 	return CLSIDFromString(CComBSTR(str), &guid);
@@ -1541,9 +1541,9 @@ bool SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValueName, LPC
 {
 	bool bOK = false;
 
-	CString szKey(pszKey);
+	CStringW szKey(pszKey);
 	if (pszSubkey != 0) {
-		szKey += CString(L"\\") + pszSubkey;
+		szKey += CStringW(L"\\") + pszSubkey;
 	}
 
 	HKEY hKey;
@@ -1570,9 +1570,9 @@ bool SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValue)
 
 void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkbytes, LPCWSTR ext, ...)
 {
-	CString null = CStringFromGUID(GUID_NULL);
-	CString majortype = CStringFromGUID(MEDIATYPE_Stream);
-	CString subtype = CStringFromGUID(subtype2);
+	CStringW null = CStringFromGUID(GUID_NULL);
+	CStringW majortype = CStringFromGUID(MEDIATYPE_Stream);
+	CStringW subtype = CStringFromGUID(subtype2);
 
 	SetRegKeyValue(L"Media Type\\" + majortype, subtype, L"0", chkbytes);
 	SetRegKeyValue(L"Media Type\\" + majortype, subtype, L"Source Filter", CStringFromGUID(clsid));
@@ -1587,15 +1587,15 @@ void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkb
 	va_end(marker);
 }
 
-void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CString>& chkbytes, LPCWSTR ext, ...)
+void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CStringW>& chkbytes, LPCWSTR ext, ...)
 {
-	CString null = CStringFromGUID(GUID_NULL);
-	CString majortype = CStringFromGUID(MEDIATYPE_Stream);
-	CString subtype = CStringFromGUID(subtype2);
+	CStringW null = CStringFromGUID(GUID_NULL);
+	CStringW majortype = CStringFromGUID(MEDIATYPE_Stream);
+	CStringW subtype = CStringFromGUID(subtype2);
 
 	auto it = chkbytes.begin();
 	for (int i = 0; it != chkbytes.end(); i++) {
-		CString idx;
+		CStringW idx;
 		idx.Format(L"%d", i);
 		SetRegKeyValue(L"Media Type\\" + majortype, subtype, idx, *it++);
 	}

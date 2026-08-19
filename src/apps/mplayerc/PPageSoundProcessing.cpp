@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2025 see Authors.txt
+ * (C) 2017-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -191,6 +191,7 @@ BOOL CPPageSoundProcessing::OnInitDialog()
 	m_chkAudioFilters.SetCheck(s.bAudioFilters);
 	m_cmbFilter1Name.AddString(L"");
 	m_cmbFilter1Name.AddString(L"compand");
+	m_cmbFilter1Name.SetCurSel(0);
 	if (s.strAudioFilter1.GetLength()) {
 		CStringW flt_name;
 		CStringW flt_args;

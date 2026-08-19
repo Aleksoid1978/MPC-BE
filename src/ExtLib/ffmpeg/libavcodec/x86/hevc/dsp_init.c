@@ -24,7 +24,6 @@
 
 #include "libavutil/cpu.h"
 #include "libavutil/mem_internal.h"
-#include "libavutil/x86/asm.h"
 #include "libavutil/x86/cpu.h"
 #include "libavcodec/hevc/dsp.h"
 #include "libavcodec/x86/hevc/dsp.h"
@@ -87,6 +86,12 @@ void ff_hevc_idct_32x32_10_ ## opt(int16_t *coeffs, int col_limit);
 IDCT_FUNCS(sse2)
 IDCT_FUNCS(avx)
 
+#define TRANSFORM_LUMA_FUNCS(opt)                            \
+void ff_hevc_transform_4x4_luma_8_  ## opt(int16_t *coeffs); \
+void ff_hevc_transform_4x4_luma_10_ ## opt(int16_t *coeffs)
+
+TRANSFORM_LUMA_FUNCS(sse2);
+TRANSFORM_LUMA_FUNCS(avx);
 
 #define ff_hevc_pel_filters ff_hevc_qpel_filters
 #define DECL_HV_FILTER(f)                                  \
@@ -838,14 +843,11 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 
             c->idct[0]    = ff_hevc_idct_4x4_8_sse2;
             c->idct[1]    = ff_hevc_idct_8x8_8_sse2;
+            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_8_sse2;
 
             c->add_residual[1] = ff_hevc_add_residual_8_8_sse2;
             c->add_residual[2] = ff_hevc_add_residual_16_8_sse2;
             c->add_residual[3] = ff_hevc_add_residual_32_8_sse2;
-
-            // ==> Start patch MPC
-            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_8_sse2;
-            // ==> End patch MPC
         }
         if (EXTERNAL_SSSE3(cpu_flags)) {
 #if ARCH_X86_64
@@ -883,6 +885,7 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 
             c->idct[0] = ff_hevc_idct_4x4_8_avx;
             c->idct[1] = ff_hevc_idct_8x8_8_avx;
+            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_8_avx;
         }
         if (EXTERNAL_AVX2(cpu_flags)) {
             c->sao_band_filter[0] = ff_hevc_sao_band_filter_8_8_avx2;
@@ -999,9 +1002,6 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
         }
 #endif
     } else if (bit_depth == 10) {
-        if (EXTERNAL_MMXEXT(cpu_flags)) {
-            c->add_residual[0] = ff_hevc_add_residual_4_10_mmxext;
-        }
         if (EXTERNAL_SSE2(cpu_flags)) {
             c->hevc_v_loop_filter_chroma = ff_hevc_v_loop_filter_chroma_10_sse2;
             c->hevc_h_loop_filter_chroma = ff_hevc_h_loop_filter_chroma_10_sse2;
@@ -1022,14 +1022,12 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 
             c->idct[0]    = ff_hevc_idct_4x4_10_sse2;
             c->idct[1]    = ff_hevc_idct_8x8_10_sse2;
+            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_10_sse2;
 
+            c->add_residual[0] = ff_hevc_add_residual_4_10_sse2;
             c->add_residual[1] = ff_hevc_add_residual_8_10_sse2;
             c->add_residual[2] = ff_hevc_add_residual_16_10_sse2;
             c->add_residual[3] = ff_hevc_add_residual_32_10_sse2;
-
-            // ==> Start patch MPC
-            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_10_sse2;
-            // ==> End patch MPC
         }
 #if ARCH_X86_64
         if (EXTERNAL_SSSE3(cpu_flags)) {
@@ -1063,6 +1061,7 @@ void ff_hevc_dsp_init_x86(HEVCDSPContext *c, const int bit_depth)
 
             c->idct[0] = ff_hevc_idct_4x4_10_avx;
             c->idct[1] = ff_hevc_idct_8x8_10_avx;
+            c->transform_4x4_luma = ff_hevc_transform_4x4_luma_10_avx;
 
             SAO_BAND_INIT(10, avx);
         }

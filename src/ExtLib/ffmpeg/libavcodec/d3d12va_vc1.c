@@ -94,6 +94,7 @@ static int d3d12va_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer
 
 static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPUT_STREAM_ARGUMENTS *input_args, ID3D12Resource *buffer)
 {
+    D3D12VADecodeContext      *ctx          = D3D12VA_DECODE_CONTEXT(avctx);
     const VC1Context *v                     = avctx->priv_data;
     const MpegEncContext      *s            = &v->s;
     D3D12DecodePictureContext *ctx_pic      = s->cur_pic.ptr->hwaccel_picture_private;
@@ -101,6 +102,7 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
 
     const unsigned mb_count = s->mb_width * (s->mb_height >> v->field_mode);
     uint8_t *mapped_data, *mapped_ptr;
+    UINT bitstream_size = ctx->bitstream_size;
 
     static const uint8_t start_code[] = { 0, 0, 1, 0x0d };
 
@@ -114,6 +116,12 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
         DXVA_SliceInfo *slice = &ctx_pic->slices[i];
         unsigned position     = slice->dwSliceDataLocation;
         unsigned size         = slice->dwSliceBitsInBuffer / 8;
+
+        if ((uint64_t)size + ((avctx->codec_id == AV_CODEC_ID_VC1) ? sizeof(start_code) : 0) > bitstream_size) {
+            av_log(avctx, AV_LOG_ERROR, "Input frame bitstream size exceeds internal buffer!\n");
+            ID3D12Resource_Unmap(buffer, 0, NULL);
+            return AVERROR(EINVAL);
+        }
 
         slice->dwSliceDataLocation = mapped_ptr - mapped_data;
         if (i < ctx_pic->slice_count - 1)
@@ -129,11 +137,13 @@ static int update_input_arguments(AVCodecContext *avctx, D3D12_VIDEO_DECODE_INPU
                 mapped_ptr[3] = 0x0b;
 
             mapped_ptr += sizeof(start_code);
+            bitstream_size -= sizeof(start_code);
             slice->dwSliceBitsInBuffer += sizeof(start_code) * 8;
         }
 
         memcpy(mapped_ptr, &ctx_pic->bitstream[position], size);
         mapped_ptr += size;
+        bitstream_size -= size;
     }
 
     ID3D12Resource_Unmap(buffer, 0, NULL);

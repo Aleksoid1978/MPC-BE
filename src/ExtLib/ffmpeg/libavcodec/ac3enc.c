@@ -1982,7 +1982,6 @@ int ff_ac3_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
                         const AVFrame *frame, int *got_packet_ptr)
 {
     AC3EncodeContext *const s = avctx->priv_data;
-    int discard_padding;
     int ret;
 
     /* add current frame to queue */
@@ -2025,17 +2024,9 @@ int ff_ac3_encode_frame(AVCodecContext *avctx, AVPacket *avpkt,
         return ret;
     ac3_output_frame(s, avpkt->data);
 
-    ff_af_queue_remove(&s->afq, avctx->frame_size, &avpkt->pts,
-                       &avpkt->duration);
-
-    discard_padding = avctx->frame_size - ff_samples_from_time_base(avctx, avpkt->duration);
-    if (discard_padding > 0) {
-        uint8_t *side_data =
-            av_packet_new_side_data(avpkt, AV_PKT_DATA_SKIP_SAMPLES, 10);
-        if (!side_data)
-            return AVERROR(ENOMEM);
-        AV_WL32(side_data + 4, discard_padding);
-    }
+    ret = ff_af_queue_remove(&s->afq, avctx->frame_size, avpkt);
+    if (ret < 0)
+        return ret;
 
     *got_packet_ptr = 1;
     return 0;

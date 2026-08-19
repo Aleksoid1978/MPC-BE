@@ -80,6 +80,9 @@ void ff_dca_downmix_to_stereo_fixed(DCADSPContext *dcadsp, int32_t **samples,
                                     int *coeff_l, int nsamples, int ch_mask);
 void ff_dca_downmix_to_stereo_float(AVFloatDSPContext *fdsp, float **samples,
                                     int *coeff_l, int nsamples, int ch_mask);
+int ff_dca_export_downmix_matrix(AVCodecContext *avctx, AVFrame *frame,
+                                 enum DCADownMixType downmix_type,
+                                 int output_mask, const int *coeff_l);
 
 static inline int ff_dca_check_crc(AVCodecContext *avctx, GetBitContext *s,
                                    int p1, int p2)

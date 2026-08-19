@@ -1499,6 +1499,17 @@ int ff_dca_xll_filter_frame(DCAXllDecoder *s, AVFrame *frame)
     } else if (request_mask != s->output_mask && p->dmix_type == DCA_DMIX_TYPE_LtRt) {
         matrix_encoding = AV_MATRIX_ENCODING_DOLBY;
     }
+
+    // TODO: Support downmix when the primary channel set lacks coeffs.
+    if (p->ch_mask == s->output_mask && !dca->request_channel_layout &&
+        p->dmix_embedded && (p->dmix_type == DCA_DMIX_TYPE_LoRo ||
+                             p->dmix_type == DCA_DMIX_TYPE_LtRt)) {
+        ret = ff_dca_export_downmix_matrix(avctx, frame, p->dmix_type, s->output_mask,
+                                           p->dmix_coeff);
+        if (ret < 0)
+            return ret;
+    }
+
     if ((ret = ff_side_data_update_matrix_encoding(frame, matrix_encoding)) < 0)
         return ret;
 

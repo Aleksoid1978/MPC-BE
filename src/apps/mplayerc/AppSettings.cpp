@@ -1209,7 +1209,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	for (size_t i = 0; i < Accel.size(); i++) {
 		Accel[i] = wmcmds[i];
 	}
-	hAccel = CreateAcceleratorTableW(Accel.data(), Accel.size());
+	hAccel = HandlerForCreateAcceleratorTable(Accel);
 
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_WINLIRCADDR, strWinLircAddr);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_WINLIRC, bWinLirc);

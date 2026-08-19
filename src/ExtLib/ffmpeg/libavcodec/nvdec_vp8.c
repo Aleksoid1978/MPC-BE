@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "avcodec.h"
 #include "nvdec.h"
 #include "decode.h"
@@ -87,10 +89,18 @@ static int nvdec_vp8_start_frame(AVCodecContext *avctx,
 }
 
 static int nvdec_vp8_frame_params(AVCodecContext *avctx,
-                                  AVBufferRef *hw_frames_ctx)
+                                  AVBufferRef *hw_frames_ctx,
+                                  enum AVPixelFormat hw_format)
 {
     // VP8 uses a fixed size pool of 3 possible reference frames
-    return ff_nvdec_frame_params(avctx, hw_frames_ctx, 3, 0);
+    return ff_nvdec_frame_params(avctx, hw_frames_ctx, hw_format, 3, 0);
+}
+
+#if CONFIG_VP8_NVDEC_HWACCEL
+static int nvdec_vp8_cuda_frame_params(AVCodecContext *avctx,
+                                       AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_vp8_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUDA);
 }
 
 const FFHWAccel ff_vp8_nvdec_hwaccel = {
@@ -101,8 +111,31 @@ const FFHWAccel ff_vp8_nvdec_hwaccel = {
     .start_frame          = nvdec_vp8_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = ff_nvdec_simple_decode_slice,
-    .frame_params         = nvdec_vp8_frame_params,
+    .frame_params         = nvdec_vp8_cuda_frame_params,
     .init                 = ff_nvdec_decode_init,
     .uninit               = ff_nvdec_decode_uninit,
     .priv_data_size       = sizeof(NVDECContext),
 };
+#endif
+
+#if CONFIG_VP8_NVDEC_CUARRAY_HWACCEL
+static int nvdec_vp8_cuarray_frame_params(AVCodecContext *avctx,
+                                          AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_vp8_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUARRAY);
+}
+
+const FFHWAccel ff_vp8_nvdec_cuarray_hwaccel = {
+    .p.name               = "vp8_nvdec_cuarray",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_VP8,
+    .p.pix_fmt            = AV_PIX_FMT_CUARRAY,
+    .start_frame          = nvdec_vp8_start_frame,
+    .end_frame            = ff_nvdec_simple_end_frame,
+    .decode_slice         = ff_nvdec_simple_decode_slice,
+    .frame_params         = nvdec_vp8_cuarray_frame_params,
+    .init                 = ff_nvdec_decode_init,
+    .uninit               = ff_nvdec_decode_uninit,
+    .priv_data_size       = sizeof(NVDECContext),
+};
+#endif

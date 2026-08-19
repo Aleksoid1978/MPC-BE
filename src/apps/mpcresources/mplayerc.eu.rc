@@ -441,10 +441,12 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Enable dark menu",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Use Blur Behind effect (Windows 10 and above)",IDC_CHECK7,
+    CONTROL         "Use Blur Behind effect (Windows 10 or later)",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,71,265,9,WS_EX_TRANSPARENT
-    CONTROL         "Enable dark title (Windows 10 and above)",IDC_CHECK5,
+    CONTROL         "Enable dark title (Windows 10 or later)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
+    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
+    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Erabili denbora oharra:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -459,8 +461,6 @@ BEGIN
     LTEXT           "Playlist font size:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    LTEXT           "Controls size:",IDC_STATIC8,14,96,99,8
-    COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Erabili Windows 7 (eta berriagoa) Eginkizun-barra ezaugarriak",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END

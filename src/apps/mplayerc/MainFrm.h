@@ -692,7 +692,7 @@ public:
 
 	bool m_bTrayIcon;
 	void ShowTrayIcon(bool fShow);
-	void SetTrayTip(CString str);
+	void SetTrayTip(const CStringW& str);
 
 	CSize GetVideoSize();
 

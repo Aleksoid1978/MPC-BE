@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -131,6 +131,8 @@ const AMOVIESETUP_MEDIATYPE sudPinTypesIn[] = {
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_PCM_FL64},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IEEE_FLOAT}, // only for 64-bit float PCM
 	// ADPCM
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_MS_ADPCM},
+	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IMA_ADPCM},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IMA4},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_ADPCM_SWF},
 	{&MEDIATYPE_Audio,				&MEDIASUBTYPE_IMA_AMV},

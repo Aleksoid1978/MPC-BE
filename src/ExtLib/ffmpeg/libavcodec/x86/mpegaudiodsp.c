@@ -50,7 +50,7 @@ void ff_dct32_float_avx (float *out, const float *in);
 
 DECLARE_ALIGNED(16, static float, mdct_win_sse)[2][4][4*40];
 
-#if HAVE_6REGS && HAVE_SSE_INLINE
+#if HAVE_X86_6REGS && HAVE_SSE_INLINE
 
 #define MACS(rt, ra, rb) rt+=(ra)*(rb)
 #define MLSS(rt, ra, rb) rt-=(ra)*(rb)
@@ -194,7 +194,7 @@ static void apply_window_mp3(float *in, float *win, int *unused, float *out,
     *out = sum;
 }
 
-#endif /* HAVE_6REGS && HAVE_SSE_INLINE */
+#endif /* HAVE_X86_6REGS && HAVE_SSE_INLINE */
 
 #if HAVE_X86ASM
 #define DECL_IMDCT_BLOCKS(CPU1, CPU2)                                       \
@@ -260,7 +260,7 @@ av_cold void ff_mpadsp_init_x86(MPADSPContext *s)
 {
     av_unused int cpu_flags = av_get_cpu_flags();
 
-#if HAVE_6REGS && HAVE_SSE_INLINE
+#if HAVE_X86_6REGS && HAVE_SSE_INLINE
     if (INLINE_SSE(cpu_flags)) {
         s->apply_window_float = apply_window_mp3;
     }

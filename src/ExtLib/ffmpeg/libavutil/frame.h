@@ -299,6 +299,12 @@ enum AVFrameSideDataType {
      * libavutil/raw_color_params.h.
      */
     AV_FRAME_DATA_RAW_COLOR_PARAMS,
+
+    /**
+     * Metadata relevant to a downmix procedure in the form of a remixig matrix.
+     * The data is the AVDownmixMatrix struct defined in libavutil/downmix_info.h.
+     */
+    AV_FRAME_DATA_DOWNMIX_MATRIX,
 };
 
 enum AVActiveFormatDescription {

@@ -24,6 +24,7 @@
 #include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/mem.h"
+#include "libavutil/refstruct.h"
 
 #include "cms.h"
 #include "csputils.h"
@@ -31,27 +32,14 @@
 
 SwsLut3D *ff_sws_lut3d_alloc(void)
 {
-    SwsLut3D *lut3d = av_malloc(sizeof(*lut3d));
+    const int flags = AV_REFSTRUCT_FLAG_NO_ZEROING;
+    SwsLut3D *lut3d = av_refstruct_alloc_ext(sizeof(*lut3d), flags, NULL, NULL);
     if (!lut3d)
         return NULL;
 
+    lut3d->map = (SwsColorMap) {0};
     lut3d->dynamic = false;
     return lut3d;
-}
-
-void ff_sws_lut3d_free(SwsLut3D **plut3d)
-{
-    av_freep(plut3d);
-}
-
-bool ff_sws_lut3d_test_fmt(enum AVPixelFormat fmt, int output)
-{
-    return fmt == AV_PIX_FMT_RGBA64;
-}
-
-enum AVPixelFormat ff_sws_lut3d_pick_pixfmt(const SwsFormat *fmt, int output)
-{
-    return AV_PIX_FMT_RGBA64;
 }
 
 /**
@@ -195,10 +183,9 @@ static av_always_inline v3u16_t apply_tone_map(const SwsLut3D *lut3d, v3u16_t ip
     const int shift = 16 - TONE_LUT_BITS;
     const int Ix = ipt.x >> shift;
     const int If = ipt.x & ((1 << shift) - 1);
-    const int In = FFMIN(Ix + 1, TONE_LUT_SIZE - 1);
 
     const v2u16_t w0 = lut3d->tone_map[Ix];
-    const v2u16_t w1 = lut3d->tone_map[In];
+    const v2u16_t w1 = lut3d->tone_map[Ix + 1];
     const v2u16_t w  = lerp2u16(w0, w1, If, shift);
     const int base   = (1 << 15) - w.y;
 
@@ -208,22 +195,18 @@ static av_always_inline v3u16_t apply_tone_map(const SwsLut3D *lut3d, v3u16_t ip
     return ipt;
 }
 
-int ff_sws_lut3d_generate(SwsLut3D *lut3d, enum AVPixelFormat fmt_in,
-                          enum AVPixelFormat fmt_out, const SwsColorMap *map)
+int ff_sws_lut3d_generate(SwsLut3D *lut3d, const SwsColorMap *map)
 {
     int ret;
-
-    if (!ff_sws_lut3d_test_fmt(fmt_in, 0) || !ff_sws_lut3d_test_fmt(fmt_out, 1))
-        return AVERROR(EINVAL);
 
     lut3d->dynamic = map->src.frame_peak.num > 0;
     lut3d->map = *map;
 
     if (lut3d->dynamic) {
         ret = ff_sws_color_map_generate_dynamic(&lut3d->input[0][0][0],
-                                             &lut3d->output[0][0][0],
-                                             INPUT_LUT_SIZE, OUTPUT_LUT_SIZE_I,
-                                             OUTPUT_LUT_SIZE_PT, map);
+                                                &lut3d->output[0][0][0],
+                                                INPUT_LUT_SIZE, OUTPUT_LUT_SIZE_I,
+                                                OUTPUT_LUT_SIZE_PT, map);
         if (ret < 0)
             return ret;
 
@@ -232,7 +215,7 @@ int ff_sws_lut3d_generate(SwsLut3D *lut3d, enum AVPixelFormat fmt_in,
         return 0;
     } else {
         return ff_sws_color_map_generate_static(&lut3d->input[0][0][0],
-                                             INPUT_LUT_SIZE, map);
+                                                INPUT_LUT_SIZE, map);
     }
 }
 
@@ -245,10 +228,12 @@ void ff_sws_lut3d_update(SwsLut3D *lut3d, const SwsColor *new_src)
     lut3d->map.src.frame_avg  = new_src->frame_avg;
 
     ff_sws_tone_map_generate(lut3d->tone_map, TONE_LUT_SIZE, &lut3d->map);
+    lut3d->tone_map[TONE_LUT_SIZE] = lut3d->tone_map[TONE_LUT_SIZE - 1];
 }
 
-void ff_sws_lut3d_apply(const SwsLut3D *lut3d, const uint8_t *in, int in_stride,
-                        uint8_t *out, int out_stride, int w, int h)
+void ff_sws_lut3d_apply_rgba64(const SwsLut3D *lut3d, const uint8_t *in,
+                               int in_stride, uint8_t *out, int out_stride,
+                               int w, int h)
 {
     while (h--) {
         const uint16_t *in16 = (const uint16_t *) in;

@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config_components.h"
+
 #include "libavutil/mem.h"
 #include "avcodec.h"
 #include "nvdec.h"
@@ -333,10 +335,19 @@ static int nvdec_av1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
     return 0;
 }
 
-static int nvdec_av1_frame_params(AVCodecContext *avctx, AVBufferRef *hw_frames_ctx)
+static int nvdec_av1_frame_params(AVCodecContext *avctx,
+                                  AVBufferRef *hw_frames_ctx,
+                                  enum AVPixelFormat hw_format)
 {
     /* Maximum of 8 reference frames, but potentially stored twice due to film grain */
-    return ff_nvdec_frame_params(avctx, hw_frames_ctx, 8 * 2, 0);
+    return ff_nvdec_frame_params(avctx, hw_frames_ctx, hw_format, 8 * 2, 0);
+}
+
+#if CONFIG_AV1_NVDEC_HWACCEL
+static int nvdec_av1_cuda_frame_params(AVCodecContext *avctx,
+                                       AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_av1_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUDA);
 }
 
 const FFHWAccel ff_av1_nvdec_hwaccel = {
@@ -347,8 +358,31 @@ const FFHWAccel ff_av1_nvdec_hwaccel = {
     .start_frame          = nvdec_av1_start_frame,
     .end_frame            = ff_nvdec_simple_end_frame,
     .decode_slice         = nvdec_av1_decode_slice,
-    .frame_params         = nvdec_av1_frame_params,
+    .frame_params         = nvdec_av1_cuda_frame_params,
     .init                 = ff_nvdec_decode_init,
     .uninit               = ff_nvdec_decode_uninit,
     .priv_data_size       = sizeof(NVDECContext),
 };
+#endif
+
+#if CONFIG_AV1_NVDEC_CUARRAY_HWACCEL
+static int nvdec_av1_cuarray_frame_params(AVCodecContext *avctx,
+                                          AVBufferRef *hw_frames_ctx)
+{
+    return nvdec_av1_frame_params(avctx, hw_frames_ctx, AV_PIX_FMT_CUARRAY);
+}
+
+const FFHWAccel ff_av1_nvdec_cuarray_hwaccel = {
+    .p.name               = "av1_nvdec_cuarray",
+    .p.type               = AVMEDIA_TYPE_VIDEO,
+    .p.id                 = AV_CODEC_ID_AV1,
+    .p.pix_fmt            = AV_PIX_FMT_CUARRAY,
+    .start_frame          = nvdec_av1_start_frame,
+    .end_frame            = ff_nvdec_simple_end_frame,
+    .decode_slice         = nvdec_av1_decode_slice,
+    .frame_params         = nvdec_av1_cuarray_frame_params,
+    .init                 = ff_nvdec_decode_init,
+    .uninit               = ff_nvdec_decode_uninit,
+    .priv_data_size       = sizeof(NVDECContext),
+};
+#endif
