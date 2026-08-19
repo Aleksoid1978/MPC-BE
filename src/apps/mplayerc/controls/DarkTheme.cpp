@@ -800,22 +800,11 @@ namespace DarkTheme
 					CRect rc;
 					::GetClientRect(hWnd, &rc);
 					pDC->FillSolidRect(rc, FaceColor());
+					// Draw the dividers we hid while theming (localized SS_ETCHED* separators). CPPageBase pages
+					// do this in their own OnEraseBkgnd; dialogs themed through ThemeDialog (File Properties
+					// Details/Clip, aux dialogs like Pan&Scan Edit) reach US instead.
+					DrawHiddenSeparators(hWnd, pDC);
 					return 1;
-				}
-				case WM_DRAWITEM: {
-					// Draw the separators ThemeControl converted from SS_ETCHED* to SS_OWNERDRAW. CPPageBase
-					// pages draw these via their own OnDrawItem, but pages/dialogs themed through ThemeDialog
-					// (File Properties Details/Clip, aux dialogs) reach US instead. Guard on the conversion prop
-					// so we ONLY touch our own separators and never clobber a dialog's real owner-drawn controls.
-					const DRAWITEMSTRUCT* dis = reinterpret_cast<const DRAWITEMSTRUCT*>(lParam);
-					if (dis && dis->CtlType == ODT_STATIC && dis->hwndItem && ::GetPropW(dis->hwndItem, L"MPC_ETCHED_ORIG")) {
-						CDC* pDC = CDC::FromHandle(dis->hDC);
-						CRect rc(dis->rcItem);
-						pDC->FillSolidRect(rc, FaceColor());
-						pDC->FillSolidRect(rc.left, rc.top + rc.Height() / 2, rc.Width(), 1, CtrlBorderColor());
-						return TRUE;
-					}
-					break;
 				}
 				case WM_NCDESTROY:
 					RemoveWindowSubclass(hWnd, DialogSubclassProc, kDialogSubclassId);
@@ -1377,21 +1366,25 @@ namespace DarkTheme
 				const LONG ex = GetWindowLongW(hCtrl, GWL_EXSTYLE);
 				const LONG sType = st & SS_TYPEMASK;
 				if (sType == SS_ETCHEDHORZ || sType == SS_ETCHEDVERT || sType == SS_ETCHEDFRAME) {
-					// Localized-resource dividers use SS_ETCHEDHORZ (a light 3D line native dark mode never
-					// darkens) where the base .rc uses SS_OWNERDRAW. Convert to SS_OWNERDRAW so there is NO
-					// native rendering to leak and the page's CPPageBase::OnDrawItem paints the same flat dark
-					// line it draws for the English separators. Remember the original type so a toggle-off
-					// restores the native etched look. (A WM_PAINT subclass was tried first but the native
-					// etched still bled through at the ends — the owner-draw conversion removes it entirely.)
+					// Localized-resource dividers use SS_ETCHED* (a light 3D line native dark mode never
+					// darkens) where the base .rc uses SS_OWNERDRAW, so every non-English UI showed a white
+					// separator. Two earlier attempts failed: overpainting in a WM_PAINT subclass (the native
+					// etched still bled through) and converting the style to SS_OWNERDRAW at runtime (a static
+					// picks its paint routine when it is CREATED, so the conversion silently did nothing and
+					// the native etched line was drawn in full).
+					//
+					// So stop trying to out-paint the control: HIDE it, and draw the divider ourselves from the
+					// parent's background paint (DrawHiddenSeparators, called after the dark FillSolidRect in
+					// CPPageBase::OnEraseBkgnd and in DialogSubclassProc). A hidden window is never painted by
+					// anyone, so there is no native rendering left to leak on any repaint path or timing.
+					// The marker prop records the original type so a runtime toggle-off can restore it.
 					if (!::GetPropW(hCtrl, L"MPC_ETCHED_ORIG")) {
 						::SetPropW(hCtrl, L"MPC_ETCHED_ORIG", reinterpret_cast<HANDLE>(static_cast<INT_PTR>(sType) + 1));
 					}
-					::SetWindowLongW(hCtrl, GWL_STYLE, (st & ~SS_TYPEMASK) | SS_OWNERDRAW);
-					// SWP_FRAMECHANGED so the static re-evaluates its (now owner-draw) style and starts sending
-					// WM_DRAWITEM instead of self-drawing the etched line.
-					::SetWindowPos(hCtrl, nullptr, 0, 0, 0, 0,
-						SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
-					InvalidateRect(hCtrl, nullptr, TRUE);
+					::ShowWindow(hCtrl, SW_HIDE);
+					if (HWND hParent = ::GetParent(hCtrl)) {
+						::InvalidateRect(hParent, nullptr, TRUE); // repaint the strip the control used to cover
+					}
 				} else if ((st & SS_SUNKEN) || (ex & (WS_EX_CLIENTEDGE | WS_EX_STATICEDGE))) {
 					ApplyOwnerBorder(hCtrl);
 				} else if (sType == SS_LEFT || sType == SS_CENTER || sType == SS_RIGHT
@@ -1441,12 +1434,11 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, ComboBorderSubclassProc, kComboBorderSubclassId);
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
-			// Restore a separator we converted from SS_ETCHED* to SS_OWNERDRAW, so it draws its native
-			// (light) etched line again in the light theme.
-			if (HANDLE p = ::GetPropW(hChild, L"MPC_ETCHED_ORIG")) {
-				const LONG origType = static_cast<LONG>(reinterpret_cast<INT_PTR>(p) - 1);
-				::SetWindowLongW(hChild, GWL_STYLE, (::GetWindowLongW(hChild, GWL_STYLE) & ~SS_TYPEMASK) | origType);
+			// Un-hide a separator we hid while dark (see the SS_ETCHED* branch in ThemeControl) so it draws
+			// its own native etched line again, which is the correct look in the light theme.
+			if (::GetPropW(hChild, L"MPC_ETCHED_ORIG")) {
 				::RemovePropW(hChild, L"MPC_ETCHED_ORIG");
+				::ShowWindow(hChild, SW_SHOW);
 			}
 
 			DWORD_PTR gridFlag = 0;
@@ -1960,6 +1952,45 @@ namespace DarkTheme
 		}
 		il.DeleteImageList();
 		return false;
+	}
+
+	void DrawHiddenSeparators(HWND hWndParent, CDC* pDC) {
+		if (!IsActive() || !hWndParent || !pDC) {
+			return;
+		}
+		// Draw a divider for every child ThemeControl hid (marker prop MPC_ETCHED_ORIG). Their window rects
+		// are still valid while hidden, so the line lands exactly where the resource put it. Direct children
+		// only: a hidden divider always belongs to the page/dialog whose background is being painted.
+		struct Ctx { HWND parent; CDC* dc; };
+		Ctx ctx = { hWndParent, pDC };
+		::EnumChildWindows(hWndParent, [](HWND hChild, LPARAM lp) -> BOOL {
+			auto* c = reinterpret_cast<Ctx*>(lp);
+			if (::GetParent(hChild) != c->parent || !::GetPropW(hChild, L"MPC_ETCHED_ORIG")) {
+				return TRUE;
+			}
+			RECT rc;
+			::GetWindowRect(hChild, &rc);
+			::MapWindowPoints(nullptr, c->parent, reinterpret_cast<POINT*>(&rc), 2); // screen -> parent client
+			const int w = rc.right - rc.left;
+			const int h = rc.bottom - rc.top;
+			if (w <= 0 || h <= 0) {
+				return TRUE;
+			}
+			// The localized dividers are 1 dialog unit tall (~2px) where the English SS_OWNERDRAW ones are 3,
+			// so centre a single 1px line in the control's own rect exactly like CPPageBase::OnDrawItem does.
+			const COLORREF line = CtrlBorderColor();
+			const LONG type = static_cast<LONG>(reinterpret_cast<INT_PTR>(::GetPropW(hChild, L"MPC_ETCHED_ORIG")) - 1);
+			if (type == SS_ETCHEDVERT) {
+				c->dc->FillSolidRect(rc.left + w / 2, rc.top, 1, h, line);
+			} else if (type == SS_ETCHEDFRAME) {
+				CBrush br(line);
+				CRect r(rc);
+				c->dc->FrameRect(r, &br);
+			} else { // SS_ETCHEDHORZ
+				c->dc->FillSolidRect(rc.left, rc.top + h / 2, w, 1, line);
+			}
+			return TRUE;
+		}, reinterpret_cast<LPARAM>(&ctx));
 	}
 
 	HBRUSH OnCtlColor(CDC* pDC, UINT nCtlColor) {

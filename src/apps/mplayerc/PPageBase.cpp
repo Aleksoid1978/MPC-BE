@@ -124,6 +124,9 @@ BOOL CPPageBase::OnEraseBkgnd(CDC* pDC)
 		CRect rc;
 		GetClientRect(rc);
 		pDC->FillSolidRect(rc, DarkTheme::FaceColor());
+		// Localized resources use SS_ETCHED* dividers, which paint a light 3D line dark mode never darkens.
+		// They are hidden while theming, so draw them here, on top of the background we just filled.
+		DarkTheme::DrawHiddenSeparators(GetSafeHwnd(), pDC);
 		return TRUE;
 	}
 

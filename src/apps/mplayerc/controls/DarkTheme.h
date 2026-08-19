@@ -125,6 +125,13 @@ namespace DarkTheme
 	// an inactive list. Returns false when theming is unavailable (keep the default).
 	bool MakeCheckStateImageList(CImageList& il, int size, HWND hRef, bool bDisabled = false);
 
+	// Draws the separator lines for dividers we hid while theming hWndParent. The localized resources
+	// use SS_ETCHED* statics, which paint a light 3D line that dark mode never darkens and that cannot be
+	// reliably overpainted or restyled at runtime, so ThemeControl HIDES them and we draw the divider here
+	// instead. Call from the parent's background paint, right AFTER filling it with FaceColor (see
+	// CPPageBase::OnEraseBkgnd); no-op when the theme is off or the parent has no hidden dividers.
+	void DrawHiddenSeparators(HWND hWndParent, CDC* pDC);
+
 	// WM_CTLCOLOR* helper: sets dark text/background on pDC and returns a cached
 	// dark brush, or nullptr when the dark theme is inactive (use default handling).
 	HBRUSH OnCtlColor(CDC* pDC, UINT nCtlColor);
