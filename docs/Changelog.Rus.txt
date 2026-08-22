@@ -12,7 +12,7 @@ VideoRenderers
 Обновлен румынский перевод (автор Andrei Miloiu).
 
 Обновлены библиотеки:
-	ffmpeg n9.1-dev-861-gb16b5f2a01;
+	ffmpeg n9.1-dev-935-geb0bfa852e;
 	nv-codec-headers n11.1.5.4.
 
 
