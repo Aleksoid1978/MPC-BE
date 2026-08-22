@@ -693,7 +693,7 @@ void YT_DLP::FilterAudioFormats(const CStringA& audioLang)
 	}
 
 	if (lang_preferred.GetLength()) {
-		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [&audioLang](yt_aformat_t a) { return a.language != audioLang; }), mAudioFormats.end());
+		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [&lang_preferred](yt_aformat_t a) { return a.language != lang_preferred; }), mAudioFormats.end());
 	}
 }
 
