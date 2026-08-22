@@ -125,7 +125,7 @@ private:
 	UINT mHttpVideoCount = 0;
 	UINT mDashVideoCount = 0;
 
-	bool SetFormats(const rapidjson::Document& doc);
+	bool SetFormats(const rapidjson::Document& doc, const CStringA& audioLang);
 	void SetSubtitles(const rapidjson::Document& doc);
 	void SetInfo(const rapidjson::Document& doc);
 

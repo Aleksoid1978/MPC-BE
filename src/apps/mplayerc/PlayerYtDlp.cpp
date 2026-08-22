@@ -493,7 +493,7 @@ bool YT_DLP::Parse_Playlist(const CStringW& pls_url, CFileItemList& playlist, in
 	return false;
 }
 
-bool YT_DLP::SetFormats(const rapidjson::Document& doc)
+bool YT_DLP::SetFormats(const rapidjson::Document& doc, const CStringA& audioLang)
 {
 	auto formats = GetJsonArray(doc, "formats");
 	if (!formats) {
@@ -667,6 +667,9 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 		mVideoFormats = std::move(hlsVideoFormats);
 		mAudioFormats = std::move(hlsAudioFormats);
 	}
+
+	auto it = std::find_if(mAudioFormats..begin(), mAudioFormats.end(), [](const yt_aformat_t& a) { return a.language == audioLang; });
+	for (auto& afmt : mAudioFormats) {
 
 	std::sort(mVideoFormats.begin(), mVideoFormats.end(), [](const yt_vformat_t& a, const yt_vformat_t& b) {
 		return (vformat_cmp(a, b) < 0);
@@ -1037,6 +1040,7 @@ bool YT_DLP::Parse_URL(const CStringW& url)
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	const CStringA audioLang = s.strYdlAudioLang;
 	const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
 	if (ydl_path.IsEmpty()) {
 		return false;
@@ -1058,7 +1062,7 @@ bool YT_DLP::Parse_URL(const CStringW& url)
 		return false;
 	}
 
-	ok = SetFormats(doc);
+	ok = SetFormats(doc, audioLang);
 	if (!ok) {
 		return false;
 	}
