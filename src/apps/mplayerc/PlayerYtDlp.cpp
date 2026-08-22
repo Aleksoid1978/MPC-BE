@@ -668,8 +668,10 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc, const CStringA& audioLan
 		mAudioFormats = std::move(hlsAudioFormats);
 	}
 
-	auto it = std::find_if(mAudioFormats..begin(), mAudioFormats.end(), [](const yt_aformat_t& a) { return a.language == audioLang; });
-	for (auto& afmt : mAudioFormats) {
+	auto it = std::find_if(mAudioFormats.cbegin(), mAudioFormats.cend(), [&audioLang](const yt_aformat_t& a) { return a.language == audioLang; });
+	if (it != mAudioFormats.cend()) {
+		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [&audioLang](yt_aformat_t a) { return a.language != audioLang; }), hlsAudioFormats.end());
+	}
 
 	std::sort(mVideoFormats.begin(), mVideoFormats.end(), [](const yt_vformat_t& a, const yt_vformat_t& b) {
 		return (vformat_cmp(a, b) < 0);
