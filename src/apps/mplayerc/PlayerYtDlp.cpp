@@ -691,6 +691,14 @@ void YT_DLP::FilterAudioFormats(const CStringA& audioLang)
 	if (lang_found) {
 		lang_preferred = audioLang;
 	}
+	else if (audioLang.GetLength() == 2) {
+		for (const auto& afmt : mAudioFormats) {
+			if (afmt.language.GetLength() > 3 && StartsWith(afmt.language, audioLang) && afmt.language[2] == '-') {
+				lang_preferred = audioLang;
+				break;
+			}
+		}
+	}
 
 	if (lang_preferred.GetLength()) {
 		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [&lang_preferred](yt_aformat_t a) { return a.language != lang_preferred; }), mAudioFormats.end());
