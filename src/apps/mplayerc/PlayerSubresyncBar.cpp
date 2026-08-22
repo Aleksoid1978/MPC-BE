@@ -22,6 +22,8 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerSubresyncBar.h"
+#include "controls/DarkTheme.h"
+#include "controls/DarkTabCtrl.h"
 
 
 // CPlayerSubresyncBar
@@ -52,7 +54,20 @@ BOOL CPlayerSubresyncBar::Create(CWnd* pParentWnd, UINT defDockBarID, CCritSec* 
 
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
+	// This bar isn't run through ThemeDialog, so the list kept a white empty background, a light
+	// WS_EX_CLIENTEDGE border and a light column header. Theme the control directly (dark background /
+	// border / header; per-item colours are still handled by our NM_CUSTOMDRAW). Use the reversible
+	// refresh so the list also follows a later "Use dark theme" toggle-off. No-op / strip when off.
+	RefreshListDarkTheme();
+
 	return TRUE;
+}
+
+void CPlayerSubresyncBar::RefreshListDarkTheme()
+{
+	if (::IsWindow(m_list.GetSafeHwnd())) {
+		DarkTheme::RefreshThemeForControl(m_list.GetSafeHwnd());
+	}
 }
 
 void CPlayerSubresyncBar::ReloadTranslatableResources()
@@ -257,16 +272,38 @@ void CPlayerSubresyncBar::ResetSubtitle()
 				m_list.SetItemData(i, (DWORD_PTR)TSEP);
 			}
 			prevstart = m_subtimes[i].orgstart;
-
-			// Since all items in COL_START and COL_PREVSTART have the same text size,
-			// we can compute it for the first element only so that it's faster.
-			if (i == 0) {
-				m_list.SetColumnWidth(COL_START, LVSCW_AUTOSIZE);
-				m_list.SetColumnWidth(COL_PREVSTART, LVSCW_AUTOSIZE);
-			}
 		}
 
 		UpdateStrings();
+
+		// Size the narrow columns (End = 4 px, Charset = 20 px by default) to fit their header caption
+		// and first-row value. Measure only the header text + the first data row, NOT LVSCW_AUTOSIZE
+		// per column: that scans every row of all 11 columns (slow on big subs) and forces the list to
+		// repaint mid-population, which left ghost separator lines piling up until the load finished.
+		// Every row in a time/number column is the same width, so the first row is representative;
+		// columns only ever grow, so the wide Text column keeps its default width.
+		if (CHeaderCtrl* pHeader = m_list.GetHeaderCtrl()) {
+			CClientDC dc(&m_list);
+			CFont* pOldFont = dc.SelectObject(m_list.GetFont());
+			for (int col = 0, nCols = pHeader->GetItemCount(); col < nCols; col++) {
+				wchar_t buf[256] = {};
+				HDITEMW hdi = {};
+				hdi.mask = HDI_TEXT;
+				hdi.pszText = buf;
+				hdi.cchTextMax = _countof(buf) - 1;
+				int wNeed = pHeader->GetItem(col, &hdi) ? dc.GetTextExtent(buf).cx + 12 : 0; // header + padding
+				if (nCount > 0) {
+					const int wCell = dc.GetTextExtent(m_list.GetItemText(0, col)).cx + 12; // first row + padding
+					if (wCell > wNeed) {
+						wNeed = wCell;
+					}
+				}
+				if (wNeed > m_list.GetColumnWidth(col)) {
+					m_list.SetColumnWidth(col, wNeed); // only grow, so Text keeps its default width
+				}
+			}
+			dc.SelectObject(pOldFont);
+		}
 	}
 
 	m_list.SetRedraw(TRUE);
@@ -1069,7 +1106,7 @@ void CPlayerSubresyncBar::OnRclickList(NMHDR* pNMHDR, LRESULT* pResult)
 							}
 						}
 
-						CPropertySheet dlg(L"Styles...", this, iSelPage);
+						CDarkPropertySheet dlg(L"Styles...", this, iSelPage);
 						for (const auto& page : pages) {
 							dlg.AddPage(page.get());
 						}
@@ -1180,37 +1217,50 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 		COLORREF clrText;
 		COLORREF clrTextBk;
 
+		// This subtitle grid is custom-drawn with fixed light colours; remap them to the dark palette
+		// when the dark theme is on, keeping the same semantics (editable vs read-only columns,
+		// alternating groups, the currently-playing line, the edited start/end markers).
+		const bool dark = DarkTheme::IsActive();
+
 		if ((pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_TEXT || pLVCD->iSubItem == COL_STYLE
 				|| pLVCD->iSubItem == COL_LAYER || pLVCD->iSubItem == COL_ACTOR || pLVCD->iSubItem == COL_EFFECT)
 				&& m_mode == TEXTSUB) {
-			clrText = 0;
+			clrText = dark ? DarkTheme::TextColor() : (COLORREF)0;
 		} else if ((pLVCD->iSubItem == COL_START)
 				   && m_mode == VOBSUB) {
-			clrText = 0;
+			clrText = dark ? DarkTheme::TextColor() : (COLORREF)0;
 		} else {
-			clrText = 0x606060;
+			clrText = dark ? RGB(120, 125, 130) : (COLORREF)0x606060;
 		}
 
-		clrTextBk = 0xffffff;
-		//if (s_totalGroups > 0)
-		clrTextBk -= ((s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
+		if (dark) {
+			// two subtly different dark shades for the alternating groups
+			clrTextBk = (s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? DarkTheme::FaceColor() : DarkTheme::CtrlBackColor();
+		} else {
+			clrTextBk = 0xffffff;
+			//if (s_totalGroups > 0)
+			clrTextBk -= ((s_itemGroups[pLVCD->nmcd.dwItemSpec] & 1) ? 0x100010 : 0x200020);
+		}
 
 		if (m_sts[pLVCD->nmcd.dwItemSpec].start <= m_rt / 10000 && m_rt / 10000 < m_sts[pLVCD->nmcd.dwItemSpec].end) {
-			clrText |= 0xFF;
+			clrText |= 0xFF; // tint the currently-playing line
 		}
 
 		int nCheck = (int)m_list.GetItemData((int)pLVCD->nmcd.dwItemSpec);
 
+		const COLORREF clrEditStrong = dark ? RGB(50, 70, 100) : (COLORREF)0xffddbb; // edited start/end marker
+		const COLORREF clrEditWeak   = dark ? RGB(40, 55, 78)  : (COLORREF)0xffeedd; // preview marker
+
 		if ((nCheck & 1) && (pLVCD->iSubItem == COL_START || pLVCD->iSubItem == COL_PREVSTART)) {
-			clrTextBk = 0xffddbb;
+			clrTextBk = clrEditStrong;
 		} else if ((nCheck & 4) && (/*pLVCD->iSubItem == COL_START ||*/ pLVCD->iSubItem == COL_PREVSTART)) {
-			clrTextBk = 0xffeedd;
+			clrTextBk = clrEditWeak;
 		}
 
 		if ((nCheck & 2) && (pLVCD->iSubItem == COL_END || pLVCD->iSubItem == COL_PREVEND)) {
-			clrTextBk = 0xffddbb;
+			clrTextBk = clrEditStrong;
 		} else if ((nCheck & 8) && (/*pLVCD->iSubItem == COL_END ||*/ pLVCD->iSubItem == COL_PREVEND)) {
-			clrTextBk = 0xffeedd;
+			clrTextBk = clrEditWeak;
 		}
 
 		pLVCD->clrText = clrText;
@@ -1235,9 +1285,18 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			CRect rcItem;
 			m_list.GetItemRect(nItem, &rcItem, LVIR_BOUNDS);
 
+			// The row separator and column grid lines were drawn with fixed light greys: 0xe0e0e0 shows
+			// as a bright near-white line on the dark rows ("not look good"), and the group-separator's
+			// 0x404040 is nearly invisible against the dark background ("badly represented"). Remap both
+			// to the dark palette when it's active — subtle grid lines, and a clearly lighter separator.
+			const bool dark = DarkTheme::IsActive();
+
 			{
 				bool fSeparator = nItem < m_list.GetItemCount() - 1 && (m_list.GetItemData(nItem + 1)&TSEP);
-				CPen p(PS_INSIDEFRAME, 1, fSeparator ? 0x404040 : 0xe0e0e0);
+				const COLORREF clrLine = dark
+					? (fSeparator ? ThemeRGB(95, 105, 115) : DarkTheme::GridlineColor())
+					: (fSeparator ? RGB(64, 64, 64) : RGB(224, 224, 224));
+				CPen p(PS_INSIDEFRAME, 1, clrLine);
 				CPen* old = pDC->SelectObject(&p);
 				pDC->MoveTo(CPoint(rcItem.left, rcItem.bottom - 1));
 				pDC->LineTo(CPoint(rcItem.right, rcItem.bottom - 1));
@@ -1245,7 +1304,8 @@ void CPlayerSubresyncBar::OnCustomdrawList(NMHDR* pNMHDR, LRESULT* pResult)
 			}
 
 			{
-				CPen p(PS_INSIDEFRAME, 1, 0xe0e0e0);
+				const COLORREF clrGrid = dark ? DarkTheme::GridlineColor() : RGB(224, 224, 224);
+				CPen p(PS_INSIDEFRAME, 1, clrGrid);
 				CPen* old = pDC->SelectObject(&p);
 
 				CHeaderCtrl* pHeader = (CHeaderCtrl*)m_list.GetDlgItem(0);

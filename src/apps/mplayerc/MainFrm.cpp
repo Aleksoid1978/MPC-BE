@@ -71,6 +71,8 @@
 #include <filters/renderer/VideoRenderers/IPinHook.h>
 #include "filters/ffmpeg_link_fix.h"
 #include "ComPropertySheet.h"
+#include "controls/DarkTheme.h"
+#include "controls/DarkTabCtrl.h"
 #include <comdef.h>
 #include <dwmapi.h>
 
@@ -817,8 +819,16 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// Hide all dockable bars by default
 	for (const auto& pDockingBar : m_dockingbars) {
+		// Draw the bar frame / gripper / floating-frame border dark, like the playlist bar. Without
+		// this the Shader Editor, Capture, Navigation and Subresync bars render their sizing frame
+		// with light system colours (a bright "white frame", docked or floating).
+		pDockingBar->m_bUseDarkTheme = s.bUseDarkTheme;
 		pDockingBar->ShowWindow(SW_HIDE);
 	}
+
+	// Dark-theme every standard message box shown on the UI thread (Reset/Export settings, error
+	// prompts, ...) without wrapping each call site. Follows the theme toggle; no-op when it's off.
+	DarkTheme::InstallMessageBoxHook();
 
 	m_fileDropTarget.Register(this);
 
@@ -9079,7 +9089,7 @@ void CMainFrame::OnMenuSubtitlesStyle()
 		CString caption = ResStr(IDS_SUBTITLES_STYLES);
 		caption.Replace(L"&", nullptr);
 
-		CPropertySheet dlg(caption, GetModalParent());
+		CDarkPropertySheet dlg(caption, GetModalParent());
 		for (size_t i = 0; i < pages.size(); i++) {
 			dlg.AddPage(pages[i].get());
 		}

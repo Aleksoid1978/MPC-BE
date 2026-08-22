@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "SelectMediaType.h"
+#include "controls/DarkTheme.h"
 
 CString GetMediaTypeName(const GUID& guid)
 {
@@ -67,6 +68,8 @@ BOOL CSelectMediaType::OnInitDialog()
 	for (const auto& guid : m_guids) {
 		m_guidsctrl.AddString(GetMediaTypeName(guid));
 	}
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

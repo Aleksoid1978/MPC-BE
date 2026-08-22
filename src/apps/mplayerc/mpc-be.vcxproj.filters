@@ -66,6 +66,15 @@
     <ClCompile Include="controls\EditWithButton.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
+    <ClCompile Include="controls\DarkCheckListBox.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\DarkTabCtrl.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="controls\DarkTheme.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
     <ClCompile Include="controls\FloatEdit.cpp">
       <Filter>Controls</Filter>
     </ClCompile>
@@ -528,6 +537,15 @@
       <Filter>Filters</Filter>
     </ClInclude>
     <ClInclude Include="controls\EditWithButton.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\DarkCheckListBox.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\DarkTabCtrl.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="controls\DarkTheme.h">
       <Filter>Controls</Filter>
     </ClInclude>
     <ClInclude Include="controls\FloatEdit.h">

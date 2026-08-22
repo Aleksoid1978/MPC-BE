@@ -33,6 +33,12 @@ protected :
 	UINT m_defDockBarID;
 	CString m_strSettingName;
 
+	// The floating mini-frame we last applied the dark title to. Dragging a floating bar fires
+	// OnWindowPosChanged continuously; re-running EnableForWindow (which calls the heavy
+	// RefreshImmersiveColorPolicyState + DwmSetWindowAttribute) on every move floods the DWM and
+	// smears the window. Track the frame so we theme it once per float, not once per move.
+	HWND m_hThemedMiniFrame = nullptr;
+
 public:
 	CPlayerBar();
 	virtual ~CPlayerBar();
@@ -46,4 +52,9 @@ public:
 
 	afx_msg void OnWindowPosChanged(WINDOWPOS* lpwndpos);
 	virtual CSize CalcFixedLayout(BOOL bStretch, BOOL bHorz) override;
+
+	// The base returns 0 (black) — only the playlist bar used to override this, so every other
+	// docking bar (Shader Editor, Capture, Navigation, Subresync) painted its dark frame / gripper /
+	// close button pure black. Provide the themed colour here so all CPlayerBar-derived bars match.
+	COLORREF ColorThemeRGB(const int iR, const int iG, const int iB) const override;
 };

@@ -26,6 +26,7 @@
 #include "PPageFileInfoDetails.h"
 #include "PPageFileInfoRes.h"
 #include "PPageFileMediaInfo.h"
+#include "controls/DarkTabCtrl.h"
 
 
 class CMainFrame;
@@ -74,6 +75,8 @@ private:
 
 	CButton m_Button_MI_SaveAs;
 	CButton m_Button_MI_Clipboard;
+
+	CDarkTabCtrl m_dark_tab; // owner-drawn dark tab attached in OnInitDialog when the dark theme is on
 
 	BOOL    m_bNeedInit = TRUE;
 	CRect   m_rCrt;
