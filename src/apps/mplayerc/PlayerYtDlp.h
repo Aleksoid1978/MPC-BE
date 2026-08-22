@@ -60,7 +60,7 @@ public:
 		CStringW desc;
 		CStringA ext;
 		CStringA language;
-		//int language_preference = 0;
+		//int language_preference = -1;
 		UINT menuflags = 0;
 	};
 
@@ -73,7 +73,7 @@ public:
 		CStringW desc;
 		CStringA ext;
 		CStringA language;
-		//int language_preference = 0;
+		int language_preference = -1;
 		UINT menuflags = 0;
 	};
 
@@ -125,7 +125,10 @@ private:
 	UINT mHttpVideoCount = 0;
 	UINT mDashVideoCount = 0;
 
-	bool SetFormats(const rapidjson::Document& doc, const CStringA& audioLang);
+	bool GetFormats(const rapidjson::Document& doc);
+	void FilterAudioFormats(const CStringA& audioLang);
+	void SetFormatDesc();
+
 	void SetSubtitles(const rapidjson::Document& doc);
 	void SetInfo(const rapidjson::Document& doc);
 
