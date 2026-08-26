@@ -694,7 +694,7 @@ void YT_DLP::FilterAudioFormats(const CStringA& audioLang)
 	else if (audioLang.GetLength() == 2) {
 		for (const auto& afmt : mAudioFormats) {
 			if (afmt.language.GetLength() > 3 && StartsWith(afmt.language, audioLang) && afmt.language[2] == '-') {
-				lang_preferred = audioLang;
+				lang_preferred = afmt.language;
 				break;
 			}
 		}
