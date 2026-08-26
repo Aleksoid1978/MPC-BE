@@ -2,8 +2,14 @@
 
 1.9.1.x dev
 =============================
+MPCVideoDec
+Improved support for Color Transfer Characteristic BT.2020.
+
 VideoRenderers
 Fixed retrieval of the original video frame size for MPC VR and madVR.
+
+yt-dlp
+The ability to select a preferred audio track language has been restored.
 
 Player
 Fixed the issue with the Space bar when Japanese character input is active.
