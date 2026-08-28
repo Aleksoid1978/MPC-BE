@@ -11257,6 +11257,18 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 	// presentation point first; unlike a forced RedrawWindow this does not
 	// synchronously repaint a stale pre-WM_SIZE child surface.
 	if (bCloakedForFullscreenTransition) {
+		// Repaint the final frame while still cloaked, before DwmFlush()/uncloak.
+		// Without it, lifting the cloak can flash a one-frame legacy/Basic frame on
+		// some GPU/DWM builds. The comment above warns a forced repaint can paint a
+		// stale pre-WM_SIZE surface; here it is issued after MoveVideoWindow() so the
+		// child geometry is already final and that pitfall does not apply. Only needed
+		// for the empty player (no media), m_eMediaLoadState != MLS_LOADED: a loaded
+		// clip already repaints via its present cadence, so #1217's cloak alone
+		// suffices there.
+		if (m_eMediaLoadState != MLS_LOADED) {
+			RedrawWindow(nullptr, nullptr, RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_UPDATENOW);
+		}
+
 		DwmFlush();
 
 		const BOOL bCloak = FALSE;
