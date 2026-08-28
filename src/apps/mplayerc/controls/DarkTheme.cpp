@@ -158,7 +158,7 @@ namespace DarkTheme
 
 					CRect rcFrame = rc;
 					rcFrame.top += textH / 2;
-					CBrush brFrame(ThemeRGB(70, 75, 80));
+					CBrush brFrame(CtrlBorderColor()); // the shared control border, not a brighter one of its own
 					pDC->FrameRect(rcFrame, &brFrame);
 
 					if (!text.IsEmpty()) {
@@ -507,8 +507,11 @@ namespace DarkTheme
 							CDC* pDC = CDC::FromHandle(p->hdc);
 							CRect rc(p->rc);
 							pDC->FillSolidRect(rc, FaceColor());
-							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), ThemeRGB(70, 75, 80));
-							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, ThemeRGB(70, 75, 80));
+							// Shared border colour: at 70/75/80 these separators were the brightest lines on screen
+							// (and vivid rather than grey wherever the theme sliders amplify them).
+							const COLORREF clrSep = CtrlBorderColor();
+							pDC->FillSolidRect(rc.right - 1, rc.top, 1, rc.Height(), clrSep);
+							pDC->FillSolidRect(rc.left, rc.bottom - 1, rc.Width(), 1, clrSep);
 
 							wchar_t buf[256] = {};
 							HDITEMW hdi = {};
@@ -1205,6 +1208,22 @@ namespace DarkTheme
 				case WM_ENABLE:
 					::InvalidateRect(hWnd, nullptr, TRUE); // repaint when the enable state changes
 					break;
+				case WM_SETTEXT: {
+					// A static repaints itself IMMEDIATELY when its text changes, drawing straight to a DC it
+					// grabs itself instead of going through WM_PAINT — which bypasses the disabled owner-draw
+					// below, so Windows' disabled text (near-white under force-dark) lands on screen and stays.
+					// Sound Processing hits this: its Default button rewrites the "Level"/"Release time" captions
+					// while they are disabled, and nothing invalidates them afterwards. Let the text be stored,
+					// then repaint through our WM_PAINT at once (synchronously, so the native paint never shows).
+					// Only needed while disabled: an enabled static paints with the colours the parent hands it
+					// via WM_CTLCOLORSTATIC, which already match.
+					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
+					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) {
+						::InvalidateRect(hWnd, nullptr, TRUE);
+						::UpdateWindow(hWnd);
+					}
+					return r;
+				}
 				case WM_PAINT:
 					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) {
 						PAINTSTRUCT ps;
@@ -1485,7 +1504,11 @@ namespace DarkTheme
 	// high base like 70/75/80 renders as a LIGHT (near-white, tinted) line once the user's theme
 	// brightness/colour sliders are up — which is what made every control border read as white.
 	COLORREF CtrlBorderColor() { return ThemeRGB(35, 40, 45); }
-	COLORREF GridlineColor()   { return ThemeRGB(40, 45, 50); }
+	// Sits BETWEEN FaceColor and CtrlBorderColor, i.e. genuinely darker than the control borders like
+	// the header says. It was 40/45/50, which suited the old 70/75/80 border but became BRIGHTER than
+	// the border once that dropped to 35/40/45 - leaving grid lines the most prominent line in the UI,
+	// and vivid rather than subtle wherever the theme sliders amplify them.
+	COLORREF GridlineColor()   { return ThemeRGB(29, 34, 39); }
 
 	void AllowDarkModeForApp() {
 		if (!IsActive()) {
