@@ -262,7 +262,6 @@ SRCS_LC = \
 	libavcodec/float_fmul_reverse.c \
 	libavcodec/float2half.c \
 	libavcodec/flvdec.c \
-	libavcodec/fmtconvert.c \
 	libavcodec/frame_thread_encoder.c \
 	libavcodec/fraps.c \
 	libavcodec/g2meet.c \
@@ -631,7 +630,6 @@ SRCS_LC_B = \
 	libavcodec/x86/fdct.c \
 	libavcodec/x86/fdctdsp_init.c \
 	libavcodec/x86/flacdsp_init.c \
-	libavcodec/x86/fmtconvert_init.c \
 	libavcodec/x86/h263dsp_init.c \
 	libavcodec/x86/h264_cabac.c \
 	libavcodec/x86/h264_intrapred_init.c \
@@ -679,8 +677,7 @@ SRCS_LC_B = \
 	libavcodec/x86/h26x/h2656dsp.c \
 	\
 	libavcodec/x86/hevc/dsp_init.c \
-	libavcodec/x86/hevc/patch_idct_intrinsic.c \
-	libavcodec/x86/hevc/patch_intra_intrinsic.c \
+	libavcodec/x86/hevc/pred_init.c \
 	\
 	libavcodec/x86/vvc/dsp_init.c
 
@@ -867,7 +864,6 @@ SRCS_ASM_LC = \
 	libavcodec/x86/dirac_dwt.asm \
 	libavcodec/x86/diracdsp.asm \
 	libavcodec/x86/flacdsp.asm \
-	libavcodec/x86/fmtconvert.asm \
 	libavcodec/x86/fpel.asm \
 	libavcodec/x86/h263_loopfilter.asm \
 	libavcodec/x86/h264_chromamc.asm \
@@ -937,6 +933,7 @@ SRCS_ASM_LC = \
 	libavcodec/x86/hevc/dequant.asm \
 	libavcodec/x86/hevc/idct.asm \
 	libavcodec/x86/hevc/mc.asm \
+	libavcodec/x86/hevc/pred.asm \
 	libavcodec/x86/hevc/sao.asm \
 	libavcodec/x86/hevc/sao_10bit.asm \
 	\

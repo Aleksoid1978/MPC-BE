@@ -17,20 +17,16 @@
 * libavcodec/h264dec.c
 * libavcodec/h264dec.h
 * libavcodec/hevc/hevcdec.c
-* libavcodec/hevc/pred.c
-* libavcodec/hevc/pred.h
 * libavcodec/hevc/ps.c
 * libavcodec/hwconfig.h
 * libavcodec/kbdwin.h
-* libavcodec/mpeg4audio.h
 * libavcodec/mpeg12dec.c
+* libavcodec/mpeg4audio.h
 * libavcodec/mpegaudio_parser.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
 * libavcodec/vp9.c
 * libavcodec/vvc/dec.c
-* libavcodec/x86/hevc/dsp.h
-* libavcodec/x86/hevc/dsp_init.c
 
 * libavutil/float_dsp.c
 * libavutil/float_dsp.h
@@ -56,6 +52,3 @@ The following files are available only in MPC-BE (compared with ffmpeg):
 * libavcodec/ac4dec_data.h
 * libavcodec/float_fmul_reverse.c
 * libavcodec/libvvdec.c
-* libavcodec/x86/hevc/patch_idct_intrinsic.c
-* libavcodec/x86/hevc/patch_intra_intrinsic.c
-* libavcodec/x86/hevc/patch_pred.h

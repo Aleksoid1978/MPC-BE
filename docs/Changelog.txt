@@ -18,7 +18,7 @@ Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
 
 Updated libraries:
-	ffmpeg n9.1-dev-935-geb0bfa852e;
+	ffmpeg n9.1-dev-1005-gdf48dc624e;
 	nv-codec-headers n11.1.5.4.
 
 

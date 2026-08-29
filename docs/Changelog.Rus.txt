@@ -18,7 +18,7 @@ yt-dlp
 Обновлен румынский перевод (автор Andrei Miloiu).
 
 Обновлены библиотеки:
-	ffmpeg n9.1-dev-935-geb0bfa852e;
+	ffmpeg n9.1-dev-1005-gdf48dc624e;
 	nv-codec-headers n11.1.5.4.
 
 

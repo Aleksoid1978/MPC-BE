@@ -182,8 +182,4 @@ void ff_hevc_add_residual_32_10_sse2(uint8_t *dst, const int16_t *res, ptrdiff_t
 void ff_hevc_add_residual_16_10_avx2(uint8_t *dst, const int16_t *res, ptrdiff_t stride);
 void ff_hevc_add_residual_32_10_avx2(uint8_t *dst, const int16_t *res, ptrdiff_t stride);
 
-// ==> Start patch MPC
-void ff_hevc_transform_4x4_luma_12_sse2(int16_t *res);
-// ==> End patch MPC
-
 #endif // AVCODEC_X86_HEVC_DSP_H
