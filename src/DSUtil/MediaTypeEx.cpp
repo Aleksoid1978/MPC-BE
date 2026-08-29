@@ -656,7 +656,7 @@ void CMediaTypeEx::Dump(std::list<CString>& sl)
 				// http://msdn.microsoft.com/en-us/library/windows/desktop/ms698715%28v=vs.85%29.aspx
 				const LPCSTR chromasubsampling[] = { nullptr, "MPEG-1", nullptr, nullptr, nullptr, "MPEG-2", "PAL DV", "Co-sited" };
 				const LPCSTR nominalrange[] = { nullptr, "0-255", "16-235", "48-208" };
-				const LPCSTR transfermatrix[] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, nullptr, "YCgCo" };
+				const LPCSTR transfermatrix[] = { nullptr, "BT.709", "BT.601", "SMPTE 240M", "BT.2020", nullptr, "FCC", "YCgCo"};
 				const LPCSTR lighting[] = { nullptr, "bright", "office", "dim", "dark" };
 				const LPCSTR primaries[] = { nullptr, "Reserved", "BT.709", "BT.470-4 System M", "BT.470-4 System B,G",
 					"SMPTE 170M", "SMPTE 240M", "EBU Tech. 3213", "SMPTE C", "BT.2020" };
