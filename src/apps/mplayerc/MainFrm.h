@@ -1411,4 +1411,8 @@ private:
 	bool m_bIsLiveOnline = false;
 
 	void SaveHistory();
+
+	void Run();
+	void Pause();
+	void Stop();
 };
