@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "ShaderAutoCompleteDlg.h"
+#include "controls/DarkTheme.h"
 
 // CShaderAutoCompleteDlg dialog
 
@@ -162,6 +163,8 @@ BOOL CShaderAutoCompleteDlg::OnInitDialog()
 
 	::SendMessageW(m_hToolTipWnd, TTM_ADDTOOLW, 0, (LPARAM)&m_ti);
 	::SendMessageW(m_hToolTipWnd, TTM_SETMAXTIPWIDTH, 0, (LPARAM)400);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

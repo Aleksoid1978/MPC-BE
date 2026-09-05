@@ -26,6 +26,7 @@
 #include "DSUtil/FileHandle.h"
 #include "DSUtil/std_helper.h"
 #include "PPageExternalFilters.h"
+#include "controls/DarkTheme.h"
 
 // CRegFilterChooserDlg dialog
 
@@ -98,6 +99,8 @@ BOOL CRegFilterChooserDlg::OnInitDialog()
 	AddAnchor(IDCANCEL, BOTTOM_RIGHT);
 
 	SetMinTrackSize(CSize(300,100));
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

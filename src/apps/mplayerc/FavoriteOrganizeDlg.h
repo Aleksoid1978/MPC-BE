@@ -24,6 +24,7 @@
 #include <afxcmn.h>
 #include <afxwin.h>
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
+#include "controls/DarkTabCtrl.h"
 
 // CFavoriteOrganizeDlg dialog
 
@@ -42,7 +43,7 @@ public:
 
 	enum { IDD = IDD_FAVORGANIZE };
 
-	CTabCtrl m_tab;
+	CDarkTabCtrl m_tab; // owner-drawn dark tab (falls back to native when the dark theme is off)
 	CListCtrl m_list;
 
 protected:

@@ -172,6 +172,9 @@ protected:
     CSize   m_szFixedFloat;
 
     HBRUSH   m_hBrush, m_hBrush_orig, m_hBrushFrame;
+    // Separate CLIENT background brush. m_hBrush is the lighter NC/caption shade; the client must match the
+    // DARK content the bar hosts (shader editor dialog / lists), or an exposed strip reads as a pale rectangle.
+    HBRUSH   m_hBrushClient;
     COLORREF m_dwBrushColor;
 //MPC-BE custom code end
 
@@ -195,6 +198,7 @@ protected:
     afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
     afx_msg void OnWindowPosChanging(WINDOWPOS FAR* lpwndpos);
     afx_msg void OnPaint();
+    afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnClose();
     afx_msg void OnSize(UINT nType, int cx, int cy);
     //}}AFX_MSG

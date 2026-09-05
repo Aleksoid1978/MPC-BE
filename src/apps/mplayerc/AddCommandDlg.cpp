@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "AddCommandDlg.h"
+#include "controls/DarkTheme.h"
 
 // CAddCommandDlg dialog
 
@@ -136,6 +137,8 @@ BOOL CAddCommandDlg::OnInitDialog()
 	m_okButton.EnableWindow(FALSE);
 
 	SHAutoComplete(m_FilterEdit, SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }
