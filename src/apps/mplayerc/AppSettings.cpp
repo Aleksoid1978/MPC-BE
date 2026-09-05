@@ -490,12 +490,34 @@ void CAppSettings::ResetSettings()
 	fEnableWorkerThreadForOpening = true;
 	fReportFailedPins = true;
 
+	// Player
 	iMultipleInst = 1;
 	iTitleBarTextStyle = TEXTBAR_FILENAME;
 	iSeekBarTextStyle = TEXTBAR_TITLE;
 
-	iOnTop = 0;
+	bKeepHistory = true;
+	nHistoryEntriesMax = 200;
+	bRememberFilePos = false;
+	bRememberDVDPos = false;
+
+	bRecentFilesMenuEllipsis = true;
+	bRecentFilesShowUrlTitle = false;
+
+	bRememberPlaylistItems = true;
+	bSavePnSZoom = false;
+	dZoomX = 1.0;
+	dZoomY = 1.0;
 	bTrayIcon = false;
+	bHideCDROMsSubMenu = false;
+	dwPriority = NORMAL_PRIORITY_CLASS;
+
+	iNetworkTimeout = APP_NETTIMEOUT_DEF;
+	iNetworkReceiveTimeout = APP_NETRECEIVETIMEOUT_DEF;
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
+	//
+
+	iOnTop = 0;
 	fShowBarsWhenFullScreen = true;
 	nShowBarsWhenFullScreenTimeOut = 0;
 
@@ -541,18 +563,8 @@ void CAppSettings::ResetSettings()
 	fExitFullScreenAtTheEnd = true;
 	fExitFullScreenAtFocusLost = false;
 	fRestoreResAfterExit = true;
-	bSavePnSZoom = false;
-	dZoomX = 1.0;
-	dZoomY = 1.0;
 	sizeAspectRatio.cx = 0;
 	sizeAspectRatio.cy = 0;
-
-	bKeepHistory = true;
-	bRecentFilesMenuEllipsis = true;
-	bRecentFilesShowUrlTitle = false;
-	nHistoryEntriesMax = 200;
-	bRememberDVDPos = false;
-	bRememberFilePos = false;
 
 	// Window size
 	nStartupWindowMode = STARTUPWND_DEFAULT;
@@ -569,7 +581,6 @@ void CAppSettings::ResetSettings()
 	bSnapToDesktopEdges = false;
 
 	bShufflePlaylistItems = false;
-	bRememberPlaylistItems = true;
 	bHidePlaylistFullScreen = false;
 	bShowPlaylistTooltip = true;
 	bShowPlaylistSearchBar = true;
@@ -610,10 +621,6 @@ void CAppSettings::ResetSettings()
 	fUseDefaultSubtitlesStyle = false;
 
 	iBufferDuration = APP_BUFDURATION_DEF;
-	iNetworkTimeout = APP_NETTIMEOUT_DEF;
-	iNetworkReceiveTimeout = APP_NETRECEIVETIMEOUT_DEF;
-	http::connectTimeout = iNetworkTimeout * 1000;
-	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	bAudioMixer = false;
 	nAudioMixerLayout = SPK_STEREO;
@@ -710,9 +717,6 @@ void CAppSettings::ResetSettings()
 	nLogoId = DEF_LOGO;
 	bLogoExternal = false;
 
-	bHideCDROMsSubMenu = false;
-
-	dwPriority = NORMAL_PRIORITY_CLASS;
 	fLaunchfullscreen = false;
 
 	fEnableWebServer = false;
@@ -856,6 +860,42 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 
 	FiltersPriority.LoadSettings();
 
+	// Player
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst, 0, 2);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
+
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax, 100, 900);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBER_FILEPOS, bRememberFilePos);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMEMBER_DVDPOS, bRememberDVDPos);
+
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
+
+	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
+	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str)
+		&& swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2
+		&& dZoomX >= 0.2 && dZoomX <= 5.0
+		&& dZoomY >= 0.2 && dZoomY <= 5.0) {
+		bSavePnSZoom = true;
+	} else {
+		bSavePnSZoom = false;
+		dZoomX = 1.0;
+		dZoomY = 1.0;
+	}
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
+	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
+	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
+	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
+
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
+	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout, APP_NETRECEIVETIMEOUT_MIN, APP_NETRECEIVETIMEOUT_MAX);
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
+	//
+
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode, MODE_SHOWCAPTIONMENU, MODE_BORDERLESS);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
 	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
@@ -894,13 +934,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_ENABLEWORKERTHREADFOROPENING, fEnableWorkerThreadForOpening);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REPORTFAILEDPINS, fReportFailedPins);
 
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst, 0, 2);
-
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle, TEXTBAR_EMPTY, TEXTBAR_FULLPATH);
-
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop, 0, 3);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
@@ -923,17 +957,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_OPEN_DIR, strLastOpenDir);
 	// Last Saved Playlist Dir
 	profile.ReadString(IDS_R_SETTINGS, IDS_RS_LAST_SAVED_PLAYLIST_DIR, strLastSavedPlaylistDir);
-
-	if (profile.ReadString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str)
-			&& swscanf_s(str, L"%f,%f", &dZoomX, &dZoomY) == 2
-			&& dZoomX >= 0.2 && dZoomX <= 5.0
-			&& dZoomY >= 0.2 && dZoomY <= 5.0) {
-		bSavePnSZoom = true;
-	} else {
-		bSavePnSZoom = false;
-		dZoomX = 1.0;
-		dZoomY = 1.0;
-	}
 
 	// Window size
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode, STARTUPWND_DEFAULT, STARTUPWND_SPECIFIED);
@@ -968,14 +991,7 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, *(int*)&sizeAspectRatio.cx);
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, *(int*)&sizeAspectRatio.cy);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber, APP_RECENTFILES_MIN, APP_RECENTFILES_MAX);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax, 100, 900);
-
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
-	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_HIDEINFULLSCREEN, bHidePlaylistFullScreen);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.ReadBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
@@ -1013,10 +1029,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_USEDEFAULTSUBTITLESSTYLE, fUseDefaultSubtitlesStyle);
 
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration, APP_BUFDURATION_MIN, APP_BUFDURATION_MAX);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout, APP_NETTIMEOUT_MIN, APP_NETTIMEOUT_MAX);
-	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout, APP_NETRECEIVETIMEOUT_MIN, APP_NETRECEIVETIMEOUT_MAX);
-	http::connectTimeout = iNetworkTimeout * 1000;
-	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	// Audio
 	profile.ReadInt(IDS_R_AUDIO, IDS_RS_VOLUME, nVolume, 0, 100);
@@ -1354,11 +1366,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadInt(IDS_R_SETTINGS, IDS_RS_LOGOID, nLogoId);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_LOGOEXT, bLogoExternal);
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
-
-	profile.ReadUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, *(unsigned*)&dwPriority);
-	::SetPriorityClass(::GetCurrentProcess(), dwPriority);
-
 	profile.ReadBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.ReadInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort, 1, 65535);
 	profile.ReadInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERQUALITY, nWebServerQuality, APP_WEBSRVQUALITY_MIN, APP_WEBSRVQUALITY_MAX);
@@ -1484,9 +1491,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 		m_DVBChannels.emplace_back(Channel);
 	}
 
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
-	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
-
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_REMAINING_TIME, bRemainingTime);
 	profile.ReadBool(IDS_R_SETTINGS, IDS_RS_SHOW_ZERO_HOURS, bShowZeroHours);
 
@@ -1589,6 +1593,37 @@ void CAppSettings::SaveSettings()
 
 	FiltersPriority.SaveSettings();
 
+	// Player
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);
+
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBER_FILEPOS, bRememberFilePos);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_REMEMBER_DVDPOS, bRememberDVDPos);
+
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
+
+	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
+	if (bSavePnSZoom) {
+		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
+		profile.WriteString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
+	} else {
+		profile.DeleteValue(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM);
+	}
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
+	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
+	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
+
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
+	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout);
+	http::connectTimeout = iNetworkTimeout * 1000;
+	http::readTimeout = iNetworkReceiveTimeout * 1000;
+	//
+
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_HIDECAPTIONMENU, iCaptionMenuMode);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDENAVIGATION, fHideNavigation);
 	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_CONTROLSTATE, nCS);
@@ -1606,28 +1641,10 @@ void CAppSettings::SaveSettings()
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SPEED_STEP, nSpeedStep);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_SPEED_NOTRESET, bSpeedNotReset);
 
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_MULTIINST, iMultipleInst);
-
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_TITLEBARTEXT, iTitleBarTextStyle);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_SEEKBARTEXT, iSeekBarTextStyle);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ONTOP, iOnTop);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_TRAYICON, bTrayIcon);
-
-	if (bSavePnSZoom) {
-		str.Format(L"%.3f,%.3f", dZoomX, dZoomY);
-		profile.WriteString(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM, str);
-	} else {
-		profile.DeleteValue(IDS_R_SETTINGS, IDS_RS_PANSCANZOOM);
-	}
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_X, sizeAspectRatio.cx);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_ASPECTRATIO_Y, sizeAspectRatio.cy);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_KEEPHISTORY, bKeepHistory);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_NUMBER, iRecentFilesNumber);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_MENU_ELLIPSIS, bRecentFilesMenuEllipsis);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RECENT_FILES_SHOW_URL_TITLE, bRecentFilesShowUrlTitle);
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_HISTORY_ENTRIES_MAX, nHistoryEntriesMax);
 
 	// Window size
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_WINDOWMODESTARTUP, nStartupWindowMode);
@@ -1647,7 +1664,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_RESETWINDOWAFTERCLOSINGFILE, bResetWindowAfterClosingFile);
 
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHUFFLE, bShufflePlaylistItems);
-	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_REMEMBERMAIN, bRememberPlaylistItems);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_HIDEINFULLSCREEN, bHidePlaylistFullScreen);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWPTOOLTIP, bShowPlaylistTooltip);
 	profile.WriteBool(IDS_RS_PLAYLIST, IDS_RS_PLAYLIST_SHOWSEARCHBAR, bShowPlaylistSearchBar);
@@ -1730,10 +1746,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteBool(IDS_R_AUDIO, IDS_RS_AUDIOFILTERS_NOTFORSTEREO, bAudioFiltersNotForStereo);
 
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_BUFFERDURATION, iBufferDuration);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETWORKTIMEOUT, iNetworkTimeout);
-	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_NETRECEIVETIMEOUT, iNetworkReceiveTimeout);
-	http::connectTimeout = iNetworkTimeout * 1000;
-	http::readTimeout = iNetworkReceiveTimeout * 1000;
 
 	// Prevent Minimize when in Fullscreen mode on non default monitor
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_PREVENT_MINIMIZE, fPreventMinimize);
@@ -1829,10 +1841,6 @@ void CAppSettings::SaveSettings()
 		profile.WriteString(IDS_R_DVB, strTemp, Channel.ToString());
 		iChannel++;
 	}
-
-	// playback positions for last played DVDs
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_DVDPOS, bRememberDVDPos);
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_FILEPOS, bRememberFilePos);
 
 	profile.DeleteSection(IDS_R_PNSPRESETS);
 	for (int i = 0, j = m_pnspresets.GetCount(); i < j; i++) {
@@ -1969,10 +1977,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteString(IDS_R_SETTINGS, IDS_RS_LOGOFILE, strLogoFileName);
 	profile.WriteInt(IDS_R_SETTINGS, IDS_RS_LOGOID, nLogoId);
 	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_LOGOEXT, bLogoExternal);
-
-	profile.WriteBool(IDS_R_SETTINGS, IDS_RS_HIDECDROMSSUBMENU, bHideCDROMsSubMenu);
-
-	profile.WriteUInt(IDS_R_SETTINGS, IDS_RS_PRIORITY, dwPriority);
 
 	profile.WriteBool(IDS_R_WEBSERVER, IDS_RS_ENABLEWEBSERVER, fEnableWebServer);
 	profile.WriteInt(IDS_R_WEBSERVER, IDS_RS_WEBSERVERPORT, nWebServerPort);
