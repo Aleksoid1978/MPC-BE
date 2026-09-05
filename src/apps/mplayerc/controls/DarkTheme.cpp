@@ -375,32 +375,51 @@ namespace DarkTheme
 			HPEN pen = ::CreatePen(PS_SOLID, 1, GridlineColor());
 			HGDIOBJ oldPen = ::SelectObject(hdc, pen);
 
-			// horizontal line under each visible row
+			// Column geometry first: the grid must stop at the right edge of the LAST column. Header_GetItemRect
+			// is relative to the header window, which is scrolled left when the list is scrolled horizontally, so
+			// map the header's client origin into the list-view's client (otherwise everything stays at the
+			// unscrolled positions).
+			POINT hdrOrg = { 0, 0 };
+			int cols = 0;
+			int gridRight = rcClient.right;
+			if (hHeader) {
+				::ClientToScreen(hHeader, &hdrOrg);
+				::ScreenToClient(hWnd, &hdrOrg); // hdrOrg.x = -horizontal scroll offset
+				cols = static_cast<int>(::SendMessageW(hHeader, HDM_GETITEMCOUNT, 0, 0));
+				int right = rcClient.left;
+				for (int c = 0; c < cols; ++c) {
+					RECT hr{};
+					if (Header_GetItemRect(hHeader, c, &hr)) {
+						const int r = hdrOrg.x + hr.right; // columns can be reordered, so take the furthest edge
+						if (r > right) {
+							right = r;
+						}
+					}
+				}
+				if (cols > 0 && right < gridRight) {
+					gridRight = right;
+				}
+			}
+
+			// horizontal line under each visible row, stopping at the last column. Running these out to the client
+			// edge ruled the empty trailing space to the right of the last column, which the header itself leaves
+			// blank - so the rows looked lined where the header was not.
 			const int top = static_cast<int>(::SendMessageW(hWnd, LVM_GETTOPINDEX, 0, 0));
 			const int per = static_cast<int>(::SendMessageW(hWnd, LVM_GETCOUNTPERPAGE, 0, 0));
 			for (int i = top; i <= top + per && i < count; ++i) {
 				RECT r{}; r.left = LVIR_BOUNDS;
 				::SendMessageW(hWnd, LVM_GETITEMRECT, i, reinterpret_cast<LPARAM>(&r));
 				::MoveToEx(hdc, rcClient.left, r.bottom - 1, nullptr);
-				::LineTo(hdc, rcClient.right, r.bottom - 1);
+				::LineTo(hdc, gridRight, r.bottom - 1);
 			}
 
-			// vertical line at each column's right edge, through the item rows only. Header_GetItemRect
-			// is relative to the header window, which is scrolled left when the list is scrolled
-			// horizontally; map the header's client origin into the list-view's client so the lines
-			// follow the scroll (otherwise they stay at the unscrolled column positions).
-			if (hHeader) {
-				POINT hdrOrg = { 0, 0 };
-				::ClientToScreen(hHeader, &hdrOrg);
-				::ScreenToClient(hWnd, &hdrOrg); // hdrOrg.x = -horizontal scroll offset
-				const int cols = static_cast<int>(::SendMessageW(hHeader, HDM_GETITEMCOUNT, 0, 0));
-				for (int c = 0; c < cols; ++c) {
-					RECT hr{};
-					if (Header_GetItemRect(hHeader, c, &hr)) {
-						const int x = hdrOrg.x + hr.right - 1;
-						::MoveToEx(hdc, x, headerH, nullptr);
-						::LineTo(hdc, x, gridBottom);
-					}
+			// vertical line at each column's right edge, through the item rows only
+			for (int c = 0; c < cols; ++c) {
+				RECT hr{};
+				if (Header_GetItemRect(hHeader, c, &hr)) {
+					const int x = hdrOrg.x + hr.right - 1;
+					::MoveToEx(hdc, x, headerH, nullptr);
+					::LineTo(hdc, x, gridBottom);
 				}
 			}
 
@@ -1209,20 +1228,21 @@ namespace DarkTheme
 					::InvalidateRect(hWnd, nullptr, TRUE); // repaint when the enable state changes
 					break;
 				case WM_SETTEXT: {
-					// A static repaints itself IMMEDIATELY when its text changes, drawing straight to a DC it
-					// grabs itself instead of going through WM_PAINT — which bypasses the disabled owner-draw
-					// below, so Windows' disabled text (near-white under force-dark) lands on screen and stays.
-					// Sound Processing hits this: its Default button rewrites the "Level"/"Release time" captions
-					// while they are disabled, and nothing invalidates them afterwards. Let the text be stored,
-					// then repaint through our WM_PAINT at once (synchronously, so the native paint never shows).
-					// Only needed while disabled: an enabled static paints with the colours the parent hands it
-					// via WM_CTLCOLORSTATIC, which already match.
-					const LRESULT r = DefSubclassProc(hWnd, msg, wParam, lParam);
+					// A static repaints itself IMMEDIATELY when its text changes, grabbing a DC of its own instead of
+					// going through WM_PAINT - which bypasses the disabled owner-draw below, so Windows' disabled text
+					// (near-white under force-dark) is what lands on screen. Sound Processing hits this: Default rewrites
+					// its "Level"/"Release time" captions while they are disabled.
+					//
+					// Repainting AFTER that is not enough: the white is drawn first and only then replaced, which shows
+					// as a flash when Default is clicked repeatedly. So while disabled, skip the control's own WM_SETTEXT
+					// handler and let DefWindowProc merely STORE the caption - then no self-paint happens at all - and
+					// invalidate so our WM_PAINT is the only thing that ever draws it.
 					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) {
+						const LRESULT res = ::DefWindowProcW(hWnd, msg, wParam, lParam);
 						::InvalidateRect(hWnd, nullptr, TRUE);
-						::UpdateWindow(hWnd);
+						return res;
 					}
-					return r;
+					break; // enabled: its own paint uses the colours the parent hands it via WM_CTLCOLORSTATIC
 				}
 				case WM_PAINT:
 					if (::GetWindowLongW(hWnd, GWL_STYLE) & WS_DISABLED) {
