@@ -121,6 +121,23 @@ namespace DarkTheme
 			}
 		}
 
+		// Windows' DrawFocusRect XORs against whatever is underneath, which on this dark palette lands almost
+		// invisible - so the dotted keyboard-focus marker effectively vanished when tabbing between controls.
+		// Draw the same dotted rectangle ourselves in a light colour so it actually reads on dark.
+		void DrawDarkFocusRect(HDC hdc, const RECT& rc) {
+			LOGBRUSH lb = { BS_SOLID, RGB(150, 155, 160), 0 };
+			HPEN pen = ::ExtCreatePen(PS_COSMETIC | PS_ALTERNATE, 1, &lb, 0, nullptr);
+			if (!pen) {
+				return;
+			}
+			HGDIOBJ oldPen = ::SelectObject(hdc, pen);
+			HGDIOBJ oldBrush = ::SelectObject(hdc, ::GetStockObject(NULL_BRUSH));
+			::Rectangle(hdc, rc.left, rc.top, rc.right, rc.bottom);
+			::SelectObject(hdc, oldBrush);
+			::SelectObject(hdc, oldPen);
+			::DeleteObject(pen);
+		}
+
 		// Group boxes (BS_GROUPBOX) are not repainted by Windows' native dark mode
 		// (their frame and caption stay drawn with the classic black-on-light system
 		// colors) and they do not emit NM_CUSTOMDRAW, so we subclass them and paint
@@ -327,7 +344,7 @@ namespace DarkTheme
 					if (focused && !disabled) {
 						CRect fr = rc;
 						fr.DeflateRect(3, 3);
-						pDC->DrawFocusRect(fr);
+						DrawDarkFocusRect(hdc, fr);
 					}
 					::EndPaint(hWnd, &ps);
 					return 0;
@@ -1117,6 +1134,14 @@ namespace DarkTheme
 				}
 				case WM_PAINT:
 					if (listType) {
+						// Paint the closed field ourselves rather than letting the system draw it (via WM_PRINTCLIENT)
+						// and only re-stroking the border. The system's dark rendering of a drop-down list changes shade
+						// between states - most visibly it goes pale when the control is disabled - so the same combo
+						// looked 'washed out' after Apply / Reset / Default while its neighbours stayed dark. The control
+						// cannot be switched to owner-drawn after creation (a combo picks its drawing routine when it is
+						// created, exactly like the static separators did), and the style cannot go in the resources
+						// because the translated resource files are separate and would drift - so we draw it here, which
+						// also makes every state ours. Input is untouched: this only replaces the painting.
 						RECT rc;
 						::GetClientRect(h, &rc);
 						PAINTSTRUCT ps;
@@ -1124,10 +1149,53 @@ namespace DarkTheme
 						HDC mem = ::CreateCompatibleDC(hdc);
 						HBITMAP bmp = ::CreateCompatibleBitmap(hdc, rc.right, rc.bottom);
 						HBITMAP old = static_cast<HBITMAP>(::SelectObject(mem, bmp));
-						::SendMessageW(h, WM_PRINTCLIENT, reinterpret_cast<WPARAM>(mem), PRF_CLIENT | PRF_ERASEBKGND);
-						HBRUSH br = ::CreateSolidBrush(CtrlBorderColor()); // consistent dark border in every state (incl. focused)
+
+						const bool disabled = (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) != 0;
+
+						// Interior: the SAME colour whether enabled or disabled, so the shade never shifts under the
+						// user; only the text and arrow dim.
+						HBRUSH bg = ::CreateSolidBrush(CtrlBackColor());
+						::FillRect(mem, &rc, bg);
+						::DeleteObject(bg);
+
+						// Drop-down arrow, in its own button-width strip on the right.
+						const UINT dpi = ::GetDpiForWindow(h);
+						const int btnW = ::GetSystemMetricsForDpi(SM_CXVSCROLL, dpi ? dpi : 96);
+						CRect rcBtn(rc.right - btnW, rc.top, rc.right, rc.bottom);
+						DrawArrow(CDC::FromHandle(mem), rcBtn, false,
+							disabled ? RGB(110, 115, 120) : RGB(170, 175, 180));
+
+						// Selected item text.
+						const int sel = static_cast<int>(::SendMessageW(h, CB_GETCURSEL, 0, 0));
+						if (sel >= 0) {
+							const int len = static_cast<int>(::SendMessageW(h, CB_GETLBTEXTLEN, sel, 0));
+							if (len > 0 && len < 4096) {
+								CString text;
+								::SendMessageW(h, CB_GETLBTEXT, sel, reinterpret_cast<LPARAM>(text.GetBuffer(len + 1)));
+								text.ReleaseBuffer();
+								CDC* pMem = CDC::FromHandle(mem);
+								HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(h, WM_GETFONT, 0, 0));
+								CFont* pOldFont = hFont ? pMem->SelectObject(CFont::FromHandle(hFont)) : nullptr;
+								pMem->SetBkMode(TRANSPARENT);
+								pMem->SetTextColor(disabled ? RGB(110, 115, 120) : TextColor());
+								CRect rcText(rc.left + 4, rc.top, rc.right - btnW - 2, rc.bottom);
+								pMem->DrawTextW(text, rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+								if (pOldFont) {
+									pMem->SelectObject(pOldFont);
+								}
+							}
+						}
+
+						HBRUSH br = ::CreateSolidBrush(CtrlBorderColor()); // consistent dark border in every state
 						::FrameRect(mem, &rc, br);
 						::DeleteObject(br);
+
+						// Keyboard focus marker, so tabbing onto the combo is visible.
+						if (::GetFocus() == h && !disabled) {
+							RECT rcFocus = { rc.left + 2, rc.top + 2, rc.right - btnW - 1, rc.bottom - 2 };
+							DrawDarkFocusRect(mem, rcFocus);
+						}
+
 						::BitBlt(hdc, 0, 0, rc.right, rc.bottom, mem, 0, 0, SRCCOPY);
 						::SelectObject(mem, old);
 						::DeleteObject(bmp);
@@ -2166,7 +2234,7 @@ namespace DarkTheme
 			if (focus) {
 				CRect rf = rc;
 				rf.DeflateRect(3, 3);
-				pDC->DrawFocusRect(rf);
+				DrawDarkFocusRect(pDC->GetSafeHdc(), rf);
 			}
 			*pResult = CDRF_SKIPDEFAULT;
 			return true;
