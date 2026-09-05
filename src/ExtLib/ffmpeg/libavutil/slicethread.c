@@ -74,9 +74,7 @@ static int run_jobs(AVSliceThread *ctx)
             continue;
         ret = ctx->worker_func(ctx->priv, current_job, first_job, nb_jobs, nb_active_threads);
         if (ret) {
-// ==> Start patch MPC
-            intptr_t prev = 0;
-// ==> End patch MPC
+            int prev = 0;
             atomic_compare_exchange_strong_explicit(&ctx->error, &prev, ret,
                                                     memory_order_relaxed,
                                                     memory_order_relaxed);

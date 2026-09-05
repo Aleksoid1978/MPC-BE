@@ -35,7 +35,7 @@ CFLAGS = -I. -Icompat/atomics/win32 -Icompat/windows \
 	   -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -DOPJ_STATIC \
 	   -D_WIN32_WINNT=0x0601 -DWINVER=0x0601 -DWIN32_LEAN_AND_MEAN \
 	   -fomit-frame-pointer -std=c17 \
-	   -fno-common -fno-ident -mthreads -Wno-discarded-qualifiers
+	   -fno-common -fno-ident -mthreads -Wno-discarded-qualifiers -Wno-incompatible-pointer-types
 
 NASMFLAGS = -I. -Pconfig.asm
 
@@ -47,7 +47,7 @@ ifeq ($(64BIT),yes)
 	NASMFLAGS  += -f win64 -DWIN64=1 -DARCH_X86_32=0 -DARCH_X86_64=1 -DPIC
 else
 	TARGET_OS   = i686-w64-mingw32
-	CFLAGS     += -DWIN32 -D_WIN32 -DARCH_X86_32 -Wno-incompatible-pointer-types
+	CFLAGS     += -DWIN32 -D_WIN32 -DARCH_X86_32
 	OPTFLAGS    = -m32 -march=i686 -msse -msse2 -mfpmath=sse -mstackrealign
 	NASMFLAGS  += -f win32 -DWIN32=1 -DARCH_X86_32=1 -DARCH_X86_64=0 -DPREFIX
 endif
