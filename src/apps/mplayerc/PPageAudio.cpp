@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -64,8 +64,8 @@ BOOL CPPageAudio::PreTranslateMessage(MSG* pMsg)
 			CStringW text;
 			m_iAudioRendererCtrl.GetWindowText(text);
 			CopyStringToClipboard(this->m_hWnd, text);
+			return TRUE;
 		}
-		return TRUE;
 	}
 
 	return CPPageBase::PreTranslateMessage(pMsg);

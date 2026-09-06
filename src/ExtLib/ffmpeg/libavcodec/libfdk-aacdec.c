@@ -151,12 +151,14 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
         channel_counts[ctype]++;
     }
     av_log(avctx, AV_LOG_DEBUG,
-           "%d channels - front:%d side:%d back:%d lfe:%d top:%d\n",
+           "%d channels - front:%d side:%d back:%d lfe:%d top:%d bottom %d\n",
            info->numChannels,
            channel_counts[ACT_FRONT], channel_counts[ACT_SIDE],
            channel_counts[ACT_BACK],  channel_counts[ACT_LFE],
            channel_counts[ACT_FRONT_TOP] + channel_counts[ACT_SIDE_TOP] +
-           channel_counts[ACT_BACK_TOP]  + channel_counts[ACT_TOP]);
+           channel_counts[ACT_BACK_TOP]  + channel_counts[ACT_TOP],
+           channel_counts[ACT_FRONT_BOTTOM] + channel_counts[ACT_SIDE_BOTTOM] +
+           channel_counts[ACT_BACK_BOTTOM]  + channel_counts[ACT_BOTTOM]);
 
     switch (channel_counts[ACT_FRONT]) {
     case 5:
@@ -235,6 +237,60 @@ static int get_stream_info(AVCodecContext *avctx, AVFrame *frame)
             av_log(avctx, AV_LOG_WARNING,
                    "unsupported number of top front channels: %d\n",
                    channel_counts[ACT_FRONT_TOP]);
+            ch_error = 1;
+            break;
+        }
+    }
+    if (channel_counts[ACT_BACK_TOP] > 0) {
+        switch (channel_counts[ACT_BACK_TOP]) {
+        case 3:
+        case 2:
+            ch_layout |= AV_CH_TOP_BACK_LEFT | AV_CH_TOP_BACK_RIGHT;
+            av_fallthrough;
+        case 1:
+            if (channel_counts[ACT_BACK_TOP] & 1)
+                ch_layout |= AV_CH_TOP_BACK_CENTER;
+            break;
+        default:
+            av_log(avctx, AV_LOG_WARNING,
+                   "unsupported number of top back channels: %d\n",
+                   channel_counts[ACT_BACK_TOP]);
+            ch_error = 1;
+            break;
+        }
+    }
+    if (channel_counts[ACT_SIDE_TOP] > 0) {
+        switch (channel_counts[ACT_SIDE_TOP]) {
+        case 3:
+        case 2:
+            ch_layout |= AV_CH_TOP_SIDE_LEFT | AV_CH_TOP_SIDE_RIGHT;
+            av_fallthrough;
+        case 1:
+            if (channel_counts[ACT_SIDE_TOP] & 1)
+                ch_layout |= AV_CH_TOP_CENTER;
+            break;
+        default:
+            av_log(avctx, AV_LOG_WARNING,
+                   "unsupported number of top side channels: %d\n",
+                   channel_counts[ACT_SIDE_TOP]);
+            ch_error = 1;
+            break;
+        }
+    }
+    if (channel_counts[ACT_FRONT_BOTTOM] > 0) {
+        switch (channel_counts[ACT_FRONT_BOTTOM]) {
+        case 3:
+        case 2:
+            ch_layout |= AV_CH_BOTTOM_FRONT_LEFT | AV_CH_BOTTOM_FRONT_RIGHT;
+            av_fallthrough;
+        case 1:
+            if (channel_counts[ACT_FRONT_BOTTOM] & 1)
+                ch_layout |= AV_CH_BOTTOM_FRONT_CENTER;
+            break;
+        default:
+            av_log(avctx, AV_LOG_WARNING,
+                   "unsupported number of bottom front channels: %d\n",
+                   channel_counts[ACT_FRONT_BOTTOM]);
             ch_error = 1;
             break;
         }

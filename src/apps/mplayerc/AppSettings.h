@@ -170,8 +170,8 @@ enum MCE_RAW_INPUT {
 #define AUDRNDT_NULL_UNCOMP L"Null Audio Renderer (Uncompressed)"
 #define AUDRNDT_MPC         L"MPC Audio Renderer"
 
-#define DEFAULT_AUDIO_PATHS    L".;.\\audio;"
-#define DEFAULT_SUBTITLE_PATHS L".;.\\subtitles;.\\*subs;.\\*sub;"
+#define DEFAULT_AUDIO_PATHS    L".;.\\audio;.\\sound *"
+#define DEFAULT_SUBTITLE_PATHS L".;.\\subtitles;.\\*subs;.\\*sub;.\\sub *"
 #define DEFAULT_JUMPDISTANCE_1  1000
 #define DEFAULT_JUMPDISTANCE_2  5000
 #define DEFAULT_JUMPDISTANCE_3 20000
@@ -482,31 +482,28 @@ public:
 
 	// Player
 	int				iMultipleInst;
-	bool			bTrayIcon;
-	union {
-		struct{
-			UINT Enable : 1;
-			UINT FileName : 1;
-			UINT SeekTime : 1;
-		};
-		UINT value;
-	} ShowOSD;
-
-	bool			bHideCDROMsSubMenu;
-	DWORD			dwPriority;
 	int				iTitleBarTextStyle;
 	int				iSeekBarTextStyle;
+
 	bool			bKeepHistory;
+	unsigned		nHistoryEntriesMax;
+	bool			bRememberFilePos;
+	bool			bRememberDVDPos;
+
 	int				iRecentFilesNumber;
 	bool			bRecentFilesMenuEllipsis;
 	bool			bRecentFilesShowUrlTitle;
-	unsigned		nHistoryEntriesMax;
-	bool			bRememberDVDPos;
-	bool			bRememberFilePos;
+
 	bool			bRememberPlaylistItems;
 	bool			bSavePnSZoom;
 	float			dZoomX;
 	float			dZoomY;
+	bool			bTrayIcon;
+	bool			bHideCDROMsSubMenu;
+	DWORD			dwPriority;
+
+	int				iNetworkTimeout;
+	int				iNetworkReceiveTimeout;
 
 	// Formats
 	CMediaFormats	m_Formats;
@@ -670,8 +667,6 @@ public:
 	bool			VideoFilters[VDEC_COUNT];
 	bool			AudioFilters[ADEC_COUNT];
 	int				iBufferDuration;
-	int				iNetworkTimeout;
-	int				iNetworkReceiveTimeout;
 
 	// Audio Switcher
 	bool			bAudioMixer;
@@ -740,6 +735,14 @@ public:
 	bool			fUseWin7TaskBar;
 
 	// OSD
+	union {
+		struct {
+			UINT Enable : 1;
+			UINT FileName : 1;
+			UINT SeekTime : 1;
+		};
+		UINT value;
+	} ShowOSD;
 	CString			strOSDFont;
 	int				nOSDSize;
 	bool			bOSDFontShadow;

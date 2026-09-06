@@ -276,8 +276,6 @@ BOOL CPPageMouse::OnApply()
 
 BEGIN_MESSAGE_MAP(CPPageMouse, CPPageBase)
 	ON_CBN_SELCHANGE(IDC_COMBO1, OnLeftClickChange)
-	ON_CBN_SELCHANGE(IDC_COMBO4, OnLongPressLeftSpeedRateChange)
-	ON_CBN_SELCHANGE(IDC_COMBO5, OnLongPressLeftSpeedDelayChange)
 	ON_BN_CLICKED(IDC_CHECK3, OnLongPressLeftSpeedChange)
 	ON_NOTIFY(LVN_BEGINLABELEDITW, IDC_LIST1, OnBeginlabeleditList)
 	ON_NOTIFY(LVN_DOLABELEDIT, IDC_LIST1, OnDolabeleditList)
@@ -302,16 +300,6 @@ void CPPageMouse::OnLongPressLeftSpeedChange()
 {
 	m_cmbMouseLongPressLeftSpeedRate.EnableWindow(m_chkMouseLongPressLeftSpeed.GetCheck() ? TRUE : FALSE);
 	m_cmbMouseLongPressLeftSpeedDelay.EnableWindow(m_chkMouseLongPressLeftSpeed.GetCheck() ? TRUE : FALSE);
-	SetModified();
-}
-
-void CPPageMouse::OnLongPressLeftSpeedRateChange()
-{
-	SetModified();
-}
-
-void CPPageMouse::OnLongPressLeftSpeedDelayChange()
-{
 	SetModified();
 }
 
@@ -452,6 +440,7 @@ void CPPageMouse::OnBnClickedReset()
 	m_table_values[ROW_WHL_R][COL_RBTN]   = 0;
 
 	SyncList();
+	OnLongPressLeftSpeedChange();
 
 	SetModified();
 }

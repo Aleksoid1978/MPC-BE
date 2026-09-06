@@ -813,10 +813,10 @@ BEGIN
     LTEXT           "Dubbelklikken",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Venster verplaatsen door het videobeeld te verslepen",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
-    CONTROL         "Enable long press speed-up",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
-    LTEXT           "Long press speed",IDC_STATIC,20,97,130,8
+    CONTROL         "Verhoogde snelheid bij lang indrukken inschakelen",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
+    LTEXT           "Snelheid bij lang indrukken",IDC_STATIC,20,97,130,8
     COMBOBOX        IDC_COMBO4,153,95,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Long press delay",IDC_STATIC,20,113,130,8
+    LTEXT           "Vertraging bij lang indrukken",IDC_STATIC,20,113,130,8
     COMBOBOX        IDC_COMBO5,153,111,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Rechts klikken",IDC_STATIC,10,134,60,8
     COMBOBOX        IDC_COMBO3,70,133,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -942,7 +942,7 @@ BEGIN
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Afspeellijst laden",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,145
-    CONTROL         "Use the built-in YouTube playlist parser",IDC_CHECK7,
+    CONTROL         "Ingebouwde parser voor YouTube-afspeellijsten gebruiken",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,137,206,10
     CONTROL         "yt-dlp",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Executable:",IDC_STATIC,10,17,77,8
@@ -3074,7 +3074,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Het eerste bestand in de map is geladen."
     IDS_LAST_IN_FOLDER      "Het laatste bestand in de map is geladen."
     IDS_MERGING_FILES       "Bestanden aan het samenvoegen..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "Bestanden samenvoegen met FFmpeg"
 END
 
 STRINGTABLE
@@ -3499,14 +3499,14 @@ BEGIN
     IDS_ARS_CHANNELS        "Kanalen:"
     IDS_ARS_WASAPI_METHOD   "WASAPI-methode:"
     IDS_ARS_DUMMY_CHANNELS  "Bij het upmixen geen kanalen vullen"
-    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Audioapparaat actief houden tijdens de pauze"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Indien mogelijk wordt de audio in het oorspronkelijke formaat verzonden.\nAnders wordt het opgegeven formaat in de systeeminstellingen gebruikt."
 END
 
 STRINGTABLE
 BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "De renderer zal het apparaat zonder enkele controles proberen te initialiseren."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "De renderer stuurt onhoorbaar geluid naar het audioapparaat."
 END
 
 STRINGTABLE

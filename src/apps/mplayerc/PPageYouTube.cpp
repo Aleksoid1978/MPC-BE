@@ -178,7 +178,7 @@ BOOL CPPageYoutube::OnInitDialog()
 
 	OnCheckYDLEnable();
 
-#if 1 // TODO yt-dlp
+#if 0 // TODO yt-dlp
 	GetDlgItem(IDC_STATIC4)->ShowWindow(SW_HIDE);
 	m_cbAudioLang.ShowWindow(SW_HIDE);
 #endif

@@ -650,6 +650,9 @@ STDMETHODIMP CEVRAllocatorPresenter::ProcessMessage(MFVP_MESSAGE_TYPE eMessage, 
 				4) The EVR sets the media type on the substreams.
 			*/
 			if (!m_hRenderThread) {// handle things here
+				// Keep the presenter lock ahead of m_RenderLock. SetMediaType()
+				// eventually enters InitializeDevice(), which uses the same order.
+				CAutoLock lock(this);
 				CAutoLock lock2(&m_ImageProcessingLock);
 				CAutoLock cRenderLock(&m_RenderLock);
 				RenegotiateMediaType();
@@ -1939,6 +1942,9 @@ void CEVRAllocatorPresenter::RenderThread()
 		UNREFERENCED_PARAMETER(llPerf);
 		dwObject = WaitForMultipleObjects(std::size(hEvts), hEvts, FALSE, std::max(NextSleepTime < 0 ? 1 : NextSleepTime, 0));
 		if (m_hEvtRenegotiate) {
+			// ResizeDevice() takes the presenter lock before m_RenderLock. Do the
+			// same here because RenegotiateMediaType() enters InitializeDevice().
+			CAutoLock lock(this);
 			CAutoLock Lock(&m_csExternalMixerLock);
 			CAutoLock cRenderLock(&m_RenderLock);
 			RenegotiateMediaType();
@@ -1971,6 +1977,9 @@ void CEVRAllocatorPresenter::RenderThread()
 			case WAIT_TIMEOUT :
 				if (m_LastSetOutputRange != -1 && m_LastSetOutputRange != m_ExtraSets.iEVROutputRange) {
 					{
+						// FlushSamples() and RenegotiateMediaType() both acquire the
+						// presenter lock internally, so establish that order first.
+						CAutoLock lock(this);
 						CAutoLock Lock(&m_csExternalMixerLock);
 						CAutoLock cRenderLock(&m_RenderLock);
 						FlushSamples();

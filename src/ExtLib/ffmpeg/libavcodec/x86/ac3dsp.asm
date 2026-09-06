@@ -153,55 +153,46 @@ cglobal float_to_fixed24, 3, 3, 5, dst, src, len
     RET
 
 ;------------------------------------------------------------------------------
-; int ff_ac3_compute_mantissa_size(uint16_t mant_cnt[6][16])
+; int ff_ac3_compute_mantissa_size(const uint16_t mant_cnt[6][16])
 ;------------------------------------------------------------------------------
 
-%macro PHADDD4 2 ; xmm src, xmm tmp
-    movhlps  %2, %1
-    paddd    %1, %2
-    pshufd   %2, %1, 0x1
-    paddd    %1, %2
-%endmacro
-
 INIT_XMM sse2
-cglobal ac3_compute_mantissa_size, 1, 2, 4, mant_cnt, sum
+cglobal ac3_compute_mantissa_size, 1, 1, 5, mant_cnt
     movdqa      m0, [mant_cntq      ]
     movdqa      m1, [mant_cntq+ 1*16]
+    movdqa      m4, [pw_bap_mul1]
     paddw       m0, [mant_cntq+ 2*16]
     paddw       m1, [mant_cntq+ 3*16]
+    movq        m2, [mant_cntq     +2]
     paddw       m0, [mant_cntq+ 4*16]
     paddw       m1, [mant_cntq+ 5*16]
+    movhps      m2, [mant_cntq+1*32+2]
     paddw       m0, [mant_cntq+ 6*16]
     paddw       m1, [mant_cntq+ 7*16]
     paddw       m0, [mant_cntq+ 8*16]
+    pmulhuw     m2, m4
     paddw       m1, [mant_cntq+ 9*16]
     paddw       m0, [mant_cntq+10*16]
     paddw       m1, [mant_cntq+11*16]
     pmaddwd     m0, [ac3_bap_bits   ]
     pmaddwd     m1, [ac3_bap_bits+16]
     paddd       m0, m1
-    PHADDD4     m0, m1
-    movd      sumd, m0
-    movdqa      m3, [pw_bap_mul1]
-    movhpd      m0, [mant_cntq     +2]
-    movlpd      m0, [mant_cntq+1*32+2]
-    movhpd      m1, [mant_cntq+2*32+2]
-    movlpd      m1, [mant_cntq+3*32+2]
-    movhpd      m2, [mant_cntq+4*32+2]
-    movlpd      m2, [mant_cntq+5*32+2]
-    pmulhuw     m0, m3
-    pmulhuw     m1, m3
-    pmulhuw     m2, m3
-    paddusw     m0, m1
-    paddusw     m0, m2
-    pmaddwd     m0, [pw_bap_mul2]
-    PHADDD4     m0, m1
+    movq        m1, [mant_cntq+2*32+2]
+    movhps      m1, [mant_cntq+3*32+2]
+    movq        m3, [mant_cntq+4*32+2]
+    movhps      m3, [mant_cntq+5*32+2]
+    pmulhuw     m1, m4
+    pmulhuw     m3, m4
+    paddw       m1, m2
+    paddw       m1, m3
+    pmaddwd     m1, [pw_bap_mul2]
+    paddd       m0, m1
+    HADDD       m0, m1
     movd       eax, m0
-    add        eax, sumd
     RET
 
 ;------------------------------------------------------------------------------
-; void ff_ac3_extract_exponents(uint8_t *exp, int32_t *coef, int nb_coefs)
+; void ff_ac3_extract_exponents(uint8_t *exp, const int32_t *coef, int nb_coefs)
 ;------------------------------------------------------------------------------
 
 %macro PABSD 1-2 ; src/dst, unused
@@ -224,17 +215,20 @@ cglobal ac3_extract_exponents, 3, 3, 4, exp, coef, len
     mova      m2, [pd_1]
     mova      m3, [pd_151]
 .loop:
+%if cpuflag(ssse3)
+    pabsd     m0, [coefq+4*lenq]
+%else
     ; move 4 32-bit coefs to xmm0
     mova      m0, [coefq+4*lenq]
     ; absolute value
     PABSD     m0, m1
+%endif
     ; convert to float and extract exponents
     pslld     m0, 1
     por       m0, m2
     cvtdq2ps  m1, m0
     psrld     m1, 23
-    mova      m0, m3
-    psubd     m0, m1
+    psubd     m0, m3, m1
     ; move the lowest byte in each of 4 dwords to the low dword
     ; NOTE: We cannot just extract the low bytes with pshufb because the dword
     ;       result for 16777215 is -1 due to float inaccuracy. Using packuswb

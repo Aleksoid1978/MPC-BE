@@ -129,8 +129,6 @@ protected:
 public:
 	afx_msg void OnLeftClickChange();
 	afx_msg void OnLongPressLeftSpeedChange();
-	afx_msg void OnLongPressLeftSpeedRateChange();
-	afx_msg void OnLongPressLeftSpeedDelayChange();
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);

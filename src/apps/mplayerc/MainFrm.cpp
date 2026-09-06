@@ -3618,9 +3618,9 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 	m_pMC->GetState(0, &fs);
 	if (fs == State_Running) {
 		if (GetPlaybackMode() != PM_CAPTURE) {
-			m_pMC->Pause();
+			Pause();
 		} else {
-			m_pMC->Stop(); // Capture mode doesn't support pause
+			Stop(); // Capture mode doesn't support pause
 		}
 	}
 
@@ -3645,7 +3645,7 @@ LRESULT CMainFrame::OnResetDevice(WPARAM wParam, LPARAM lParam)
 	*/
 
 	if (fs == State_Running) {
-		m_pMC->Run();
+		Run();
 	}
 
 	DLog(L"CMainFrame::OnResetDevice() : end");
@@ -6270,7 +6270,7 @@ void CMainFrame::OnFileSaveAs()
 	m_pMC->GetState(0, &fs);
 
 	if (fs == State_Running) {
-		m_pMC->Pause();
+		Pause();
 	}
 
 	HRESULT hr = S_OK;
@@ -6283,7 +6283,7 @@ void CMainFrame::OnFileSaveAs()
 	}
 
 	if (fs == State_Running) {
-		m_pMC->Run();
+		Run();
 	}
 }
 
@@ -6414,7 +6414,7 @@ HRESULT CMainFrame::GetCurrentFrame(CSimpleBlock<BYTE>& dib, CString& errmsg)
 	}
 
 	if (fs == State_Running && !m_pCAP) {
-		m_pMC->Pause();
+		Pause();
 		GetMediaState(); // wait for completion of the pause command
 	}
 
@@ -6448,7 +6448,7 @@ HRESULT CMainFrame::GetCurrentFrame(CSimpleBlock<BYTE>& dib, CString& errmsg)
 	}
 
 	if (fs == State_Running && GetMediaState() != State_Running) {
-		m_pMC->Run();
+		Run();
 	}
 
 	return hr;
@@ -8225,7 +8225,7 @@ void CMainFrame::OnPlayPlay()
 			if (m_bIsLiveOnline || FAILED(m_pMS->SetRate(m_PlaybackRate))) {
 				m_PlaybackRate = 1.0;
 			};
-			m_pMC->Run();
+			Run();
 		} else if (GetPlaybackMode() == PM_DVD) {
 			if (m_PlaybackRate >= 0.0) {
 				m_pDVDC->PlayForwards(m_PlaybackRate, DVD_CMD_FLAG_Block, nullptr);
@@ -8233,10 +8233,10 @@ void CMainFrame::OnPlayPlay()
 				m_pDVDC->PlayBackwards(abs(m_PlaybackRate), DVD_CMD_FLAG_Block, nullptr);
 			}
 			m_pDVDC->Pause(FALSE);
-			m_pMC->Run();
+			Run();
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
-			m_pMC->Stop(); // audio preview won't be in sync if we run it from paused state
-			m_pMC->Run();
+			Stop(); // audio preview won't be in sync if we run it from paused state
+			Run();
 			if (s.iDefaultCaptureDevice == 1) {
 				CComQIPtr<IBDATuner> pTun = m_pGB.p;
 				if (pTun) {
@@ -8358,7 +8358,7 @@ void CMainFrame::OnPlayPause()
 		if (GetPlaybackMode() == PM_FILE
 				|| GetPlaybackMode() == PM_DVD
 				|| GetPlaybackMode() == PM_CAPTURE) {
-			m_pMC->Pause();
+			Pause();
 		} else {
 			ASSERT(FALSE);
 		}
@@ -8396,7 +8396,7 @@ void CMainFrame::OnPlayStop()
 		if (GetPlaybackMode() == PM_FILE) {
 			LONGLONG pos = 0;
 			m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
-			m_pMC->Stop();
+			Stop();
 
 			// BUG: after pause or stop the netshow url source filter won't continue
 			// on the next play command, unless we cheat it by setting the file name again.
@@ -8419,7 +8419,7 @@ void CMainFrame::OnPlayStop()
 			EndEnumFilters;
 		} else if (GetPlaybackMode() == PM_DVD) {
 			m_pDVDC->SetOption(DVD_ResetOnStop, TRUE);
-			m_pMC->Stop();
+			Stop();
 			m_pDVDC->SetOption(DVD_ResetOnStop, FALSE);
 
 			if (m_pDVDC_preview) {
@@ -8429,7 +8429,7 @@ void CMainFrame::OnPlayStop()
 			}
 
 		} else if (GetPlaybackMode() == PM_CAPTURE) {
-			m_pMC->Stop();
+			Stop();
 		}
 
 		if (m_bFrameSteppingActive) { // FIXME
@@ -8515,8 +8515,6 @@ void CMainFrame::OnUpdatePlayPauseStop(CCmdUI* pCmdUI)
 	}
 
 	pCmdUI->Enable(fEnable);
-
-	m_CMediaControls.UpdateButtons();
 }
 
 void CMainFrame::OnPlayFrameStep(UINT nID)
@@ -13149,11 +13147,11 @@ CString CMainFrame::OpenCapture(OpenDeviceData* pODD)
 				OAFilterState fs = State_Stopped;
 				m_pMC->GetState(0, &fs);
 				if (fs == State_Running) {
-					m_pMC->Pause();
+					Pause();
 				}
 				m_pAMTuner->put_Channel(vchannel, AMTUNER_SUBCHAN_DEFAULT, AMTUNER_SUBCHAN_DEFAULT);
 				if (fs == State_Running) {
-					m_pMC->Run();
+					Run();
 				}
 			}
 		}
@@ -14771,7 +14769,7 @@ void CMainFrame::CloseMediaPrivate()
 		m_pMC->GetState(0, &fs);
 		if (fs != State_Stopped) {
 			// Some filters, such as Microsoft StreamBufferSource, need to call IMediaControl::Stop() before close the graph;
-			m_pMC->Stop();
+			Stop();
 		}
 	}
 	m_bCapturing = false;
@@ -21197,3 +21195,31 @@ void CMainFrame::SaveHistory()
 		historyFile.SaveSessionInfo(m_SessionInfo);
 	}
 }
+
+void CMainFrame::Run()
+{
+	if (m_pMC) {
+		m_pMC->Run();
+	}
+
+	m_CMediaControls.UpdateButtons();
+}
+
+void CMainFrame::Pause()
+{
+	if (m_pMC) {
+		m_pMC->Pause();
+	}
+
+	m_CMediaControls.UpdateButtons();
+}
+
+void CMainFrame::Stop()
+{
+	if (m_pMC) {
+		m_pMC->Stop();
+	}
+
+	m_CMediaControls.UpdateButtons();
+}
+

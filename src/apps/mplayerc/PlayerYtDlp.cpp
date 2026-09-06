@@ -493,7 +493,7 @@ bool YT_DLP::Parse_Playlist(const CStringW& pls_url, CFileItemList& playlist, in
 	return false;
 }
 
-bool YT_DLP::SetFormats(const rapidjson::Document& doc)
+bool YT_DLP::GetFormats(const rapidjson::Document& doc)
 {
 	auto formats = GetJsonArray(doc, "formats");
 	if (!formats) {
@@ -643,6 +643,7 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 			}
 
 			getJsonValue(format, "language", aformat.language);
+			getJsonValue(format, "language_preference", aformat.language_preference);
 
 			if (aformat.protocol == protocol_hls) {
 				hlsAudioFormats.emplace_back(aformat);
@@ -668,50 +669,77 @@ bool YT_DLP::SetFormats(const rapidjson::Document& doc)
 		mAudioFormats = std::move(hlsAudioFormats);
 	}
 
-	std::sort(mVideoFormats.begin(), mVideoFormats.end(), [](const yt_vformat_t& a, const yt_vformat_t& b) {
-		return (vformat_cmp(a, b) < 0);
-		});
-	std::sort(mAudioFormats.begin(), mAudioFormats.end(), [](const yt_aformat_t& a, const yt_aformat_t& b) {
-		return (aformat_cmp(a, b) < 0);
-		});
+	return mVideoFormats.size() || mAudioFormats.size();
+}
 
-	if (GetFormatsCount()) {
-		int count = 0;
-		yt_protocol_type protocol = protocol_unknoun;
-		yt_vcodec_type vcodec = vcodec_none;
-		yt_acodec_type acodec = acodec_none;
+void YT_DLP::FilterAudioFormats(const CStringA& audioLang)
+{
+	bool lang_found = false;
+	int  lang_preference = 0;
+	CStringA lang_preferred;
 
-		for (auto& fmt : mVideoFormats) {
-			switch (fmt.protocol) {
-			case protocol_http: mHttpVideoCount++; break;
-			case protocol_dash: mDashVideoCount++; break;
-			}
-
-			if (protocol != fmt.protocol || vcodec != fmt.codec) {
-				if (count > 0) {
-					fmt.menuflags = MF_SEPARATOR;
-				}
-				protocol = fmt.protocol;
-				vcodec = fmt.codec;
-			}
-			SetVFormatDesc(fmt);
-			count++;
+	for (const auto& afmt : mAudioFormats) {
+		if (!lang_found && afmt.language == audioLang) {
+			lang_found = true;
 		}
-
-		for (auto& fmt : mAudioFormats) {
-			if (protocol != fmt.protocol || acodec != fmt.codec) {
-				if (count > 0) {
-					fmt.menuflags = MF_SEPARATOR;
-				}
-				protocol = fmt.protocol;
-				acodec = fmt.codec;
-			}
-			SetAFormatDesc(fmt);
-			count++;
+		if (afmt.language_preference > lang_preference) {
+			lang_preference = afmt.language_preference;
+			lang_preferred = afmt.language;
 		}
 	}
 
-	return mVideoFormats.size() || mAudioFormats.size();
+	if (lang_found) {
+		lang_preferred = audioLang;
+	}
+	else if (audioLang.GetLength() == 2) {
+		for (const auto& afmt : mAudioFormats) {
+			if (afmt.language.GetLength() > 3 && StartsWith(afmt.language, audioLang) && afmt.language[2] == '-') {
+				lang_preferred = afmt.language;
+				break;
+			}
+		}
+	}
+
+	if (lang_preferred.GetLength()) {
+		mAudioFormats.erase(std::remove_if(mAudioFormats.begin(), mAudioFormats.end(), [&lang_preferred](yt_aformat_t a) { return a.language != lang_preferred; }), mAudioFormats.end());
+	}
+}
+
+void YT_DLP::SetFormatDesc()
+{
+	int count = 0;
+	yt_protocol_type protocol = protocol_unknoun;
+	yt_vcodec_type vcodec = vcodec_none;
+	yt_acodec_type acodec = acodec_none;
+
+	for (auto& fmt : mVideoFormats) {
+		switch (fmt.protocol) {
+		case protocol_http: mHttpVideoCount++; break;
+		case protocol_dash: mDashVideoCount++; break;
+		}
+
+		if (protocol != fmt.protocol || vcodec != fmt.codec) {
+			if (count > 0) {
+				fmt.menuflags = MF_SEPARATOR;
+			}
+			protocol = fmt.protocol;
+			vcodec = fmt.codec;
+		}
+		SetVFormatDesc(fmt);
+		count++;
+	}
+
+	for (auto& fmt : mAudioFormats) {
+		if (protocol != fmt.protocol || acodec != fmt.codec) {
+			if (count > 0) {
+				fmt.menuflags = MF_SEPARATOR;
+			}
+			protocol = fmt.protocol;
+			acodec = fmt.codec;
+		}
+		SetAFormatDesc(fmt);
+		count++;
+	}
 }
 
 void YT_DLP::SetSubtitles(const rapidjson::Document& doc)
@@ -1037,6 +1065,7 @@ bool YT_DLP::Parse_URL(const CStringW& url)
 
 	CAppSettings& s = AfxGetAppSettings();
 
+	const CStringA audioLang = s.strYdlAudioLang;
 	const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
 	if (ydl_path.IsEmpty()) {
 		return false;
@@ -1058,10 +1087,17 @@ bool YT_DLP::Parse_URL(const CStringW& url)
 		return false;
 	}
 
-	ok = SetFormats(doc);
+	ok = GetFormats(doc);
 	if (!ok) {
 		return false;
 	}
+
+	FilterAudioFormats(audioLang);
+
+	std::sort(mVideoFormats.begin(), mVideoFormats.end(), [](const yt_vformat_t& a, const yt_vformat_t& b) { return (vformat_cmp(a, b) < 0); });
+	std::sort(mAudioFormats.begin(), mAudioFormats.end(), [](const yt_aformat_t& a, const yt_aformat_t& b) { return (aformat_cmp(a, b) < 0); });
+
+	SetFormatDesc();
 
 #ifdef _DEBUG
 	for (const auto& v : mVideoFormats) {
