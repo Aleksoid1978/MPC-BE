@@ -1247,8 +1247,18 @@ namespace DarkTheme
 				case WM_ENABLE: {
 					// Reset/Default toggle the combo's WS_DISABLED, which makes comctl32 rebuild the drop list
 					// and lose its theme -> it reopens in a different shade. Re-assert the dark theme on it.
+					//
+					// The combo ALSO paints itself immediately on this message, straight to a DC of its own
+					// rather than through WM_PAINT - which put the system's own (pale) field and drop-down
+					// button back on top of ours and left it there, so the control looked washed out after
+					// Apply/Reset/Default. Suppress that by switching redraw off across the default handling,
+					// then repaint through our own painting at once.
+					::SendMessageW(h, WM_SETREDRAW, FALSE, 0);
 					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					::SendMessageW(h, WM_SETREDRAW, TRUE, 0);
 					ThemeComboDropList(h);
+					::InvalidateRect(h, nullptr, TRUE);
+					::UpdateWindow(h);
 					return r;
 				}
 				case WM_NCDESTROY:
@@ -1293,8 +1303,13 @@ namespace DarkTheme
 		LRESULT CALLBACK StaticSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
 			switch (msg) {
 				case WM_ENABLE:
-					::InvalidateRect(hWnd, nullptr, TRUE); // repaint when the enable state changes
-					break;
+					// Like WM_SETTEXT below, a static paints itself IMMEDIATELY when the enable state changes,
+					// so letting the control handle this draws Windows' own (near-white) disabled text and only
+					// then does our repaint replace it - a visible white flash. Seen on Video when Default swaps
+					// the renderer and a row of labels enable/disable at once. Nothing needs the control's own
+					// handling here (EnableWindow has already flipped the style bit), so just repaint.
+					::InvalidateRect(hWnd, nullptr, TRUE);
+					return 0;
 				case WM_SETTEXT: {
 					// A static repaints itself IMMEDIATELY when its text changes, grabbing a DC of its own instead of
 					// going through WM_PAINT - which bypasses the disabled owner-draw below, so Windows' disabled text
@@ -2304,6 +2319,17 @@ namespace DarkTheme
 
 		if (pOldFont) {
 			pDC->SelectObject(pOldFont);
+		}
+
+		// Keyboard focus marker. Check boxes and radio buttons had none at all - only push buttons and
+		// edit fields showed one - so tabbing across a page of check boxes gave no clue where focus was.
+		// Windows keeps focus markers hidden until the keyboard is actually used, so honour that state
+		// (WM_QUERYUISTATE) instead of drawing it on every click as well.
+		if ((p->uItemState & CDIS_FOCUS) && !disabled
+				&& !(::SendMessageW(hCtrl, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS)) {
+			CRect rcFocus = rc;
+			rcFocus.DeflateRect(1, 1);
+			DrawDarkFocusRect(pDC->GetSafeHdc(), rcFocus);
 		}
 
 		*pResult = CDRF_SKIPDEFAULT;
