@@ -754,6 +754,15 @@ namespace DarkTheme
 					else              { thumbClr = RGB(76, 194, 255); }  // celeste
 					pDC->FillSolidRect(th, thumbClr);
 
+					// Keyboard-focus marker: sliders had none, so tabbing onto one (Interface brightness/R/G/B)
+					// gave no clue it had focus. Hidden until the keyboard is actually used, like the others.
+					if (::GetFocus() == hWnd && !disabled
+						&& !(::SendMessageW(hWnd, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS)) {
+						CRect rcFocus(rc);
+						rcFocus.DeflateRect(1, 1);
+						DrawDarkFocusRect(pDC->GetSafeHdc(), rcFocus);
+					}
+
 					::EndPaint(hWnd, &ps);
 					return 0;
 				}
@@ -1220,11 +1229,13 @@ namespace DarkTheme
 					if (!listType) {
 						// editable: border-only re-stroke on focus change.
 						InvalidateComboBorderEdges(h);
+					} else {
+						// The keyboard-focus marker we now draw only appeared once something else repainted the
+						// combo (hovering it, or changing its value). Invalidate on focus so it shows straight
+						// away. This used to twitch the drop-down as it opened, but that was when the system
+						// still drew the field; the whole field is ours and buffered now, so a repaint is clean.
+						::InvalidateRect(h, nullptr, FALSE);
 					}
-					// listType: NO explicit invalidate. Windows already repaints the combo on focus (to show
-					// its focus indicator), which re-runs our buffered WM_PAINT and redraws the dark border.
-					// An extra full InvalidateRect here double-painted and TWITCHED the dropdown as it opened
-					// (the Shader-editor combos). The border is state-independent, so none is needed.
 					return r;
 				}
 				case WM_MOUSEMOVE:
@@ -1244,6 +1255,20 @@ namespace DarkTheme
 						InvalidateComboBorderEdges(h); // re-stroke dark once the CFD hot border clears
 					}
 					break;
+				case CB_SETCURSEL:
+				case CB_SELECTSTRING: {
+					// Changing the selection makes the combo redraw its field immediately, straight to a DC of its
+					// own, and nothing invalidates it afterwards - so the system's pale field and arrow button were
+					// left sitting on top of ours for good. This is what Reset/Default do on Colour Correction and
+					// Sound Processing (pages whose Default does not touch a combo, like Player/Mouse, looked fine).
+					// Same treatment as the enable change: hold the redraw off across it, then repaint as ourselves.
+					::SendMessageW(h, WM_SETREDRAW, FALSE, 0);
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					::SendMessageW(h, WM_SETREDRAW, TRUE, 0);
+					::InvalidateRect(h, nullptr, TRUE);
+					::UpdateWindow(h);
+					return r;
+				}
 				case WM_ENABLE: {
 					// Reset/Default toggle the combo's WS_DISABLED, which makes comctl32 rebuild the drop list
 					// and lose its theme -> it reopens in a different shade. Re-assert the dark theme on it.
@@ -2322,13 +2347,22 @@ namespace DarkTheme
 		}
 
 		// Keyboard focus marker. Check boxes and radio buttons had none at all - only push buttons and
-		// edit fields showed one - so tabbing across a page of check boxes gave no clue where focus was.
+		// edit fields showed one - so tabbing across a page of them gave no clue where focus was.
+		// It wraps the CAPTION, not the whole control: the light theme draws it tight around the text,
+		// and using the full control rect made it noticeably bigger than its light-theme counterpart.
 		// Windows keeps focus markers hidden until the keyboard is actually used, so honour that state
 		// (WM_QUERYUISTATE) instead of drawing it on every click as well.
 		if ((p->uItemState & CDIS_FOCUS) && !disabled
-				&& !(::SendMessageW(hCtrl, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS)) {
-			CRect rcFocus = rc;
-			rcFocus.DeflateRect(1, 1);
+			&& !(::SendMessageW(hCtrl, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS)) {
+			CFont* pFocusFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
+			CRect rcFocus = rcText;
+			pDC->DrawTextW(text, rcFocus, fmt | DT_CALCRECT);
+			if (pFocusFont) {
+				pDC->SelectObject(pFocusFont);
+			}
+			rcFocus.InflateRect(1, 1);
+			if (rcFocus.bottom > rc.bottom) { rcFocus.bottom = rc.bottom; }
+			if (rcFocus.right  > rc.right)  { rcFocus.right  = rc.right;  }
 			DrawDarkFocusRect(pDC->GetSafeHdc(), rcFocus);
 		}
 
