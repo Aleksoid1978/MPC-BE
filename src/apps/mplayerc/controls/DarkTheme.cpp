@@ -730,7 +730,7 @@ namespace DarkTheme
 					const bool frozen = (dwData != 0 && g_committedFace != CLR_INVALID);
 					const COLORREF face   = frozen ? g_committedFace   : FaceColor();
 					const COLORREF groove = frozen ? g_committedGroove : ThemeRGB(10, 14, 18);
-					const COLORREF border = frozen ? g_committedBorder : ThemeRGB(60, 65, 70);
+					const COLORREF border = frozen ? g_committedBorder : CtrlBorderColor();
 					pDC->FillSolidRect(rc, face);
 
 					RECT rcCh{};
@@ -1774,7 +1774,7 @@ namespace DarkTheme
 		// slider drag ends so all four repaint together to the final colour (see TrackbarSubclassProc).
 		g_committedFace   = FaceColor();
 		g_committedGroove = ThemeRGB(10, 14, 18);
-		g_committedBorder = ThemeRGB(60, 65, 70);
+		g_committedBorder = CtrlBorderColor();
 	}
 
 	void MakeTrackbarOwnerDrawn(HWND hTrackbar, bool bThemeControl) {
@@ -2198,7 +2198,7 @@ namespace DarkTheme
 					CDC* pDC = CDC::FromHandle(p->hdc);
 					CRect rc(p->rc);
 					pDC->FillSolidRect(rc, ThemeRGB(10, 14, 18));                        // dark groove
-					pDC->Draw3dRect(rc, ThemeRGB(60, 65, 70), ThemeRGB(60, 65, 70));     // subtle border
+					pDC->Draw3dRect(rc, CtrlBorderColor(), CtrlBorderColor());           // subtle border
 					*pResult = CDRF_SKIPDEFAULT;
 				} else {
 					*pResult = CDRF_DODEFAULT; // keep the default thumb and tick marks
