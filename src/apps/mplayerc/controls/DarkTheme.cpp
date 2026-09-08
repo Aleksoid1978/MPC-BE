@@ -102,9 +102,31 @@ namespace DarkTheme
 			g_bApiOk = pAllowDarkModeForWindow && (pSetPreferredAppMode || pAllowDarkModeForApp);
 		}
 
+		// Structural colours - outlines, grid lines, sunken interiors, button faces - are derived from the
+		// background with a FIXED offset rather than being ThemeRGB() bases of their own.
+		//
+		// A ThemeRGB base is scaled by the colour sliders, so the gap between two of them shrinks with the
+		// tint and vanishes entirely as the theme colour approaches black: at R/G/B = 0 every one of them
+		// evaluates to the same black and the dialog loses all its boundaries - buttons, text boxes, drop-
+		// downs, group boxes and the slider channel are simply not there any more. Offsetting from the
+		// background instead keeps the separation constant whatever the tint is. The offsets below are the
+		// gaps the old bases produced at the default settings, so nothing shifts for anyone who has not
+		// turned the colour right down.
+		COLORREF Shade(COLORREF c, int delta) {
+			// delta > 0 lightens, < 0 darkens. If there is no headroom that way - a theme at either extreme -
+			// it goes the other, so the two colours can never land on each other.
+			const int lum = (GetRValue(c) * 30 + GetGValue(c) * 59 + GetBValue(c) * 11) / 100;
+			int d = delta;
+			if ((delta > 0 && lum + delta > 255) || (delta < 0 && lum + delta < 0)) {
+				d = -delta;
+			}
+			auto ch = [d](int v) { const int r = v + d; return r < 0 ? 0 : (r > 255 ? 255 : r); };
+			return RGB(ch(GetRValue(c)), ch(GetGValue(c)), ch(GetBValue(c)));
+		}
+
 		void EnsureBrushes() {
-			const COLORREF clrFace = ThemeRGB(22, 27, 32);
-			const COLORREF clrCtrl = ThemeRGB(10, 14, 18);
+			const COLORREF clrFace = FaceColor();
+			const COLORREF clrCtrl = CtrlBackColor();
 			if (clrFace != g_clrFace || !g_hbrFace) {
 				if (g_hbrFace) {
 					::DeleteObject(g_hbrFace);
@@ -254,13 +276,13 @@ namespace DarkTheme
 
 					pDC->FillSolidRect(rc, FaceColor()); // dialog bg behind the rounded corners
 
-					const COLORREF face = disabled ? ThemeRGB(38, 43, 48)
-										: pressed  ? ThemeRGB(36, 41, 46)
-										: hot      ? ThemeRGB(62, 69, 76)
-												   : ThemeRGB(50, 56, 62);
-					const COLORREF border = disabled ? ThemeRGB(60, 65, 70)
+					const COLORREF face = disabled ? Shade(FaceColor(), 16)
+										: pressed  ? Shade(FaceColor(), 14)
+										: hot      ? Shade(FaceColor(), 40)
+												   : Shade(FaceColor(), 28);
+					const COLORREF border = disabled ? Shade(FaceColor(), 38)
 										  : isDef    ? RGB(76, 194, 255)
-													 : ThemeRGB(84, 90, 96);
+													 : Shade(FaceColor(), 62);
 
 					CBrush brFace(face);
 					CPen   penBd(PS_SOLID, 1, border);
@@ -671,8 +693,8 @@ namespace DarkTheme
 					CRect rc;
 					::GetClientRect(hWnd, &rc);
 
-					const COLORREF clrFace   = ThemeRGB(38, 44, 50);
-					const COLORREF clrBorder = ThemeRGB(70, 75, 80);
+					const COLORREF clrFace   = Shade(FaceColor(), 16);
+					const COLORREF clrBorder = Shade(FaceColor(), 48);
 					const COLORREF clrArrow   = RGB(170, 175, 180); // fixed: foreground glyph never tints
 
 					pDC->FillSolidRect(rc, clrFace);
@@ -729,7 +751,7 @@ namespace DarkTheme
 					// the one being dragged doesn't recolour live; other sliders use the live colour.
 					const bool frozen = (dwData != 0 && g_committedFace != CLR_INVALID);
 					const COLORREF face   = frozen ? g_committedFace   : FaceColor();
-					const COLORREF groove = frozen ? g_committedGroove : ThemeRGB(10, 14, 18);
+					const COLORREF groove = frozen ? g_committedGroove : CtrlBackColor();
 					const COLORREF border = frozen ? g_committedBorder : CtrlBorderColor();
 					pDC->FillSolidRect(rc, face);
 
@@ -748,7 +770,7 @@ namespace DarkTheme
 					const bool pressed  = ::GetPropW(hWnd, L"MPC_TB_PRESSED") != nullptr;
 					const bool hover    = ::GetPropW(hWnd, L"MPC_TB_HOVER")   != nullptr;
 					COLORREF thumbClr;
-					if (disabled)     { thumbClr = ThemeRGB(90, 95, 100); }
+					if (disabled)     { thumbClr = RGB(90, 95, 100); } // fixed, like the celeste below: a tinted thumb vanished at a black theme
 					else if (pressed) { thumbClr = RGB(150, 224, 255); } // brightest while dragging
 					else if (hover)   { thumbClr = RGB(115, 210, 255); } // lighter on hover
 					else              { thumbClr = RGB(76, 194, 255); }  // celeste
@@ -913,7 +935,7 @@ namespace DarkTheme
 			// A consistent dark border in every state. (A hover/focus accent was tried to restore the
 			// hover/click feedback, but a bright celeste frame around a big focused panel — the Options
 			// nav tree — read as garish and "followed" the focus around, so it's dropped.)
-			return (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) ? ThemeRGB(50, 55, 60) : CtrlBorderColor();
+			return (::GetWindowLongW(h, GWL_STYLE) & WS_DISABLED) ? Shade(FaceColor(), 28) : CtrlBorderColor();
 		}
 
 		void OwnerBorderRefreshFrame(HWND h) {
@@ -1627,16 +1649,18 @@ namespace DarkTheme
 	// driven to black when a channel is lowered.
 	COLORREF FaceColor()       { return ThemeRGB(22, 27, 32); }
 	COLORREF TextColor()       { return RGB(165, 170, 175); }
-	COLORREF CtrlBackColor()   { return ThemeRGB(10, 14, 18); }
-	// Kept close to FaceColor(22,27,32) on purpose: ThemeRGB is (brightness + value) * tint / 256, so a
-	// high base like 70/75/80 renders as a LIGHT (near-white, tinted) line once the user's theme
-	// brightness/colour sliders are up — which is what made every control border read as white.
-	COLORREF CtrlBorderColor() { return ThemeRGB(35, 40, 45); }
-	// Sits BETWEEN FaceColor and CtrlBorderColor, i.e. genuinely darker than the control borders like
-	// the header says. It was 40/45/50, which suited the old 70/75/80 border but became BRIGHTER than
-	// the border once that dropped to 35/40/45 - leaving grid lines the most prominent line in the UI,
-	// and vivid rather than subtle wherever the theme sliders amplify them.
-	COLORREF GridlineColor()   { return ThemeRGB(29, 34, 39); }
+	// Sunken interiors (edits, list boxes, the combo field, the slider groove) sit a little darker than
+	// the background - or lighter, if the theme is so dark there is no room to go down.
+	COLORREF CtrlBackColor()   { return Shade(FaceColor(), -12); }
+	// The shared outline for every control: edits, drop-downs, spins, colour wells, group boxes, tabs,
+	// list/tree borders, header separators and the slider channel. Offset from the background rather
+	// than tinted, so the outline survives a theme colour set to (or near) black, where a tinted one
+	// collapsed onto the background and every boundary in the dialog disappeared. A little stronger
+	// than the old value, since low contrast was the complaint that prompted this.
+	COLORREF CtrlBorderColor() { return Shade(FaceColor(), 22); }
+	// Grid lines stay subtler than the control outlines, as the name of the game is separating rows
+	// without drawing a table.
+	COLORREF GridlineColor()   { return Shade(FaceColor(), 11); }
 
 	void AllowDarkModeForApp() {
 		if (!IsActive()) {
@@ -1773,7 +1797,7 @@ namespace DarkTheme
 		// Snapshot the current theme colours for the R/G/B/Brightness sliders. Call this when a
 		// slider drag ends so all four repaint together to the final colour (see TrackbarSubclassProc).
 		g_committedFace   = FaceColor();
-		g_committedGroove = ThemeRGB(10, 14, 18);
+		g_committedGroove = CtrlBackColor();
 		g_committedBorder = CtrlBorderColor();
 	}
 
@@ -2000,9 +2024,9 @@ namespace DarkTheme
 			// which made the checkboxes vanish; a solid grey box + grey tick reads clearly
 			// as an inactive checkbox and never disappears.
 			const COLORREF mask   = RGB(255, 0, 255);
-			const COLORREF fill   = ThemeRGB(34, 39, 44);
-			const COLORREF border = ThemeRGB(90, 95, 100);
-			const COLORREF mark   = ThemeRGB(120, 125, 130);
+			const COLORREF fill   = Shade(FaceColor(), 12);
+			const COLORREF border = RGB(90, 95, 100);
+			const COLORREF mark   = RGB(120, 125, 130);
 
 			CClientDC screen(nullptr);
 			CDC dc;
@@ -2197,7 +2221,7 @@ namespace DarkTheme
 				if (p->dwItemSpec == TBCD_CHANNEL) {
 					CDC* pDC = CDC::FromHandle(p->hdc);
 					CRect rc(p->rc);
-					pDC->FillSolidRect(rc, ThemeRGB(10, 14, 18));                        // dark groove
+					pDC->FillSolidRect(rc, CtrlBackColor());                             // dark groove
 					pDC->Draw3dRect(rc, CtrlBorderColor(), CtrlBorderColor());           // subtle border
 					*pResult = CDRF_SKIPDEFAULT;
 				} else {
@@ -2248,12 +2272,12 @@ namespace DarkTheme
 		if (isPush) {
 			// Flat dark push button (face darkens when pressed, lightens on hover).
 			const bool focus = (p->uItemState & CDIS_FOCUS) != 0;
-			const COLORREF face = disabled ? ThemeRGB(30, 34, 38)
-								: pressed  ? ThemeRGB(28, 33, 38)
-								: hot      ? ThemeRGB(52, 59, 66)
-								:            ThemeRGB(44, 50, 56);
+			const COLORREF face = disabled ? Shade(FaceColor(), 8)
+								: pressed  ? Shade(FaceColor(), 6)
+								: hot      ? Shade(FaceColor(), 30)
+								:            Shade(FaceColor(), 22);
 			pDC->FillSolidRect(rc, face);
-			pDC->Draw3dRect(rc, ThemeRGB(80, 86, 92), ThemeRGB(80, 86, 92));
+			pDC->Draw3dRect(rc, Shade(FaceColor(), 58), Shade(FaceColor(), 58));
 
 			CString btext;
 			const int blen = ::GetWindowTextLengthW(hCtrl);
