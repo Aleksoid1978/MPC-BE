@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,14 +34,14 @@ CompositionObject::~CompositionObject()
 	SAFE_DELETE_ARRAY(m_pRLEData);
 }
 
-void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool bRec709, ColorConvert::convertType type/* = ColorConvert::convertType::DEFAULT*/, bool bIsRGB/* = false*/)
+void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, ColorConvert::ColorSpace cs, ColorConvert::convertType type/* = ColorConvert::convertType::DEFAULT*/, bool bIsRGB/* = false*/)
 {
 	m_nColorNumber = nNbEntry;
 	for (int i = 0; i < nNbEntry; i++) {
 		if (bIsRGB) {
 			m_Colors[pPalette[i].entry_id] = D3DCOLOR_ARGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
 		} else {
-			m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, bRec709, type);
+			m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, cs, type);
 		}
 	}
 }

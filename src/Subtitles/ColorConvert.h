@@ -1,5 +1,5 @@
 /*
-* (C) 2016 see Authors.txt
+* (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -21,13 +21,19 @@
 #pragma once
 
 namespace ColorConvert {
-	enum convertType {
+	enum class convertType {
 		DEFAULT,
 		TV_2_TV = DEFAULT,
 		PC_2_PC,
 		TV_2_PC,
 		PC_2_TV
 	};
+	enum class ColorSpace {
+		Unknown,
+		REC601,
+		REC709,
+		BT2020
+	};
 
-	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, bool bRec709, convertType type = convertType::DEFAULT);
+	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, ColorSpace cs, convertType type = convertType::DEFAULT);
 } // namespace ColorConvert

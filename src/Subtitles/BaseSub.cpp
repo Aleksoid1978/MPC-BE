@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,11 +74,14 @@ void CBaseSub::FinalizeRender(SubPicDesc& spd)
 
 HRESULT CBaseSub::SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::convertType _convertType)
 {
+	if (wcscmp(_yuvMatrix, L"2020") == 0) {
+		colorSpace = ColorConvert::ColorSpace::BT2020;
+	}
 	if (wcscmp(_yuvMatrix, L"709") == 0) {
-		yuvMatrix = YUVMATRIX::BT709;
+		colorSpace = ColorConvert::ColorSpace::REC709;
 	}
 	else if (wcscmp(_yuvMatrix, L"601") == 0) {
-		yuvMatrix = YUVMATRIX::BT601;
+		colorSpace = ColorConvert::ColorSpace::REC601;
 	}
 
 	convertType = _convertType;

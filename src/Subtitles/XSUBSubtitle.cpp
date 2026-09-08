@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -258,7 +258,7 @@ HRESULT CXSUBSubtitle::ParseSample(BYTE* pData, long nLen)
 		}
 	}
 
-	pSub->SetPalette(4, Palette, false, ColorConvert::convertType::DEFAULT, true);
+	pSub->SetPalette(4, Palette, {}, ColorConvert::convertType::DEFAULT, true);
 
 	int RLESize = gb.GetSize() - gb.GetPos();
 	pSub->SetRLEData(gb.GetBufferPos(), RLESize, RLESize);

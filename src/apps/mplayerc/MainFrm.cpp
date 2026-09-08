@@ -16716,7 +16716,7 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 				int nPos = 0;
 				inputRange = yuvMatrix.Tokenize(L".", nPos);
 				yuvMatrix = yuvMatrix.Mid(nPos);
-				if (yuvMatrix != L"601") {
+				if (yuvMatrix != L"2020" && yuvMatrix != L"601") {
 					yuvMatrix = L"709";
 				}
 			} else {

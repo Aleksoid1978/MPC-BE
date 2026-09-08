@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2018 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -22,23 +22,27 @@
 #include "ColorConvert.h"
 
 namespace ColorConvert {
-	const double rgb_low_PC  = 0.0;
-	const double rgb_high_PC = 255.0;
+	constexpr double rgb_low_PC  = 0.0;
+	constexpr double rgb_high_PC = 255.0;
 
-	const double rgb_low_TV  = 16.0;
-	const double rgb_high_TV = 219.0;
+	constexpr double rgb_low_TV  = 16.0;
+	constexpr double rgb_high_TV = 219.0;
 
-	const double coeff_default = 1.0;
-	const double coeff_TV_2_PC = rgb_high_PC / rgb_high_TV;
-	const double coeff_PC_2_TV = rgb_high_TV / rgb_high_PC;
+	constexpr double coeff_default = 1.0;
+	constexpr double coeff_TV_2_PC = rgb_high_PC / rgb_high_TV;
+	constexpr double coeff_PC_2_TV = rgb_high_TV / rgb_high_PC;
 
-	const double Rec601_Kr = 0.299;
-	const double Rec601_Kb = 0.114;
-	const double Rec601_Kg = 0.587;
+	constexpr double Rec601_Kr = 0.299;
+	constexpr double Rec601_Kb = 0.114;
+	constexpr double Rec601_Kg = 0.587;
 
-	const double Rec709_Kr = 0.2125;
-	const double Rec709_Kb = 0.0721;
-	const double Rec709_Kg = 0.7154;
+	constexpr double Rec709_Kr = 0.2125;
+	constexpr double Rec709_Kb = 0.0721;
+	constexpr double Rec709_Kg = 0.7154;
+
+	constexpr double BT2020_Kr = 0.2627;
+	constexpr double BT2020_Kb = 0.0593;
+	constexpr double BT2020_Kg = 0.6780;
 
 	static void YCrCbToRGB(BYTE Y, BYTE Cr, BYTE Cb, const double Kr, const double Kb, const double Kg, const double coeff, const double yuv_low, const double rgb_low, const double rgb_high, double& r, double& g, double& b)
 	{
@@ -95,12 +99,15 @@ namespace ColorConvert {
 		return D3DCOLOR_ARGB(A, (BYTE)(r), (BYTE)(g), (BYTE)(b));
 	}
 
-	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, bool bRec709, convertType type/* = convertType::DEFAULT*/)
+	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, ColorSpace cs, convertType type/* = convertType::DEFAULT*/)
 	{
-		if (bRec709) {
-			return YCrCbToRGB(A, Y, Cr, Cb, Rec709_Kr, Rec709_Kb, Rec709_Kg, type);
-		} else {
-			return YCrCbToRGB(A, Y, Cr, Cb, Rec601_Kr, Rec601_Kb, Rec601_Kg, type);
+		switch (cs) {
+			case ColorSpace::BT2020:
+				return YCrCbToRGB(A, Y, Cr, Cb, BT2020_Kr, BT2020_Kb, BT2020_Kg, type);
+			case ColorSpace::REC709:
+				return YCrCbToRGB(A, Y, Cr, Cb, Rec709_Kr, Rec709_Kb, Rec709_Kg, type);
+			default: // REC601
+				return YCrCbToRGB(A, Y, Cr, Cb, Rec601_Kr, Rec601_Kb, Rec601_Kg, type);
 		}
 	}
 } // namespace ColorConvert

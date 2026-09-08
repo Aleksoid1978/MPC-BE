@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2016 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,16 +62,16 @@ public :
 
 	void				SetRLEData(const BYTE* pBuffer, int nSize, int nTotalSize);
 	void				AppendRLEData(const BYTE* pBuffer, int nSize);
-	int					GetRLEDataSize() { return m_nRLEDataSize; };
+	int					GetRLEDataSize() const{ return m_nRLEDataSize; };
 	const BYTE*			GetRLEData() { return m_pRLEData; };
-	bool				IsRLEComplete() { return m_nRLEPos >= m_nRLEDataSize; };
+	bool				IsRLEComplete() const { return m_nRLEPos >= m_nRLEDataSize; };
 
 	void				RenderHdmv(SubPicDesc& spd, SubPicDesc* spdResized);
 	void				RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY, SubPicDesc* spdResized);
 	void				RenderXSUB(SubPicDesc& spd);
 
-	void				SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, bool bRec709, ColorConvert::convertType type = ColorConvert::convertType::DEFAULT, bool bIsRGB = false);
-	const bool			HavePalette() { return m_nColorNumber > 0; };
+	void				SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, ColorConvert::ColorSpace cs, ColorConvert::convertType type = ColorConvert::convertType::DEFAULT, bool bIsRGB = false);
+	const bool			HavePalette() const { return m_nColorNumber > 0; };
 
 	CompositionObject* Copy() {
 		CompositionObject* pCompositionObject = DNew CompositionObject(*this);

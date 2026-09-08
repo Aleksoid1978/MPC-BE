@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,15 +57,8 @@ protected :
 	void					InitSpd(SubPicDesc& spd, int nWidth, int nHeight);
 	void					FinalizeRender(SubPicDesc& spd);
 
-	enum class YUVMATRIX
-	{
-		UNKNOWN,
-		BT601,
-		BT709
-	};
-
-	YUVMATRIX					yuvMatrix = {};
-	ColorConvert::convertType	convertType;
+	ColorConvert::ColorSpace	colorSpace = {};
+	ColorConvert::convertType	convertType = {};
 
 	bool m_bForced = false;
 };

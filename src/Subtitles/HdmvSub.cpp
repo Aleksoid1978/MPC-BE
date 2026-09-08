@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -175,7 +175,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 
 	HRESULT hr = E_FAIL;
 
-	const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
+	const auto cs = (colorSpace != ColorConvert::ColorSpace::Unknown ? colorSpace : (m_VideoDescriptor.nVideoWidth > 720 ? ColorConvert::ColorSpace::REC709 : ColorConvert::ColorSpace::REC601));
 
 	POSITION pos = m_pObjects.GetHeadPosition();
 	while (pos) {
@@ -187,7 +187,7 @@ HRESULT CHdmvSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 					m_VideoDescriptor.nVideoHeight >= (pObject->m_vertical_position + pObject->m_height)) {
 
 				if (!pObject->HavePalette() && m_DefaultCLUT.Palette) {
-					pObject->SetPalette(m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, bRec709, convertType);
+					pObject->SetPalette(m_DefaultCLUT.pSize, m_DefaultCLUT.Palette, cs, convertType);
 				}
 
 				if (!pObject->HavePalette()) {
@@ -327,9 +327,9 @@ void CHdmvSub::ParsePresentationSegment(CGolombBuffer* pGBuffer, REFERENCE_TIME 
 	if (!m_pObjects.IsEmpty()) {
 		auto& pObject = m_pObjects.GetTail();
 		if (!pObject->HavePalette() && m_CLUT[palette_id_ref].Palette) {
-			const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
+			const auto cs = (colorSpace != ColorConvert::ColorSpace::Unknown ? colorSpace : (m_VideoDescriptor.nVideoWidth > 720 ? ColorConvert::ColorSpace::REC709 : ColorConvert::ColorSpace::REC601));
 			auto& clut = m_CLUT[palette_id_ref];
-			pObject->SetPalette(clut.pSize, clut.Palette, bRec709, convertType);
+			pObject->SetPalette(clut.pSize, clut.Palette, cs, convertType);
 		}
 	}
 
@@ -441,10 +441,10 @@ void CHdmvSub::ParsePalette(CGolombBuffer* pGBuffer, USHORT nSize)
 	memcpy(m_DefaultCLUT.Palette, pPalette, nNbEntry * sizeof(HDMV_PALETTE));
 
 	if (m_pCurrentWindow && m_pCurrentWindow->m_palette_id_ref == palette_id && m_pCurrentWindow->m_nObjectNumber) {
-		const bool bRec709 = yuvMatrix == YUVMATRIX::BT709 ? true : yuvMatrix == YUVMATRIX::BT601 ? false : m_VideoDescriptor.nVideoWidth > 720;
+		const auto cs = (colorSpace != ColorConvert::ColorSpace::Unknown ? colorSpace : (m_VideoDescriptor.nVideoWidth > 720 ? ColorConvert::ColorSpace::REC709 : ColorConvert::ColorSpace::REC601));
 
 		for (int i = 0; i < m_pCurrentWindow->m_nObjectNumber; i++) {
-			m_pCurrentWindow->Objects[i]->SetPalette(nNbEntry, pPalette, bRec709, convertType);
+			m_pCurrentWindow->Objects[i]->SetPalette(nNbEntry, pPalette, cs, convertType);
 		}
 	}
 }
