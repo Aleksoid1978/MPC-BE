@@ -1946,6 +1946,14 @@ namespace DarkTheme
 			if (FAILED(DwmSetWindowAttribute(hRoot, 20, &bDark, sizeof(bDark)))) {
 				DwmSetWindowAttribute(hRoot, 19, &bDark, sizeof(bDark));
 			}
+			// EnableForWindow also pins an explicit caption colour on Win11, and that outranks the
+			// light/dark preference above - so clearing only the dark-mode attribute left the title bar
+			// dark until the dialog was closed and reopened (a fresh window has no override). Hand the
+			// caption back to the system.
+			if (SysVersion::IsWin11orLater()) {
+				COLORREF cap = 0xFFFFFFFF; // DWMWA_COLOR_DEFAULT
+				DwmSetWindowAttribute(hRoot, 35 /*DWMWA_CAPTION_COLOR*/, &cap, sizeof(cap));
+			}
 			EnumChildWindows(hRoot, StripThemeChildProc, 0);
 		}
 		::RedrawWindow(hRoot, nullptr, nullptr,
