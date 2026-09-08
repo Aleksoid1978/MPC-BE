@@ -2360,7 +2360,18 @@ namespace DarkTheme
 			if (pFocusFont) {
 				pDC->SelectObject(pFocusFont);
 			}
+			if (!(style & BS_MULTILINE)) {
+				// DT_CALCRECT ignores DT_VCENTER, so it comes back top-aligned; put it back where the
+				// caption is actually drawn.
+				const int textH = rcFocus.Height();
+				rcFocus.top = rc.top + (rc.Height() - textH) / 2;
+				rcFocus.bottom = rcFocus.top + textH;
+			}
 			rcFocus.InflateRect(1, 1);
+			// Keep it inside the control on EVERY side: the caption can reach the control's own edge, and
+			// the extra pixel then falls outside and is clipped away - which is what hid the top border.
+			if (rcFocus.top    < rc.top)    { rcFocus.top    = rc.top;    }
+			if (rcFocus.left   < rc.left)   { rcFocus.left   = rc.left;   }
 			if (rcFocus.bottom > rc.bottom) { rcFocus.bottom = rc.bottom; }
 			if (rcFocus.right  > rc.right)  { rcFocus.right  = rc.right;  }
 			DrawDarkFocusRect(pDC->GetSafeHdc(), rcFocus);
