@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -63,10 +63,10 @@ static const double D32MAX = double(INT32_MAX) / INT32_PEAK;
 #define SAMPLE_int24_to_int32(p)       (int32_t((uint32_t)*(p) << 8 | (uint32_t)*(p+1) << 16 | (uint32_t)*(p+2) << 24))
 
 #define SAMPLECONVERTFUNCT(in, out) \
-inline void convert_##in##_to_##out## (##out##_t* output, ##in##_t* input, size_t allsamples) \
+inline void convert_##in##_to_##out(out##_t* output, const in##_t* input, const size_t allsamples) \
 { \
-    for (##in##_t* end = input + allsamples; input < end; ++input) { \
-        *output++ = SAMPLE_##in##_to_##out##(*input); \
+    for (const in##_t* end = input + allsamples; input < end; ++input) { \
+        *output++ = SAMPLE_##in##_to_##out(*input); \
     } \
 } \
 
@@ -92,28 +92,28 @@ SAMPLECONVERTFUNCT(float, double)
 
 SampleFormat GetSampleFormat(const WAVEFORMATEX* wfe);
 
-HRESULT convert_to_int16(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int16_t* pOut);
-HRESULT convert_to_int24(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, BYTE* pOut);
-HRESULT convert_to_int32(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, int32_t* pOut);
-HRESULT convert_to_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut);
+HRESULT convert_to_int16(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, const BYTE* pIn, int16_t* pOut);
+HRESULT convert_to_int24(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, const BYTE* pIn, BYTE* pOut);
+HRESULT convert_to_int32(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, const BYTE* pIn, int32_t* pOut);
+HRESULT convert_to_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, const BYTE* pIn, float* pOut);
 
-HRESULT convert_to_planar_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, BYTE* pIn, float* pOut);
+HRESULT convert_to_planar_float(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples,const BYTE* pIn, float* pOut);
 
-HRESULT convert_float_to(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, float* pIn, BYTE* pOut);
+HRESULT convert_float_to(const SampleFormat sfmt, const unsigned nChannels, const unsigned nSamples, const float* pIn, BYTE* pOut);
 
 #define INT32_TO_INT24(i32, pOut) \
     *pOut++ = (BYTE)(i32 >>  8);  \
     *pOut++ = (BYTE)(i32 >> 16);  \
     *pOut++ = (BYTE)(i32 >> 24);  \
 
-inline void convert_int24_to_int32(int32_t* pOut, BYTE* pIn, size_t allsamples)
+inline void convert_int24_to_int32(int32_t* pOut, const BYTE* pIn, const size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
         pOut[i] = SAMPLE_int24_to_int32(pIn + 3 * i);
     }
 }
 
-inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
+inline void convert_int32_to_int24(BYTE* pOut, const int32_t* pIn, const size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
         INT32_TO_INT24(pIn[i], pOut);
@@ -121,7 +121,7 @@ inline void convert_int32_to_int24(BYTE* pOut, int32_t* pIn, size_t allsamples)
 }
 
 /*
-inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
+inline void convert_int24_to_float(float* pOut, const BYTE* pIn, const size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
         int32_t i32 = SAMPLE_int24_to_int32(pIn + 3 * i);
@@ -129,7 +129,7 @@ inline void convert_int24_to_float(float* pOut, BYTE* pIn, size_t allsamples)
     }
 }
 
-inline void convert_float_to_int24(BYTE* pOut, float* pIn, size_t allsamples)
+inline void convert_float_to_int24(BYTE* pOut, const float* pIn, const size_t allsamples)
 {
     for (size_t i = 0; i < allsamples; i++) {
         int32_t i32 = SAMPLE_float_to_int32(pIn[i]);
