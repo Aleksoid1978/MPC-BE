@@ -807,6 +807,7 @@ SRCS_LU = \
 SRCS_LR = \
 	libswresample/audioconvert.c \
 	libswresample/dither.c\
+	libswresample/dsd2pcm.c\
 	libswresample/options.c \
 	libswresample/rematrix.c \
 	libswresample/resample.c \

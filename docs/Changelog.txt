@@ -19,7 +19,7 @@ Updated Romanian translation (by Andrei Miloiu).
 Updated Dutch translation (by beter).
 
 Updated libraries:
-	ffmpeg n9.1-dev-1106-gef5929f4eb;
+	ffmpeg n9.1-dev-1211-ge15ddb7f9a;
 	nv-codec-headers n11.1.5.4.
 
 

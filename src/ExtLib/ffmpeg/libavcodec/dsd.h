@@ -1,7 +1,5 @@
 /*
  * Direct Stream Digital (DSD) decoder
- * based on BSD licensed dsd2pcm by Sebastian Gesemann
- * Copyright (c) 2009, 2011 Sebastian Gesemann. All rights reserved.
  * Copyright (c) 2014 Peter Ross
  *
  * This file is part of FFmpeg.
@@ -24,28 +22,15 @@
 #ifndef AVCODEC_DSD_H
 #define AVCODEC_DSD_H
 
-#include <stddef.h>
-#include <stdint.h>
-
-#define HTAPS   48               /** number of FIR constants */
-#define FIFOSIZE 16              /** must be a power of two */
-#define FIFOMASK (FIFOSIZE - 1)  /** bit mask for FIFO offsets */
-
-#if FIFOSIZE * 8 < HTAPS * 2
-#error "FIFOSIZE too small"
-#endif
+struct AVCodecContext;
+struct SwrContext;
 
 /**
- * Per-channel buffer
+ * (Re)create a libswresample context converting AV_SAMPLE_FMT_DSD to
+ * avctx->sample_fmt at the same sample rate. This is a transitional helper for
+ * the deprecated in-decoder DSD to PCM conversion.
+ * Only available if CONFIG_SWRESAMPLE && FF_API_DSD_PCM.
  */
-typedef struct DSDContext {
-    uint8_t buf[FIFOSIZE];
-    unsigned pos;
-} DSDContext;
+int ff_dsd_to_pcm_init(struct AVCodecContext *avctx, struct SwrContext **swrp);
 
-void ff_init_dsd_data(void);
-
-void ff_dsd2pcm_translate(DSDContext* s, size_t samples, int lsbf,
-                          const uint8_t *src, ptrdiff_t src_stride,
-                          float *dst, ptrdiff_t dst_stride);
 #endif /* AVCODEC_DSD_H */

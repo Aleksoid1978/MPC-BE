@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "config.h"
+
 #include "libavutil/channel_layout.h"
 #include "libavutil/mem.h"
 
@@ -34,6 +36,10 @@
 #include "unary.h"
 #include "wavpack.h"
 #include "dsd.h"
+
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+#include "libswresample/swresample.h"
+#endif
 
 /**
  * @file
@@ -107,12 +113,26 @@ typedef struct WavpackContext {
     int ch_offset;
 
     Modulation modulation;
+    int dsd_raw;            ///< output the raw DSD bitstream instead of PCM
 
-    DSDContext *dsdctx; ///< RefStruct reference
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    struct WvDSDSwr *dsd_swr; ///< RefStruct reference, shared between threads
+    uint8_t *dsd_scratch;   ///< per-thread frame sized raw DSD buffer
+    unsigned dsd_scratch_size;
+#endif
     ThreadProgress *curr_progress, *prev_progress; ///< RefStruct references
     AVRefStructPool *progress_pool; ///< RefStruct reference
     int dsd_channels;
 } WavpackContext;
+
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+typedef struct WvDSDSwr {
+    struct SwrContext *swr;
+} WvDSDSwr;
+#define WV_DSD_SWR(wc) ((wc)->dsd_swr)
+#else
+#define WV_DSD_SWR(wc) (NULL)
+#endif
 
 #define LEVEL_DECAY(a)  (((a) + 0x80) >> 8)
 
@@ -432,7 +452,14 @@ typedef struct {
     unsigned int byte;
 } DSDfilters;
 
-static int wv_unpack_dsd_high(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right)
+static void wv_dsd_silence(uint8_t *dst, int samples, ptrdiff_t stride)
+{
+    for (int i = 0; i < samples; i++)
+        dst[i * stride] = 0x69;
+}
+
+static int wv_unpack_dsd_high(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right,
+                              ptrdiff_t stride)
 {
     uint32_t checksum = 0xFFFFFFFF;
     uint8_t *dst_l = dst_left, *dst_r = dst_right;
@@ -553,12 +580,12 @@ static int wv_unpack_dsd_high(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
 
         checksum += (checksum << 1) + (*dst_l = sp[0].byte & 0xff);
         sp[0].factor -= (sp[0].factor + 512) >> 10;
-        dst_l += 4;
+        dst_l += stride;
 
         if (stereo) {
             checksum += (checksum << 1) + (*dst_r = filters[1].byte & 0xff);
             filters[1].factor -= (filters[1].factor + 512) >> 10;
-            dst_r += 4;
+            dst_r += stride;
         }
     }
 
@@ -566,16 +593,17 @@ static int wv_unpack_dsd_high(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
         if (s->avctx->err_recognition & AV_EF_CRCCHECK)
             return AVERROR_INVALIDDATA;
 
-        memset(dst_left, 0x69, s->samples * 4);
+        wv_dsd_silence(dst_left, s->samples, stride);
 
         if (dst_r)
-            memset(dst_right, 0x69, s->samples * 4);
+            wv_dsd_silence(dst_right, s->samples, stride);
     }
 
     return 0;
 }
 
-static int wv_unpack_dsd_fast(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right)
+static int wv_unpack_dsd_fast(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right,
+                              ptrdiff_t stride)
 {
     uint8_t *dst_l = dst_left, *dst_r = dst_right;
     uint8_t history_bits, max_probability;
@@ -689,18 +717,18 @@ static int wv_unpack_dsd_fast(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
             if ((*dst_l = code = s->value_lookup[p0][index]))
                 low += s->summed_probabilities[p0][code-1] * mult;
 
-            dst_l += 4;
+            dst_l += stride;
         } else {
             if ((code = s->value_lookup[p0][index]))
                 low += s->summed_probabilities[p0][code-1] * mult;
 
             if (chan) {
                 *dst_r = code;
-                dst_r += 4;
+                dst_r += stride;
             }
             else {
                 *dst_l = code;
-                dst_l += 4;
+                dst_l += stride;
             }
 
             chan ^= 1;
@@ -727,16 +755,17 @@ static int wv_unpack_dsd_fast(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
         if (s->avctx->err_recognition & AV_EF_CRCCHECK)
             return AVERROR_INVALIDDATA;
 
-        memset(dst_left, 0x69, s->samples * 4);
+        wv_dsd_silence(dst_left, s->samples, stride);
 
         if (dst_r)
-            memset(dst_right, 0x69, s->samples * 4);
+            wv_dsd_silence(dst_right, s->samples, stride);
     }
 
     return 0;
 }
 
-static int wv_unpack_dsd_copy(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right)
+static int wv_unpack_dsd_copy(WavpackFrameContext *s, uint8_t *dst_left, uint8_t *dst_right,
+                              ptrdiff_t stride)
 {
     uint8_t *dst_l = dst_left, *dst_r = dst_right;
     int total_samples           = s->samples;
@@ -747,11 +776,11 @@ static int wv_unpack_dsd_copy(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
 
     while (total_samples--) {
         checksum += (checksum << 1) + (*dst_l = bytestream2_get_byte(&s->gbyte));
-        dst_l += 4;
+        dst_l += stride;
 
         if (dst_r) {
             checksum += (checksum << 1) + (*dst_r = bytestream2_get_byte(&s->gbyte));
-            dst_r += 4;
+            dst_r += stride;
         }
     }
 
@@ -759,10 +788,10 @@ static int wv_unpack_dsd_copy(WavpackFrameContext *s, uint8_t *dst_left, uint8_t
         if (s->avctx->err_recognition & AV_EF_CRCCHECK)
             return AVERROR_INVALIDDATA;
 
-        memset(dst_left, 0x69, s->samples * 4);
+        wv_dsd_silence(dst_left, s->samples, stride);
 
         if (dst_r)
-            memset(dst_right, 0x69, s->samples * 4);
+            wv_dsd_silence(dst_right, s->samples, stride);
     }
 
     return 0;
@@ -987,33 +1016,47 @@ static av_cold int wv_alloc_frame_context(WavpackContext *c)
     return 0;
 }
 
-static int wv_dsd_reset(WavpackContext *s, int channels)
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+static void wv_dsd_swr_free(AVRefStructOpaque opaque, void *obj)
 {
-    int i;
+    WvDSDSwr *h = obj;
+
+    swr_free(&h->swr);
+}
+#endif
+
+static int wv_dsd_reset(AVCodecContext *avctx, int channels)
+{
+    WavpackContext *s = avctx->priv_data;
 
     s->dsd_channels = 0;
-    av_refstruct_unref(&s->dsdctx);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    av_refstruct_unref(&s->dsd_swr);
+#endif
     av_refstruct_unref(&s->curr_progress);
     av_refstruct_unref(&s->prev_progress);
 
     if (!channels)
         return 0;
 
-    if (WV_MAX_CHANNELS > SIZE_MAX / sizeof(*s->dsdctx) &&
-        channels > SIZE_MAX / sizeof(*s->dsdctx))
-        return AVERROR(EINVAL);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    {
+        s->dsd_swr = av_refstruct_alloc_ext(sizeof(*s->dsd_swr), 0, NULL,
+                                            wv_dsd_swr_free);
+        if (!s->dsd_swr)
+            return AVERROR(ENOMEM);
 
-    s->dsdctx = av_refstruct_allocz(channels * sizeof(*s->dsdctx));
-    if (!s->dsdctx)
-        return AVERROR(ENOMEM);
-    s->dsd_channels = channels;
-
-    for (i = 0; i < channels; i++)
-        memset(s->dsdctx[i].buf, 0x69, sizeof(s->dsdctx[i].buf));
-
-    ff_init_dsd_data();
-
+        int ret = ff_dsd_to_pcm_init(avctx, &s->dsd_swr->swr);
+        if (ret < 0) {
+            av_refstruct_unref(&s->dsd_swr);
+            return ret;
+        }
+        s->dsd_channels = channels;
+    }
     return 0;
+#else
+    return AVERROR_BUG;
+#endif
 }
 
 #if HAVE_THREADS
@@ -1023,7 +1066,9 @@ static int update_thread_context(AVCodecContext *dst, const AVCodecContext *src)
     WavpackContext *fdst = dst->priv_data;
 
     av_refstruct_replace(&fdst->curr_progress, fsrc->curr_progress);
-    av_refstruct_replace(&fdst->dsdctx, fsrc->dsdctx);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    av_refstruct_replace(&fdst->dsd_swr, fsrc->dsd_swr);
+#endif
     fdst->dsd_channels = fsrc->dsd_channels;
 
     return 0;
@@ -1056,6 +1101,11 @@ static av_cold int wavpack_decode_init(AVCodecContext *avctx)
 
     s->fdec_num = 0;
 
+    s->dsd_raw = 1;
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    s->dsd_raw = avctx->request_sample_fmt == AV_SAMPLE_FMT_DSD;
+#endif
+
 #if HAVE_THREADS
     if (ff_thread_sync_ref(avctx, offsetof(WavpackContext, progress_pool)) == FF_THREAD_IS_FIRST_THREAD) {
         s->progress_pool = av_refstruct_pool_alloc_ext(sizeof(*s->curr_progress),
@@ -1081,7 +1131,10 @@ static av_cold int wavpack_decode_end(AVCodecContext *avctx)
     s->fdec_num = 0;
 
     av_refstruct_pool_uninit(&s->progress_pool);
-    wv_dsd_reset(s, 0);
+    wv_dsd_reset(avctx, 0);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    av_freep(&s->dsd_scratch);
+#endif
 
     return 0;
 }
@@ -1094,6 +1147,7 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
     GetByteContext gb;
     enum AVSampleFormat sample_fmt;
     void *samples_l = NULL, *samples_r = NULL;
+    ptrdiff_t stride = 0;
     int ret;
     int got_terms   = 0, got_weights = 0, got_samples = 0,
         got_entropy = 0, got_pcm     = 0, got_float   = 0, got_hybrid = 0;
@@ -1126,7 +1180,9 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
     }
     s->frame_flags = bytestream2_get_le32(&gb);
 
-    if (s->frame_flags & (WV_FLOAT_DATA | WV_DSD_DATA))
+    if (s->frame_flags & WV_DSD_DATA)
+        sample_fmt = wc->dsd_raw ? AV_SAMPLE_FMT_DSD : AV_SAMPLE_FMT_FLTP;
+    else if (s->frame_flags & WV_FLOAT_DATA)
         sample_fmt = AV_SAMPLE_FMT_FLTP;
     else if ((s->frame_flags & 0x03) <= 1)
         sample_fmt = AV_SAMPLE_FMT_S16P;
@@ -1527,21 +1583,28 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
         }
         av_assert1(new_ch_layout.nb_channels <= WV_MAX_CHANNELS);
 
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
         /* clear DSD state if stream properties change */
-        if ((wc->dsdctx && !got_dsd) ||
-            got_dsd && (new_ch_layout.nb_channels != wc->dsd_channels ||
-                        av_channel_layout_compare(&new_ch_layout, &avctx->ch_layout) ||
-                        new_samplerate != avctx->sample_rate)) {
-            ret = wv_dsd_reset(wc, got_dsd ? new_ch_layout.nb_channels : 0);
+        int reset_dsd = !wc->dsd_raw &&
+            ((wc->dsd_swr && !got_dsd) ||
+             got_dsd && (new_ch_layout.nb_channels != wc->dsd_channels ||
+                         av_channel_layout_compare(&new_ch_layout, &avctx->ch_layout) ||
+                         new_samplerate != avctx->sample_rate));
+#endif
+        av_channel_layout_copy(&avctx->ch_layout, &new_ch_layout);
+        avctx->sample_rate         = new_samplerate;
+        avctx->sample_fmt          = sample_fmt;
+        avctx->bits_per_raw_sample = orig_bpp;
+
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+        if (reset_dsd) {
+            ret = wv_dsd_reset(avctx, got_dsd ? new_ch_layout.nb_channels : 0);
             if (ret < 0) {
                 av_log(avctx, AV_LOG_ERROR, "Error reinitializing the DSD context\n");
                 return ret;
             }
         }
-        av_channel_layout_copy(&avctx->ch_layout, &new_ch_layout);
-        avctx->sample_rate         = new_samplerate;
-        avctx->sample_fmt          = sample_fmt;
-        avctx->bits_per_raw_sample = orig_bpp;
+#endif
 
         /* get output buffer */
         frame->nb_samples = s->samples;
@@ -1551,7 +1614,7 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
 
         av_assert1(!!wc->progress_pool == !!(avctx->active_thread_type & FF_THREAD_FRAME));
         if (wc->progress_pool) {
-            if (wc->dsdctx) {
+            if (WV_DSD_SWR(wc)) {
                 av_refstruct_unref(&wc->prev_progress);
                 wc->prev_progress = av_refstruct_pool_get(wc->progress_pool);
                 if (!wc->prev_progress)
@@ -1559,7 +1622,7 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
                 FFSWAP(ThreadProgress*, wc->prev_progress, wc->curr_progress);
                 *new_progress = 1;
             }
-            av_assert1(!!wc->dsdctx == !!wc->curr_progress);
+            av_assert1(!!WV_DSD_SWR(wc) == !!wc->curr_progress);
             ff_thread_finish_setup(avctx);
         }
     }
@@ -1569,20 +1632,37 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
         return ((avctx->err_recognition & AV_EF_EXPLODE) || !wc->ch_offset) ? AVERROR_INVALIDDATA : 0;
     }
 
-    samples_l = frame->extended_data[wc->ch_offset];
-    if (s->stereo)
-        samples_r = frame->extended_data[wc->ch_offset + 1];
+    if (got_dsd) {
+        // DSD output is interleaved
+        stride = avctx->ch_layout.nb_channels;
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+        if (wc->dsd_swr) {
+            av_fast_malloc(&wc->dsd_scratch, &wc->dsd_scratch_size,
+                           (size_t)s->samples * stride);
+            if (!wc->dsd_scratch)
+                return AVERROR(ENOMEM);
+            samples_l = wc->dsd_scratch + wc->ch_offset;
+        } else
+#endif
+        samples_l = frame->data[0] + wc->ch_offset;
+        if (s->stereo)
+            samples_r = (uint8_t *)samples_l + 1;
+    } else {
+        samples_l = frame->extended_data[wc->ch_offset];
+        if (s->stereo)
+            samples_r = frame->extended_data[wc->ch_offset + 1];
+    }
 
     wc->ch_offset += 1 + s->stereo;
 
     if (s->stereo_in) {
         if (got_dsd) {
             if (dsd_mode == 3) {
-                ret = wv_unpack_dsd_high(s, samples_l, samples_r);
+                ret = wv_unpack_dsd_high(s, samples_l, samples_r, stride);
             } else if (dsd_mode == 1) {
-                ret = wv_unpack_dsd_fast(s, samples_l, samples_r);
+                ret = wv_unpack_dsd_fast(s, samples_l, samples_r, stride);
             } else {
-                ret = wv_unpack_dsd_copy(s, samples_l, samples_r);
+                ret = wv_unpack_dsd_copy(s, samples_l, samples_r, stride);
             }
         } else {
             ret = wv_unpack_stereo(s, &s->gb, samples_l, samples_r, avctx->sample_fmt);
@@ -1592,11 +1672,11 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
     } else {
         if (got_dsd) {
             if (dsd_mode == 3) {
-                ret = wv_unpack_dsd_high(s, samples_l, NULL);
+                ret = wv_unpack_dsd_high(s, samples_l, NULL, stride);
             } else if (dsd_mode == 1) {
-                ret = wv_unpack_dsd_fast(s, samples_l, NULL);
+                ret = wv_unpack_dsd_fast(s, samples_l, NULL, stride);
             } else {
-                ret = wv_unpack_dsd_copy(s, samples_l, NULL);
+                ret = wv_unpack_dsd_copy(s, samples_l, NULL, stride);
             }
         } else {
             ret = wv_unpack_mono(s, &s->gb, samples_l, avctx->sample_fmt);
@@ -1604,8 +1684,14 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
         if (ret < 0)
             return ret;
 
-        if (s->stereo)
-            memcpy(samples_r, samples_l, bpp * s->samples);
+        if (s->stereo) {
+            if (got_dsd) {
+                for (int i = 0; i < s->samples; i++)
+                    ((uint8_t *)samples_r)[i * stride] =
+                        ((const uint8_t *)samples_l)[i * stride];
+            } else
+                memcpy(samples_r, samples_l, bpp * s->samples);
+        }
     }
 
     return 0;
@@ -1613,21 +1699,7 @@ static int wavpack_decode_block(AVCodecContext *avctx, AVFrame *frame, int block
 
 static av_cold void wavpack_decode_flush(AVCodecContext *avctx)
 {
-    WavpackContext *s = avctx->priv_data;
-
-    wv_dsd_reset(s, 0);
-}
-
-static int dsd_channel(AVCodecContext *avctx, void *frmptr, int jobnr, int threadnr)
-{
-    const WavpackContext *s  = avctx->priv_data;
-    AVFrame *frame = frmptr;
-
-    ff_dsd2pcm_translate(&s->dsdctx[jobnr], s->samples, 0,
-        (uint8_t *)frame->extended_data[jobnr], 4,
-        (float *)frame->extended_data[jobnr], 1);
-
-    return 0;
+    wv_dsd_reset(avctx, 0);
 }
 
 static int wavpack_decode_frame(AVCodecContext *avctx, AVFrame *frame,
@@ -1639,7 +1711,7 @@ static int wavpack_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     int frame_size, ret, frame_flags;
     int block = 0, new_progress = 0;
 
-    av_assert1(!s->curr_progress || s->dsdctx);
+    av_assert1(!s->curr_progress || WV_DSD_SWR(s));
 
     if (avpkt->size <= WV_HEADER_SIZE)
         return AVERROR_INVALIDDATA;
@@ -1683,13 +1755,19 @@ static int wavpack_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         goto error;
     }
 
-    if (s->dsdctx) {
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    if (s->dsd_swr) {
         if (s->prev_progress)
             ff_thread_progress_await(s->prev_progress, INT_MAX);
-        avctx->execute2(avctx, dsd_channel, frame, NULL, avctx->ch_layout.nb_channels);
+        ret = swr_convert(s->dsd_swr->swr, frame->extended_data, s->samples,
+                          (const uint8_t *const []){ s->dsd_scratch },
+                          s->samples);
         if (s->curr_progress)
             ff_thread_progress_report(s->curr_progress, INT_MAX);
+        if (ret != s->samples)
+            return ret < 0 ? ret : AVERROR_BUG;
     }
+#endif
 
     *got_frame_ptr = 1;
 
@@ -1717,6 +1795,6 @@ const FFCodec ff_wavpack_decoder = {
     .flush          = wavpack_decode_flush,
     UPDATE_THREAD_CONTEXT(update_thread_context),
     .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_FRAME_THREADS |
-                      AV_CODEC_CAP_SLICE_THREADS | AV_CODEC_CAP_CHANNEL_CONF,
+                      AV_CODEC_CAP_CHANNEL_CONF,
     .caps_internal  = FF_CODEC_CAP_INIT_CLEANUP,
 };

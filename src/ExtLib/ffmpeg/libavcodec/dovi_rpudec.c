@@ -405,6 +405,9 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         VALIDATE(rpu[0], 25, 25); /* NAL prefix */
         rpu++;
         rpu_size--;
+        /* Strip trailing padding zero bytes */
+        while (rpu_size && !rpu[rpu_size - 1])
+            rpu_size--;
     }
 
     if ((ret = init_get_bits8(gb, rpu, rpu_size)) < 0)
@@ -710,7 +713,8 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
             return ret;
         }
 
-        if (get_bits_left(gb) > 48 /* padding + CRC32 + terminator */) {
+        /* ue(1) + ue(0) + level + CRC32 + terminator */
+        if (get_bits_left(gb) >= 3 + 1 + 8 + 32 + 8) {
             if ((ret = parse_ext_blocks(s, gb, 2, dm_compression, err_recognition)) < 0) {
                 ff_dovi_ctx_unref(s);
                 return ret;
@@ -721,18 +725,39 @@ int ff_dovi_rpu_parse(DOVIContext *s, const uint8_t *rpu, size_t rpu_size,
         av_refstruct_unref(&s->ext_blocks);
     }
 
+    int aligned = get_bits_count(gb) % 8 == 0;
     align_get_bits(gb);
+
+    /* The payload is followed by a CRC32 and a 0x80 terminator. Some encoders
+     * emit an extra zero padding byte before the CRC32 when the payload already
+     * ended on a byte boundary. A leading zero byte is then ambiguous: it may
+     * be that padding, or simply a CRC32 that starts with a zero byte. If only
+     * the padded position holds the terminator, assume the padding is real. If
+     * both do (the last CRC32 byte is 0x80 or there is stray 0x80 after real
+     * payload) the terminator position is ambiguous. Calculate CRC twice when
+     * AV_EF_CRCCHECK is requested. Note that this situation is extremely
+     * unlikely, there shouldn't be non-zero data after payload. */
+    int pad = aligned && show_bits(gb, 8) == 0;
     skip_bits(gb, 32); /* CRC32 */
-    if (get_bits(gb, 8) != 0x80) {
+    int term_unpadded = get_bits(gb, 8) == 0x80;       /* terminator w/o padding */
+    int term_padded = pad && show_bits(gb, 8) == 0x80; /* terminator w/ padding */
+
+    if (!term_unpadded && !term_padded) {
         avpriv_request_sample(s->logctx, "Unexpected RPU format");
         ff_dovi_ctx_unref(s);
         return AVERROR_PATCHWELCOME;
     }
 
     if (err_recognition & AV_EF_CRCCHECK) {
+        if (term_padded && !term_unpadded)
+            skip_bits(gb, 8); /* unambiguously padded */
         rpu_size = get_bits_count(gb) / 8;
         uint32_t crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
                                   -1, rpu, rpu_size - 1)); /* exclude 0x80 */
+        if (crc && term_padded && term_unpadded) {
+            crc = av_bswap32(av_crc(av_crc_get_table(AV_CRC_32_IEEE),
+                                    -1, rpu, rpu_size)); /* include padding byte */
+        }
         if (crc) {
             av_log(s->logctx, AV_LOG_ERROR, "RPU CRC mismatch: %X\n", crc);
             if (err_recognition & AV_EF_EXPLODE) {

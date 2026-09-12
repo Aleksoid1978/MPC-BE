@@ -1,7 +1,5 @@
 /*
  * Direct Stream Digital (DSD) decoder
- * based on BSD licensed dsd2pcm by Sebastian Gesemann
- * Copyright (c) 2009, 2011 Sebastian Gesemann. All rights reserved.
  * Copyright (c) 2014 Peter Ross
  *
  * This file is part of FFmpeg.
@@ -26,95 +24,131 @@
  * Direct Stream Digital (DSD) decoder
  */
 
+#include "config.h"
+
+#include <string.h>
+
+#include "libavutil/avassert.h"
 #include "libavutil/mem.h"
+#include "libavutil/reverse.h"
 
 #include "avcodec.h"
 #include "codec_internal.h"
 #include "decode.h"
 #include "dsd.h"
 
-#define DSD_SILENCE 0x69
-#define DSD_SILENCE_REVERSED 0x96
-/* 0x69 = 01101001
- * This pattern "on repeat" makes a low energy 352.8 kHz tone
- * and a high energy 1.0584 MHz tone which should be filtered
- * out completely by any playback system --> silence
- */
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+#include "libswresample/swresample.h"
+
+typedef struct DSDDecContext {
+    struct SwrContext *swr;
+    uint8_t *scratch;
+    unsigned scratch_size;
+} DSDDecContext;
+
+#define PRIV_DATA_SIZE sizeof(DSDDecContext)
+#else
+#define PRIV_DATA_SIZE 0
+#endif
 
 static av_cold int decode_init(AVCodecContext *avctx)
 {
-    DSDContext * s;
-    int i;
-    uint8_t silence;
-
     if (!avctx->ch_layout.nb_channels)
         return AVERROR_INVALIDDATA;
 
-    ff_init_dsd_data();
+    avctx->sample_fmt = AV_SAMPLE_FMT_DSD;
 
-    s = av_malloc_array(avctx->ch_layout.nb_channels, sizeof(*s));
-    if (!s)
-        return AVERROR(ENOMEM);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    if (avctx->request_sample_fmt != AV_SAMPLE_FMT_DSD)
+        avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+#endif
 
-    silence = avctx->codec_id == AV_CODEC_ID_DSD_LSBF_PLANAR ||
-              avctx->codec_id == AV_CODEC_ID_DSD_LSBF ? DSD_SILENCE_REVERSED : DSD_SILENCE;
-    for (i = 0; i < avctx->ch_layout.nb_channels; i++) {
-        s[i].pos = 0;
-        memset(s[i].buf, silence, sizeof(s[i].buf));
-    }
-
-    avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-    avctx->priv_data  = s;
     return 0;
 }
 
-typedef struct ThreadData {
-    AVFrame *frame;
-    const AVPacket *avpkt;
-} ThreadData;
-
-static int dsd_channel(AVCodecContext *avctx, void *tdata, int j, int threadnr)
+static av_cold int decode_close(AVCodecContext *avctx)
 {
-    int lsbf = avctx->codec_id == AV_CODEC_ID_DSD_LSBF || avctx->codec_id == AV_CODEC_ID_DSD_LSBF_PLANAR;
-    DSDContext *s = avctx->priv_data;
-    ThreadData *td = tdata;
-    AVFrame *frame = td->frame;
-    const AVPacket *avpkt = td->avpkt;
-    int src_next, src_stride;
-    float *dst = ((float **)frame->extended_data)[j];
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    DSDDecContext *s = avctx->priv_data;
 
-    if (avctx->codec_id == AV_CODEC_ID_DSD_LSBF_PLANAR || avctx->codec_id == AV_CODEC_ID_DSD_MSBF_PLANAR) {
-        src_next   = frame->nb_samples;
-        src_stride = 1;
-    } else {
-        src_next   = 1;
-        src_stride = avctx->ch_layout.nb_channels;
-    }
-
-    ff_dsd2pcm_translate(&s[j], frame->nb_samples, lsbf,
-                         avpkt->data + j * src_next, src_stride,
-                         dst, 1);
-
+    swr_free(&s->swr);
+    av_freep(&s->scratch);
+#endif
     return 0;
+}
+
+// repack the input to interleaved DSD bytes, most significant bit first
+static void repack(AVCodecContext *avctx, uint8_t *dst, const uint8_t *src,
+                   int nb_samples)
+{
+    const int channels = avctx->ch_layout.nb_channels;
+
+    switch (avctx->codec_id) {
+    case AV_CODEC_ID_DSD_MSBF:
+        memcpy(dst, src, nb_samples * channels);
+        break;
+    case AV_CODEC_ID_DSD_LSBF:
+        for (int i = 0; i < nb_samples * channels; i++)
+            dst[i] = ff_reverse[src[i]];
+        break;
+    case AV_CODEC_ID_DSD_MSBF_PLANAR:
+        for (int ch = 0; ch < channels; ch++) {
+            const uint8_t *plane = src + ch * nb_samples;
+            for (int i = 0; i < nb_samples; i++)
+                dst[i * channels + ch] = plane[i];
+        }
+        break;
+    case AV_CODEC_ID_DSD_LSBF_PLANAR:
+        for (int ch = 0; ch < channels; ch++) {
+            const uint8_t *plane = src + ch * nb_samples;
+            for (int i = 0; i < nb_samples; i++)
+                dst[i * channels + ch] = ff_reverse[plane[i]];
+        }
+        break;
+    default:
+        av_assert1(0);
+    }
 }
 
 static int decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         int *got_frame_ptr, AVPacket *avpkt)
 {
-    ThreadData td;
+    const int channels = avctx->ch_layout.nb_channels;
     int ret;
 
-    frame->nb_samples = avpkt->size / avctx->ch_layout.nb_channels;
+    frame->nb_samples = avpkt->size / channels;
 
     if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
         return ret;
 
-    td.frame = frame;
-    td.avpkt = avpkt;
-    avctx->execute2(avctx, dsd_channel, &td, NULL, avctx->ch_layout.nb_channels);
+#if CONFIG_SWRESAMPLE && FF_API_DSD_PCM
+    DSDDecContext *s = avctx->priv_data;
+    if (avctx->sample_fmt != AV_SAMPLE_FMT_DSD) {
+        if (!s->swr && (ret = ff_dsd_to_pcm_init(avctx, &s->swr)) < 0)
+            return ret;
+
+        av_fast_malloc(&s->scratch, &s->scratch_size,
+                       frame->nb_samples * channels);
+        if (!s->scratch)
+            return AVERROR(ENOMEM);
+
+        repack(avctx, s->scratch, avpkt->data, frame->nb_samples);
+
+        ret = swr_convert(s->swr, frame->extended_data, frame->nb_samples,
+                          (const uint8_t *const []){ s->scratch },
+                          frame->nb_samples);
+        if (ret != frame->nb_samples)
+            return ret < 0 ? ret : AVERROR_BUG;
+
+        *got_frame_ptr = 1;
+        return frame->nb_samples * channels;
+    }
+#endif
+
+    repack(avctx, frame->data[0], avpkt->data, frame->nb_samples);
 
     *got_frame_ptr = 1;
-    return frame->nb_samples * avctx->ch_layout.nb_channels;
+    return frame->nb_samples * channels;
 }
 
 #define DSD_DECODER(id_, name_, long_name_) \
@@ -123,9 +157,11 @@ const FFCodec ff_ ## name_ ## _decoder = { \
     CODEC_LONG_NAME(long_name_), \
     .p.type       = AVMEDIA_TYPE_AUDIO, \
     .p.id         = AV_CODEC_ID_##id_, \
+    .priv_data_size = PRIV_DATA_SIZE, \
     .init         = decode_init, \
+    .close        = decode_close, \
     FF_CODEC_DECODE_CB(decode_frame), \
-    .p.capabilities = AV_CODEC_CAP_DR1 | AV_CODEC_CAP_SLICE_THREADS, \
+    .p.capabilities = AV_CODEC_CAP_DR1, \
 };
 
 DSD_DECODER(DSD_LSBF, dsd_lsbf, "DSD (Direct Stream Digital), least significant bit first")

@@ -36,7 +36,7 @@
 
 //FIXME rounding ?
 #define CONV_FUNC(ofmt, otype, ifmt, expr)\
-static void CONV_FUNC_NAME(ofmt, ifmt)(uint8_t *po, const uint8_t *pi, int is, int os, uint8_t *end)\
+static void CONV_FUNC_NAME(ofmt, ifmt)(DSDContext *st, uint8_t *po, const uint8_t *pi, int is, int os, uint8_t *end)\
 {\
     uint8_t *end2 = end - 3*os;\
     while(po < end2){\
@@ -87,6 +87,12 @@ CONV_FUNC(AV_SAMPLE_FMT_S32, int32_t, AV_SAMPLE_FMT_DBL, av_clipl_int32(llrint(*
 CONV_FUNC(AV_SAMPLE_FMT_S64, int64_t, AV_SAMPLE_FMT_DBL, llrint(*(const double*)pi * (UINT64_C(1)<<63)))
 CONV_FUNC(AV_SAMPLE_FMT_FLT, float  , AV_SAMPLE_FMT_DBL, *(const double*)pi)
 CONV_FUNC(AV_SAMPLE_FMT_DBL, double , AV_SAMPLE_FMT_DBL, *(const double*)pi)
+CONV_FUNC(AV_SAMPLE_FMT_DSD, uint8_t, AV_SAMPLE_FMT_DSD, *(const uint8_t*)pi)
+
+static void CONV_FUNC_NAME(AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_DSD)(DSDContext *st, uint8_t *po, const uint8_t *pi, int is, int os, uint8_t *end)
+{
+    swri_dsd2pcm_translate(st, (end - po) / os, pi, is, (float *)po, os / sizeof(float));
+}
 
 #define FMT_PAIR_FUNC(out, in) [(out) + AV_SAMPLE_FMT_NB*(in)] = CONV_FUNC_NAME(out, in)
 
@@ -127,6 +133,8 @@ static conv_func_type * const fmt_pair_to_conv_functions[AV_SAMPLE_FMT_NB*AV_SAM
     FMT_PAIR_FUNC(AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_S64),
     FMT_PAIR_FUNC(AV_SAMPLE_FMT_DBL, AV_SAMPLE_FMT_S64),
     FMT_PAIR_FUNC(AV_SAMPLE_FMT_S64, AV_SAMPLE_FMT_S64),
+    FMT_PAIR_FUNC(AV_SAMPLE_FMT_FLT, AV_SAMPLE_FMT_DSD),
+    FMT_PAIR_FUNC(AV_SAMPLE_FMT_DSD, AV_SAMPLE_FMT_DSD),
 };
 
 static void cpy1(uint8_t **dst, const uint8_t **src, int len){
@@ -166,6 +174,12 @@ AudioConvert *swri_audio_convert_alloc(enum AVSampleFormat out_fmt,
     ctx->ch_map   = ch_map;
     if (in_fmt == AV_SAMPLE_FMT_U8 || in_fmt == AV_SAMPLE_FMT_U8P)
         memset(ctx->silence, 0x80, sizeof(ctx->silence));
+    if (in_fmt == AV_SAMPLE_FMT_DSD) {
+        swri_dsd2pcm_init();
+        memset(ctx->silence, 0x69, sizeof(ctx->silence));
+        for (int ch = 0; ch < FF_ARRAY_ELEMS(ctx->dsd_state); ch++)
+            memset(ctx->dsd_state[ch].buf, 0x69, sizeof(ctx->dsd_state[ch].buf));
+    }
 
     if(out_fmt == in_fmt && !ch_map) {
         switch(av_get_bytes_per_sample(in_fmt)){
@@ -245,7 +259,7 @@ int swri_audio_convert(AudioConvert *ctx, AudioData *out, AudioData *in, int len
         if(!po)
             continue;
         end = po + os * len;
-        ctx->conv_f(po+off*os, pi+off*is, is, os, end);
+        ctx->conv_f(&ctx->dsd_state[ch], po+off*os, pi+off*is, is, os, end);
     }
     return 0;
 }

@@ -68,6 +68,14 @@ enum AVSampleFormat {
     AV_SAMPLE_FMT_S64,         ///< signed 64 bits
     AV_SAMPLE_FMT_S64P,        ///< signed 64 bits, planar
 
+    /**
+     * DSD (Direct Stream Digital) bitstream, interleaved. Each byte
+     * carries 8 consecutive one-bit samples, most significant bit first.
+     * One sample in the API sense is one such byte, so the sample rate
+     * is 1/8th of the DSD bit rate.
+     */
+    AV_SAMPLE_FMT_DSD,
+
     AV_SAMPLE_FMT_NB           ///< Number of sample formats. DO NOT USE if linking dynamically
 };
 

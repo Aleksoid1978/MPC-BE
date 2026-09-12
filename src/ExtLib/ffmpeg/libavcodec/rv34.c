@@ -735,7 +735,7 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
         /* wait for the referenced mb row to be finished */
         int mb_row = s->mb_y + ((yoff + my + 5 + 8 * height) >> 4);
         const ThreadProgress *p = dir ? &s->next_pic.ptr->progress : &s->last_pic.ptr->progress;
-        ff_thread_progress_await(p, mb_row);
+        ff_thread_progress_await(p, FFMAX(0, mb_row));
     }
 
     dxy = ly*4 + lx;
@@ -755,7 +755,7 @@ static inline void rv34_mc(RV34DecContext *r, const int block_type,
         srcY -= 2 + 2*s->linesize;
         s->vdsp.emulated_edge_mc(s->sc.edge_emu_buffer, srcY,
                                  s->linesize, s->linesize,
-                                 (width << 3) + 6, (height << 3) + 6,
+                                 (width << 3) + 6, (height << 3) + 5,
                                  src_x - 2, src_y - 2,
                                  s->h_edge_pos, s->v_edge_pos);
         srcY = s->sc.edge_emu_buffer + 2 + 2*s->linesize;

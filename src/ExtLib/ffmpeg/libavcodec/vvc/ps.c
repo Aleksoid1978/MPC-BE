@@ -20,6 +20,7 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+#include <limits.h>
 #include <stdbool.h>
 
 #include "libavcodec/cbs_h266.h"
@@ -1045,14 +1046,39 @@ static void decode_recovery_flag(VVCContext *s)
         s->no_output_before_recovery_flag = s->last_eos;
 }
 
-static void decode_recovery_poc(VVCContext *s, const VVCPH *ph)
+static int decode_recovery_poc(VVCContext *s, const VVCFrameParamSets *fps)
 {
+    const VVCPH *ph = &fps->ph;
+
+    if (IS_GDR(s)) {
+        const uint32_t recovery_poc_cnt     = ph->r->ph_recovery_poc_cnt;
+        const uint32_t max_recovery_poc_cnt = fps->sps->max_pic_order_cnt_lsb - 1;
+
+        const int64_t recovery_poc = (int64_t)ph->poc + recovery_poc_cnt;
+        if (recovery_poc < INT_MIN || recovery_poc > INT_MAX) {
+            av_log(s->avctx, AV_LOG_ERROR, "Recovery point POC out of range: %"PRId64".\n", recovery_poc);
+            return AVERROR_INVALIDDATA;
+        }
+
+        if (recovery_poc_cnt > max_recovery_poc_cnt) {
+            const int strict = s->avctx->strict_std_compliance >= FF_COMPLIANCE_STRICT;
+            av_log(s->avctx, strict ? AV_LOG_ERROR : AV_LOG_WARNING,
+                   "ph_recovery_poc_cnt out of range: %"PRIu32
+                   ", expected [0, %"PRIu32"].\n", recovery_poc_cnt, max_recovery_poc_cnt);
+            if (strict)
+                return AVERROR_INVALIDDATA;
+        }
+
+        if (s->no_output_before_recovery_flag)
+            s->gdr_recovery_point_poc = recovery_poc;
+    }
+
     if (s->no_output_before_recovery_flag) {
-        if (IS_GDR(s))
-            s->gdr_recovery_point_poc = ph->poc + ph->r->ph_recovery_poc_cnt;
         if (!GDR_IS_RECOVERED(s) && s->gdr_recovery_point_poc <= ph->poc)
             GDR_SET_RECOVERED(s);
     }
+
+    return 0;
 }
 
 int ff_vvc_decode_frame_ps(struct VVCFrameContext *fc, struct VVCContext *s)
@@ -1071,8 +1097,10 @@ int ff_vvc_decode_frame_ps(struct VVCFrameContext *fc, struct VVCContext *s)
         return ret;
 
     ret = decode_frame_ps(fps, ps, sc, s->poc_tid0, is_clvss, s);
-    decode_recovery_poc(s, &fps->ph);
-    return ret;
+    if (ret < 0)
+        return ret;
+
+    return decode_recovery_poc(s, fps);
 }
 
 void ff_vvc_frame_ps_free(VVCFrameParamSets *fps)

@@ -25,7 +25,6 @@
 * libavcodec/mpegaudio_parser.c
 * libavcodec/vc1.h
 * libavcodec/vc1dec.c
-* libavcodec/vp9.c
 * libavcodec/vvc/dec.c
 
 * libavutil/float_dsp.c

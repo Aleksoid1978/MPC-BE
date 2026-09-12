@@ -681,7 +681,7 @@ typedef struct  H266RawPictureHeader {
     uint8_t  ph_intra_slice_allowed_flag;
     uint8_t  ph_pic_parameter_set_id;
     uint16_t ph_pic_order_cnt_lsb;
-    uint8_t  ph_recovery_poc_cnt;
+    uint32_t ph_recovery_poc_cnt;
     uint8_t  ph_extra_bit[16];
     uint8_t  ph_poc_msb_cycle_present_flag;
     uint8_t  ph_poc_msb_cycle_val;

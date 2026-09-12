@@ -462,6 +462,7 @@ extern const FFCodec ff_dfpwm_encoder;
 extern const FFCodec ff_dfpwm_decoder;
 extern const FFCodec ff_dolby_e_decoder;
 extern const FFCodec ff_dsd_lsbf_decoder;
+extern const FFCodec ff_dsd_msbf_encoder;
 extern const FFCodec ff_dsd_msbf_decoder;
 extern const FFCodec ff_dsd_lsbf_planar_decoder;
 extern const FFCodec ff_dsd_msbf_planar_decoder;

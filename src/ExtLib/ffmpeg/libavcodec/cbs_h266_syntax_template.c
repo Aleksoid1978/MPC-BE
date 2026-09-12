@@ -2687,9 +2687,16 @@ static int FUNC(picture_header) (CodedBitstreamContext *ctx, RWContext *rw,
     }
 
     ub(sps->sps_log2_max_pic_order_cnt_lsb_minus4 + 4, ph_pic_order_cnt_lsb);
-    if (current->ph_gdr_pic_flag)
+    if (current->ph_gdr_pic_flag) {
+#ifdef READ
+        // H.266 7.4.3.8: ph_recovery_poc_cnt shall be in [0, MaxPicOrderCntLsb - 1].
+        // The range check is deferred to decode_recovery_poc().
+        ue(ph_recovery_poc_cnt, 0, UINT32_MAX - 1);
+#else
         ue(ph_recovery_poc_cnt, 0,
-           1 << (sps->sps_log2_max_pic_order_cnt_lsb_minus4 + 4));
+           (1 << (sps->sps_log2_max_pic_order_cnt_lsb_minus4 + 4)) - 1);
+#endif
+    }
 
     for (i = 0; i < sps->sps_num_extra_ph_bytes * 8; i++) {
         if (sps->sps_extra_ph_bit_present_flag[i])

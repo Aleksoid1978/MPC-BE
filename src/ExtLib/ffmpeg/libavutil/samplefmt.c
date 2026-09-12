@@ -46,6 +46,7 @@ static const SampleFmtInfo sample_fmt_info[AV_SAMPLE_FMT_NB] = {
     [AV_SAMPLE_FMT_S64P] = { .name = "s64p", .bits = 64, .planar = 1, .altform = AV_SAMPLE_FMT_S64  },
     [AV_SAMPLE_FMT_FLTP] = { .name = "fltp", .bits = 32, .planar = 1, .altform = AV_SAMPLE_FMT_FLT  },
     [AV_SAMPLE_FMT_DBLP] = { .name = "dblp", .bits = 64, .planar = 1, .altform = AV_SAMPLE_FMT_DBL  },
+    [AV_SAMPLE_FMT_DSD]  = { .name =  "dsd", .bits =  8, .planar = 0, .altform = AV_SAMPLE_FMT_DSD  },
 };
 
 const char *av_get_sample_fmt_name(enum AVSampleFormat sample_fmt)
@@ -250,9 +251,14 @@ int av_samples_set_silence(uint8_t * const *audio_data, int offset, int nb_sampl
     int planes      = planar ? nb_channels : 1;
     int block_align = av_get_bytes_per_sample(sample_fmt) * (planar ? 1 : nb_channels);
     int data_size   = nb_samples * block_align;
-    int fill_char   = (sample_fmt == AV_SAMPLE_FMT_U8 ||
-                     sample_fmt == AV_SAMPLE_FMT_U8P) ? 0x80 : 0x00;
-    int i;
+    int fill_char, i;
+
+    if (sample_fmt == AV_SAMPLE_FMT_U8 || sample_fmt == AV_SAMPLE_FMT_U8P)
+        fill_char = 0x80;
+    else if (sample_fmt == AV_SAMPLE_FMT_DSD)
+        fill_char = 0x69; // only ultrasonic tones, filtered out on playback
+    else
+        fill_char = 0x00;
 
     offset *= block_align;
 

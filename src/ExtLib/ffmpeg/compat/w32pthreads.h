@@ -53,7 +53,7 @@ typedef struct w32pthread_t {
     void *ret;
 } *pthread_t;
 
-/* use light weight mutex/condition variable API for Windows Vista and later */
+/* use light weight mutex/condition variable API */
 typedef SRWLOCK pthread_mutex_t;
 typedef CONDITION_VARIABLE pthread_cond_t;
 
