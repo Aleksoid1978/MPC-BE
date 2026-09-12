@@ -477,7 +477,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	else if (m_pAVCtx->sample_fmt == AV_SAMPLE_FMT_DSD) {
 		DLog(L"CFFAudioDecoder::Init : Enable DSD to PCM Float conversion");
 		m_bNeedMix           = true;
-		m_MixerSamplerate    = m_pAVCtx->sample_rate; // TODO: fix the sampling rate change
+		m_MixerSamplerate    = m_pAVCtx->sample_rate;
 		m_MixerChannels      = ch_layout.nb_channels;
 		m_MixerChannelLayout = ch_layout.u.mask;
 		m_Mixer.UpdateInput(SAMPLE_FMT_DSD, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
@@ -619,6 +619,7 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputS
 					BuffOut.resize(outputSize);
 				}
 				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, mixBuffer.data(), nSamples);
+				outputSize = static_cast<size_t>(out_samples) * m_MixerChannels * sizeof(float);
 				if (!out_samples) {
 					av_frame_unref(m_pFrame);
 					return E_INVALIDARG;
