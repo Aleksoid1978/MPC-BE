@@ -477,7 +477,7 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 	else if (m_pAVCtx->sample_fmt == AV_SAMPLE_FMT_DSD) {
 		DLog(L"CFFAudioDecoder::Init : Enable DSD to PCM Float conversion");
 		m_bNeedMix           = true;
-		m_MixerSamplerate    = m_pAVCtx->sample_rate;
+		m_MixerSamplerate    = 96000;
 		m_MixerChannels      = ch_layout.nb_channels;
 		m_MixerChannelLayout = ch_layout.u.mask;
 		m_Mixer.UpdateInput(SAMPLE_FMT_DSD, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
