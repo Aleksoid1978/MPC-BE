@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,8 +39,8 @@ sample_fmt_info[SAMPLE_FMT_NB] = {
     { 64,  true }, // SAMPLE_FMT_DBLP
     { 64, false }, // SAMPLE_FMT_S64
     { 64,  true }, // SAMPLE_FMT_S64P
+    {  8, false }, // SAMPLE_FMT_DSD
     { 24, false }, // SAMPLE_FMT_S24
-//  { 24,  true }  // SAMPLE_FMT_S24P
 };
 
 int get_bits_per_sample(const SampleFormat sample_fmt)

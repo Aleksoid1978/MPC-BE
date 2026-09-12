@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -36,8 +36,9 @@ enum SampleFormat {
     SAMPLE_FMT_S64,         ///< signed 64 bits
     SAMPLE_FMT_S64P,        ///< signed 64 bits, planar
 
+    SAMPLE_FMT_DSD,         ///< DSD (Direct Stream Digital) bitstream, interleaved.
+
     SAMPLE_FMT_S24,         ///< signed 24 bits
-  //SAMPLE_FMT_S24P,        ///< signed 24 bits, planar
 
     SAMPLE_FMT_NB           ///< Number of sample formats.
 };

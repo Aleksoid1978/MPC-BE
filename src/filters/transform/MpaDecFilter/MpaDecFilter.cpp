@@ -276,8 +276,8 @@ static const MPCSampleFormat SamplefmtToMPC[SAMPLE_FMT_NB] = {
 	SF_FLOAT, // <-- SAMPLE_FMT_DBLP
 	SF_PCM32, // <-- SAMPLE_FMT_S64
 	SF_PCM32, // <-- SAMPLE_FMT_S64P
+	SF_FLOAT, // <-- SAMPLE_FMT_DSD
 	SF_PCM24, // <-- SAMPLE_FMT_S24
-//  SF_PCM24  // <-- SAMPLE_FMT_S24P
 };
 
 static const SampleFormat MPCtoSamplefmt[sfcount] = {

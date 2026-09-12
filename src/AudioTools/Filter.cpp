@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -70,6 +70,7 @@ static AVSampleFormat MpcToAvSampleFormat(const SampleFormat sample_fmt)
 	case SAMPLE_FMT_S32: return AV_SAMPLE_FMT_S32;
 	case SAMPLE_FMT_FLT: return AV_SAMPLE_FMT_FLT;
 	case SAMPLE_FMT_DBL: return AV_SAMPLE_FMT_DBL;
+	case SAMPLE_FMT_DSD: // not supported
 	default:
 		ASSERT(FALSE);
 		return AV_SAMPLE_FMT_NONE;
