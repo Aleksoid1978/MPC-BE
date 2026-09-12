@@ -17068,7 +17068,7 @@ void CMainFrame::SeekTo(REFERENCE_TIME rtPos, bool bShowOSD/* = true*/)
 		CAppSettings& s = AfxGetAppSettings();
 		const bool bShowMilliSecs = s.bShowMilliSecs || m_wndSubresyncBar.IsWindowVisible();
 		m_wndStatusBar.SetStatusTimer(rtPos, stop, bShowMilliSecs, GetTimeFormat());
-		if (bShowOSD && stop > 0 && s.ShowOSD.SeekTime) {
+		if (bShowOSD && stop > 0 && s.ShowOSD.SeekTime && !s.bOSDRemainingTime) {
 			m_OSD.DisplayMessage(OSD_TOPLEFT, m_wndStatusBar.GetStatusTimer(), 1500);
 		}
 	}
