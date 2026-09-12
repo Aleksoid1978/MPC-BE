@@ -1,5 +1,5 @@
 /*
- * (C) 2021-2023 see Authors.txt
+ * (C) 2021-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,7 +57,7 @@ void CDitherInt16::UpdateInput(const SampleFormat sf, const int chanels)
 	}
 }
 
-void CDitherInt16::ProcessFloat(int16_t* pDst, float* pSrc, const int samples)
+void CDitherInt16::ProcessFloat(int16_t* pDst, const float* pSrc, const int samples)
 {
 	for (int frame = 0; frame < samples; frame++) {
 		for (int channel = 0; channel < m_chanels; channel++) {
@@ -74,7 +74,7 @@ void CDitherInt16::ProcessFloat(int16_t* pDst, float* pSrc, const int samples)
 	}
 }
 
-void CDitherInt16::Process(int16_t* pDst, BYTE* pSrc, const int samples)
+void CDitherInt16::Process(int16_t* pDst, const BYTE* pSrc, const int samples)
 {
 	switch (m_sf) {
 	case SAMPLE_FMT_FLT:

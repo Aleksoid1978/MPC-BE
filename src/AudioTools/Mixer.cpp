@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -324,7 +324,7 @@ void CMixer::UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samp
 	}
 }
 
-int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
+int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
 		DLog(L"CMixer::Mixing() : Init failed");
@@ -354,7 +354,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples)
 	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? in_ch : 1;
 	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : in_ch) * av_get_bytes_per_sample(m_in_avsf);
 
-	static BYTE* ppInput[64/*SWR_CH_MAX*/];
+	static const BYTE* ppInput[64/*SWR_CH_MAX*/];
 	for (int i = 0; i < in_plane_nb; i++) {
 		ppInput[i] = pInput + i * in_plane_size;
 	}

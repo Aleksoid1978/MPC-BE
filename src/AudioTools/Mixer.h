@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -61,7 +61,7 @@ public:
 	void UpdateInput (SampleFormat  in_sf, uint64_t in_layout, int  in_samplerate = 48000);
 	void UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samplerate = 48000);
 
-	int  Mixing(BYTE* pOutput, int out_samples, BYTE* pInput, int in_samples);
+	int  Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_samples);
 
 	int     Receive(BYTE* pOutput, int out_samples); // needed when using resampling
 	int64_t GetDelay();                              // needed when using resampling

@@ -1,5 +1,5 @@
 /*
- * (C) 2021 see Authors.txt
+ * (C) 2021-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -42,6 +42,6 @@ public:
 	CDitherInt16();
 	void UpdateInput(const SampleFormat sf, const int chanels);
 
-	void ProcessFloat(int16_t* pDst, float* pSrc, const int samples);
-	void Process(int16_t* pDst, BYTE* pSrc, const int samples);
+	void ProcessFloat(int16_t* pDst, const float* pSrc, const int samples);
+	void Process(int16_t* pDst, const BYTE* pSrc, const int samples);
 };
