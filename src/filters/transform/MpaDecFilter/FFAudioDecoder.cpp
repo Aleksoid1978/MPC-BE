@@ -466,11 +466,21 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pPacket->pts = 0;
 	}
 	else if (m_pAVCtx->ch_layout.nb_channels > 8 && m_pAVCtx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE && (m_pAVCtx->ch_layout.u.mask & 0xffffffff00000000)) {
+		DLog(L"CFFAudioDecoder::Init : Enable conversion of more than 8-channel audio with unsupported channel layouts to 7.1");
 		m_bNeedMix           = true;
 		m_MixerSamplerate    = m_pAVCtx->sample_rate;
 		m_MixerChannels      = 8;
 		m_MixerChannelLayout = GetDefChannelMask(8);
 		m_Mixer.UpdateInput((SampleFormat)m_pAVCtx->sample_fmt, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_MixerSamplerate);
+	}
+	else if (m_pAVCtx->sample_fmt == AV_SAMPLE_FMT_DSD) {
+		DLog(L"CFFAudioDecoder::Init : Enable DSD to PCM Float conversion");
+		m_bNeedMix           = true;
+		m_MixerSamplerate    = m_pAVCtx->sample_rate; // TODO: fix the sampling rate change
+		m_MixerChannels      = ch_layout.nb_channels;
+		m_MixerChannelLayout = ch_layout.u.mask;
+		m_Mixer.UpdateInput(SAMPLE_FMT_DSD, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_MixerSamplerate);
 	}
 
