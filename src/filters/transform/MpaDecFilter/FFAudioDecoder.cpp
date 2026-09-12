@@ -812,7 +812,7 @@ const char* CFFAudioDecoder::GetCodecName()
 
 SampleFormat CFFAudioDecoder::GetSampleFmt()
 {
-	return (SampleFormat)m_pAVCtx->sample_fmt;
+	return m_bNeedMix ? SAMPLE_FMT_FLT : (SampleFormat)m_pAVCtx->sample_fmt;
 }
 
 DWORD CFFAudioDecoder::GetSampleRate()
