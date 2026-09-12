@@ -466,11 +466,12 @@ bool CFFAudioDecoder::Init(enum AVCodecID codecID, CMediaType* mediaType)
 		m_pPacket->pts = 0;
 	}
 	else if (m_pAVCtx->ch_layout.nb_channels > 8 && m_pAVCtx->ch_layout.order == AV_CHANNEL_ORDER_NATIVE && (m_pAVCtx->ch_layout.u.mask & 0xffffffff00000000)) {
-		m_bNeedMix = true;
-		m_MixerChannels = 8;
+		m_bNeedMix           = true;
+		m_MixerSamplerate    = m_pAVCtx->sample_rate;
+		m_MixerChannels      = 8;
 		m_MixerChannelLayout = GetDefChannelMask(8);
 		m_Mixer.UpdateInput((SampleFormat)m_pAVCtx->sample_fmt, m_pAVCtx->ch_layout.u.mask, m_pAVCtx->sample_rate);
-		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_pAVCtx->sample_rate);
+		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, m_MixerChannelLayout, m_MixerSamplerate);
 	}
 
 	m_bNeedSyncpoint = (m_raData.deint_id != 0);
@@ -817,7 +818,7 @@ SampleFormat CFFAudioDecoder::GetSampleFmt()
 
 DWORD CFFAudioDecoder::GetSampleRate()
 {
-	return (DWORD)m_pAVCtx->sample_rate;
+	return m_bNeedMix ? (DWORD)m_MixerSamplerate : (DWORD)m_pAVCtx->sample_rate;
 }
 
 WORD CFFAudioDecoder::GetChannels()

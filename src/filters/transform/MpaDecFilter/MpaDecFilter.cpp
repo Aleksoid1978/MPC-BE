@@ -804,7 +804,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
 			REFERENCE_TIME rtStart = INVALID_TIME;
-			size_t decodedSize = {};
+			size_t decodedSize = 0;
 			while (S_OK == (hr = m_FFAudioDec.ReceiveData(m_FFAudioDecodedBuffer, decodedSize, samplefmt, rtStart))) {
 				if (decodedSize) {
 					hr = Deliver(m_FFAudioDecodedBuffer.data(), decodedSize, rtStart, samplefmt,
@@ -849,7 +849,7 @@ HRESULT CMpaDecFilter::ProcessFFmpeg(enum AVCodecID nCodecId, BOOL bEOF/* = FALS
 			SampleFormat samplefmt = SAMPLE_FMT_NONE;
 
 			REFERENCE_TIME rtStart = INVALID_TIME;
-			size_t decodedSize = {};
+			size_t decodedSize = 0;
 			while (S_OK == (hr = m_FFAudioDec.ReceiveData(m_FFAudioDecodedBuffer, decodedSize, samplefmt, rtStart))) {
 				if (decodedSize) {
 					hr = Deliver(m_FFAudioDecodedBuffer.data(), decodedSize, rtStart, samplefmt,

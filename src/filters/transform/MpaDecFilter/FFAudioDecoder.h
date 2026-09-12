@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2025 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,7 @@ private:
 	bool m_bNeedReinit    = false;
 
 	bool m_bNeedMix       = false;
+	int m_MixerSamplerate = 0;
 	int m_MixerChannels   = 0;
 	uint64_t m_MixerChannelLayout = 0;
 	CMixer m_Mixer;
