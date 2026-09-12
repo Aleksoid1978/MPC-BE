@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -159,7 +159,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	CMixer m_Mixer;
 	std::vector<float> m_encbuff;
 	CAC3Encoder m_AC3Enc;
-	HRESULT AC3Encode(BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask);
+	HRESULT AC3Encode(const BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask);
 
 	BOOL ProcessBitstream(enum AVCodecID nCodecId, HRESULT& hr, BOOL bEOF = FALSE);
 
@@ -184,7 +184,7 @@ class __declspec(uuid("3D446B6F-71DE-4437-BE15-8CE47174340F"))
 	HRESULT ProcessPCMfloatLE();
 
 	HRESULT GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData);
-	HRESULT Deliver(BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask = 0);
+	HRESULT Deliver(const BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask = 0);
 	HRESULT DeliverBitstream(BYTE* pBuff, const int size, const REFERENCE_TIME rtStartInput, const WORD type, const int sample_rate, const int samples);
 	HRESULT ReconnectOutput(int nSamples, CMediaType& mt);
 	CMediaType CreateMediaType(MPCSampleFormat sf, DWORD nSamplesPerSec, WORD nChannels, DWORD dwChannelMask = 0);

@@ -1616,7 +1616,7 @@ HRESULT CMpaDecFilter::GetDeliveryBuffer(IMediaSample** pSample, BYTE** pData)
 	return S_OK;
 }
 
-HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask/* = 0*/)
+HRESULT CMpaDecFilter::Deliver(const BYTE* pBuff, const size_t size, const REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, DWORD dwChannelMask/* = 0*/)
 {
 	if (m_bFlushing) {
 		return S_FALSE;
@@ -1661,8 +1661,6 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_T
 	MPCSampleFormat out_mpcsf = SelectOutputFormat(SamplefmtToMPC[sfmt]);
 	const SampleFormat out_sf = MPCtoSamplefmt[out_mpcsf];
 
-	BYTE*  pDataIn  = pBuff;
-
 	CMediaType mt = CreateMediaType(out_mpcsf, nSamplesPerSec, nChannels, dwChannelMask);
 	WAVEFORMATEX* wfe = (WAVEFORMATEX*)mt.Format();
 
@@ -1699,16 +1697,16 @@ HRESULT CMpaDecFilter::Deliver(BYTE* pBuff, const size_t size, const REFERENCE_T
 
 	switch (out_mpcsf) {
 		case SF_PCM16:
-			convert_to_int16(sfmt, nChannels, nSamples, pDataIn, (int16_t*)pDataOut);
+			convert_to_int16(sfmt, nChannels, nSamples, pBuff, (int16_t*)pDataOut);
 			break;
 		case SF_PCM24:
-			convert_to_int24(sfmt, nChannels, nSamples, pDataIn, pDataOut);
+			convert_to_int24(sfmt, nChannels, nSamples, pBuff, pDataOut);
 			break;
 		case SF_PCM32:
-			convert_to_int32(sfmt, nChannels, nSamples, pDataIn, (int32_t*)pDataOut);
+			convert_to_int32(sfmt, nChannels, nSamples, pBuff, (int32_t*)pDataOut);
 			break;
 		case SF_FLOAT:
-			convert_to_float(sfmt, nChannels, nSamples, pDataIn, (float*)pDataOut);
+			convert_to_float(sfmt, nChannels, nSamples, pBuff, (float*)pDataOut);
 			break;
 	}
 
@@ -1855,7 +1853,7 @@ HRESULT CMpaDecFilter::DeliverBitstream(BYTE* pBuff, const int size, const REFER
 	return m_pOutput->Deliver(pOut);
 }
 
-HRESULT CMpaDecFilter::AC3Encode(BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask)
+HRESULT CMpaDecFilter::AC3Encode(const BYTE* pBuff, const size_t size, REFERENCE_TIME rtStartInput, const SampleFormat sfmt, const DWORD nSamplesPerSec, const WORD nChannels, const DWORD dwChannelMask)
 {
 	DWORD new_layout     = m_AC3Enc.SelectLayout(dwChannelMask);
 	WORD  new_channels   = av_popcount(new_layout);
