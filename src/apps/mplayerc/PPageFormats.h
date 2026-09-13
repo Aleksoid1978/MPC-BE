@@ -38,8 +38,11 @@ class CPPageFormats : public CPPageBase
 
 private:
 	CImageList m_onoff;
+	bool m_onoffDark = false; // the dark-theme state the m_onoff checkbox glyphs were built for
 	bool m_bInsufficientPrivileges;
 	bool m_bFileExtChanged;
+
+	void BuildCheckImageList(); // (re)builds the checkbox glyph image list for the current theme
 
 	int GetChecked(int iItem);
 	void SetChecked(int iItem, int fChecked);
@@ -96,6 +99,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);
 	virtual BOOL OnInitDialog();
+	virtual BOOL OnSetActive();
 	virtual BOOL OnApply();
 
 	DECLARE_MESSAGE_MAP()

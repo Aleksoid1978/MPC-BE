@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageFileInfoClip.h"
+#include "controls/DarkTheme.h"
 #include <wmsdkidl.h>
 
 
@@ -231,6 +232,8 @@ BOOL CPPageFileInfoClip::OnInitDialog()
 	m_desc.SetWindowTextW(m_descText);
 
 	UpdateData(FALSE);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

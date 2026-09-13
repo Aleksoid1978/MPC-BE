@@ -143,7 +143,7 @@ int  WINAPI CoolSB_SetScrollPos	(HWND hwnd, int nBar, int nPos, BOOL fRedraw);
 int  WINAPI CoolSB_SetScrollRange	(HWND hwnd, int nBar, int nMinPos, int nMaxPos, BOOL fRedraw);
 BOOL WINAPI CoolSB_ShowScrollBar	(HWND hwnd, int wBar, BOOL fShow);
 
-ptr_themeRGB fThemeRGB;
+extern ptr_themeRGB fThemeRGB;
 
 //
 // Scrollbar dimension functions

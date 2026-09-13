@@ -20,6 +20,8 @@
 
 #include "stdafx.h"
 #include "EditWithButton.h"
+#include "DarkTheme.h"
+#include "../Misc.h" // ThemeRGB
 
 #define WM_EDITWITHBUTTON_RECALCNCSIZE (WM_USER + 200)
 
@@ -74,6 +76,31 @@ int CEditWithButton_Base::GetButtonThemeState() const
 void CEditWithButton_Base::DrawButton(CRect rectButton)
 {
 	CWindowDC dc(this);
+
+	// Dark theme: this NC-area button is fully owner-drawn (not a real BUTTON control), so the dark
+	// machinery never reaches it and OpenThemeData("Button") below would render a light system button
+	// on the dark page (seen editing a hotkey in Options > Keys, and the search/clear edits). Draw it
+	// dark instead — matching the owner-drawn dialog buttons — then let DrawButtonContent paint the
+	// caption light (its non-themed path uses the DC's text colour).
+	if (DarkTheme::IsActive()) {
+		const int st = GetButtonThemeState();
+		const bool disabled = (st == PBS_DISABLED);
+		const bool pressed  = (st == PBS_PRESSED);
+		const bool hot      = (st == PBS_HOT);
+		const COLORREF face = disabled ? ThemeRGB(38, 43, 48)
+							: pressed  ? ThemeRGB(36, 41, 46)
+							: hot      ? ThemeRGB(62, 69, 76)
+									   : ThemeRGB(50, 56, 62);
+		dc.FillSolidRect(rectButton, face);
+		CBrush brBorder(DarkTheme::CtrlBorderColor());
+		dc.FrameRect(rectButton, &brBorder);
+		if (pressed) {
+			rectButton.OffsetRect(1, 1); // "push" the caption slightly
+		}
+		dc.SetTextColor(disabled ? RGB(120, 125, 130) : DarkTheme::TextColor());
+		DrawButtonContent(dc, rectButton, nullptr);
+		return;
+	}
 
 	HTHEME hButtonTheme = OpenThemeData(m_hWnd, L"Button");
 

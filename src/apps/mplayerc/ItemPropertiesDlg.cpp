@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include <afxinet.h>
 #include "ItemPropertiesDlg.h"
+#include "controls/DarkTheme.h"
 
 // CItemPropertiesDlg
 
@@ -68,6 +69,8 @@ BOOL CItemPropertiesDlg::OnInitDialog()
 	GetWindowRect(r);
 	SetMinTrackSize(r.Size());
 	SetMaxTrackSize({ 1000, r.Height() });
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

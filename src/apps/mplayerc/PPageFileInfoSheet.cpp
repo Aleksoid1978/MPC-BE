@@ -24,6 +24,11 @@
 #include "PPageFileInfoSheet.h"
 #include "PPageFileMediaInfo.h"
 #include "FileDialogs.h"
+#include "controls/DarkTheme.h"
+
+// windowsx.h defines a function-like SubclassWindow(hwnd, lpfn) macro that collides with
+// CWnd::SubclassWindow(HWND); undef it so the MFC method call below parses correctly.
+#undef SubclassWindow
 
 IMPLEMENT_DYNAMIC(CMPCPropertySheet, CPropertySheet)
 CMPCPropertySheet::CMPCPropertySheet(LPCWSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
@@ -119,6 +124,16 @@ BOOL CPPageFileInfoSheet::OnInitDialog()
 	CenterWindow();
 
 	ModifyStyle(0, WS_MAXIMIZEBOX);
+
+	// Dark-theme the property-sheet frame + the two dynamically-created MediaInfo buttons, and attach
+	// the owner-drawn dark tab (the stock tab keeps a light body/frame; it falls back to native when
+	// the theme is off). Each page dark-themes itself in its own OnInitDialog.
+	if (DarkTheme::IsActive()) {
+		if (CTabCtrl* pTab = GetTabControl()) {
+			m_dark_tab.SubclassWindow(pTab->GetSafeHwnd());
+		}
+	}
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	for (int i = 0; i < GetPageCount(); i++) {
 		DWORD nID = GetResourceId(i);

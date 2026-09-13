@@ -26,6 +26,7 @@
 #include <Tlhelp32.h>
 #include "MainFrm.h"
 #include "Misc.h"
+#include "controls/DarkTheme.h"
 #include <winternl.h>
 #include "Ifo.h"
 #include "MultiMonitor.h"
@@ -921,6 +922,10 @@ BOOL CMPlayerCApp::InitInstance()
 	if (m_s.nCLSwitches & CLSW_ADMINOPTION) {
 		m_bRunAdmin = true;
 		m_s.LoadFormats(true);
+		// This elevated instance only loads the Formats settings, so bUseDarkTheme would stay at
+		// its default (dark) and the dialog would appear dark even when the user turned the dark
+		// theme off. Load the flag so the elevated Formats dialog matches the chosen theme.
+		AfxGetProfile().ReadBool(IDS_R_THEME, IDS_RS_USEDARKTHEME, m_s.bUseDarkTheme);
 
 		switch (m_s.iAdminOption) {
 			case CPPageFormats::IDD : {
@@ -1531,6 +1536,9 @@ void CMPlayerCApp::SetLanguage(int nLanguage, bool bSave/* = true*/)
 					s.iLanguage = nLanguage;
 				}
 			} else {
+				// Dark-theme this box (it fires during early startup, before the persistent message-box
+				// hook is installed in CMainFrame::OnCreate, so the RAII guard installs a scoped one).
+				DarkTheme::CDarkMessageBoxHook mbHook;
 				// This message should stay in English!
 				MessageBoxW(nullptr, L"Your language pack will not work with this version. Please download a compatible one from the MPC-BE homepage.",
 					L"MPC-BE", MB_OK);

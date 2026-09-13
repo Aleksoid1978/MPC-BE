@@ -110,6 +110,7 @@ public:
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnCloseup();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 };
 
 class CInPlaceListBox : public CListBox
@@ -168,7 +169,16 @@ public:
 
 	bool m_fInPlaceDirty = false;
 
+	// "Locked" keeps the control enabled (so the dark theme keeps painting it, instead of
+	// the ugly light native disabled rendering) while blocking all user interaction, so it
+	// behaves like a disabled list. Used by the dark Fullscreen page.
+	void SetLocked(bool bLocked) { m_bLocked = bLocked; }
+	bool IsLocked() const { return m_bLocked; }
+
 protected:
+	bool m_bLocked = false;
+
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual void PreSubclassWindow();
 	virtual INT_PTR OnToolHitTest(CPoint point, TOOLINFO* pTI) const;
 	virtual ULONG GetGestureStatus(CPoint) { return 0; };
@@ -192,6 +202,7 @@ public:
 	afx_msg void OnLbnSelChangeList1();
 	afx_msg BOOL OnHdnItemchanging(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg BOOL OnToolTipNotify(UINT id, NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 
 	int InsertColumn(_In_ int nCol, _In_z_ LPCWSTR lpszColumnHeading,
 		_In_ int nFormat = LVCFMT_LEFT, _In_ int nWidth = -1, _In_ int nSubItem = -1, _In_ int nMinWidth = 20);

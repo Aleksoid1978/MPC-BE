@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "AuthDlg.h"
+#include "controls/DarkTheme.h"
 
 // CAuthDlg dialog
 
@@ -81,6 +82,8 @@ BOOL CAuthDlg::OnInitDialog()
 	}
 
 	m_usernamectrl.SetFocus();
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

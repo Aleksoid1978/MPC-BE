@@ -27,10 +27,164 @@
 #include "PPageFormats.h"
 #include "SvgHelper.h"
 #include "WindowsUserChoice.h"
+#include "controls/DarkTheme.h"
+#include <uxtheme.h>
+#include <vssym32.h> // BP_CHECKBOX / CBS_*
+#pragma comment(lib, "uxtheme.lib")
 
 static constexpr auto previousRegistration = L"PreviousRegistration";
 static constexpr auto registeredAppName    = L"MPC-BE";
 static constexpr auto registeredKey        = L"Software\\Clients\\Media\\MPC-BE\\Capabilities";
+
+// Renders the native themed dark checkbox — the same celeste-accent glyph the rest of
+// the dark Options dialog uses (Internal Filters, Fullscreen) — into a 3-state image
+// list: index 0 = unchecked, 1 = checked, 2 = indeterminate.
+// The glyph is drawn directly over the opaque dark row background (exactly like the
+// Fullscreen page draws it with DrawThemeBackground). Going through buffered paint /
+// premultiplied alpha instead darkened the celeste and left the unchecked box white.
+// Because the app runs in force-dark mode, OpenThemeData(..., "BUTTON") resolves to the
+// dark (celeste) checkbox.
+static bool MakeThemedCheckImageList(CImageList& il, int h, HWND hRef, bool bDark)
+{
+	if (bDark) {
+		DarkTheme::AllowDarkModeForApp();     // force-dark app mode
+		DarkTheme::ApplyThemeToControl(hRef); // allow dark mode on the list *now* — this runs at
+		                                      // OnInitDialog time, before the page's OnSetActive
+		                                      // themes it, so OpenThemeData(hRef, "BUTTON") resolves
+		                                      // to the dark checkbox (celeste check), not the light one.
+	}
+	// In light mode the control keeps its default theme, so OpenThemeData resolves to the native
+	// light checkbox glyph — the same one the other checklists show when the dark theme is off.
+
+	HTHEME hTheme = ::OpenThemeData(hRef, L"BUTTON");
+	if (!hTheme) {
+		return false;
+	}
+
+	il.DeleteImageList();
+	if (!il.Create(h, h, ILC_COLOR32, 3, 0)) {
+		::CloseThemeData(hTheme);
+		return false;
+	}
+
+	// Buffered painting into a 32-bit top-down DIB keeps the glyph's per-pixel alpha, so
+	// the rounded corners stay transparent (a plain opaque draw left 4 white corner dots).
+	::BufferedPaintInit();
+
+	const int states[3] = { CBS_UNCHECKEDNORMAL, CBS_CHECKEDNORMAL, CBS_MIXEDNORMAL };
+	HDC hdcScreen = ::GetDC(nullptr);
+	HDC hdcMem    = ::CreateCompatibleDC(hdcScreen);
+	bool ok = true;
+
+	for (int i = 0; i < 3 && ok; ++i) {
+		BITMAPINFO bmi = {};
+		bmi.bmiHeader.biSize        = sizeof(BITMAPINFOHEADER);
+		bmi.bmiHeader.biWidth       = h;
+		bmi.bmiHeader.biHeight      = -h; // top-down
+		bmi.bmiHeader.biPlanes      = 1;
+		bmi.bmiHeader.biBitCount    = 32;
+		bmi.bmiHeader.biCompression = BI_RGB;
+
+		void* pBits = nullptr;
+		HBITMAP hDib = ::CreateDIBSection(hdcScreen, &bmi, DIB_RGB_COLORS, &pBits, nullptr, 0);
+		if (!hDib) {
+			ok = false;
+			break;
+		}
+		HBITMAP hOldBmp = (HBITMAP)::SelectObject(hdcMem, hDib);
+
+		RECT rcFull = { 0, 0, h, h };
+		BP_PAINTPARAMS pp = { sizeof(pp) };
+		pp.dwFlags = BPPF_ERASE;
+		HDC hdcPaint = nullptr;
+		HPAINTBUFFER hbp = ::BeginBufferedPaint(hdcMem, &rcFull, BPBF_TOPDOWNDIB, &pp, &hdcPaint);
+		if (hbp) {
+			SIZE gsz = { h, h };
+			::GetThemePartSize(hTheme, hdcPaint, BP_CHECKBOX, states[i], nullptr, TS_DRAW, &gsz);
+			// Clamp to the cell so the glyph is never clipped (its natural size can be a
+			// couple of pixels larger than the cell, which cut off part of the checkbox).
+			int sz = std::min(std::min((int)gsz.cx, (int)gsz.cy), h);
+			if (sz < 1) { sz = h; }
+			RECT rg;
+			rg.left   = (h - sz) / 2;
+			rg.top    = (h - sz) / 2;
+			rg.right  = rg.left + sz;
+			rg.bottom = rg.top  + sz;
+			::DrawThemeBackground(hTheme, hdcPaint, BP_CHECKBOX, states[i], &rg, nullptr);
+			::EndBufferedPaint(hbp, TRUE); // copy the premultiplied bits into hDib
+		} else {
+			ok = false;
+		}
+
+		::SelectObject(hdcMem, hOldBmp);
+		if (ok) {
+			il.Add(CBitmap::FromHandle(hDib), (CBitmap*)nullptr); // 32bpp: keeps per-pixel alpha
+		}
+		::DeleteObject(hDib);
+	}
+
+	::DeleteDC(hdcMem);
+	::ReleaseDC(nullptr, hdcScreen);
+	::BufferedPaintUnInit();
+	::CloseThemeData(hTheme);
+
+	if (ok && il.GetImageCount() == 3) {
+		return true;
+	}
+	il.DeleteImageList();
+	return false;
+}
+
+// Fallback (used only if the themed glyph above is unavailable): a hand-drawn dark box
+// with a celeste checkmark, matching the palette of the rest of the dark dialog.
+static void MakeDarkCheckImageList(CImageList& il, int h, HWND hRef)
+{
+	if (MakeThemedCheckImageList(il, h, hRef, true)) {
+		return;
+	}
+
+	const COLORREF mask   = RGB(255, 0, 255);   // transparent key colour
+	const COLORREF back   = DarkTheme::CtrlBackColor();
+	const COLORREF border = DarkTheme::CtrlBorderColor();
+	const COLORREF mark   = RGB(76, 194, 255);  // celeste, Win11 dark-mode accent glyph
+
+	CClientDC screen(nullptr);
+	CDC dc;
+	dc.CreateCompatibleDC(&screen);
+	CBitmap bmp;
+	bmp.CreateCompatibleBitmap(&screen, h * 3, h);
+	CBitmap* pOld = dc.SelectObject(&bmp);
+
+	dc.FillSolidRect(0, 0, h * 3, h, mask);
+
+	for (int i = 0; i < 3; ++i) {
+		CRect box(i * h, 0, i * h + h, h);
+		box.DeflateRect(1, 1);
+		dc.FillSolidRect(box, back);
+		dc.Draw3dRect(box, border, border);
+
+		if (i == 1) {
+			// checkmark
+			CPen pen(PS_SOLID, 2, mark);
+			CPen* pp = dc.SelectObject(&pen);
+			const int l = box.left, t = box.top, w = box.Width(), hh = box.Height();
+			dc.MoveTo(l + w * 3 / 10,  t + hh * 5 / 10);
+			dc.LineTo(l + w * 45 / 100, t + hh * 7 / 10);
+			dc.LineTo(l + w * 75 / 100, t + hh * 28 / 100);
+			dc.SelectObject(pp);
+		} else if (i == 2) {
+			// partial: a small filled square
+			CRect inner = box;
+			inner.DeflateRect(box.Width() / 4, box.Height() / 4);
+			dc.FillSolidRect(inner, mark);
+		}
+	}
+
+	dc.SelectObject(pOld);
+	il.DeleteImageList();
+	il.Create(h, h, ILC_COLOR24 | ILC_MASK, 3, 0);
+	il.Add(&bmp, mask);
+}
 
 // CPPageFormats dialog
 
@@ -78,22 +232,16 @@ void CPPageFormats::DoDataExchange(CDataExchange* pDX)
 
 int CPPageFormats::GetChecked(int iItem)
 {
-	LVITEM lvi;
-	lvi.iItem = iItem;
-	lvi.iSubItem = 0;
-	lvi.mask = LVIF_IMAGE;
-	m_list.GetItem(&lvi);
-	return(lvi.iImage);
+	// The check state lives in the item's state-image index (1-based). Using the state image
+	// instead of the small icon keeps the checkbox out of the row's selection highlight, like a
+	// native list-view checkbox (the small icon shares the item cell and gets the highlight).
+	const UINT st = m_list.GetItemState(iItem, LVIS_STATEIMAGEMASK);
+	return (int)(st >> 12) - 1; // 0 = none, 1 = all, 2 = partial
 }
 
 void CPPageFormats::SetChecked(int iItem, int iChecked)
 {
-	LVITEM lvi;
-	lvi.iItem = iItem;
-	lvi.iSubItem = 0;
-	lvi.mask = LVIF_IMAGE;
-	lvi.iImage = iChecked;
-	m_list.SetItem(&lvi);
+	m_list.SetItemState(iItem, INDEXTOSTATEIMAGEMASK(iChecked + 1), LVIS_STATEIMAGEMASK);
 }
 
 CString CPPageFormats::GetEnqueueCommand()
@@ -665,6 +813,56 @@ END_MESSAGE_MAP()
 
 // CPPageFormats message handlers
 
+void CPPageFormats::BuildCheckImageList()
+{
+	int chkH = 0;
+	if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
+		chkH = pDpi->ScaleY(12);
+	} else {
+		// this panel can be created without the main window.
+		CDPI dpi;
+		chkH = dpi.ScaleY(12);
+	}
+
+	m_onoff.DeleteImageList(); // rebuildable: re-run when the dark theme is toggled at runtime
+
+	if (DarkTheme::IsActive()) {
+		MakeDarkCheckImageList(m_onoff, chkH, m_list.GetSafeHwnd());
+	} else if (!MakeThemedCheckImageList(m_onoff, chkH, m_list.GetSafeHwnd(), false)) {
+		// Native (themed) light checkboxes matching the other checklists; fall back to upstream's
+		// SVG glyphs only if the visual style is unavailable.
+		CSvgImage svgImage;
+		if (svgImage.Load(IDF_SVG_ONOFF)) {
+			int w = 0;
+			int h = chkH;
+			if (HBITMAP hBitmap = svgImage.Rasterize(w, h)) {
+				if (w == h * 3) {
+					m_onoff.Create(h, h, ILC_COLOR32 | ILC_MASK, 3, 0);
+					ImageList_Add(m_onoff.GetSafeHandle(), hBitmap, nullptr);
+				}
+				DeleteObject(hBitmap);
+			}
+		}
+	}
+
+	m_list.SetImageList(&m_onoff, LVSIL_STATE);
+	m_onoffDark = DarkTheme::IsActive();
+}
+
+BOOL CPPageFormats::OnSetActive()
+{
+	const BOOL bRet = __super::OnSetActive();
+
+	// The checkbox glyphs are baked into an image list at init time; if the dark theme was
+	// toggled since then, rebuild them so unchecked boxes don't stay dark on a light dialog.
+	if (m_onoffDark != DarkTheme::IsActive()) {
+		BuildCheckImageList();
+		m_list.Invalidate();
+	}
+
+	return bRet;
+}
+
 BOOL CPPageFormats::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -677,27 +875,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 	m_list.InsertColumn(COL_CATEGORY, L"Category", LVCFMT_LEFT);
 
-	CSvgImage svgImage;
-	if (svgImage.Load(IDF_SVG_ONOFF)) {
-		int w = 0;
-		int h = 0;
-		if (CDPI* pDpi = dynamic_cast<CDPI*>(AfxGetMainWnd())) {
-			h = pDpi->ScaleY(12);
-		} else {
-			// this panel can be created without the main window.
-			CDPI dpi;
-			h = dpi.ScaleY(12);
-		}
-		if (HBITMAP hBitmap = svgImage.Rasterize(w, h)) {
-			if (w == h * 3) {
-				m_onoff.Create(h, h, ILC_COLOR32 | ILC_MASK, 3, 0);
-				ImageList_Add(m_onoff.GetSafeHandle(), hBitmap, nullptr);
-			}
-			DeleteObject(hBitmap);
-		}
-	}
-
-	m_list.SetImageList(&m_onoff, LVSIL_SMALL);
+	BuildCheckImageList();
 
 	CMediaFormats& mf = AfxGetAppSettings().m_Formats;
 	mf.UpdateData(false);
@@ -713,6 +891,15 @@ BOOL CPPageFormats::OnInitDialog()
 	}
 
 	m_list.SetColumnWidth(COL_CATEGORY, LVSCW_AUTOSIZE);
+	{
+		// Stretch the single column to at least the list width so the content (and the
+		// full-row selection highlight) fills the control instead of stopping mid-way.
+		CRect rcList;
+		m_list.GetClientRect(rcList);
+		if (m_list.GetColumnWidth(COL_CATEGORY) < rcList.Width()) {
+			m_list.SetColumnWidth(COL_CATEGORY, rcList.Width());
+		}
+	}
 
 	m_list.SetSelectionMark(0);
 	m_list.SetItemState(0, LVIS_SELECTED, LVIS_SELECTED);
@@ -752,6 +939,7 @@ BOOL CPPageFormats::OnInitDialog()
 
 		GetDlgItem(IDC_BUTTON5)->ShowWindow(SW_SHOW);
 		GetDlgItem(IDC_BUTTON5)->SendMessageW(BCM_SETSHIELD, 0, 1);
+		DarkTheme::MarkUacShield(GetDlgItem(IDC_BUTTON5)->GetSafeHwnd());
 
 		m_bInsufficientPrivileges = true;
 	} else {
@@ -1067,9 +1255,10 @@ void CPPageFormats::OnNMClickList1(NMHDR* pNMHDR, LRESULT* pResult)
 	LPNMLISTVIEW lpnmlv = (LPNMLISTVIEW)pNMHDR;
 
 	if (lpnmlv->iItem >= 0 && lpnmlv->iSubItem == COL_CATEGORY) {
-		CRect r;
-		m_list.GetItemRect(lpnmlv->iItem, r, LVIR_ICON);
-		if (r.PtInRect(lpnmlv->ptAction)) {
+		LVHITTESTINFO hti = {};
+		hti.pt = lpnmlv->ptAction;
+		m_list.HitTest(&hti);
+		if (hti.flags & LVHT_ONITEMSTATEICON) {
 			if (m_bInsufficientPrivileges) {
 				MessageBoxW(ResStr (IDS_CANNOT_CHANGE_FORMAT));
 			} else {

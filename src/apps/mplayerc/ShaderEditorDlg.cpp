@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "ShaderNewDlg.h"
 #include "ShaderEditorDlg.h"
+#include "controls/DarkTheme.h"
 
 // CShaderEdit
 
@@ -220,6 +221,14 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 	m_cbProfile.AddString(L"ps_4_0");
 
 	m_bD3D11 = (AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && IsWindows8OrGreater());
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
+	if (DarkTheme::IsActive()) {
+		// The source editor's line-number margin is a self-drawn CStatic that paints its own light
+		// background (RGB(200,200,200)); recolour it so the left gutter isn't a bright strip.
+		m_edSrcdata.SetMarginBackgroundColor(DarkTheme::FaceColor(), TRUE);
+		m_edSrcdata.SetMarginForegroundColor(RGB(120, 125, 130), TRUE);
+	}
 
 	return TRUE;
 }

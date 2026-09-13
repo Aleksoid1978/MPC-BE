@@ -25,6 +25,7 @@
 #include "OpenDlg.h"
 #include "FileDialogs.h"
 #include "MainFrm.h"
+#include "controls/DarkTheme.h"
 
 //
 // COpenDlg dialog
@@ -141,6 +142,8 @@ BOOL COpenDlg::OnInitDialog()
 		CStatic *pStat = (CStatic*)GetDlgItem(IDC_MAINFRAME_ICON);
 		pStat->SetIcon(m_hIcon);
 	}
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

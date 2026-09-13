@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "PlaylistNameDlg.h"
+#include "controls/DarkTheme.h"
 
 IMPLEMENT_DYNAMIC(CPlaylistNameDlg, CCmdUIDialog)
 CPlaylistNameDlg::CPlaylistNameDlg(const CString& str, CWnd* pParent/* = nullptr*/)
@@ -44,6 +45,8 @@ BOOL CPlaylistNameDlg::OnInitDialog()
 	m_namectrl.SetFocus();
 	m_namectrl.SetWindowText(m_name);
 	m_namectrl.SetSel(0, -1);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return FALSE;
 }

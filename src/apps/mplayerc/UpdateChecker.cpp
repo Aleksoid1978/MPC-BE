@@ -25,6 +25,7 @@
 #include "DSUtil/HTTPAsync.h"
 #include "rapidjsonHelper.h"
 #include "UpdateChecker.h"
+#include "controls/DarkTheme.h"
 
 #include "Version.h"
 
@@ -128,6 +129,7 @@ UINT UpdateChecker::RunCheckForUpdateThread(LPVOID pParam)
 			ASSERT(0);
 		}
 
+		DarkTheme::CDarkMessageBoxHook mbHook; // dark-theme the result message box when the theme is on
 		if (updateStatus == UPDATER_NEW_VERSION_IS_AVAILABLE) {
 			if (IDYES == AfxMessageBox(text, nType)) {
 				ShellExecuteW(nullptr, L"open", m_UpdateURL, nullptr, nullptr, SW_SHOWDEFAULT);

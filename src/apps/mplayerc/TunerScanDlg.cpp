@@ -22,6 +22,7 @@
 #include "MainFrm.h"
 #include "TunerScanDlg.h"
 #include "DVBChannel.h"
+#include "controls/DarkTheme.h"
 
 enum TSC_COLUMN {
 	TSCC_NUMBER,
@@ -68,6 +69,8 @@ BOOL CTunerScanDlg::OnInitDialog()
 	m_Strength.SetRange(0, 100);
 	m_Quality.SetRange(0, 100);
 	m_btnSave.EnableWindow(FALSE);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

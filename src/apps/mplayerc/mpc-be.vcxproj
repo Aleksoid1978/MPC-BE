@@ -98,6 +98,9 @@
     <ClCompile Include="Content.cpp" />
     <ClCompile Include="controls\ColorEdit.cpp" />
     <ClCompile Include="controls\EditWithButton.cpp" />
+    <ClCompile Include="controls\DarkCheckListBox.cpp" />
+    <ClCompile Include="controls\DarkTabCtrl.cpp" />
+    <ClCompile Include="controls\DarkTheme.cpp" />
     <ClCompile Include="controls\FloatEdit.cpp" />
     <ClCompile Include="controls\LineNumberEdit.cpp" />
     <ClCompile Include="controls\MenuEx.cpp" />
@@ -231,6 +234,9 @@
     <ClInclude Include="Content.h" />
     <ClInclude Include="controls\ColorEdit.h" />
     <ClInclude Include="controls\EditWithButton.h" />
+    <ClInclude Include="controls\DarkCheckListBox.h" />
+    <ClInclude Include="controls\DarkTabCtrl.h" />
+    <ClInclude Include="controls\DarkTheme.h" />
     <ClInclude Include="controls\FloatEdit.h" />
     <ClInclude Include="controls\LineNumberEdit.h" />
     <ClInclude Include="controls\MenuEx.h" />

@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PnSPresetsDlg.h"
+#include "controls/DarkTheme.h"
 
 
 // CPnSPresetsDlg dialog
@@ -63,6 +64,8 @@ BOOL CPnSPresetsDlg::OnInitDialog()
 			OnLbnSelchangeList1();
 		}
 	}
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

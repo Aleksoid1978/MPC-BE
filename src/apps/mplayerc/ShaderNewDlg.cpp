@@ -20,6 +20,7 @@
 
 #include "stdafx.h"
 #include "ShaderNewDlg.h"
+#include "controls/DarkTheme.h"
 
 // CShaderNewDlg dialog
 
@@ -45,6 +46,8 @@ BOOL CShaderNewDlg::OnInitDialog()
 	__super::OnInitDialog();
 
 	UpdateData(FALSE);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

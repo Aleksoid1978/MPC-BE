@@ -52,6 +52,7 @@ private:
 	CString m_strFullScreenMonitorID;
 
 	CPlayerListCtrl m_list;
+	int m_listLocked = -1; // -1 = unset, 0/1 = current locked state
 	enum {
 		COL_Z,
 		COL_VFR_F,
@@ -75,6 +76,7 @@ private:
 	void ReindexList();
 	void GetCurDispModeString(CString& strMode);
 	void ModesUpdate();
+	void UpdateListLockState();
 public:
 	CPPageFullscreen();
 	~CPPageFullscreen() = default;
@@ -90,6 +92,7 @@ protected:
 
 public:
 	afx_msg void OnUpdateFullscreenRes(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateFullscreenList(CCmdUI* pCmdUI);
 	afx_msg void OnBeginlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnDolabeleditList(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnEndlabeleditList(NMHDR* pNMHDR, LRESULT* pResult);

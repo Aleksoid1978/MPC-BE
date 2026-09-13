@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "ShaderCombineDlg.h"
+#include "controls/DarkTheme.h"
 
 // CShaderCombineDlg dialog
 
@@ -102,6 +103,8 @@ BOOL CShaderCombineDlg::OnInitDialog()
 	OnSelChangeDXNum();
 
 	UpdateData(FALSE);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }
