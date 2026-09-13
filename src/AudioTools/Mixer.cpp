@@ -32,20 +32,7 @@ extern "C" {
 #pragma warning(pop)
 
 CMixer::CMixer()
-	: m_pSWRCxt(nullptr)
-	, m_matrix_dbl(nullptr)
-	, m_center_level(1.0)
-	, m_surround_level(1.0)
-	, m_normalize_matrix(false)
-	, m_dummy_channels(false)
-	, m_ActualContext(false)
-	, m_in_sf(SAMPLE_FMT_NONE)
-	, m_out_sf(SAMPLE_FMT_NONE)
-	, m_in_layout(0)
-	, m_out_layout(0)
-	, m_in_samplerate(0)
-	, m_out_samplerate(0)
-	, m_in_avsf(AV_SAMPLE_FMT_NONE)
+	: m_in_avsf(AV_SAMPLE_FMT_NONE)
 	, m_out_avsf(AV_SAMPLE_FMT_NONE)
 {
 	// Allocate SWR Context
@@ -75,10 +62,8 @@ bool CMixer::Init()
 	av_freep(&m_matrix_dbl);
 	int ret = 0;
 
-	const int in_ch = av_popcount64(m_in_layout);
-	const int out_ch = av_popcount(m_out_layout);
-	const AVChannelLayout in_ch_layout = { AV_CHANNEL_ORDER_NATIVE, in_ch, m_in_layout };
-	const AVChannelLayout out_ch_layout = { AV_CHANNEL_ORDER_NATIVE, out_ch, m_out_layout };
+	const AVChannelLayout in_ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_in_channels, m_in_layout };
+	const AVChannelLayout out_ch_layout = { AV_CHANNEL_ORDER_NATIVE, m_out_channels, m_out_layout };
 
 	// Close SWR Context
 	swr_close(m_pSWRCxt);
@@ -95,17 +80,17 @@ bool CMixer::Init()
 	//av_opt_set_int(m_pSWRCxt,      "precision",       28,               0); // SOXR_VHQ
 
 	// Create Matrix
-	m_matrix_dbl = (double*)av_mallocz(in_ch * out_ch * sizeof(*m_matrix_dbl));
+	m_matrix_dbl = (double*)av_mallocz(m_in_channels * m_out_channels * sizeof(*m_matrix_dbl));
 
 	// special mode that adds empty channels to existing channels
 	if (m_dummy_channels && (m_out_layout & m_in_layout) == m_in_layout) {
 		int olayout = m_out_layout;
-		for (int j = 0; j < out_ch; j++) {
+		for (int j = 0; j < m_out_channels; j++) {
 			const int och = olayout & (-olayout);
 			int ilayout = m_in_layout;
-			for (int i = 0; i < in_ch; i++) {
+			for (int i = 0; i < m_in_channels; i++) {
 				const int ich = ilayout & (-ilayout);
-				m_matrix_dbl[j * in_ch + i] = (ich == och) ? 1.0 : 0.0;
+				m_matrix_dbl[j * m_in_channels + i] = (ich == och) ? 1.0 : 0.0;
 				ilayout &= ~ich;
 			}
 			olayout &= ~och;
@@ -116,12 +101,12 @@ bool CMixer::Init()
 		int i = 0;
 		m_matrix_dbl[i++] = 1.0;
 		m_matrix_dbl[i++] = 1.0;
-		while (i < out_ch) {
+		while (i < m_out_channels) {
 			m_matrix_dbl[i++] = 0.0;
 		}
 	}
 	// expand stereo
-	else if (m_in_layout == AV_CH_LAYOUT_STEREO && out_ch >= 4
+	else if (m_in_layout == AV_CH_LAYOUT_STEREO && m_out_channels >= 4
 			&& (m_out_layout & ~(AV_CH_FRONT_LEFT|AV_CH_FRONT_RIGHT|AV_CH_FRONT_CENTER|AV_CH_LOW_FREQUENCY|AV_CH_BACK_LEFT|AV_CH_BACK_RIGHT|AV_CH_SIDE_LEFT|AV_CH_SIDE_RIGHT)) == 0) {
 		int i = 0;
 		if (m_out_layout & (AV_CH_FRONT_LEFT | AV_CH_FRONT_RIGHT)) {
@@ -153,31 +138,31 @@ bool CMixer::Init()
 	}
 	// no mixing
 	else if (m_in_layout == m_out_layout) {
-		for (int j = 0; j < out_ch; j++) {
-			for (int i = 0; i < in_ch; i++) {
-				m_matrix_dbl[j * in_ch + i] = (i == j) ? 1.0 : 0.0;
+		for (int j = 0; j < m_out_channels; j++) {
+			for (int i = 0; i < m_in_channels; i++) {
+				m_matrix_dbl[j * m_in_channels + i] = (i == j) ? 1.0 : 0.0;
 			}
 		}
 
 		if (m_in_layout&AV_CH_FRONT_CENTER && m_center_level != 1.0) {
-			m_matrix_dbl[BitNum(m_in_layout, AV_CH_FRONT_CENTER) * (in_ch + 1)] *= m_center_level;
+			m_matrix_dbl[BitNum(m_in_layout, AV_CH_FRONT_CENTER) * (m_in_channels + 1)] *= m_center_level;
 		}
 
 		if (m_surround_level != 1.0) {
 			if (m_in_layout&AV_CH_BACK_LEFT) {
-				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_LEFT) * (in_ch + 1)] *= m_surround_level;
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_LEFT) * (m_in_channels + 1)] *= m_surround_level;
 			}
 			if (m_in_layout&AV_CH_BACK_RIGHT) {
-				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_RIGHT) * (in_ch + 1)] *= m_surround_level;
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_RIGHT) * (m_in_channels + 1)] *= m_surround_level;
 			}
 			if (m_in_layout&AV_CH_BACK_CENTER) {
-				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_CENTER) * (in_ch + 1)] *= m_surround_level;
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_BACK_CENTER) * (m_in_channels + 1)] *= m_surround_level;
 			}
 			if (m_in_layout&AV_CH_SIDE_LEFT) {
-				m_matrix_dbl[BitNum(m_out_layout, AV_CH_SIDE_LEFT) * (in_ch + 1)] *= m_surround_level;
+				m_matrix_dbl[BitNum(m_out_layout, AV_CH_SIDE_LEFT) * (m_in_channels + 1)] *= m_surround_level;
 			}
 			if (m_in_layout&AV_CH_SIDE_RIGHT) {
-				m_matrix_dbl[BitNum(m_in_layout, AV_CH_SIDE_RIGHT) * (in_ch + 1)] *= m_surround_level;
+				m_matrix_dbl[BitNum(m_in_layout, AV_CH_SIDE_RIGHT) * (m_in_channels + 1)] *= m_surround_level;
 			}
 		}
 	}
@@ -192,7 +177,7 @@ bool CMixer::Init()
 			&in_ch_layout, &out_ch_layout,
 			center_mix_level, surround_mix_level, lfe_mix_level,
 			rematrix_maxval, rematrix_volume,
-			m_matrix_dbl, in_ch,
+			m_matrix_dbl, m_in_channels,
 			AV_MATRIX_ENCODING_NONE, nullptr);
 		if (ret < 0) {
 			DLog(L"CMixer::Init() : swr_build_matrix2 failed");
@@ -204,28 +189,28 @@ bool CMixer::Init()
 			// if back channels do not have sound, then divide side channels for the back and side
 			if ((m_in_layout & (AV_CH_BACK_LEFT | AV_CH_BACK_RIGHT)) == 0) {
 				bool back_no_sound = true;
-				for (int i = 0; i < in_ch * 2; i++) {
-					if (m_matrix_dbl[4 * in_ch + i] != 0.0) {
+				for (int i = 0; i < m_in_channels * 2; i++) {
+					if (m_matrix_dbl[4 * m_in_channels + i] != 0.0) {
 						back_no_sound = false;
 					}
 				}
 				if (back_no_sound) {
-					for (int i = 0; i < in_ch * 2; i++) {
-						m_matrix_dbl[4 * in_ch + i] = (m_matrix_dbl[6 * in_ch + i] *= M_SQRT1_2);
+					for (int i = 0; i < m_in_channels * 2; i++) {
+						m_matrix_dbl[4 * m_in_channels + i] = (m_matrix_dbl[6 * m_in_channels + i] *= M_SQRT1_2);
 					}
 				}
 			}
 			// if side channels do not have sound, then divide back channels for the back and side
 			else if ((m_in_layout & (AV_CH_SIDE_LEFT | AV_CH_SIDE_RIGHT)) == 0) {
 				bool size_no_sound = true;
-				for (int i = 0; i < in_ch * 2; i++) {
-					if (m_matrix_dbl[6 * in_ch + i] != 0.0) {
+				for (int i = 0; i < m_in_channels * 2; i++) {
+					if (m_matrix_dbl[6 * m_in_channels + i] != 0.0) {
 						size_no_sound = false;
 					}
 				}
 				if (size_no_sound) {
-					for (int i = 0; i < in_ch * 2; i++) {
-						m_matrix_dbl[6 * in_ch + i] = (m_matrix_dbl[4 * in_ch + i] *= M_SQRT1_2);
+					for (int i = 0; i < m_in_channels * 2; i++) {
+						m_matrix_dbl[6 * m_in_channels + i] = (m_matrix_dbl[4 * m_in_channels + i] *= M_SQRT1_2);
 					}
 				}
 			}
@@ -235,10 +220,10 @@ bool CMixer::Init()
 	if (m_normalize_matrix) {
 		double peekmax = 0.0;
 
-		for (int j = 0; j < out_ch; j++) {
+		for (int j = 0; j < m_out_channels; j++) {
 			double peek = 0.0;
-			for (int i = 0; i < in_ch; i++) {
-				peek += m_matrix_dbl[j * in_ch + i];
+			for (int i = 0; i < m_in_channels; i++) {
+				peek += m_matrix_dbl[j * m_in_channels + i];
 			}
 			if (peek > peekmax) {
 				peekmax = peek;
@@ -246,9 +231,9 @@ bool CMixer::Init()
 		}
 
 		if (fabs(peekmax - 1.0) > 0.0001) {
-			for (int j = 0; j < out_ch; j++) {
-				for (int i = 0; i < in_ch; i++) {
-					m_matrix_dbl[j * in_ch + i] /= peekmax;
+			for (int j = 0; j < m_out_channels; j++) {
+				for (int i = 0; i < m_in_channels; i++) {
+					m_matrix_dbl[j * m_in_channels + i] /= peekmax;
 				}
 			}
 		}
@@ -257,10 +242,10 @@ bool CMixer::Init()
 #ifdef DEBUG_OR_LOG
 	CStringW matrix_str = L"CMixer::Init() : matrix";
 	double k = 0.0;
-	for (int j = 0; j < out_ch; j++) {
+	for (int j = 0; j < m_out_channels; j++) {
 		matrix_str.AppendFormat(L"\n    %d:", j + 1);
-		for (int i = 0; i < in_ch; i++) {
-			k = m_matrix_dbl[j * in_ch + i];
+		for (int i = 0; i < m_in_channels; i++) {
+			k = m_matrix_dbl[j * m_in_channels + i];
 			matrix_str.AppendFormat(L" %.4f", k);
 		}
 	}
@@ -268,7 +253,7 @@ bool CMixer::Init()
 #endif
 
 	// Set Matrix on the context
-	ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, in_ch);
+	ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, m_in_channels);
 	if (ret < 0) {
 		DLog(L"CMixer::Init() : swr_set_matrix failed");
 		av_freep(&m_matrix_dbl);
@@ -308,6 +293,7 @@ void CMixer::UpdateInput(SampleFormat in_sf, uint64_t in_layout, int in_samplera
 {
 	if (in_sf != m_in_sf || in_layout != m_in_layout || in_samplerate != m_in_samplerate) {
 		m_in_layout     = in_layout;
+		m_in_channels   = av_popcount64(m_in_layout);
 		m_in_sf         = in_sf;
 		m_in_samplerate = in_samplerate;
 		m_ActualContext = false;
@@ -318,6 +304,7 @@ void CMixer::UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samp
 {
 	if (out_sf != m_out_sf || out_layout != m_out_layout || out_samplerate != m_out_samplerate) {
 		m_out_layout     = out_layout;
+		m_out_channels   = av_popcount(m_out_layout);
 		m_out_sf         = out_sf;
 		m_out_samplerate = out_samplerate;
 		m_ActualContext  = false;
@@ -331,12 +318,9 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_sa
 		return 0;
 	}
 
-	const int in_ch  = av_popcount64(m_in_layout);
-	const int out_ch = av_popcount(m_out_layout);
-
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
-		size_t allsamples = in_samples * in_ch;
+		size_t allsamples = in_samples * m_in_channels;
 		m_Buffer1.ExtendSize(allsamples);
 		convert_int24_to_int32(m_Buffer1.Data(), pInput, allsamples);
 		pInput = (BYTE*)m_Buffer1.Data();
@@ -345,14 +329,14 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_sa
 	BYTE* output;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
-		m_Buffer2.ExtendSize(out_samples * out_ch);
+		m_Buffer2.ExtendSize(out_samples * m_out_channels);
 		output = (BYTE*)m_Buffer2.Data();
 	} else {
 		output = pOutput;
 	}
 
-	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? in_ch : 1;
-	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : in_ch) * av_get_bytes_per_sample(m_in_avsf);
+	int in_plane_nb   = av_sample_fmt_is_planar(m_in_avsf) ? m_in_channels : 1;
+	int in_plane_size = in_samples * (av_sample_fmt_is_planar(m_in_avsf) ? 1 : m_in_channels) * av_get_bytes_per_sample(m_in_avsf);
 
 	static const BYTE* ppInput[64/*SWR_CH_MAX*/];
 	for (int i = 0; i < in_plane_nb; i++) {
@@ -366,7 +350,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_sa
 	}
 
 	if (output == (BYTE*)m_Buffer2.Data()) {
-		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * out_ch);
+		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * m_out_channels);
 	}
 
 	return out_samples;
@@ -379,12 +363,10 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 		return 0;
 	}
 
-	const int out_ch = av_popcount(m_out_layout);
-
 	BYTE* output;
 	if (m_out_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_out_avsf == AV_SAMPLE_FMT_S32);
-		m_Buffer2.ExtendSize(out_samples * out_ch);
+		m_Buffer2.ExtendSize(out_samples * m_out_channels);
 		output = (BYTE*)m_Buffer2.Data();
 	} else {
 		output = pOutput;
@@ -397,7 +379,7 @@ int CMixer::Receive(BYTE* pOutput, int out_samples)
 	}
 
 	if (output == (BYTE*)m_Buffer2.Data()) {
-		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * out_ch);
+		convert_int32_to_int24(pOutput, m_Buffer2.Data(), out_samples * m_out_channels);
 	}
 
 	return out_samples;
@@ -429,7 +411,7 @@ void CMixer::FlushBuffers()
 		swr_close(m_pSWRCxt);
 
 		// Set Matrix on the context
-		int ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, av_popcount(m_in_layout));
+		int ret = swr_set_matrix(m_pSWRCxt, m_matrix_dbl, m_in_channels);
 		if (ret < 0) {
 			DLog(L"CMixer::FlushBuffers() : swr_set_matrix failed");
 			return;
