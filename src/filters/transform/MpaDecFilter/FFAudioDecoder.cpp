@@ -589,40 +589,40 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputS
 
 		const size_t nSamples = m_pFrame->nb_samples;
 		if (nSamples) {
-			const WORD nChannels = m_pAVCtx->ch_layout.nb_channels;
-			samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
-			const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
-
-			static std::vector<BYTE> mixBuffer;
-			auto& bufferOutput = m_bNeedMix ? mixBuffer : BuffOut;
-
-			outputSize = monosize * nChannels;
-			if (outputSize > bufferOutput.size()) {
-				bufferOutput.resize(outputSize);
-			}
-
-			if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
-				BYTE* pOut = bufferOutput.data();
-				for (int ch = 0; ch < nChannels; ++ch) {
-					memcpy(pOut, m_pFrame->extended_data[ch], monosize);
-					pOut += monosize;
-				}
-			} else {
-				memcpy(bufferOutput.data(), m_pFrame->data[0], outputSize);
-			}
-
 			if (m_bNeedMix) {
 				samplefmt = SAMPLE_FMT_FLT;
+
 				auto out_samples = m_Mixer.CalcOutSamples(nSamples);
 				outputSize = static_cast<size_t>(out_samples) * m_MixerChannels * sizeof(float);
 				if (outputSize > BuffOut.size()) {
 					BuffOut.resize(outputSize);
 				}
-				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, mixBuffer.data(), nSamples);
+				out_samples = m_Mixer.Mixing(BuffOut.data(), out_samples, (const BYTE**)m_pFrame->extended_data, nSamples);
 				outputSize = static_cast<size_t>(out_samples) * m_MixerChannels * sizeof(float);
 				if (!out_samples) {
 					av_frame_unref(m_pFrame);
 					return E_INVALIDARG;
+				}
+			}
+			else {
+				samplefmt = (SampleFormat)m_pAVCtx->sample_fmt;
+
+				const WORD nChannels = m_pAVCtx->ch_layout.nb_channels;
+				const size_t monosize = nSamples * av_get_bytes_per_sample(m_pAVCtx->sample_fmt);
+
+				outputSize = monosize * nChannels;
+				if (outputSize > BuffOut.size()) {
+					BuffOut.resize(outputSize);
+				}
+
+				if (av_sample_fmt_is_planar(m_pAVCtx->sample_fmt)) {
+					BYTE* pOut = BuffOut.data();
+					for (int ch = 0; ch < nChannels; ++ch) {
+						memcpy(pOut, m_pFrame->extended_data[ch], monosize);
+						pOut += monosize;
+					}
+				} else {
+					memcpy(BuffOut.data(), m_pFrame->data[0], outputSize);
 				}
 			}
 		}
