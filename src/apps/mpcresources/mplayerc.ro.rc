@@ -3888,9 +3888,9 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MOUSE_CLICK_MIDDLE  "Clic din mijloc"
-    IDS_MOUSE_CLICK_X1      "Clic pe butonul lateral 1 (Clic X1)"
-    IDS_MOUSE_CLICK_X2      "Clic pe butonul lateral 2 (Clic X2)"
+    IDS_MOUSE_CLICK_MIDDLE  "Clic pe butonul din mijloc"
+    IDS_MOUSE_CLICK_X1      "Clic pe butonul lateral 1 (Clic pe X1)"
+    IDS_MOUSE_CLICK_X2      "Clic pe butonul lateral 2 (Clic pe X2)"
     IDS_MOUSE_WHEEL_UP      "Rotița în sus"
     IDS_MOUSE_WHEEL_DOWN    "Rotița în jos"
     IDS_MOUSE_WHEEL_LEFT    "Rotița în stânga"
