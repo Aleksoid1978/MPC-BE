@@ -323,7 +323,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE** ppInput, const i
 		return 0;
 	}
 
-	static const BYTE* buffers[64/*SWR_CH_MAX*/] = {};
+	const BYTE* buffers[64/*SWR_CH_MAX*/] = {};
 
 	if (m_in_sf == SAMPLE_FMT_S24) {
 		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
