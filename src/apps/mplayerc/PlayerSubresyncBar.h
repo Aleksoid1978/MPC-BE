@@ -126,6 +126,11 @@ public:
 	bool ShiftSubtitle(int nItem, long lValue, REFERENCE_TIME& rtPos);
 	bool SaveToDisk();
 
+	// Re-applies or strips the dark theme on the list to match the current "Use dark theme" state.
+	// The list is themed once in Create; without this it stays dark (dark header/border/background,
+	// light rows) after the theme is toggled off. Called from the Interface page's toggle handler.
+	void RefreshListDarkTheme();
+
 
 protected:
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);

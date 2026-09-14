@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "GoToDlg.h"
+#include "controls/DarkTheme.h"
 
 // CGoToDlg dialog
 
@@ -100,6 +101,8 @@ BOOL CGoToDlg::OnInitDialog()
 				break;
 		}
 	}
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return FALSE;
 }

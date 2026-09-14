@@ -22,6 +22,7 @@
 #pragma once
 
 #include "ComPropertyPage.h"
+#include "controls/DarkTabCtrl.h"
 
 
 interface IComPropertyPageDirty {
@@ -38,6 +39,7 @@ class CComPropertySheet : public CPropertySheet, public IComPropertyPageDirty
 	std::list<CComPtr<ISpecifyPropertyPages>> m_spp;
 	std::list<CComPropertyPage> m_pages;
 	CSize m_size;
+	CDarkTabCtrl m_dark_tab; // owner-drawn dark tab, attached in OnInitDialog when the dark theme is on
 
 public:
 	CComPropertySheet(UINT nIDCaption, CWnd* pParentWnd = nullptr, UINT iSelectPage = 0);

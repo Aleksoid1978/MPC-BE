@@ -34,6 +34,9 @@ protected:
 	CToolTipCtrl m_wndToolTip;
 	void CreateToolTip();
 
+	// dark theme: apply the dark visual style to child controls once, on first activation
+	bool m_bDarkThemeApplied = false;
+
 public:
 	CPPageBase(UINT nIDTemplate, UINT nIDCaption = 0);
 	virtual ~CPPageBase();
@@ -43,6 +46,7 @@ protected:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnSetActive();
 	virtual BOOL OnApply();
+	virtual BOOL OnNotify(WPARAM wParam, LPARAM lParam, LRESULT* pResult);
 
 	int ScaleY(int y);
 
@@ -50,4 +54,7 @@ protected:
 
 public:
 	afx_msg void OnDestroy();
+	afx_msg HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 };
