@@ -313,6 +313,8 @@ void CMixer::UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samp
 
 int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, const int in_samples)
 {
+	// do not check 'm_in_avsf' and 'm_out_avsf' here
+
 	const BYTE* pInputs[64/*SWR_CH_MAX*/] = {};
 
 	if (sample_fmt_is_planar(m_in_sf)) {
@@ -320,26 +322,25 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, const int
 		for (int i = 0; i < m_in_channels; i++) {
 			pInputs[i] = pInput + i * in_plane_size;
 		}
-	} else {
+	}
+	else if (m_in_sf == SAMPLE_FMT_S24) {
+		size_t allsamples = in_samples * m_in_channels;
+		m_Buffer1.ExtendSize(allsamples);
+		convert_int24_to_int32(m_Buffer1.Data(), pInput, allsamples);
+		pInputs[0] = (BYTE*)m_Buffer1.Data();
+	}
+	else {
 		pInputs[0] = pInput;
 	}
 
 	return Mixing2(pOutput, out_samples, &pInput, in_samples);
 }
 
-int CMixer::Mixing2(BYTE* pOutput, int out_samples, const BYTE** ppInputs, const int in_samples)
+int CMixer::Mixing2(BYTE* pOutput, int out_samples, const BYTE** const ppInputs, const int in_samples)
 {
 	if (!m_ActualContext && !Init()) {
 		DLog(L"CMixer::Mixing2() : Init failed");
 		return 0;
-	}
-
-	if (m_in_sf == SAMPLE_FMT_S24) {
-		ASSERT(m_in_avsf == AV_SAMPLE_FMT_S32);
-		size_t allsamples = in_samples * m_in_channels;
-		m_Buffer1.ExtendSize(allsamples);
-		convert_int24_to_int32(m_Buffer1.Data(), ppInputs[0], allsamples);
-		ppInputs[0] = (BYTE*)m_Buffer1.Data();
 	}
 
 	BYTE* output;
