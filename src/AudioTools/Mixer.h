@@ -64,7 +64,7 @@ public:
 	void UpdateOutput(SampleFormat out_sf, uint32_t out_layout, int out_samplerate = 48000);
 
 	int  Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, int in_samples);
-	int  Mixing(BYTE* pOutput, int out_samples, const BYTE** ppInput, int in_samples);
+	int  Mixing2(BYTE* pOutput, int out_samples, const BYTE** ppInputs, int in_samples);
 
 	int     Receive(BYTE* pOutput, int out_samples); // needed when using resampling
 	int64_t GetDelay();                              // needed when using resampling
