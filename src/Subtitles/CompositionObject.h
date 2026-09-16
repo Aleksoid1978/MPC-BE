@@ -70,7 +70,8 @@ public :
 	void				RenderDvb(SubPicDesc& spd, SHORT nX, SHORT nY, SubPicDesc* spdResized);
 	void				RenderXSUB(SubPicDesc& spd);
 
-	void				SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, ColorConvert::ColorSpace cs, ColorConvert::convertType type = ColorConvert::convertType::DEFAULT, bool bIsRGB = false);
+	void				SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, const ColorConvert::Converter& conv);
+	void				SetPaletteRGBA(int nNbEntry, HDMV_PALETTE* pPalette);
 	const bool			HavePalette() const { return m_nColorNumber > 0; };
 
 	CompositionObject* Copy() {

@@ -22,92 +22,56 @@
 #include "ColorConvert.h"
 
 namespace ColorConvert {
-	constexpr double rgb_low_PC  = 0.0;
-	constexpr double rgb_high_PC = 255.0;
+	namespace {
+		constexpr double rgb_low_TV = 16.0;
+		constexpr double rgb_high_TV = 219.0;
 
-	constexpr double rgb_low_TV  = 16.0;
-	constexpr double rgb_high_TV = 219.0;
-
-	constexpr double coeff_default = 1.0;
-	constexpr double coeff_TV_2_PC = rgb_high_PC / rgb_high_TV;
-	constexpr double coeff_PC_2_TV = rgb_high_TV / rgb_high_PC;
-
-	constexpr double Rec601_Kr = 0.299;
-	constexpr double Rec601_Kb = 0.114;
-	constexpr double Rec601_Kg = 0.587;
-
-	constexpr double Rec709_Kr = 0.2125;
-	constexpr double Rec709_Kb = 0.0721;
-	constexpr double Rec709_Kg = 0.7154;
-
-	constexpr double BT2020_Kr = 0.2627;
-	constexpr double BT2020_Kb = 0.0593;
-	constexpr double BT2020_Kg = 0.6780;
-
-	static void YCrCbToRGB(BYTE Y, BYTE Cr, BYTE Cb, const double Kr, const double Kb, const double Kg, const double coeff, const double yuv_low, const double rgb_low, const double rgb_high, double& r, double& g, double& b)
-	{
-		Y = (Y - yuv_low);
-
-		r = Y * coeff + 2 * (Cr - 128) * (1.0 - Kr);
-		g = Y * coeff - 2 * (Cb - 128) * (1.0 - Kb) * Kb / Kg - 2 * (Cr - 128) * (1.0 - Kr) * Kr / Kg;
-		b = Y * coeff + 2 * (Cb - 128) * (1.0 - Kb);
-
-		r = std::clamp(fabs(r), 0.0, rgb_high);
-		g = std::clamp(fabs(g), 0.0, rgb_high);
-		b = std::clamp(fabs(b), 0.0, rgb_high);
-
-		r += rgb_low;
-		g += rgb_low;
-		b += rgb_low;
+		struct CS { double Kr, Kb, Kg; };
+		constexpr CS k601{ 0.299,  0.114,  0.587 };
+		constexpr CS k709{ 0.2125, 0.0721, 0.7154 };
+		constexpr CS k2020{ 0.2627, 0.0593, 0.6780 };
 	}
 
-	static DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, const double Kr, const double Kb, const double Kg, convertType type)
+	void Converter::Set(ColorSpace cs, ConvertType type)
 	{
-		double r, g, b;
-		double coeff, yuv_low, rgb_low, rgb_high;
-
-		switch (type) {
-			default:
-			case convertType::TV_2_TV:
-				coeff    = coeff_default;
-				yuv_low  = rgb_low_TV;
-				rgb_low  = rgb_low_TV;
-				rgb_high = rgb_high_TV;
-				break;
-			case convertType::PC_2_PC:
-				coeff    = coeff_default;
-				yuv_low  = rgb_low_PC;
-				rgb_low  = rgb_low_PC;
-				rgb_high = rgb_high_PC;
-				break;
-			case convertType::TV_2_PC:
-				coeff    = coeff_TV_2_PC;
-				yuv_low  = rgb_low_TV;
-				rgb_low  = rgb_low_PC;
-				rgb_high = rgb_high_PC;
-				break;
-			case convertType::PC_2_TV:
-				coeff    = coeff_PC_2_TV;
-				yuv_low  = rgb_low_PC;
-				rgb_low  = rgb_low_TV;
-				rgb_high = rgb_high_TV;
-				break;
+		if (cs == m_cs && type == m_type) {
+			return;
 		}
 
-		YCrCbToRGB(Y, Cr, Cb, Kr, Kb, Kg, coeff, yuv_low, rgb_low, rgb_high, r, g, b);
+		m_cs = cs;
+		m_type = type;
 
-		return D3DCOLOR_ARGB(A, (BYTE)(r), (BYTE)(g), (BYTE)(b));
+		const CS c = cs == ColorSpace::BT2020 ? k2020
+			: cs == ColorSpace::REC709 ? k709
+			: k601;
+
+		const bool srcTV = (type == ConvertType::TV_2_TV || type == ConvertType::TV_2_PC);
+		const bool dstPC = (type == ConvertType::PC_2_PC || type == ConvertType::TV_2_PC);
+
+		const double src_low = srcTV ? rgb_low_TV : 0.0;
+		m_rgb_low = dstPC ? 0.0 : rgb_low_TV;
+		m_rgb_high = dstPC ? 255.0 : rgb_high_TV;
+		const double coeff = (dstPC ? 255.0 : rgb_high_TV) / (srcTV ? rgb_high_TV : 255.0);
+
+		for (int i = 0; i < 256; i++) {
+			const double y = (i - src_low) * coeff;
+			m_ry[i] = y; m_gy[i] = y; m_by[i] = y;
+
+			const double cr = i - 128.0;
+			const double cb = i - 128.0;
+			m_rv[i] = 2.0 * cr * (1.0 - c.Kr);
+			m_gv[i] = -2.0 * cr * (1.0 - c.Kr) * c.Kr / c.Kg;
+			m_gu[i] = -2.0 * cb * (1.0 - c.Kb) * c.Kb / c.Kg;
+			m_bu[i] = 2.0 * cb * (1.0 - c.Kb);
+		}
 	}
 
-	DWORD YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb, ColorSpace cs, convertType type/* = convertType::DEFAULT*/)
+	DWORD Converter::YCrCbToRGB(BYTE A, BYTE Y, BYTE Cr, BYTE Cb) const
 	{
-		switch (cs) {
-			case ColorSpace::BT2020:
-				return YCrCbToRGB(A, Y, Cr, Cb, BT2020_Kr, BT2020_Kb, BT2020_Kg, type);
-			case ColorSpace::REC709:
-				return YCrCbToRGB(A, Y, Cr, Cb, Rec709_Kr, Rec709_Kb, Rec709_Kg, type);
-			default: // REC601
-				return YCrCbToRGB(A, Y, Cr, Cb, Rec601_Kr, Rec601_Kb, Rec601_Kg, type);
-		}
+		const double r = std::clamp(m_ry[Y] + m_rv[Cr], 0.0, m_rgb_high) + m_rgb_low;
+		const double g = std::clamp(m_gy[Y] + m_gu[Cb] + m_gv[Cr], 0.0, m_rgb_high) + m_rgb_low;
+		const double b = std::clamp(m_by[Y] + m_bu[Cb], 0.0, m_rgb_high) + m_rgb_low;
+
+		return D3DCOLOR_ARGB(A, (BYTE)r, (BYTE)g, (BYTE)b);
 	}
 } // namespace ColorConvert

@@ -192,23 +192,23 @@ STDMETHODIMP CRenderedHdmvSubtitle::Reload()
 
 STDMETHODIMP CRenderedHdmvSubtitle::SetSourceTargetInfo(LPCWSTR yuvMatrix, LPCWSTR inputRange, LPCWSTR outpuRange)
 {
-	ColorConvert::convertType convertType = ColorConvert::convertType::DEFAULT;
+	ColorConvert::ConvertType convertType = ColorConvert::ConvertType::TV_2_TV;
 
 
 	if (wcscmp(inputRange, L"TV") == 0) {
 		if (wcscmp(outpuRange, L"TV") == 0) {
-			convertType = ColorConvert::convertType::TV_2_TV;
+			convertType = ColorConvert::ConvertType::TV_2_TV;
 		}
 		else if (wcscmp(outpuRange, L"PC") == 0) {
-			convertType = ColorConvert::convertType::TV_2_PC;
+			convertType = ColorConvert::ConvertType::TV_2_PC;
 		}
 	}
 	else if (wcscmp(inputRange, L"PC") == 0) {
 		if (wcscmp(outpuRange, L"PC") == 0) {
-			convertType = ColorConvert::convertType::PC_2_PC;
+			convertType = ColorConvert::ConvertType::PC_2_PC;
 		}
 		else if (wcscmp(outpuRange, L"TV") == 0) {
-			convertType = ColorConvert::convertType::PC_2_TV;
+			convertType = ColorConvert::ConvertType::PC_2_TV;
 		}
 	}
 

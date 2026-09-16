@@ -258,7 +258,7 @@ HRESULT CXSUBSubtitle::ParseSample(BYTE* pData, long nLen)
 		}
 	}
 
-	pSub->SetPalette(4, Palette, {}, ColorConvert::convertType::DEFAULT, true);
+	pSub->SetPaletteRGBA(4, Palette);
 
 	int RLESize = gb.GetSize() - gb.GetPos();
 	pSub->SetRLEData(gb.GetBufferPos(), RLESize, RLESize);

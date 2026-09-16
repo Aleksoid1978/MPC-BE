@@ -42,7 +42,8 @@ public:
 	virtual void			CleanOld(REFERENCE_TIME rt) PURE;
 	virtual HRESULT			EndOfStream() { return S_OK; }
 
-	HRESULT					SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::convertType _convertType);
+	HRESULT					SetConvertType(LPCWSTR _yuvMatrix, ColorConvert::ConvertType _convertType);
+	ColorConvert::ColorSpace ResolveColorSpace(SHORT width) const;
 
 	void					SetForced(bool bForced) { m_bForced = bForced; }
 
@@ -58,7 +59,8 @@ protected :
 	void					FinalizeRender(SubPicDesc& spd);
 
 	ColorConvert::ColorSpace	colorSpace = {};
-	ColorConvert::convertType	convertType = {};
+	ColorConvert::ConvertType	convertType = {};
+	ColorConvert::Converter		m_conv;
 
 	bool m_bForced = false;
 };

@@ -341,7 +341,7 @@ HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 		pPage->rendered = true;
 		TRACE_DVB(L"DVB - Renderer - %s - %s", ReftimeToString(pPage->rtStart), ReftimeToString(pPage->rtStop));
 
-		const auto cs = (colorSpace != ColorConvert::ColorSpace::Unknown ? colorSpace : (m_Display.width > 720 ? ColorConvert::ColorSpace::REC709 : ColorConvert::ColorSpace::REC601));
+		m_conv.Set(ResolveColorSpace(m_Display.width), convertType);
 
 		int nRegion = 1, nObject = 1;
 		for (POSITION pos = pPage->regionsPos.GetHeadPosition(); pos; nRegion++) {
@@ -355,7 +355,7 @@ HRESULT CDVBSub::Render(SubPicDesc& spd, REFERENCE_TIME rt, RECT& bbox)
 							SHORT nY = regionPos.vertAddr  + objectPos.object_vertical_position;
 							pObject->m_width  = pRegion->width;
 							pObject->m_height = pRegion->height;
-							pObject->SetPalette(pCLUT->size, pCLUT->palette, cs, convertType);
+							pObject->SetPalette(pCLUT->size, pCLUT->palette, m_conv);
 
 							InitSpd(spd, m_Display.width, m_Display.height);
 							pObject->RenderDvb(spd, nX, nY, m_bResizedRender ? &m_spd : NULL);

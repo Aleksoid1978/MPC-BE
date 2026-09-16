@@ -34,15 +34,19 @@ CompositionObject::~CompositionObject()
 	SAFE_DELETE_ARRAY(m_pRLEData);
 }
 
-void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, ColorConvert::ColorSpace cs, ColorConvert::convertType type/* = ColorConvert::convertType::DEFAULT*/, bool bIsRGB/* = false*/)
+void CompositionObject::SetPalette(int nNbEntry, HDMV_PALETTE* pPalette, const ColorConvert::Converter& conv)
 {
 	m_nColorNumber = nNbEntry;
 	for (int i = 0; i < nNbEntry; i++) {
-		if (bIsRGB) {
-			m_Colors[pPalette[i].entry_id] = D3DCOLOR_ARGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
-		} else {
-			m_Colors[pPalette[i].entry_id] = ColorConvert::YCrCbToRGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb, cs, type);
-		}
+		m_Colors[pPalette[i].entry_id] = conv.YCrCbToRGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
+	}
+}
+
+void CompositionObject::SetPaletteRGBA(int nNbEntry, HDMV_PALETTE* pPalette)
+{
+	m_nColorNumber = nNbEntry;
+	for (int i = 0; i < nNbEntry; i++) {
+		m_Colors[pPalette[i].entry_id] = D3DCOLOR_ARGB(pPalette[i].T, pPalette[i].Y, pPalette[i].Cr, pPalette[i].Cb);
 	}
 }
 
