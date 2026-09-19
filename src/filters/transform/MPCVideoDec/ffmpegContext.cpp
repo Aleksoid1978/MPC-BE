@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -34,7 +34,7 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/pixdesc.h>
 // This is kind of an hack but it avoids using a C++ keyword as a struct member name
 #define class classFFMPEG
-	#include <ExtLib/ffmpeg/libavcodec/h264dec.h>
+	#include <ExtLib/ffmpeg/libavcodec/h264_ps.h>
 	#include <ExtLib/ffmpeg/libavcodec/ffv1.h>
 #undef class
 	//#include <ExtLib/ffmpeg/libavcodec/vvc/dec.h>
@@ -84,8 +84,7 @@ static bool CheckPCID(UINT pcid, const UINT16* pPCIDs, size_t count)
 int FFH264CheckCompatibility(int nWidth, int nHeight, struct AVCodecContext* pAVCtx,
 							 UINT nPCIVendor, UINT nPCIDevice, UINT64 VideoDriverVersion)
 {
-	const H264Context* h = (H264Context*)pAVCtx->priv_data;
-	const SPS* sps = h264_getSPS(h);
+	const SPS* sps = h264_getSPS(pAVCtx->priv_data);
 	int flags = 0;
 
 	if (sps) {

@@ -447,8 +447,9 @@ static av_cold int h264_decode_init(AVCodecContext *avctx)
 }
 
 // ==> Start patch MPC
-const SPS* h264_getSPS(const H264Context *h)
+const SPS* h264_getSPS(const void *data)
 {
+	const H264Context* h = (H264Context*)data;
     const SPS *sps = h->ps.sps;
     if (!sps) {
         int i;

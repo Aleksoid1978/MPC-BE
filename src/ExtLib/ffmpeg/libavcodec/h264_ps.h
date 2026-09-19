@@ -174,4 +174,8 @@ int ff_h264_decode_picture_parameter_set(GetBitContext *gb, AVCodecContext *avct
  */
 void ff_h264_ps_uninit(H264ParamSets *ps);
 
+// ==> Start patch MPC
+const SPS* h264_getSPS(const void *data);
+// ==> End patch MPC
+
 #endif /* AVCODEC_H264_PS_H */
