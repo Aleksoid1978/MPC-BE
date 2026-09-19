@@ -379,6 +379,24 @@ static av_cold int h264_decode_end(AVCodecContext *avctx)
     return 0;
 }
 
+// ==> Start patch MPC
+enum AVPixelFormat ff_h264_get_pixel_format(H264Context *h, const SPS *sps);
+
+const SPS* h264_getSPS(const void *data)
+{
+    const H264Context* h = (H264Context*)data;
+    const SPS *sps = h->ps.sps;
+    if (!sps) {
+        int i;
+        for (i = 0; i < MAX_SPS_COUNT && !sps; i++)
+            if (h->ps.sps_list[i])
+                sps = h->ps.sps_list[i];
+    }
+
+    return sps;
+}
+// ==> End patch MPC
+
 static AVOnce h264_vlc_init = AV_ONCE_INIT;
 
 static av_cold int h264_decode_init(AVCodecContext *avctx)
@@ -445,22 +463,6 @@ static av_cold int h264_decode_init(AVCodecContext *avctx)
 
     return 0;
 }
-
-// ==> Start patch MPC
-const SPS* h264_getSPS(const void *data)
-{
-	const H264Context* h = (H264Context*)data;
-    const SPS *sps = h->ps.sps;
-    if (!sps) {
-        int i;
-        for (i = 0; i < MAX_SPS_COUNT && !sps; i++)
-            if (h->ps.sps_list[i])
-                sps = h->ps.sps_list[i];
-    }
-
-    return sps;
-}
-// ==> End patch MPC
 
 /**
  * instantaneous decoder refresh.

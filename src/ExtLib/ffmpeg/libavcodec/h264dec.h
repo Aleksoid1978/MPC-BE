@@ -735,8 +735,4 @@ void ff_h264_free_tables(H264Context *h);
 
 void ff_h264_set_erpic(ERPicture *dst, const H264Picture *src);
 
-// ==> Start patch MPC
-enum AVPixelFormat ff_h264_get_pixel_format(H264Context *h, const SPS *sps);
-// ==> End patch MPC
-
 #endif /* AVCODEC_H264DEC_H */
