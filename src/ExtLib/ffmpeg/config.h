@@ -597,6 +597,7 @@
 #define CONFIG_SWSCALE 1
 #define CONFIG_SWSCALE_ALPHA 1
 #define CONFIG_POSTPROC 0
+#define CONFIG_SWRESAMPLE 1
 
 /*
 Note: when adding a new codec, you have to:
