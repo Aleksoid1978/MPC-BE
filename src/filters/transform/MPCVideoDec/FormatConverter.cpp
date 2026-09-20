@@ -145,17 +145,25 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	switch (av_pix_fmt) {
 	case AV_PIX_FMT_NV12:
 		return PFType_NV12;
-	case AV_PIX_FMT_P010:
-	case AV_PIX_FMT_P012:
-	case AV_PIX_FMT_P016:
+
+	case AV_PIX_FMT_P010LE:
+	case AV_PIX_FMT_P012LE:
+	case AV_PIX_FMT_P016LE:
 		return PFType_P01x;
-	case AV_PIX_FMT_P210:
-	case AV_PIX_FMT_P212:
-	case AV_PIX_FMT_P216:
+
+	case AV_PIX_FMT_P210LE:
+	case AV_PIX_FMT_P212LE:
+	case AV_PIX_FMT_P216LE:
 		return PFType_P21x;
-	case AV_PIX_FMT_Y210:
-	case AV_PIX_FMT_Y212 :
-	case AV_PIX_FMT_Y216:
+
+	case AV_PIX_FMT_P410LE:
+	case AV_PIX_FMT_P412LE:
+	case AV_PIX_FMT_P416LE:
+		return PFType_P41x;
+
+	case AV_PIX_FMT_Y210LE:
+	case AV_PIX_FMT_Y212LE:
+	case AV_PIX_FMT_Y216LE:
 		return PFType_Y21x;
 	}
 
