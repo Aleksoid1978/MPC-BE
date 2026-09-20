@@ -4187,6 +4187,8 @@ void CMPCVideoDecFilter::SetDXVAState()
 			case AV_PIX_FMT_VUYX:
 			case AV_PIX_FMT_XV30LE:
 			case AV_PIX_FMT_XV36LE:
+			case AV_PIX_FMT_YUV444P10MSBLE:
+			case AV_PIX_FMT_YUV444P12MSBLE:
 				codec.Append(L" 444");
 				break;
 			}
