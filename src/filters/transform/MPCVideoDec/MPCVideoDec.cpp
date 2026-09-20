@@ -58,7 +58,9 @@ extern "C" {
 	#include <ExtLib/ffmpeg/libavutil/mastering_display_metadata.h>
 	#include <ExtLib/ffmpeg/libavutil/dovi_meta.h>
 	#include <ExtLib/ffmpeg/libavutil/opt.h>
-	#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
+	namespace cuda {
+		#include <ExtLib/ffmpeg/libavutil/hwcontext_cuda_internal.h>
+	}
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d11va.h>
 	#include <ExtLib/ffmpeg/libavutil/hwcontext_d3d12va.h>
 }
@@ -3880,11 +3882,11 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 			}
 			else if (frames_ctx->format == AV_PIX_FMT_CUDA && m_FormatConverter.DirectCopyPossible(frames_ctx->sw_format)) {
 				auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
-				auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
+				auto cuda_hwctx = reinterpret_cast<cuda::AVCUDADeviceContext*>(device_hwctx->hwctx);
 				auto cuda_fns = cuda_hwctx->internal->cuda_dl;
 
 				auto cuStatus = cuda_fns->cuCtxPushCurrent(cuda_hwctx->cuda_ctx);
-				if (cuStatus != CUDA_SUCCESS) {
+				if (cuStatus != cuda::CUDA_SUCCESS) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuCtxPushCurrent() failed");
 					av_frame_unref(frame);
 					continue;
@@ -3903,28 +3905,28 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 
 				unsigned offset = 0;
 				for (size_t i = 0; i < std::size(hwdata) && hwdata[i]; i++) {
-					CUDA_MEMCPY2D cpy = {};
+					cuda::CUDA_MEMCPY2D cpy = {};
 
 					cpy.srcPitch      = m_pHWFrame->linesize[i];
 					cpy.dstPitch      = linesize[i];
 					cpy.WidthInBytes  = std::min(cpy.srcPitch, cpy.dstPitch);
 					cpy.Height        = m_pHWFrame->height >> ((i == 0 || i == 3) ? 0 : v_shift);
 
-					cpy.srcMemoryType = CU_MEMORYTYPE_DEVICE;
-					cpy.srcDevice     = reinterpret_cast<CUdeviceptr>(hwdata[i]);
+					cpy.srcMemoryType = cuda::CU_MEMORYTYPE_DEVICE;
+					cpy.srcDevice     = reinterpret_cast<cuda::CUdeviceptr>(hwdata[i]);
 
-					cpy.dstMemoryType = CU_MEMORYTYPE_HOST;
+					cpy.dstMemoryType = cuda::CU_MEMORYTYPE_HOST;
 					cpy.dstHost       = pDataOut + offset;
 
 					cuStatus = cuda_fns->cuMemcpy2DAsync(&cpy, cuda_hwctx->stream);
-					if (cuStatus != CUDA_SUCCESS) {
+					if (cuStatus != cuda::CUDA_SUCCESS) {
 						break;
 					}
 
 					offset += linesize[i] * (m_pHWFrame->height >> (i ? v_shift : 0));
 				}
 
-				if (cuStatus != CUDA_SUCCESS) {
+				if (cuStatus != cuda::CUDA_SUCCESS) {
 					DLog(L"CMPCVideoDecFilter::DecodeInternal() : Cuda cuMemcpy2DAsync() failed");
 					av_frame_unref(frame);
 					continue;
@@ -4201,12 +4203,12 @@ void CMPCVideoDecFilter::SetDXVAState()
 
 	if (frames_ctx->format == AV_PIX_FMT_CUDA) {
 		auto device_hwctx = reinterpret_cast<AVHWDeviceContext*>(frames_ctx->device_ctx);
-		auto cuda_hwctx = reinterpret_cast<AVCUDADeviceContext*>(device_hwctx->hwctx);
+		auto cuda_hwctx = reinterpret_cast<cuda::AVCUDADeviceContext*>(device_hwctx->hwctx);
 		auto cuda_fns = cuda_hwctx->internal->cuda_dl;
 
 		char name[256] = {};
 		auto cuStatus = cuda_fns->cuDeviceGetName(name, 256, cuda_hwctx->internal->cuda_device);
-		if (cuStatus == CUDA_SUCCESS) {
+		if (cuStatus == cuda::CUDA_SUCCESS) {
 			const auto deviceName = UTF8ToWStr(name);
 			if (!StartsWith(m_strDeviceDescription, deviceName.GetString())) {
 				m_strDeviceDescription = deviceName;
