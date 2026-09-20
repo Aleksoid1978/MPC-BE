@@ -165,6 +165,10 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	case AV_PIX_FMT_Y212LE:
 	case AV_PIX_FMT_Y216LE:
 		return PFType_Y21x;
+
+	case AV_PIX_FMT_YUV444P10MSBLE:
+	case AV_PIX_FMT_YUV444P12MSBLE:
+		return PFType_unspecified;
 	}
 
 	int lumabits = pfdesc->comp[0].depth;
