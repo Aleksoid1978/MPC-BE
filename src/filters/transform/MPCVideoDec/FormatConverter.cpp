@@ -617,11 +617,13 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 
 bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat)
 {
-	return avformat == AV_PIX_FMT_NV12      && m_out_pixfmt == PixFmt_NV12 ||
-		   avformat == AV_PIX_FMT_P010      && m_out_pixfmt == PixFmt_P010 ||
-		   avformat == AV_PIX_FMT_P016      && m_out_pixfmt == PixFmt_P016 ||
-		   avformat == AV_PIX_FMT_YUV444P   && m_out_pixfmt == PixFmt_YV24 ||
-		   avformat == AV_PIX_FMT_YUV444P16 && m_out_pixfmt == PixFmt_YUV444P16;
+	return avformat == AV_PIX_FMT_NV12        && m_out_pixfmt == PixFmt_NV12 ||
+		   avformat == AV_PIX_FMT_P010LE      && m_out_pixfmt == PixFmt_P010 ||
+		   avformat == AV_PIX_FMT_P016LE      && m_out_pixfmt == PixFmt_P016 ||
+		   avformat == AV_PIX_FMT_P210LE      && m_out_pixfmt == PixFmt_P210 ||
+		   avformat == AV_PIX_FMT_P212LE      && m_out_pixfmt == PixFmt_P216 ||
+		   avformat == AV_PIX_FMT_YUV444P     && m_out_pixfmt == PixFmt_YV24 ||
+		   avformat == AV_PIX_FMT_YUV444P16LE && m_out_pixfmt == PixFmt_YUV444P16;
 }
 
 void CFormatConverter::Clear()
