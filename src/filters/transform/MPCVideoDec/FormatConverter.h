@@ -71,6 +71,7 @@ enum MPCPixFmtType {
 	PFType_YUV444Px, // YUV 4:4:4, 9-16 bit
 	PFType_NV12,     // YUV 4:2:0, U/V interleaved
 	PFType_P01x,     // YUV 4:2:0, 10 to 16-bit, U/V interleaved, MSB aligned
+	PFType_P21x,     // YUV 4:2:2, 10 to 16-bit, U/V interleaved, MSB aligned
 	PFType_Y21x,     // YUV 4:2:0, 10 to 16-bit
 };
 

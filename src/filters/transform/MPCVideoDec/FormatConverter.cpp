@@ -149,6 +149,10 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	case AV_PIX_FMT_P012:
 	case AV_PIX_FMT_P016:
 		return PFType_P01x;
+	case AV_PIX_FMT_P210:
+	case AV_PIX_FMT_P212:
+	case AV_PIX_FMT_P216:
+		return PFType_P21x;
 	case AV_PIX_FMT_Y210:
 	case AV_PIX_FMT_Y212 :
 	case AV_PIX_FMT_Y216:
