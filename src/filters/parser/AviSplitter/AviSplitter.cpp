@@ -399,6 +399,7 @@ HRESULT CAviSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 				case FCC('MPNG'):
 					mt.subtype = MEDIASUBTYPE_PNG;
 					break;
+				case FCC('NV21'):
 				case FCC('y408'):
 					mt.subtype = MEDIASUBTYPE_LAV_RAWVIDEO;
 					break;
