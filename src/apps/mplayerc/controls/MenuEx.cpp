@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2025 see Authors.txt
+ * (C) 2018-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -606,7 +606,15 @@ LRESULT CALLBACK CMenuEx::CBTProc(int nCode, WPARAM wParam, LPARAM lParam)
 		const int nLength = ::GetClassNameW(hWnd, lpClassName, MAX_PATH);
 		if (nLength == 6 && lstrcmpW(lpClassName, L"#32768") == 0) {
 			CString lpFileName = GetModulePath(pS->lpcs->hInstance);
-			if (lpFileName == m_strModuleName) {
+			bool bOurModule = (lpFileName == m_strModuleName);
+			if (!bOurModule) {
+				auto strModuleName(m_strModuleName);
+				RemoveFileSpec(strModuleName);
+				strModuleName += L"\\Lang\\mpcresources.";
+				// our mpcresources.<>.dll
+				bOurModule = (lpFileName.Find(strModuleName) == 0);
+			}
+			if (bOurModule) {
 				WNDPROC pfnOldProc = (WNDPROC)::GetWindowLongPtrW(hWnd, GWLP_WNDPROC);
 
 				::SetPropW(hWnd, g_pszOldMenuProc, (HANDLE)pfnOldProc);
