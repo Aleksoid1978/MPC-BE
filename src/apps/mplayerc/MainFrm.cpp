@@ -18417,6 +18417,8 @@ afx_msg void CMainFrame::OnLanguage(UINT nID)
 		SetColorMenu();
 	}
 
+	m_wndStatusBar.SetMenu();
+
 	// Re-create Win 7 TaskBar preview button for change button hint
 	CreateThumbnailToolbar();
 
