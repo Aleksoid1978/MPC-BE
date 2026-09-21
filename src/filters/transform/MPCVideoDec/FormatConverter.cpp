@@ -137,12 +137,51 @@ MPCPixelFormat GetPixFormat(DWORD biCompression)
 
 MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 {
-	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
-	if (!pfdesc) {
-		return PFType_unspecified;
-	}
-
 	switch (av_pix_fmt) {
+	case AV_PIX_FMT_YUV420P:
+	case AV_PIX_FMT_YUVJ420P:
+		return PFType_YUV420;
+
+	case AV_PIX_FMT_YUV422P:
+	case AV_PIX_FMT_YUVJ422P:
+		return PFType_YUV422;
+
+	case AV_PIX_FMT_YUV444P:
+	case AV_PIX_FMT_YUVJ444P:
+		return PFType_YUV444;
+
+	case AV_PIX_FMT_YUV420P9LE:
+	case AV_PIX_FMT_YUV420P10LE:
+	case AV_PIX_FMT_YUV420P12LE:
+	case AV_PIX_FMT_YUV420P14LE:
+	case AV_PIX_FMT_YUV420P16LE:
+	case AV_PIX_FMT_YUVA420P9LE:
+	case AV_PIX_FMT_YUVA420P10LE:
+	case AV_PIX_FMT_YUVA420P16LE:
+		return PFType_YUV420Px;
+
+	case AV_PIX_FMT_YUV422P9LE:
+	case AV_PIX_FMT_YUV422P10LE:
+	case AV_PIX_FMT_YUV422P12LE:
+	case AV_PIX_FMT_YUV422P14LE:
+	case AV_PIX_FMT_YUV422P16LE:
+	case AV_PIX_FMT_YUVA422P9LE:
+	case AV_PIX_FMT_YUVA422P10LE:
+	case AV_PIX_FMT_YUVA422P12LE:
+	case AV_PIX_FMT_YUVA422P16LE:
+		return PFType_YUV422Px;
+
+	case AV_PIX_FMT_YUV444P9LE:
+	case AV_PIX_FMT_YUV444P10LE:
+	case AV_PIX_FMT_YUV444P12LE:
+	case AV_PIX_FMT_YUV444P14LE:
+	case AV_PIX_FMT_YUV444P16LE:
+	case AV_PIX_FMT_YUVA444P9LE:
+	case AV_PIX_FMT_YUVA444P10LE:
+	case AV_PIX_FMT_YUVA444P12LE:
+	case AV_PIX_FMT_YUVA444P16LE:
+		return PFType_YUV444Px;
+
 	case AV_PIX_FMT_NV12:
 		return PFType_NV12;
 
@@ -165,35 +204,12 @@ MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
 	case AV_PIX_FMT_Y212LE:
 	case AV_PIX_FMT_Y216LE:
 		return PFType_Y21x;
-
-	case AV_PIX_FMT_YUV444P10MSBLE:
-	case AV_PIX_FMT_YUV444P12MSBLE:
-		return PFType_unspecified;
 	}
 
-	int lumabits = pfdesc->comp[0].depth;
-
-	if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB|AV_PIX_FMT_FLAG_PAL)) {
-		return PFType_RGB;
-	}
-
-	if (lumabits < 8 || lumabits > 16 || pfdesc->nb_components != 3 + (pfdesc->flags & AV_PIX_FMT_FLAG_ALPHA ? 1 : 0)) {
-		return PFType_unspecified;
-	}
-
-	if ((pfdesc->flags & ~AV_PIX_FMT_FLAG_ALPHA) == AV_PIX_FMT_FLAG_PLANAR) {
-		// must be planar type, ignore alpha channel, other flags are forbidden
-
-		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 1) {
-			return lumabits == 8 ? PFType_YUV420 : PFType_YUV420Px;
-		}
-
-		if (pfdesc->log2_chroma_w == 1 && pfdesc->log2_chroma_h == 0) {
-			return lumabits == 8 ? PFType_YUV422 : PFType_YUV422Px;
-		}
-
-		if (pfdesc->log2_chroma_w == 0 && pfdesc->log2_chroma_h == 0) {
-			return lumabits == 8 ? PFType_YUV444 : PFType_YUV444Px;
+	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+	if (pfdesc) {
+		if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+			return PFType_RGB;
 		}
 	}
 
