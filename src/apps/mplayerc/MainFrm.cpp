@@ -1994,8 +1994,6 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 			rcWork.InflateRect(GetInvisibleBorderSize());
 		}
 
-		RECT rcMonitor = mi.rcMonitor;
-
 		OffsetRect(pRect, cur_pos.x - (pRect->left + snap_x), cur_pos.y - (pRect->top + snap_y));
 
 		if (isSnapClose(pRect->left, rcWork.left)) { // left screen snap
@@ -2011,9 +2009,6 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 			m_bWasSnapped = true;
 		} else if (isSnapClose(rcWork.bottom, pRect->bottom)) { // bottom taskbar snap
 			OffsetRect(pRect, 0, rcWork.bottom - pRect->bottom);
-			m_bWasSnapped = true;
-		} else if (isSnapClose(pRect->bottom, rcMonitor.bottom)) { // bottom screen snap
-			OffsetRect(pRect, 0, rcMonitor.bottom - pRect->bottom);
 			m_bWasSnapped = true;
 		}
 
