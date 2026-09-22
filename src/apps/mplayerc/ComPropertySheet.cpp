@@ -235,10 +235,22 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 
 	// Dark-theme this page: its host dialog (pChild) gets its own WM_CTLCOLOR*, so the sheet's
 	// subclass doesn't reach it — theme it directly (dark background/text + themed controls).
+	// Once only: the property sheet re-activates the current page after every Apply (PSN_SETACTIVE
+	// again), and re-theming an already themed page ends in a full erase + synchronous repaint of
+	// every control, which showed as the whole page flickering on Apply. RefreshDialog is a no-op
+	// when the page is already themed.
 	if (DarkTheme::IsActive()) {
 		if (CWnd* pChild = pPage->GetWindow(GW_CHILD)) {
-			DarkTheme::ThemeDialog(pChild->GetSafeHwnd());
+			DarkTheme::RefreshDialog(pChild->GetSafeHwnd());
 		}
+		// Repaint the sheet itself only. The plain Invalidate() below cascades into the page and every
+		// control on it (the sheet doesn't clip its children), and this runs after every Apply too
+		// (the property sheet re-activates the page): with owner-drawn dark controls that repaint
+		// takes more than a frame, so the whole page - group-box lines first - visibly flickered. The
+		// page and the tab repaint themselves when they actually move (MoveWindow above); nothing else
+		// under the sheet changed.
+		RedrawWindow(nullptr, nullptr, RDW_INVALIDATE | RDW_ERASE | RDW_NOCHILDREN);
+		return;
 	}
 
 	Invalidate();

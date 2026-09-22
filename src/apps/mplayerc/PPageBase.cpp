@@ -96,6 +96,7 @@ BOOL CPPageBase::OnSetActive()
 	// (SetWindowTheme per control + repaint) made switching pages sluggish; the controls stay
 	// themed for the page's lifetime, so once is enough.
 	if (!m_bDarkThemeApplied) {
+		DarkTheme::ClipDialogChildren(GetSafeHwnd());
 		DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
 		m_bDarkThemeApplied = true;
 	}

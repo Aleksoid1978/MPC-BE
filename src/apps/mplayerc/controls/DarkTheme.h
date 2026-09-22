@@ -43,6 +43,12 @@ namespace DarkTheme
 	// (edits/combos -> DarkMode_CFD, buttons/tree/list/updown -> DarkMode_Explorer).
 	void ApplyThemeToChildren(HWND hWndParent);
 
+	// Gives a page/dialog WS_CLIPCHILDREN while the theme is on (undone by the strip paths), so an
+	// Invalidate() on it repaints only its own background and not every owner-drawn control - the
+	// visible flicker on Apply / "Default" otherwise. ThemeDialog does this itself; the Options
+	// pages, which are themed through ApplyThemeToChildren, call it explicitly.
+	void ClipDialogChildren(HWND hDlg);
+
 	// Our owner-drawn group boxes fill their whole rect with the dark face colour. When a group
 	// box is defined after the controls it frames (so it sits above them in the z-order), that
 	// fill paints over those controls and they vanish until individually invalidated (on hover,

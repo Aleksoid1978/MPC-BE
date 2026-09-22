@@ -1461,6 +1461,28 @@ namespace DarkTheme
 		// at theme time so the SAME OnDrawItem path draws them and there is NO native etched line to leak
 		// (a WM_PAINT-only subclass couldn't suppress the native etched — it bled through at the ends).
 
+		// Clip a themed dialog's children out of its own painting. Every control we theme paints its
+		// full background itself, so the dialog never needs to paint under them - and it must not: a
+		// plain Invalidate() on a dialog that does not clip its children also invalidates every child
+		// it overlaps, and repainting a page of owner-drawn controls takes more than a frame, so the
+		// whole page visibly flickered (group-box lines first) on things like Apply or a "Default"
+		// button that simply call Invalidate(). Remembered in a prop so toggling the theme off puts the
+		// dialog back exactly as it was.
+		void ClipChildren(HWND hDlg) {
+			const LONG style = GetWindowLongW(hDlg, GWL_STYLE);
+			if (!(style & WS_CLIPCHILDREN)) {
+				SetWindowLongW(hDlg, GWL_STYLE, style | WS_CLIPCHILDREN);
+				::SetPropW(hDlg, L"MPC_CLIPCHILDREN", reinterpret_cast<HANDLE>(1));
+			}
+		}
+
+		void UnclipChildren(HWND hDlg) {
+			if (::GetPropW(hDlg, L"MPC_CLIPCHILDREN")) {
+				::RemovePropW(hDlg, L"MPC_CLIPCHILDREN");
+				SetWindowLongW(hDlg, GWL_STYLE, GetWindowLongW(hDlg, GWL_STYLE) & ~WS_CLIPCHILDREN);
+			}
+		}
+
 		void ThemeControl(HWND hCtrl) {
 			if (pAllowDarkModeForWindow) {
 				pAllowDarkModeForWindow(hCtrl, true);
@@ -1468,6 +1490,13 @@ namespace DarkTheme
 
 			wchar_t cls[64] = {};
 			GetClassNameW(hCtrl, cls, _countof(cls));
+
+			if (_wcsicmp(cls, L"#32770") == 0) {
+				// A dialog nested in the tree we are theming (an Options page under its sheet, a hosted
+				// filter page): clip its children like ThemeDialog does for the root.
+				ClipChildren(hCtrl);
+				return;
+			}
 
 			if (_wcsicmp(cls, L"Button") == 0) {
 				const LONG bt = GetWindowLongW(hCtrl, GWL_STYLE) & BS_TYPEMASK;
@@ -1642,6 +1671,7 @@ namespace DarkTheme
 		// default (light) look when the dark theme is switched off while the Options dialog is
 		// open. Removing a subclass that isn't present is a safe no-op.
 		BOOL CALLBACK StripThemeChildProc(HWND hChild, LPARAM) {
+			UnclipChildren(hChild); // a nested dialog we clipped while themed
 			RemoveWindowSubclass(hChild, GroupBoxSubclassProc, kGroupBoxSubclassId);
 			RemoveWindowSubclass(hChild, ButtonSubclassProc,   kButtonSubclassId);
 			RemoveWindowSubclass(hChild, SpinSubclassProc,     kSpinSubclassId);
@@ -1805,6 +1835,12 @@ namespace DarkTheme
 		}
 	}
 
+	void ClipDialogChildren(HWND hDlg) {
+		if (IsActive() && hDlg) {
+			ClipChildren(hDlg);
+		}
+	}
+
 	void ApplyThemeToChildren(HWND hWndParent) {
 		if (!IsActive() || !hWndParent) {
 			return;
@@ -1830,6 +1866,24 @@ namespace DarkTheme
 			if (_wcsicmp(cls, L"Button") == 0 && (GetWindowLongW(c, GWL_STYLE) & BS_TYPEMASK) == BS_GROUPBOX) {
 				boxes[n++] = c;
 			}
+		}
+		if (n == 0) {
+			return;
+		}
+		// Already fixed? Then the n bottom-most siblings are exactly the group boxes. Check before
+		// touching anything: this runs on every page activation (and the property sheet re-activates
+		// the page after each Apply), and pushing to HWND_BOTTOM again is not a no-op with two or more
+		// boxes - they rotate, the z-order really changes and Windows invalidates them, which flickered.
+		int nBottom = 0;
+		for (HWND c = ::GetWindow(hWndParent, GW_CHILD); c; c = ::GetWindow(c, GW_HWNDNEXT)) {
+			bool isBox = false;
+			for (int i = 0; i < n; ++i) {
+				if (boxes[i] == c) { isBox = true; break; }
+			}
+			nBottom = isBox ? nBottom + 1 : 0; // run length of group boxes ending at the bottom
+		}
+		if (nBottom == n) {
+			return;
 		}
 		for (int i = 0; i < n; ++i) {
 			SetWindowLongW(boxes[i], GWL_STYLE, GetWindowLongW(boxes[i], GWL_STYLE) | WS_CLIPSIBLINGS);
@@ -1903,6 +1957,7 @@ namespace DarkTheme
 		// before the Options sheet (which used to be the only caller of this) has ever been shown.
 		AllowDarkModeForApp();
 		EnableForWindow(hDlg);                 // dark title bar + allow dark mode
+		ClipChildren(hDlg);                    // the dialog paints only between its controls
 		SetWindowSubclass(hDlg, DialogSubclassProc, kDialogSubclassId, 0); // dark bg / ctl colours
 		ApplyThemeToChildren(hDlg);            // theme the child controls
 		// Group boxes must sit BELOW the controls they frame: our group-box paint fills its whole
@@ -2043,6 +2098,7 @@ namespace DarkTheme
 			// the immersive dark menu theme, which otherwise stays dark until the app restarts).
 			DisallowDarkModeForApp();
 			DisableForWindow(hRoot);
+			UnclipChildren(hRoot);
 			EnumChildWindows(hRoot, StripThemeChildProc, 0);
 		}
 		::RedrawWindow(hRoot, nullptr, nullptr,
@@ -2090,6 +2146,7 @@ namespace DarkTheme
 		// per-window dark-mode flag - then repaint frame and children.
 		LoadApi();
 		RemoveWindowSubclass(hDlg, DialogSubclassProc, kDialogSubclassId);
+		UnclipChildren(hDlg);
 		EnumChildWindows(hDlg, StripThemeChildProc, 0);
 		if (g_bApiOk && pAllowDarkModeForWindow) {
 			pAllowDarkModeForWindow(hDlg, false);
