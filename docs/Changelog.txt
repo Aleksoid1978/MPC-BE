@@ -13,6 +13,7 @@ The ability to select a preferred audio track language has been restored.
 
 Player
 Fixed the issue with the Space bar when Japanese character input is active.
+Add "Dark dialogs".
 
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
