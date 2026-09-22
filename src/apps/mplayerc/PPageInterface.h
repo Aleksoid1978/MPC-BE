@@ -48,7 +48,6 @@ public:
 	CSliderCtrl m_ThemeGreenCtrl;
 	CSliderCtrl m_ThemeBlueCtrl;
 	CButton     m_chkDarkMenu;
-	CButton     m_chkDarkMenuBlurBehind;
 	CButton     m_chkDarkTitle;
 	CButton     m_chkDarkDialogs;
 

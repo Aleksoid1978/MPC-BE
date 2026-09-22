@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Po ukončení obnoviť pôvodné rozlíšenie"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Použiť „tmavú“ tému (predvolená)"
 7		"Jas:"
 9		"Nastavenie farby indikátora zvuku:"
@@ -311,17 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Povoliť tmavú ponuku"
-22		"Použiť efekt rozostrenia (Windows 10 a vyšší)"
-24		"Povoliť tmavý názov (Windows 10 a vyšší)"
-26		"Veľkosť ovládacích prvkov:"
-29		"Použiť popis času:"
-31		"Pri vyhľadávaní použiť náhľad"
-32		"Veľkosť vzhľadom na šírku obrazovky:"
-36		"Online"
-37		"Použiť značky kapitol"
-38		"Použiťe plávajúcu lištu"
-39		"Veľkosť písma zoznamu skladieb:"
-42		"Použiť funkcie panela úloh OS Windows 7 (a vyšší)."
+22		"Povoliť tmavý názov (Windows 10 a vyšší)"
+24		"Veľkosť ovládacích prvkov:"
+26		"Enable dark dialogs"
+28		"Použiť popis času:"
+30		"Pri vyhľadávaní použiť náhľad"
+31		"Veľkosť vzhľadom na šírku obrazovky:"
+35		"Online"
+36		"Použiť značky kapitol"
+37		"Použiťe plávajúcu lištu"
+38		"Veľkosť písma zoznamu skladieb:"
+41		"Použiť funkcie panela úloh OS Windows 7 (a vyšší)."
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

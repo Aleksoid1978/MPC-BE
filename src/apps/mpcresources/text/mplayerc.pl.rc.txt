@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Przywróć domyślny trybu po zakończeniu programu"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Użyj ""ciemnego"" motywu (domyślne)"
 7		"Jasność:"
 9		"Ustawianie koloru wskaźnika dźwięku:"
@@ -311,17 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Włącz ciemne menu"
-22		"Use Blur Behind effect (Windows 10 or later)"
-24		"Enable dark title (Windows 10 or later)"
-26		"Controls size:"
-29		"Pokazuj dymek z czasem:"
-31		"Użyj podglądu podczas szukania"
-32		"Rozmiar w stosunku do szerokości ekranu:"
-36		"Online"
-37		"Pokaż znacznik rozdziałów"
-38		"Użyj flybar"
-39		"Rozmiar czcionki listy odtwarzania:"
-42		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
+22		"Enable dark title (Windows 10 or later)"
+24		"Controls size:"
+26		"Enable dark dialogs"
+28		"Pokazuj dymek z czasem:"
+30		"Użyj podglądu podczas szukania"
+31		"Rozmiar w stosunku do szerokości ekranu:"
+35		"Online"
+36		"Pokaż znacznik rozdziałów"
+37		"Użyj flybar"
+38		"Rozmiar czcionki listy odtwarzania:"
+41		"Użyj funkcji paska zadań (Windows 7 i nowsze)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

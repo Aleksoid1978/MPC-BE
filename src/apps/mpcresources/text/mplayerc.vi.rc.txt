@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Khôi phục độ phân giải khi thoát chương trình"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Sử dụng giao diện ""tối"" (mặc định)"
 7		"Độ sáng :"
 9		"Thiết lập màu của chỉ báo âm thanh:"
@@ -311,17 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Bật menu tối"
-22		"Sử dụng hiệu ứng mờ nền (Windows 10 trở lên)"
-24		"Bật tiêu đề tối (Windows 10 trở lên)"
-26		"Kích thước điều khiển:"
-29		"Sử dụng chú giải thời gian:"
-31		"Sử dụng xem trước khi tìm kiếm"
-32		"Kích thước tương đối so với chiều rộng màn hình:"
-36		"Trực tuyến"
-37		"Sử dụng điểm đánh dấu chương"
-38		"Sử dụng thanh điều khiển trượt"
-39		"Kích thước phông chữ danh sách phát:"
-42		"Sử dụng tính năng thanh tác vụ của Windows 7 (trở lên)"
+22		"Bật tiêu đề tối (Windows 10 trở lên)"
+24		"Kích thước điều khiển:"
+26		"Enable dark dialogs"
+28		"Sử dụng chú giải thời gian:"
+30		"Sử dụng xem trước khi tìm kiếm"
+31		"Kích thước tương đối so với chiều rộng màn hình:"
+35		"Trực tuyến"
+36		"Sử dụng điểm đánh dấu chương"
+37		"Sử dụng thanh điều khiển trượt"
+38		"Kích thước phông chữ danh sách phát:"
+41		"Sử dụng tính năng thanh tác vụ của Windows 7 (trở lên)"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

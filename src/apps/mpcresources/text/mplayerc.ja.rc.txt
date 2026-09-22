@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"プログラム終了時に解像度を元に戻す"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"ダーク テーマを使用する (既定)"
 7		"明るさ :"
 9		"音量調節の色設定:"
@@ -311,17 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"緑:"
 17		"青:"
 21		"メニューに適用する"
-22		"背景ぼかし効果を使用する (Windows 10 以降)"
-24		"タイトルに適用する (Windows 10 以降)"
-26		"コントロール サイズ:"
-29		"タイム ツールヒントを使用する:"
-31		"検索でプレビュー機能を使用する"
-32		"画面横幅に対するサイズ:"
-36		"オンライン"
-37		"チャプター マーカーを使用する"
-38		"フライバーを使用する"
-39		"プレイリスト フォント サイズ:"
-42		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
+22		"タイトルに適用する (Windows 10 以降)"
+24		"コントロール サイズ:"
+26		"Enable dark dialogs"
+28		"タイム ツールヒントを使用する:"
+30		"検索でプレビュー機能を使用する"
+31		"画面横幅に対するサイズ:"
+35		"オンライン"
+36		"チャプター マーカーを使用する"
+37		"フライバーを使用する"
+38		"プレイリスト フォント サイズ:"
+41		"Windows 7 (とそれ以降) のタスク バーの機能を使用する"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22

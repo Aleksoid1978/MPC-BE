@@ -673,7 +673,6 @@ void CAppSettings::ResetSettings()
 	nThemeGreen = 255;
 	nThemeBlue  = 255;
 	bDarkMenu = true;
-	bDarkMenuBlurBehind = false;
 	bDarkTitle = true;
 	bDarkDialogs = false;
 
@@ -1300,7 +1299,6 @@ void CAppSettings::LoadSettings(bool bForce/* = false*/)
 	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, *(unsigned*)&clrFaceABGR);
 	profile.ReadHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, *(unsigned*)&clrOutlineABGR);
 	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
-	//profile.ReadBool(IDS_R_THEME, IDS_RS_DARKMENU_BLURBEHIND, bDarkMenuBlurBehind);
 	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKTITLE, bDarkTitle);
 	profile.ReadBool(IDS_R_THEME, IDS_RS_DARKDIALOGS, bDarkDialogs);
 
@@ -1926,7 +1924,6 @@ void CAppSettings::SaveSettings()
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLORFACE, clrFaceABGR);
 	profile.WriteHex32(IDS_R_THEME, IDS_RS_TOOLBARCOLOROUTLINE, clrOutlineABGR);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU, bDarkMenu);
-	//profile.WriteBool(IDS_R_THEME, IDS_RS_DARKMENU_BLURBEHIND, bDarkMenuBlurBehind);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKTITLE, bDarkTitle);
 	profile.WriteBool(IDS_R_THEME, IDS_RS_DARKDIALOGS, bDarkDialogs);
 

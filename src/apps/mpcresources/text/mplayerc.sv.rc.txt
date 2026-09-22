@@ -298,7 +298,7 @@ BEGIN DIALOGEX IDD_PPAGEFULLSCREEN LINES 34
 32		"Restore resolution after exit"
 END
 
-BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
+BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"Use ""dark"" theme (default)"
 7		"Brightness:"
 9		"Volume indicator colors:"
@@ -311,17 +311,17 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 44
 16		"G:"
 17		"B:"
 21		"Enable dark menu"
-22		"Use Blur Behind effect (Windows 10 or later)"
-24		"Enable dark title (Windows 10 or later)"
-26		"Controls size:"
-29		"Use time tooltips:"
-31		"Use the preview in the search"
-32		"Size relative to screen width:"
-36		"Online"
-37		"Use chapter markers"
-38		"Use flybar"
-39		"Playlist font size:"
-42		"Use Windows 7 (or later) Taskbar features"
+22		"Enable dark title (Windows 10 or later)"
+24		"Controls size:"
+26		"Enable dark dialogs"
+28		"Use time tooltips:"
+30		"Use the preview in the search"
+31		"Size relative to screen width:"
+35		"Online"
+36		"Use chapter markers"
+37		"Use flybar"
+38		"Playlist font size:"
+41		"Use Windows 7 (or later) Taskbar features"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
