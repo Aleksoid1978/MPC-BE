@@ -2100,7 +2100,6 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			if (profile == AV_PROFILE_HEVC_REXT && (m_hwType == HwType::D3D11 || m_hwType == HwType::NVDEC || m_hwType == HwType::D3D11CopyBack)) {
 				return true;
 			}
-
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
@@ -2109,6 +2108,9 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 			}
 			break;
 		case AV_CODEC_ID_VP9:
+			if (m_hwType == HwType::NVDEC && pix_fmt == AV_PIX_FMT_YUV420P12) {
+				return true;
+			}
 			if (pix_fmt != AV_PIX_FMT_YUV420P && pix_fmt != AV_PIX_FMT_YUVJ420P && pix_fmt != AV_PIX_FMT_YUV420P10) {
 				return false;
 			}
