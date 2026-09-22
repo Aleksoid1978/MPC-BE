@@ -852,6 +852,7 @@
 #define IDC_RESETDEVICE                 10871
 #define IDC_RESTORERESCHECK             10872
 #define IDC_CHECK_WIN7                  10873
+#define IDC_CHECK_DARKDIALOGS           10874
 //
 // 11000...13999 are reserved
 //

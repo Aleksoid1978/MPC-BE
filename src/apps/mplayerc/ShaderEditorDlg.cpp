@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "ShaderNewDlg.h"
 #include "ShaderEditorDlg.h"
+#include "controls/DarkTheme.h"
 
 // CShaderEdit
 
@@ -221,7 +222,24 @@ BOOL CShaderEditorDlg::Create(CWnd* pParent)
 
 	m_bD3D11 = (AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR && IsWindows8OrGreater());
 
+	RefreshDarkTheme();
+
 	return TRUE;
+}
+
+void CShaderEditorDlg::RefreshDarkTheme()
+{
+	DarkTheme::RefreshDialog(GetSafeHwnd());
+	// The source editor's line-number margin is a self-drawn CStatic that paints its own light
+	// background (RGB(200,200,200)); recolour it so the left gutter isn't a bright strip, and put
+	// the CLineNumberEdit defaults back when the option is turned off again.
+	if (DarkTheme::IsActive()) {
+		m_edSrcdata.SetMarginBackgroundColor(DarkTheme::FaceColor(), TRUE);
+		m_edSrcdata.SetMarginForegroundColor(RGB(120, 125, 130), TRUE);
+	} else {
+		m_edSrcdata.SetMarginBackgroundColor(RGB(200, 200, 200), TRUE);
+		m_edSrcdata.SetMarginForegroundColor(RGB(0, 0, 0), TRUE);
+	}
 }
 
 void CShaderEditorDlg::UpdateShaderList()

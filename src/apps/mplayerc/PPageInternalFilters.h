@@ -25,6 +25,8 @@
 #include "PPageBase.h"
 #include "afxcmn.h"
 #include "controls/FloatEdit.h"
+#include "controls/DarkCheckListBox.h"
+#include "controls/DarkTabCtrl.h"
 
 enum {
 	SOURCE,
@@ -39,7 +41,7 @@ struct filter_t {
 	UINT nHintID;
 };
 
-class CPPageInternalFiltersListBox : public CCheckListBox
+class CPPageInternalFiltersListBox : public CDarkCheckListBox
 {
 	DECLARE_DYNAMIC(CPPageInternalFiltersListBox)
 
@@ -91,7 +93,7 @@ public:
 	CIntEdit m_edtBufferDuration;
 	CSpinButtonCtrl m_spnBufferDuration;
 
-	CTabCtrl m_Tab;
+	CDarkTabCtrl m_Tab;
 
 	void ShowPPage(CUnknown* (WINAPI * CreateInstance)(LPUNKNOWN lpunk, HRESULT* phr));
 

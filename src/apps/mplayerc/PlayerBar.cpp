@@ -20,8 +20,15 @@
 
 #include "stdafx.h"
 #include "PlayerBar.h"
+#include "Misc.h" // ThemeRGB
+#include "controls/DarkTheme.h"
 
 IMPLEMENT_DYNAMIC(CPlayerBar, CSizingControlBarG)
+
+COLORREF CPlayerBar::ColorThemeRGB(const int iR, const int iG, const int iB) const
+{
+	return ThemeRGB(iR, iG, iB);
+}
 
 CPlayerBar::CPlayerBar(void)
 	: m_defDockBarID(0)
@@ -114,6 +121,43 @@ void CPlayerBar::OnWindowPosChanged(WINDOWPOS* lpwndpos)
 	if (lpwndpos->flags & SWP_HIDEWINDOW) {
 		GetParentFrame()->SetFocus();
 	}
+
+	ThemeMiniFrame(false);
+}
+
+void CPlayerBar::ThemeMiniFrame(bool bForce)
+{
+	// When floated, the bar lives in an MFC mini-frame that is an independent top-level window whose
+	// caption Windows paints light. Give it the dark title bar (immersive dark mode + themed caption
+	// colour) whenever the dialogs are dark, like the Options sheet and the auxiliary dialogs get -
+	// they all follow the option, not "Enable dark title", which is the main window's own switch.
+	// Do it once per mini-frame, not on every position change: dragging a floating bar fires this
+	// continuously, and re-running EnableForWindow each time floods the DWM (RefreshImmersiveColor
+	// PolicyState + DwmSetWindowAttribute) and leaves the window smearing across the screen.
+	// bForce = the option was just toggled: re-apply or undo on the frame we already handled.
+	if (!IsFloating()) {
+		m_hThemedMiniFrame = nullptr; // redocked / hidden - handle it again next time it floats
+		return;
+	}
+	CFrameWnd* pMiniFrame = GetParentFrame();
+	if (!pMiniFrame) {
+		return;
+	}
+	HWND hMiniFrame = pMiniFrame->GetSafeHwnd();
+	if (hMiniFrame == m_hThemedMiniFrame && !bForce) {
+		return;
+	}
+	if (DarkTheme::IsActive()) {
+		DarkTheme::EnableForWindow(hMiniFrame);
+	} else if (bForce) {
+		DarkTheme::DisableForWindow(hMiniFrame);
+	}
+	m_hThemedMiniFrame = hMiniFrame;
+}
+
+void CPlayerBar::RefreshDarkTheme()
+{
+	ThemeMiniFrame(true);
 }
 
 CSize CPlayerBar::CalcFixedLayout(BOOL bStretch, BOOL bHorz)

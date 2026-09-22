@@ -23,6 +23,7 @@
 #include "ItemPropertiesDlg.h"
 #include "HistoryDlg.h"
 #include "DSUtil/std_helper.h"
+#include "controls/DarkTheme.h"
 
 // CHistoryDlg dialog
 
@@ -286,6 +287,8 @@ BOOL CHistoryDlg::OnInitDialog()
 	EnableSaveRestore(IDS_R_DLG_HISTORY);
 
 	SHAutoComplete(m_FilterEdit, SHACF_AUTOAPPEND_FORCE_OFF | SHACF_AUTOSUGGEST_FORCE_OFF);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

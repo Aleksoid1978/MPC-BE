@@ -22,6 +22,11 @@
 #include "stdafx.h"
 #include "ComPropertySheet.h"
 #include "filters/filters/InternalPropertyPage.h"
+#include "controls/DarkTheme.h"
+
+// windowsx.h defines a function-like SubclassWindow(hwnd, lpfn) macro that collides with
+// CWnd::SubclassWindow(HWND); undef it so the MFC method call below parses correctly.
+#undef SubclassWindow
 
 
 // CComPropertyPageSite
@@ -228,6 +233,14 @@ void CComPropertySheet::OnActivated(CPropertyPage* pPage)
 
 	MoveWindow(CRect(wr.TopLeft(), ws + diff));
 
+	// Dark-theme this page: its host dialog (pChild) gets its own WM_CTLCOLOR*, so the sheet's
+	// subclass doesn't reach it — theme it directly (dark background/text + themed controls).
+	if (DarkTheme::IsActive()) {
+		if (CWnd* pChild = pPage->GetWindow(GW_CHILD)) {
+			DarkTheme::ThemeDialog(pChild->GetSafeHwnd());
+		}
+	}
+
 	Invalidate();
 }
 
@@ -243,6 +256,19 @@ BOOL CComPropertySheet::OnInitDialog()
 	if (!(GetStyle() & WS_CHILD)) {
 		CenterWindow();
 	}
+
+	// The stock tab control ignores SetWindowTheme and keeps a light body with a ~3px light frame;
+	// attach the owner-drawn dark tab so it matches (it falls back to native when the theme is off).
+	if (DarkTheme::IsActive()) {
+		if (CWnd* pTab = GetDlgItem(AFX_IDC_TAB_CONTROL)) {
+			m_dark_tab.SubclassWindow(pTab->GetSafeHwnd());
+		}
+	}
+
+	// Dark-theme the whole filter-config sheet (frame, tab, OK/Cancel/Apply) so it matches the
+	// Options dialog it was opened from. Each page's own background/controls are themed as the
+	// page is activated (OnActivated), since a property page dialog gets its WM_CTLCOLOR* itself.
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return bResult;
 }

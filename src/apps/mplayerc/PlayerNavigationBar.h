@@ -27,6 +27,7 @@
 #include "DVBChannel.h"
 #include <ExtLib/ui/ResizableLib/ResizableDialog.h>
 #include "PlayerBar.h"
+#include "controls/DarkTheme.h"
 
 #define MAX_CHANNELS_ALLOWED 200
 
@@ -86,6 +87,7 @@ public:
 	virtual ~CPlayerNavigationBar();
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 	virtual void ReloadTranslatableResources();
+	void RefreshDarkTheme() override { __super::RefreshDarkTheme(); DarkTheme::RefreshDialog(m_navdlg.GetSafeHwnd()); }
 
 	void ShowControls(CWnd* pMainfrm, bool bShow);
 

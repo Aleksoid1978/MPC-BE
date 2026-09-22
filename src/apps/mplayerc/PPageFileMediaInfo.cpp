@@ -22,6 +22,7 @@
 #include "MainFrm.h"
 #include "PPageFileMediaInfo.h"
 #include "DSUtil/FileHandle.h"
+#include "controls/DarkTheme.h"
 
 static MediaInfoLib::String mi_get_lang_file()
 {
@@ -116,6 +117,8 @@ BOOL CPPageFileMediaInfo::OnInitDialog()
 		m_cbFilename.EnableWindow(FALSE);
 	}
 	OnComboFileChange();
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

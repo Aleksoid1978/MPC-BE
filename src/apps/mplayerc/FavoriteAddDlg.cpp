@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "FavoriteAddDlg.h"
+#include "controls/DarkTheme.h"
 
 // CFavoriteAddDlg dialog
 
@@ -73,6 +74,8 @@ BOOL CFavoriteAddDlg::OnInitDialog()
 	UpdateData(FALSE);
 
 	m_namectrl.SetCurSel(0);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

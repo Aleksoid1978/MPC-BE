@@ -37,6 +37,7 @@ public:
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
 	virtual void ReloadTranslatableResources();
+	void RefreshDarkTheme() override { __super::RefreshDarkTheme(); m_dlg.RefreshDarkTheme(); }
 
 public:
 	CShaderEditorDlg m_dlg;
