@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Dunkles Menü aktivieren"
 22		"Dunkle Titelleiste aktivieren (ab Windows 10)"
 24		"Größe der Steuerelemente:"
-26		"Enable dark dialogs"
+26		"Dunkle Dialogfenster aktivieren"
 28		"Zeit-Tooltip anzeigen:"
 30		"Vorschau bei der Suche anzeigen"
 31		"Größe bezogen auf Bildschirmbreite:"
