@@ -50,6 +50,7 @@ public:
 	CButton     m_chkDarkMenu;
 	CButton     m_chkDarkMenuBlurBehind;
 	CButton     m_chkDarkTitle;
+	CButton     m_chkDarkDialogs;
 
 	BOOL      m_fUseTimeTooltip  = TRUE;
 	CComboBox m_TimeTooltipPosition;

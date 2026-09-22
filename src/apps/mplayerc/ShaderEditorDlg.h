@@ -77,6 +77,7 @@ public:
 
 	BOOL Create(CWnd* pParent = nullptr);
 	void UpdateShaderList();
+	void RefreshDarkTheme();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);

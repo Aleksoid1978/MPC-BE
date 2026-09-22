@@ -23,6 +23,7 @@
 #include "MainFrm.h"
 #include "PlayerCaptureDialog.h"
 #include "FileDialogs.h"
+#include "controls/DarkTheme.h"
 #include <moreuuids.h>
 #include "filters/muxer/WavDest/WavDest.h"
 #include "filters/muxer/MatroskaMuxer/MatroskaMuxer.h"
@@ -1344,6 +1345,8 @@ END_MESSAGE_MAP()
 BOOL CPlayerCaptureDialog::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return FALSE;  // return FALSE so that the dialog does not steal focus
 	// EXCEPTION: OCX Property Pages should return FALSE

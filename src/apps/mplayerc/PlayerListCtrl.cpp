@@ -22,6 +22,7 @@
 #include "stdafx.h"
 #include "PlayerListCtrl.h"
 #include "DSUtil/SysVersion.h"
+#include "controls/DarkTheme.h"
 
 // CInPlaceHotKey
 
@@ -290,9 +291,20 @@ BEGIN_MESSAGE_MAP(CInPlaceComboBox, CComboBox)
 	ON_WM_KILLFOCUS()
 	ON_WM_CHAR()
 	ON_WM_NCDESTROY()
+	ON_WM_CTLCOLOR()
 	ON_CONTROL_REFLECT(CBN_CLOSEUP, OnCloseup)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
+
+// The drop-down list sends WM_CTLCOLORLISTBOX to the combo (its parent); paint it with
+// the dark palette so the list items match the rest of the dark Options dialog.
+HBRUSH CInPlaceComboBox::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	if (HBRUSH hbr = DarkTheme::OnCtlColor(pDC, nCtlColor)) {
+		return hbr;
+	}
+	return CComboBox::OnCtlColor(pDC, pWnd, nCtlColor);
+}
 
 /////////////////////////////////////////////////////////////////////////////
 // CInPlaceComboBox message handlers
@@ -306,6 +318,10 @@ int CInPlaceComboBox::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// Set the proper font
 	CFont* font = GetParent()->GetFont();
 	SetFont(font);
+
+	// Match the rest of the dark Options dialog: theme the in-place combo (and its
+	// drop-down list) instead of leaving it the default light control.
+	DarkTheme::ApplyThemeToControl(GetSafeHwnd());
 
 	for (const auto& lstItem : m_lstItems) {
 		AddString(lstItem);
@@ -850,7 +866,39 @@ BEGIN_MESSAGE_MAP(CPlayerListCtrl, CListCtrl)
 	ON_LBN_SELCHANGE(IDC_LIST1, OnLbnSelChangeList1)
 	ON_NOTIFY_EX(HDN_ITEMCHANGINGW, 0, OnHdnItemchanging)
 	ON_NOTIFY_EX_RANGE(TTN_NEEDTEXTW, 0, 0xFFFF, OnToolTipNotify)
+	ON_WM_CTLCOLOR()
 END_MESSAGE_MAP()
+
+// The in-place editors (edit / hotkey / float edit) are children of this list control,
+// so their WM_CTLCOLOR* messages arrive here. Paint them with the dark palette so the
+// edit field matches the rest of the dark Options dialog instead of showing up white.
+HBRUSH CPlayerListCtrl::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	if (HBRUSH hbr = DarkTheme::OnCtlColor(pDC, nCtlColor)) {
+		return hbr;
+	}
+	return CListCtrl::OnCtlColor(pDC, pWnd, nCtlColor);
+}
+
+BOOL CPlayerListCtrl::PreTranslateMessage(MSG* pMsg)
+{
+	// When "locked" the control stays enabled (so it keeps its dark appearance) but must
+	// behave as if disabled: swallow all mouse/keyboard input so nothing can be clicked,
+	// toggled, hovered or edited.
+	if (m_bLocked && pMsg->hwnd == m_hWnd) {
+		switch (pMsg->message) {
+			case WM_LBUTTONDOWN:   case WM_LBUTTONUP:   case WM_LBUTTONDBLCLK:
+			case WM_RBUTTONDOWN:   case WM_RBUTTONUP:   case WM_RBUTTONDBLCLK:
+			case WM_MBUTTONDOWN:   case WM_MBUTTONUP:
+			case WM_MOUSEMOVE:     case WM_MOUSEWHEEL:  case WM_MOUSEHOVER:
+			case WM_KEYDOWN:       case WM_KEYUP:       case WM_SYSKEYDOWN:
+			case WM_CHAR:          case WM_SETCURSOR:
+				return TRUE; // eat it
+		}
+	}
+
+	return CListCtrl::PreTranslateMessage(pMsg);
+}
 
 // CPlayerListCtrl message handlers
 

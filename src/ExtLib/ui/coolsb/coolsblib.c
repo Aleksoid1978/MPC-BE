@@ -37,6 +37,10 @@
 
 static TCHAR szPropStr[] = _T("CoolSBSubclassPtr");
 
+// Single definition of the theme-colour callback (declared extern in coolscroll.h so the
+// header can be included from more than one translation unit without a duplicate symbol).
+ptr_themeRGB fThemeRGB = NULL;
+
 LRESULT CALLBACK CoolSBWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 SCROLLWND *GetScrollWndFromHwnd(HWND hwnd)

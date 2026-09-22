@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PPageOSD.h"
+#include "controls/DarkTheme.h"
 
 static int CALLBACK EnumFontProc(ENUMLOGFONT FAR* lf, NEWTEXTMETRIC FAR* tm, DWORD FontType, LPARAM dwData)
 {
@@ -336,9 +337,17 @@ void CPPageOSD::OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult)
 			dc.Attach(pNMCD->hdc);
 			CRect r;
 			CopyRect(&r, &pNMCD->rc);
-			CPen penFrEnabled(PS_SOLID, 0, GetSysColor(COLOR_BTNTEXT));
-			CPen penFrDisabled(PS_SOLID, 0, GetSysColor(COLOR_BTNSHADOW));
+			const bool bDark = DarkTheme::IsActive();
+			CPen penFrEnabled(PS_SOLID, 0, bDark ? DarkTheme::CtrlBorderColor() : GetSysColor(COLOR_BTNTEXT));
+			CPen penFrDisabled(PS_SOLID, 0, bDark ? DarkTheme::CtrlBorderColor() : GetSysColor(COLOR_BTNSHADOW));
 			CPen* penOld = dc.SelectObject(&penFrEnabled);
+			// Dark only: fill the rounded swatch's surround with the page colour so no light ring shows.
+			// Light keeps the DC's default brush, exactly as upstream draws it.
+			CBrush brBack(DarkTheme::FaceColor());
+			CBrush* pOldBrush = bDark ? dc.SelectObject(&brBack) : nullptr;
+			if (bDark) {
+				dc.FillSolidRect(&r, DarkTheme::FaceColor()); // avoid a light ring around the rounded swatch
+			}
 
 			if (CDIS_HOT == pNMCD->uItemState || CDIS_HOT + CDIS_FOCUS == pNMCD->uItemState || CDIS_DISABLED == pNMCD->uItemState) {
 				dc.SelectObject(&penFrDisabled);
@@ -359,6 +368,9 @@ void CPPageOSD::OnCustomDrawBtns(NMHDR* pNMHDR, LRESULT* pResult)
 			}
 
 			dc.SelectObject(&penOld);
+			if (pOldBrush) {
+				dc.SelectObject(pOldBrush);
+			}
 			dc.Detach();
 
 			*pResult = CDRF_SKIPDEFAULT;

@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageFileInfoDetails.h"
+#include "controls/DarkTheme.h"
 #include <d3d9.h>
 #include <vmr9.h>
 #include <clsids.h>
@@ -228,6 +229,8 @@ BOOL CPPageFileInfoDetails::OnInitDialog()
 	UpdateData(FALSE);
 
 	m_encoding.SetWindowTextW(m_encodingText);
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return TRUE;
 }

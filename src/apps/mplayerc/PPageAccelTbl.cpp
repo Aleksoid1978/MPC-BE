@@ -21,6 +21,7 @@
 
 #include "stdafx.h"
 #include "PPageAccelTbl.h"
+#include "controls/DarkTheme.h"
 #include "Misc.h"
 
 //#define MASK_NUMBER  0xFFF
@@ -842,11 +843,20 @@ void CPPageAccelTbl::OnCustomdrawList( NMHDR* pNMHDR, LRESULT* pResult )
 		auto itemData = (ITEMDATA*)m_list.GetItemData(pLVCD->nmcd.dwItemSpec);
 		auto dup = itemData->flag;
 
-		if (pLVCD->iSubItem == COL_CMD && dup
+		const bool isDup = (pLVCD->iSubItem == COL_CMD && dup
 				|| pLVCD->iSubItem == COL_KEY && (dup & DUP_KEY)
 				|| pLVCD->iSubItem == COL_APPCMD && (dup & DUP_APPCMD)
-				|| pLVCD->iSubItem == COL_RMCMD && (dup & DUP_RMCMD)) {
+				|| pLVCD->iSubItem == COL_RMCMD && (dup & DUP_RMCMD));
+
+		if (isDup) {
 			pLVCD->clrTextBk = RGB(255, 130, 120);
+			if (DarkTheme::IsActive()) {
+				pLVCD->clrText = RGB(0, 0, 0); // keep the text readable on the highlight
+			}
+		}
+		else if (DarkTheme::IsActive()) {
+			pLVCD->clrTextBk = DarkTheme::FaceColor();
+			pLVCD->clrText   = DarkTheme::TextColor();
 		}
 		else {
 			pLVCD->clrTextBk = GetSysColor(COLOR_WINDOW);

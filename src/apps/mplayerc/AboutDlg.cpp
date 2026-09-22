@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "AboutDlg.h"
 #include "DSUtil/FileHandle.h"
+#include "controls/DarkTheme.h"
 
 #include "Version.h"
 
@@ -93,6 +94,8 @@ BOOL CAboutDlg::OnInitDialog()
 	UpdateData(FALSE);
 
 	GetDlgItem(IDOK)->SetFocus();
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	return FALSE;
 }

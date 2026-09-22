@@ -23,6 +23,7 @@
 
 #include "PlayerBar.h"
 #include "PlayerCaptureDialog.h"
+#include "controls/DarkTheme.h"
 
 // CPlayerCaptureBar
 
@@ -39,6 +40,7 @@ public:
 	BOOL Create(CWnd* pParentWnd, UINT defDockBarID);
 
 	virtual void ReloadTranslatableResources();
+	void RefreshDarkTheme() override { __super::RefreshDarkTheme(); DarkTheme::RefreshDialog(m_capdlg.GetSafeHwnd()); }
 
 	void InitControls();
 

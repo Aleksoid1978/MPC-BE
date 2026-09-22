@@ -21,6 +21,7 @@
 #include "stdafx.h"
 #include "MainFrm.h"
 #include "PlayerNavigationBar.h"
+#include "controls/DarkTheme.h"
 #include <afxwin.h>
 #include <moreuuids.h>
 
@@ -196,6 +197,8 @@ END_MESSAGE_MAP()
 BOOL CPlayerNavigationDialog::OnInitDialog()
 {
 	__super::OnInitDialog();
+
+	DarkTheme::ThemeDialog(GetSafeHwnd());
 
 	m_bTVStations = true;
 	m_ButtonFilterStations.SetWindowTextW(ResStr(IDS_DVB_TVNAV_SEERADIO));
