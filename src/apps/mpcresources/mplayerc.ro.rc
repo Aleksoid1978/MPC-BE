@@ -445,7 +445,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activ. casetele de dialog întunecate (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
+    CONTROL         "Activează casetele de dialog întunecate (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Folosește indiciile de timp:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -3176,8 +3176,8 @@ BEGIN
     IDS_MAINFRM_37          ", Total: %d, Pierdute: %d"
     IDS_MAINFRM_38          ", Mărime: %I64d (de) KB (KO)"
     IDS_MAINFRM_39          ", Mărime: %I64d (de) MB (MO)"
-    IDS_MAINFRM_40          ", Liberă: %I64d (de) KB (KO)"
-    IDS_MAINFRM_41          ", Liberă: %I64d (de) MB (MO)"
+    IDS_MAINFRM_40          ", Spațiu liber: %I64d (de) KB (KO)"
+    IDS_MAINFRM_41          ", Spațiu liber: %I64d (de) MB (MO)"
     IDS_MAINFRM_42          ", Preîncărcări pentru V/A (Video/Audio) libere: %03d/%03d"
     IDS_AG_ERROR            "Eroare"
     IDS_SUBTITLE_STREAM_OFF "Subtitrări: Oprite"

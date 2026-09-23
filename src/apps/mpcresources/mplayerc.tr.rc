@@ -235,7 +235,7 @@ BEGIN
     CONTROL         "<a>https://github.com/Aleksoid1978/MPC-BE</a>",IDC_GITHUB_LINK,
                     "SysLink",WS_TABSTOP,30,126,200,8
     LTEXT           "Bu program ücretsiz olup GNU Genel Kamu Lisansı altında sunulmaktadır.",IDC_STATIC,30,138,200,18
-    LTEXT           "bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiş, cmhrky   (C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir.",IDC_STATIC,30,161,200,18
+    LTEXT           "bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir. cmhrky \n(C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir.",IDC_STATIC,30,161,200,18
     DEFPUSHBUTTON   "Tamam",IDOK,185,183,50,14,WS_GROUP
 END
 
@@ -441,11 +441,11 @@ BEGIN
     CONTROL         "",IDC_SLIDER3,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,34,53,12
     CONTROL         "",IDC_SLIDER4,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,233,49,53,12
     CONTROL         "Koyu menüyü etkinleştir",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,59,147,9,WS_EX_TRANSPARENT
-    CONTROL         "Koyu başlığı etkinleştir (Windows 10 ve üzeri)",IDC_CHECK5,
+    CONTROL         "Koyu başlığı etkinleştir (Windows 10 ya da üzeri)",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Kontrollerin boyutu:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Enable dark dialogs (Windows 10 or later)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
+    CONTROL         "Koyu diyalogları etkinleştir (Windows 10 ya da üzeri)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Süre bilgi ipucunu göster:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -460,7 +460,7 @@ BEGIN
     LTEXT           "Oynatma listesi yazı tipi boyutu:",IDC_STATIC,13,187,110,8
     EDITTEXT        IDC_EDIT2,127,185,25,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "%",IDC_STATIC,154,187,10,8
-    CONTROL         "Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan",IDC_CHECK_WIN7,
+    CONTROL         "Windows 7 (ya da üzeri) Görev çubuğu özelliklerini kullan",IDC_CHECK_WIN7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,206,270,11
 END
 
