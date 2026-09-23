@@ -2013,9 +2013,6 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		}
 
 	}
-
-	FlyBarSetPos();
-	OSDBarSetPos();
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
