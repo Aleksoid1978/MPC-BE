@@ -1,4 +1,4 @@
-﻿BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
+BEGIN DIALOGEX IDD_ABOUTBOX LINES 26
 3		"Hakkında"
 7		"MPC-BE"
 8		"Telif Hakkı © 2002-2026, Authors.txt dosyasına bakınız"
@@ -7,7 +7,7 @@
 12		"FFmpeg Derleyici :"
 13		"Libavcodec / Libavutil :"
 23		"Bu program ücretsiz olup GNU Genel Kamu Lisansı altında sunulmaktadır."
-24		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiş, cmhrky   (C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir."
+24		"bosluk (Sinan Hunerel) tarafından Türkçeleştirilmiştir. cmhrky \n(C. Kaya KURTOĞLU) MPC-BE için eklemelerle düzenlemiştir."
 25		"Tamam"
 END
 
@@ -311,9 +311,9 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 16		"G:"
 17		"B:"
 21		"Koyu menüyü etkinleştir"
-22		"Koyu başlığı etkinleştir (Windows 10 ve üzeri)"
+22		"Koyu başlığı etkinleştir (Windows 10 ya da üzeri)"
 24		"Kontrollerin boyutu:"
-26		"Enable dark dialogs (Windows 10 or later)"
+26		"Koyu diyalogları etkinleştir (Windows 10 ya da üzeri)"
 28		"Süre bilgi ipucunu göster:"
 30		"Arama Çubuğu üzerinde ön izleme resmi göster"
 31		"Ekran genişliğine göre boyut:"
@@ -321,7 +321,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 36		"Bölüm işaretlerini göster"
 37		"Şeffaf Çubuğu göster"
 38		"Oynatma listesi yazı tipi boyutu:"
-41		"Windows 7 (ve üzeri) Görev çubuğu özelliklerini kullan"
+41		"Windows 7 (ya da üzeri) Görev çubuğu özelliklerini kullan"
 END
 
 BEGIN DIALOGEX IDD_PPAGEINTERNALFILTERS LINES 22
