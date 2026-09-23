@@ -74,21 +74,17 @@ const SW_OUT_FMT* GetSWOF(int pixfmt)
 
 LPCWSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 {
-	int h_shift, v_shift;
+	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+	if (pfdesc && pfdesc->nb_components >= 3) {
+		unsigned chroma_sub_sample = ((unsigned)pfdesc->log2_chroma_w << 8) + pfdesc->log2_chroma_h;
 
-	if (0 == av_pix_fmt_get_chroma_sub_sample(av_pix_fmt, &h_shift, &v_shift)) {
-		if (h_shift == 0 && v_shift == 0) {
-			return L"4:4:4";
-		} else if (h_shift == 0 && v_shift == 1) {
-			return L"4:4:0";
-		} else if (h_shift == 1 && v_shift == 0) {
-			return L"4:2:2";
-		} else if (h_shift == 1 && v_shift == 1) {
-			return L"4:2:0";
-		} else if (h_shift == 2 && v_shift == 0) {
-			return L"4:1:1";
-		} else if (h_shift == 2 && v_shift == 2) {
-			return L"4:1:0";
+		switch (chroma_sub_sample) {
+		case 0x0000: return L"4:4:4";
+		case 0x0001: return L"4:4:0";
+		case 0x0100: return L"4:2:2";
+		case 0x0101: return L"4:2:0";
+		case 0x0200: return L"4:1:1";
+		case 0x0202: return L"4:1:0";
 		}
 	}
 
