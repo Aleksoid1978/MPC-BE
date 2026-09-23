@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"استخدام القائمة الداكنة"
 22		"استخدام شريط العنوان الداكن (Windows 10 والإصدارات الأحدث)"
 24		"حجم عناصر التحكم:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"استخدام تلميح الوقت:"
 30		"استخدام المعاينة في البحث"
 31		"الحجم بالنسبة لعرض الشاشة:"

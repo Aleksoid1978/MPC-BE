@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Omogući taman izbornik"
 22		"Omogući taman naslov (Windows 10 or later)"
 24		"Controls size:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"Koristi vremenski tooltip:"
 30		"Koristi pretpregled prilikom pretrage"
 31		"Veličina relativna širini ekrana:"

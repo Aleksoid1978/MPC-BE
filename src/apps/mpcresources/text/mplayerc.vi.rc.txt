@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Bật menu tối"
 22		"Bật tiêu đề tối (Windows 10 trở lên)"
 24		"Kích thước điều khiển:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"Sử dụng chú giải thời gian:"
 30		"Sử dụng xem trước khi tìm kiếm"
 31		"Kích thước tương đối so với chiều rộng màn hình:"

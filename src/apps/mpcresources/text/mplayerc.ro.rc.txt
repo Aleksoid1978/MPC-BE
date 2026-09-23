@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Activează meniul întunecat"
 22		"Activează titlul întunecat (pentru Windows 10 sau versiunile mai noi)"
 24		"Dimensiunea controalelor:"
-26		"Activ. casetele de dialog întunecate"
+26		"Activ. casetele de dialog întunecate (pentru Windows 10 sau versiunile mai noi)"
 28		"Folosește indiciile de timp:"
 30		"Folosește previzualizarea în căutare"
 31		"Dimensiunea raportată la lățimea ecranului:"

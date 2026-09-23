@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Povoliť tmavú ponuku"
 22		"Povoliť tmavý názov (Windows 10 a vyšší)"
 24		"Veľkosť ovládacích prvkov:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"Použiť popis času:"
 30		"Pri vyhľadávaní použiť náhľad"
 31		"Veľkosť vzhľadom na šírku obrazovky:"

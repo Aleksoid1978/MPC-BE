@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Donker menu inschakelen"
 22		"Activeer donkere titelbalk (Windows 10 en hoger)"
 24		"Grootte van bedieningspaneel:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"Toon scherminfo voor tijd:"
 30		"Activeer voorvertoning op zoekbalk"
 31		"Grootte op basis v/d schermbreedte:"

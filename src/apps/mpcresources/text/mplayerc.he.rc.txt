@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"Enable dark menu"
 22		"Enable dark title (Windows 10 or later)"
 24		"Controls size:"
-26		"Enable dark dialogs"
+26		"Enable dark dialogs (Windows 10 or later)"
 28		"Use time tooltips:"
 30		"Use the preview in the search"
 31		"Size relative to screen width:"
