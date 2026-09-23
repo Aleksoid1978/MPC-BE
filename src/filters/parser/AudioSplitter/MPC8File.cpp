@@ -190,6 +190,9 @@ bool CMPC8File::ReadStreamHeader()
 
 	m_channels = (m_extradata[1] >> 4) + 1;
 	const auto samplerateidx = m_extradata[0] >> 5;
+	if (samplerateidx >= std::size(freq)) {
+		return false;
+	}
 	m_samplerate = freq[samplerateidx];
 	m_block_pwr = (m_extradata[1] & 3) * 2;
 	m_framesamples = 1152 << m_block_pwr;
