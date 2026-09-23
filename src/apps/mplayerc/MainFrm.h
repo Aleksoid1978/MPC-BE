@@ -871,8 +871,7 @@ public:
 
 	afx_msg void OnEnterSizeMove();
 	afx_msg void ClipRectToMonitor(LPRECT prc);
-	int snap_Margin, snap_x, snap_y;
-	BOOL isSnapClose(int a, int b);
+	int snap_x, snap_y;
 	BOOL m_bWndZoomed;
 	RECT rc_forceNP;
 

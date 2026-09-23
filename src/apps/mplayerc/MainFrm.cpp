@@ -1897,12 +1897,6 @@ void CMainFrame::OnEnterSizeMove()
 	}
 }
 
-BOOL CMainFrame::isSnapClose(int a, int b)
-{
-	snap_Margin = GetSystemMetrics(SM_CYCAPTION);
-	return (abs(a - b) < snap_Margin);
-}
-
 void CMainFrame::OnMove(int x, int y)
 {
 	__super::OnMove(x, y);
@@ -1995,6 +1989,10 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		}
 
 		OffsetRect(pRect, cur_pos.x - (pRect->left + snap_x), cur_pos.y - (pRect->top + snap_y));
+
+		const int snap_Margin = GetSystemMetrics(SM_CYCAPTION);
+
+		auto isSnapClose = [&snap_Margin](int a, int b) { return (abs(a - b) < snap_Margin); };
 
 		if (isSnapClose(pRect->left, rcWork.left)) { // left screen snap
 			OffsetRect(pRect, rcWork.left - pRect->left, 0);
