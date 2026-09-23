@@ -135,12 +135,18 @@ void CPlayerBar::ThemeMiniFrame(bool bForce)
 	// continuously, and re-running EnableForWindow each time floods the DWM (RefreshImmersiveColor
 	// PolicyState + DwmSetWindowAttribute) and leaves the window smearing across the screen.
 	// bForce = the option was just toggled: re-apply or undo on the frame we already handled.
+	// IsFloating() alone is not enough: it only says the bar is not docked on one of the four sides,
+	// which is also true for a bar that has just been created and not laid out yet - and at that point
+	// GetParentFrame() is still the MAIN window, so this used to give the player's own title bar the
+	// dark caption at startup, ignoring "Enable dark title". Require a real floating mini-frame, the
+	// way sizecbar itself does it (see CSizingControlBar::OnSetText).
 	if (!IsFloating()) {
 		m_hThemedMiniFrame = nullptr; // redocked / hidden - handle it again next time it floats
 		return;
 	}
 	CFrameWnd* pMiniFrame = GetParentFrame();
-	if (!pMiniFrame) {
+	if (!pMiniFrame || !pMiniFrame->IsKindOf(RUNTIME_CLASS(CMiniDockFrameWnd))) {
+		m_hThemedMiniFrame = nullptr;
 		return;
 	}
 	HWND hMiniFrame = pMiniFrame->GetSafeHwnd();
