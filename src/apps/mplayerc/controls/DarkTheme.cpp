@@ -72,6 +72,54 @@ namespace DarkTheme
 			return b;
 		}
 
+		// GetDpiForWindow and GetSystemMetricsForDpi are Windows 10 1607+. The dark dialogs need 1809, so
+		// they are never CALLED on an older system - but a static import is resolved by the loader when the
+		// process starts, so importing them would stop the player from starting at all on Windows 7 / 8.
+		// Load them at runtime (as HighDPI.h does) and fall back to the screen DPI / unscaled metrics.
+		using fnGetDpiForWindow        = UINT (WINAPI*)(HWND);
+		using fnGetSystemMetricsForDpi = int  (WINAPI*)(int, UINT);
+		fnGetDpiForWindow        pGetDpiForWindow        = nullptr;
+		fnGetSystemMetricsForDpi pGetSystemMetricsForDpi = nullptr;
+		bool g_bDpiApiChecked = false;
+
+		void LoadDpiApi() {
+			if (g_bDpiApiChecked) {
+				return;
+			}
+			g_bDpiApiChecked = true;
+			if (HMODULE hUser = GetModuleHandleW(L"user32.dll")) {
+				pGetDpiForWindow        = (fnGetDpiForWindow)GetProcAddress(hUser, "GetDpiForWindow");
+				pGetSystemMetricsForDpi = (fnGetSystemMetricsForDpi)GetProcAddress(hUser, "GetSystemMetricsForDpi");
+			}
+		}
+
+		UINT DpiForWindow(HWND h) {
+			LoadDpiApi();
+			if (pGetDpiForWindow) {
+				const UINT dpi = pGetDpiForWindow(h);
+				if (dpi) {
+					return dpi;
+				}
+			}
+			UINT dpi = 96;
+			if (HDC hdc = ::GetDC(nullptr)) {
+				const int x = ::GetDeviceCaps(hdc, LOGPIXELSX);
+				if (x > 0) {
+					dpi = static_cast<UINT>(x);
+				}
+				::ReleaseDC(nullptr, hdc);
+			}
+			return dpi;
+		}
+
+		int SystemMetricsForDpi(int nIndex, UINT dpi) {
+			LoadDpiApi();
+			if (pGetSystemMetricsForDpi) {
+				return pGetSystemMetricsForDpi(nIndex, dpi);
+			}
+			return ::GetSystemMetrics(nIndex);
+		}
+
 		void LoadApi() {
 			if (g_bApiChecked) {
 				return;
@@ -901,7 +949,7 @@ namespace DarkTheme
 		};
 
 		int OwnerBorderDpi(HWND h) {
-			const UINT dpi = ::GetDpiForWindow(h);
+			const UINT dpi = DpiForWindow(h);
 			return dpi ? static_cast<int>(dpi) : 96;
 		}
 
@@ -909,7 +957,7 @@ namespace DarkTheme
 			if (logical <= 0) {
 				return 0;
 			}
-			return logical * ::GetSystemMetricsForDpi(SM_CXBORDER, OwnerBorderDpi(h));
+			return logical * SystemMetricsForDpi(SM_CXBORDER, OwnerBorderDpi(h));
 		}
 
 		// Interior colour of the reserved band, matched to what OnCtlColor gives each control's client
@@ -986,7 +1034,7 @@ namespace DarkTheme
 						// our dark fill covers the light edge DarkMode_Explorer draws between the list and the
 						// scrollbar. Use the scrollbar's REAL rect from GetScrollBarInfo — the earlier
 						// band.right - sw guess was wrong after our custom WM_NCCALCSIZE, so it never covered it.
-						const int inner = 2 * ::GetSystemMetricsForDpi(SM_CXBORDER, dpi);
+						const int inner = 2 * SystemMetricsForDpi(SM_CXBORDER, dpi);
 						if (st & WS_VSCROLL) {
 							SCROLLBARINFO sbi = { sizeof(sbi) };
 							if (::GetScrollBarInfo(h, OBJID_VSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
@@ -1018,7 +1066,7 @@ namespace DarkTheme
 						GetClassNameW(h, obcls, _countof(obcls));
 						const bool thinBorder = (_wcsicmp(obcls, L"Edit") == 0 || _wcsicmp(obcls, L"MFCMaskedEdit") == 0
 											|| _wcsicmp(obcls, L"Static") == 0);
-						const int stroke = thinBorder ? ::GetSystemMetricsForDpi(SM_CXBORDER, dpi) : t;
+						const int stroke = thinBorder ? SystemMetricsForDpi(SM_CXBORDER, dpi) : t;
 						HBRUSH edge = ::CreateSolidBrush(OwnerBorderFrame(d, h));
 						RECT fr = band;
 						for (int i = 0; i < stroke; ++i) {
@@ -1187,8 +1235,8 @@ namespace DarkTheme
 						::DeleteObject(bg);
 
 						// Drop-down arrow, in its own button-width strip on the right.
-						const UINT dpi = ::GetDpiForWindow(h);
-						const int btnW = ::GetSystemMetricsForDpi(SM_CXVSCROLL, dpi ? dpi : 96);
+						const UINT dpi = DpiForWindow(h);
+						const int btnW = SystemMetricsForDpi(SM_CXVSCROLL, dpi ? dpi : 96);
 						CRect rcBtn(rc.right - btnW, rc.top, rc.right, rc.bottom);
 						DrawArrow(CDC::FromHandle(mem), rcBtn, false,
 							disabled ? RGB(110, 115, 120) : RGB(170, 175, 180));
@@ -1361,7 +1409,7 @@ namespace DarkTheme
 					::FillRect(hdc, &rc, bg);
 					::DeleteObject(bg);
 					// Dots on the bottom-right diagonal, like the classic grip: rows of 1, 2 and 3.
-					const UINT dpi = ::GetDpiForWindow(hWnd);
+					const UINT dpi = DpiForWindow(hWnd);
 					const int step = ::MulDiv(4, dpi ? dpi : 96, 96);
 					const int dot  = ::MulDiv(2, dpi ? dpi : 96, 96);
 					HBRUSH dotBrush = ::CreateSolidBrush(Shade(FaceColor(), 55));
