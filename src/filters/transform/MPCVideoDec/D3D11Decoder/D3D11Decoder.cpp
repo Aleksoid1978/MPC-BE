@@ -351,7 +351,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
 	HRESULT hr = S_OK;
 
-	m_pFilter->m_swPixFormat = c->sw_pix_fmt;
+	m_pFilter->m_swPixFormat = CMPCVideoDecFilter::NonJPixelFmt(c->sw_pix_fmt);
 
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;

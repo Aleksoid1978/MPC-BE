@@ -2568,7 +2568,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		m_nSurfaceWidth = FFALIGN(m_pAVCtx->coded_width, m_nAlign);
 		m_nSurfaceHeight = FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 
-		m_swPixFormat = m_pAVCtx->pix_fmt;
+		m_swPixFormat = NonJPixelFmt((m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt);
 
 		m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 		m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
@@ -4344,8 +4344,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
 		for (const auto& mode : DXVAModes) {
 			if (mode.nCodecId == m_CodecId && mode.decoderGUID == decoderGUID) {
-				const auto pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
-				if (mode.swPixFormat == pix_fmt) {
+				if (mode.swPixFormat == m_swPixFormat) {
 					return TRUE;
 				}
 			}
@@ -5211,11 +5210,11 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 				|| ((m_CodecId == AV_CODEC_ID_HEVC || m_CodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
 
-			const bool bFormatChanged = (m_swPixFormat != m_pAVCtx->sw_pix_fmt);
+			const bool bFormatChanged = (m_swPixFormat != NonJPixelFmt((m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt));
 
 			m_nSurfaceWidth  = FFALIGN(c->coded_width, m_nAlign);
 			m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
-			m_swPixFormat = m_pAVCtx->sw_pix_fmt;
+			m_swPixFormat    = NonJPixelFmt((m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt);
 
 			avcodec_flush_buffers(c);
 			if (SUCCEEDED(hr = FindDecoderConfiguration())) {
@@ -5273,6 +5272,16 @@ enum AVPixelFormat CMPCVideoDecFilter::av_get_format(struct AVCodecContext *c, c
 	}
 
 	return *p;
+}
+
+AVPixelFormat CMPCVideoDecFilter::NonJPixelFmt(AVPixelFormat format) {
+	switch (format) {
+		case AV_PIX_FMT_YUVJ420P: return AV_PIX_FMT_YUV420P;
+		case AV_PIX_FMT_YUVJ422P: return AV_PIX_FMT_YUV422P;
+		case AV_PIX_FMT_YUVJ444P: return AV_PIX_FMT_YUV444P;
+		default:
+			return format;
+	}
 }
 
 // CVideoDecOutputPin

@@ -358,6 +358,8 @@ public:
 	// === Codec functions
 	HRESULT						SetFFMpegCodec(int nCodec, bool bEnabled);
 
+	static AVPixelFormat NonJPixelFmt(AVPixelFormat format);
+
 private:
 	friend class CVideoDecDXVAAllocator;
 	friend class CDXVA2Decoder;
