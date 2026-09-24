@@ -161,7 +161,7 @@ private:
 	BOOL									m_bDecodingStart = FALSE;
 	BOOL									m_bDecoderAcceptFormat = FALSE;
 
-	bool									m_bHighBitdepth = false;
+	AVPixelFormat							m_swPixFormat;
 
 	std::unique_ptr<CMSDKDecoder>			m_pMSDKDecoder;
 	int										m_iMvcOutputMode = MVC_OUTPUT_Auto;

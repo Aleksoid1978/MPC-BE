@@ -158,47 +158,46 @@ struct FFMPEG_CODECS {
 };
 
 struct {
-	const enum AVCodecID nCodecId;
-	const GUID           decoderGUID;
-	const bool           bHighBitdepth;
-	const AVPixelFormat  pixFormat = AV_PIX_FMT_NONE;
+	const AVCodecID     nCodecId;
+	const GUID          decoderGUID;
+	const AVPixelFormat swPixFormat;
 } DXVAModes[] = {
 	// H.264
-	{ AV_CODEC_ID_H264, DXVA2_ModeH264_E, false },
-	{ AV_CODEC_ID_H264, DXVA2_ModeH264_F, false },
-	{ AV_CODEC_ID_H264, DXVA2_H264_VLD_Intel, false },
-	// HEVC Rext
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12,     false, AV_PIX_FMT_YUV420P12 },
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_422, false, AV_PIX_FMT_YUV422P10 },
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_422, false, AV_PIX_FMT_YUV422P12 },
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN_444,   false, AV_PIX_FMT_YUV444P   },
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_444, false, AV_PIX_FMT_YUV444P10 },
-	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_444, false, AV_PIX_FMT_YUV444P12 },
-	// HEVC Intel
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main12_Intel,     false, AV_PIX_FMT_YUV420P12 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10_Intel, false, AV_PIX_FMT_YUV422P   },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10_Intel, false, AV_PIX_FMT_YUV422P10 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_12_Intel, false, AV_PIX_FMT_YUV422P12 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_Intel,    false, AV_PIX_FMT_YUV444P   },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_10_Intel, false, AV_PIX_FMT_YUV444P10 },
-	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_12_Intel, false, AV_PIX_FMT_YUV444P12 },
+	{ AV_CODEC_ID_H264, DXVA2_ModeH264_VLD_NoFGT,                  AV_PIX_FMT_YUV420P     },
+	{ AV_CODEC_ID_H264, DXVA2_ModeH264_VLD_FGT,                    AV_PIX_FMT_YUV420P     },
+	{ AV_CODEC_ID_H264, DXVA2_H264_VLD_Intel,                      AV_PIX_FMT_YUV420P     },
+	// HEVC Rext (AV_PROFILE_HEVC_REXT)
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12,     AV_PIX_FMT_YUV420P12LE },
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_422, AV_PIX_FMT_YUV422P10LE },
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_422, AV_PIX_FMT_YUV422P12LE },
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN_444,   AV_PIX_FMT_YUV444P     },
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN10_444, AV_PIX_FMT_YUV444P10LE },
+	{ AV_CODEC_ID_HEVC, D3D11_DECODER_PROFILE_HEVC_VLD_MAIN12_444, AV_PIX_FMT_YUV444P12LE },
+	// HEVC Intel (AV_PROFILE_HEVC_REXT)
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main12_Intel,               AV_PIX_FMT_YUV420P12LE },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10_Intel,           AV_PIX_FMT_YUV422P     },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_10_Intel,           AV_PIX_FMT_YUV422P10LE },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main422_12_Intel,           AV_PIX_FMT_YUV422P12LE },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_Intel,              AV_PIX_FMT_YUV444P     },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_10_Intel,           AV_PIX_FMT_YUV444P10LE },
+	{ AV_CODEC_ID_HEVC, DXVA2_HEVC_VLD_Main444_12_Intel,           AV_PIX_FMT_YUV444P12LE },
 	// HEVC
-	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10, true},
-	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main, false},
-	// MPEG2
-	{ AV_CODEC_ID_MPEG2VIDEO, DXVA2_ModeMPEG2_VLD, false },
-	// VC1
-	{ AV_CODEC_ID_VC1, DXVA2_ModeVC1_D2010, false },
-	{ AV_CODEC_ID_VC1, DXVA2_ModeVC1_D, false },
-	// WMV3
-	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D2010, false },
-	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D, false },
+	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main10,                 AV_PIX_FMT_YUV420P10LE }, // AV_PROFILE_HEVC_MAIN_10
+	{ AV_CODEC_ID_HEVC, DXVA2_ModeHEVC_VLD_Main,                   AV_PIX_FMT_YUV420P     }, // AV_PROFILE_HEVC_MAIN
 	// VP9
-	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_10bit_Profile2, true },
-	{ AV_CODEC_ID_VP9, DXVA2_ModeVP9_VLD_Profile0, false },
+	{ AV_CODEC_ID_VP9,  DXVA2_ModeVP9_VLD_10bit_Profile2,          AV_PIX_FMT_YUV420P10LE }, // AV_PROFILE_VP9_2
+	{ AV_CODEC_ID_VP9,  DXVA2_ModeVP9_VLD_Profile0,                AV_PIX_FMT_YUV420P     }, // AV_PROFILE_VP9_0
 	// AV1
-	{ AV_CODEC_ID_AV1, DXVA2_ModeAV1_VLD_Profile0, true },
-	{ AV_CODEC_ID_AV1, DXVA2_ModeAV1_VLD_Profile0, false }
+	{ AV_CODEC_ID_AV1,  DXVA2_ModeAV1_VLD_Profile0,                AV_PIX_FMT_YUV420P10LE }, // AV_PROFILE_AV1_MAIN
+	{ AV_CODEC_ID_AV1,  DXVA2_ModeAV1_VLD_Profile0,                AV_PIX_FMT_YUV420P     }, // AV_PROFILE_AV1_MAIN
+	// MPEG2
+	{ AV_CODEC_ID_MPEG2VIDEO, DXVA2_ModeMPEG2_VLD,                 AV_PIX_FMT_YUV420P     },
+	// VC1
+	{ AV_CODEC_ID_VC1,  DXVA2_ModeVC1_D2010,                       AV_PIX_FMT_YUV420P     },
+	{ AV_CODEC_ID_VC1,  DXVA2_ModeVC1_D,                           AV_PIX_FMT_YUV420P     },
+	// WMV3
+	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D2010,                       AV_PIX_FMT_YUV420P     },
+	{ AV_CODEC_ID_WMV3, DXVA2_ModeVC1_D,                           AV_PIX_FMT_YUV420P     },
 };
 
 FFMPEG_CODECS ffCodecs[] = {
@@ -1078,6 +1077,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	, m_CodecId(AV_CODEC_ID_NONE)
 	, m_dxva_pix_fmt(AV_PIX_FMT_NONE)
 	, m_HWPixFmt(AV_PIX_FMT_NONE)
+	, m_swPixFormat(AV_PIX_FMT_NONE)
 {
 	if (phr) {
 		*phr = S_OK;
@@ -2568,10 +2568,7 @@ HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
 		m_nSurfaceWidth = FFALIGN(m_pAVCtx->coded_width, m_nAlign);
 		m_nSurfaceHeight = FFALIGN(m_pAVCtx->coded_height, m_nAlign);
 
-		const int depth = GetLumaBits(m_pAVCtx->pix_fmt);
-		m_bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && (m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN_10 || m_pAVCtx->profile == AV_PROFILE_HEVC_REXT))
-											|| (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == AV_PROFILE_VP9_2)
-											|| (m_CodecId == AV_CODEC_ID_AV1 && m_pAVCtx->profile == AV_PROFILE_AV1_MAIN));
+		m_swPixFormat = m_pAVCtx->pix_fmt;
 
 		m_dxvaExtFormat = GetDXVA2ExtendedFormat(m_pAVCtx, m_pFrame);
 		m_dxva_pix_fmt = m_pAVCtx->pix_fmt;
@@ -2757,28 +2754,27 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 		}
 	}
 
-	int OutputCount = m_bUseFFmpeg ? nSwCount : 0;
-	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
-		OutputCount++;
-	}
-	m_VideoOutputFormats.reserve(OutputCount);
+	m_VideoOutputFormats.reserve(1 + (m_bUseFFmpeg ? nSwCount : 0));
 
-	int nPos = 0;
 	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
-		if (m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT) {
+		if (m_hwType == HwType::D3D11) {
 			switch (pix_fmt) {
-				case AV_PIX_FMT_YUV420P12: m_VideoOutputFormats.push_back(m_nPCIVendor == PCIV_nVidia ? DXVA_P010 : DXVA_P016); break;
-				case AV_PIX_FMT_YUV422P:   m_VideoOutputFormats.push_back(DXVA_YUY2); break;
-				case AV_PIX_FMT_YUV422P10: m_VideoOutputFormats.push_back(DXVA_Y210); break;
-				case AV_PIX_FMT_YUV422P12: m_VideoOutputFormats.push_back(DXVA_Y216); break;
-				case AV_PIX_FMT_YUV444P:   m_VideoOutputFormats.push_back(DXVA_AYUV); break;
-				case AV_PIX_FMT_YUV444P10: m_VideoOutputFormats.push_back(DXVA_Y410); break;
-				case AV_PIX_FMT_YUV444P12: m_VideoOutputFormats.push_back(DXVA_Y416); break;
+			case AV_PIX_FMT_YUV420P:     m_VideoOutputFormats.emplace_back(DXVA_NV12); break;
+			case AV_PIX_FMT_YUV420P10LE: m_VideoOutputFormats.emplace_back(DXVA_P010); break;
+			case AV_PIX_FMT_YUV420P12LE: m_VideoOutputFormats.emplace_back(m_nPCIVendor == PCIV_nVidia ? DXVA_P010 : DXVA_P016); break;
+			case AV_PIX_FMT_YUV422P:     m_VideoOutputFormats.emplace_back(DXVA_YUY2); break;
+			case AV_PIX_FMT_YUV422P10LE: m_VideoOutputFormats.emplace_back(DXVA_Y210); break;
+			case AV_PIX_FMT_YUV422P12LE: m_VideoOutputFormats.emplace_back(DXVA_Y216); break;
+			case AV_PIX_FMT_YUV444P:     m_VideoOutputFormats.emplace_back(DXVA_AYUV); break;
+			case AV_PIX_FMT_YUV444P10LE: m_VideoOutputFormats.emplace_back(DXVA_Y410); break;
+			case AV_PIX_FMT_YUV444P12LE: m_VideoOutputFormats.emplace_back(DXVA_Y416); break;
 			}
-		} else if (m_bHighBitdepth) {
-			m_VideoOutputFormats.push_back(DXVA_P010);
-		} else {
-			m_VideoOutputFormats.push_back(DXVA_NV12);
+		}
+		else {
+			switch (pix_fmt) {
+			case AV_PIX_FMT_YUV420P:     m_VideoOutputFormats.emplace_back(DXVA_NV12); break;
+			case AV_PIX_FMT_YUV420P10LE: m_VideoOutputFormats.emplace_back(DXVA_P010); break;
+			}
 		}
 	}
 
@@ -2789,7 +2785,6 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			m_VideoOutputFormats.emplace_back(swof->desc);
 		}
 	}
-	ASSERT(OutputCount == m_VideoOutputFormats.size());
 }
 
 void CMPCVideoDecFilter::GetOutputFormats(int& nNumber, VFormatDesc** ppFormats)
@@ -4348,16 +4343,9 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 {
 	if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
 		for (const auto& mode : DXVAModes) {
-			if (mode.nCodecId == m_CodecId
-					&& mode.decoderGUID == decoderGUID) {
-				if (m_pAVCtx->codec_id == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT) {
-					if (mode.pixFormat != AV_PIX_FMT_NONE) {
-						const auto pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
-						if (mode.pixFormat == pix_fmt) {
-							return TRUE;
-						}
-					}
-				} else if (mode.bHighBitdepth == m_bHighBitdepth) {
+			if (mode.nCodecId == m_CodecId && mode.decoderGUID == decoderGUID) {
+				const auto pix_fmt = (m_pAVCtx->sw_pix_fmt != AV_PIX_FMT_NONE) ? m_pAVCtx->sw_pix_fmt : m_pAVCtx->pix_fmt;
+				if (mode.swPixFormat == pix_fmt) {
 					return TRUE;
 				}
 			}
@@ -4370,7 +4358,7 @@ BOOL CMPCVideoDecFilter::IsSupportedDecoderMode(const GUID& decoderGUID)
 BOOL CMPCVideoDecFilter::IsSupportedDecoderConfig(const D3DFORMAT& nD3DFormat, const DXVA2_ConfigPictureDecode& config, bool& bIsPrefered)
 {
 	bIsPrefered = (config.ConfigBitstreamRaw == (m_CodecId == AV_CODEC_ID_H264 ? 2 : 1));
-	return (m_bHighBitdepth && nD3DFormat == FCC('P010') || (!m_bHighBitdepth && nD3DFormat == FCC('NV12')));
+	return (m_swPixFormat == AV_PIX_FMT_YUV420P10LE && nD3DFormat == FCC('P010') || (m_swPixFormat == AV_PIX_FMT_YUV420P && nD3DFormat == FCC('NV12')));
 }
 
 HRESULT CMPCVideoDecFilter::FindDXVA2DecoderConfiguration(IDirectXVideoDecoderService *pDecoderService,
@@ -5222,19 +5210,16 @@ HRESULT CMPCVideoDecFilter::CheckDXVA2Decoder(AVCodecContext *c)
 	if (m_pDXVADecoder) {
 		if ((m_nSurfaceWidth != FFALIGN(c->coded_width, m_nAlign) || m_nSurfaceHeight != FFALIGN(c->coded_height, m_nAlign))
 				|| ((m_CodecId == AV_CODEC_ID_HEVC || m_CodecId == AV_CODEC_ID_VP9) && m_dxva_pix_fmt != m_pAVCtx->sw_pix_fmt)) {
-			const int depth = GetLumaBits(m_pAVCtx->sw_pix_fmt);
-			const bool bHighBitdepth = (depth == 10) && ((m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_MAIN_10)
-														  || (m_CodecId == AV_CODEC_ID_VP9 && m_pAVCtx->profile == AV_PROFILE_VP9_2));
 
-			const bool bBitdepthChanged = (m_bHighBitdepth != bHighBitdepth);
+			const bool bFormatChanged = (m_swPixFormat != m_pAVCtx->sw_pix_fmt);
 
-			m_nSurfaceWidth = FFALIGN(c->coded_width, m_nAlign);
+			m_nSurfaceWidth  = FFALIGN(c->coded_width, m_nAlign);
 			m_nSurfaceHeight = FFALIGN(c->coded_height, m_nAlign);
-			m_bHighBitdepth = bHighBitdepth;
+			m_swPixFormat = m_pAVCtx->sw_pix_fmt;
 
 			avcodec_flush_buffers(c);
 			if (SUCCEEDED(hr = FindDecoderConfiguration())) {
-				if (bBitdepthChanged) {
+				if (bFormatChanged) {
 					ChangeOutputMediaFormat(2);
 				}
 				hr = RecommitAllocator();

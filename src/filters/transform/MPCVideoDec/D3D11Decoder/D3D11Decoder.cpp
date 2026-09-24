@@ -351,10 +351,7 @@ HRESULT CD3D11Decoder::FindVideoServiceConversion(AVCodecContext* c, enum AVCode
 	AVD3D11VADeviceContext* pDeviceContext = (AVD3D11VADeviceContext*)((AVHWDeviceContext*)m_pDevCtx->data)->hwctx;
 	HRESULT hr = S_OK;
 
-	const int depth = GetLumaBits(c->sw_pix_fmt);
-	m_pFilter->m_bHighBitdepth = (depth == 10) && ((codec == AV_CODEC_ID_HEVC && (c->profile == AV_PROFILE_HEVC_MAIN_10 || c->profile == AV_PROFILE_HEVC_REXT))
-												|| (codec == AV_CODEC_ID_VP9 && c->profile == AV_PROFILE_VP9_2)
-												|| (codec == AV_CODEC_ID_AV1 && c->profile == AV_PROFILE_AV1_MAIN));
+	m_pFilter->m_swPixFormat = c->sw_pix_fmt;
 
 	UINT nProfiles = pDeviceContext->video_device->GetVideoDecoderProfileCount();
 	std::vector<GUID> supportedDecoderGuids;
