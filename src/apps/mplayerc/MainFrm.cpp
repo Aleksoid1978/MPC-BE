@@ -1889,10 +1889,11 @@ void CMainFrame::OnEnterSizeMove()
 
 	if (!m_bWndZoomed) {
 		WINDOWPLACEMENT wp;
+		wp.length = sizeof(wp);
 		GetWindowPlacement(&wp);
-		RECT rcNormalPosition = wp.rcNormalPosition;
-		snap_x = cur_pos.x - rcNormalPosition.left;
-		snap_y = cur_pos.y - rcNormalPosition.top;
+
+		snap_x = cur_pos.x - wp.rcNormalPosition.left;
+		snap_y = cur_pos.y - wp.rcNormalPosition.top;
 	}
 }
 
@@ -1904,7 +1905,9 @@ void CMainFrame::OnMove(int x, int y)
 	m_wndView.Invalidate();
 
 	WINDOWPLACEMENT wp;
+	wp.length = sizeof(wp);
 	GetWindowPlacement(&wp);
+
 	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen
 			&& IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
 
@@ -1932,11 +1935,11 @@ void CMainFrame::OnMove(int x, int y)
 void CMainFrame::ClipRectToMonitor(LPRECT prc)
 {
 	WINDOWPLACEMENT wp;
+	wp.length = sizeof(wp);
 	GetWindowPlacement(&wp);
-	RECT rcNormalPosition = wp.rcNormalPosition;
 
-	int w = rcNormalPosition.right - rcNormalPosition.left;
-	int h = rcNormalPosition.bottom - rcNormalPosition.top;
+	int w = wp.rcNormalPosition.right - wp.rcNormalPosition.left;
+	int h = wp.rcNormalPosition.bottom - wp.rcNormalPosition.top;
 
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfoW(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
@@ -4038,7 +4041,9 @@ void CMainFrame::OnMouseMove(UINT nFlags, CPoint point)
 
 		if (s.iCaptionMenuMode == MODE_BORDERLESS) {
 			WINDOWPLACEMENT wp;
+			wp.length = sizeof(wp);
 			GetWindowPlacement(&wp);
+
 			if (wp.showCmd == SW_SHOWMAXIMIZED) {
 				SendMessageW(WM_SYSCOMMAND, SC_RESTORE, -1);
 				RECT r;
@@ -19411,7 +19416,9 @@ LRESULT CMainFrame::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
 			case IDTB_BUTTON5:
 				WINDOWPLACEMENT wp;
+				wp.length = sizeof(wp);
 				GetWindowPlacement(&wp);
+
 				if (wp.showCmd == SW_SHOWMINIMIZED) {
 					SendMessageW(WM_SYSCOMMAND, SC_RESTORE, -1);
 				}

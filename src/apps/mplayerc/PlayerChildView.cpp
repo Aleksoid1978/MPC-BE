@@ -347,6 +347,7 @@ LRESULT CChildView::OnNcHitTest(CPoint point)
 	UINT nHitTest = CWnd::OnNcHitTest(point);
 
 	WINDOWPLACEMENT wp;
+	wp.length = sizeof(wp);
 	m_pMainFrame->GetWindowPlacement(&wp);
 
 	if (!m_pMainFrame->m_bFullScreen && wp.showCmd != SW_SHOWMAXIMIZED && AfxGetAppSettings().iCaptionMenuMode == MODE_BORDERLESS) {

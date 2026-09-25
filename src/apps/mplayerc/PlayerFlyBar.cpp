@@ -244,7 +244,9 @@ void CFlyBar::UpdateWnd(CPoint point)
 	}
 	else if (r_RestoreIcon.PtInRect(point)) {
 		WINDOWPLACEMENT wp;
+		wp.length = sizeof(wp);
 		m_pMainFrame->GetWindowPlacement(&wp);
+
 		str2 = (wp.showCmd == SW_SHOWMAXIMIZED) ? ResStr(IDS_TOOLTIP_RESTORE) : ResStr(IDS_TOOLTIP_MAXIMIZE);
 		if (str != str2) {
 			m_tooltip.UpdateTipText(str2, this);
@@ -321,6 +323,7 @@ void CFlyBar::DrawWnd()
 		int x = rcBar.Width();
 
 		WINDOWPLACEMENT wp;
+		wp.length = sizeof(wp);
 		m_pMainFrame->GetWindowPlacement(&wp);
 
 		OAFilterState fs = m_pMainFrame->GetMediaState();
