@@ -1879,10 +1879,9 @@ void CMainFrame::OnEnterSizeMove()
 
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-	RECT rcWork = mi.rcWork;
 
 	if (IsZoomed() // window is maximized
-		|| (rcWindow.top == rcWork.top && rcWindow.bottom == rcWork.bottom) // window is aero snapped (???)
+		|| (rcWindow.top == mi.rcWork.top && rcWindow.bottom == mi.rcWork.bottom) // window is aero snapped (???)
 		|| m_bFullScreen) { // window is fullscreen
 
 		m_bWndZoomed = true;
@@ -1941,7 +1940,6 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 
 	MONITORINFO mi = { sizeof(mi) };
 	GetMonitorInfoW(MonitorFromRect(prc, MONITOR_DEFAULTTONEAREST), &mi);
-	RECT rcWork = mi.rcWork;
 
 	POINT cur_pos;
 	GetCursorPos(&cur_pos);
@@ -1950,8 +1948,8 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	// prc->left   = max(rcWork.left, min(rcWork.right-w, cur_pos.x - (double)((rnp.right-rnp.left)/((double)(rcWork.right-rcWork.left)/cur_pos.x))));
 	// prc->top    = max(rcWork.top,  min(rcWork.bottom-h, cur_pos.y - (double)((rnp.bottom-rnp.top)/((double)(rcWork.bottom-rcWork.top)/cur_pos.y))));
 
-	prc->left   = std::max(rcWork.left, std::min(rcWork.right-w, cur_pos.x - (w/2)));
-	prc->top    = std::max(rcWork.top,  std::min(rcWork.bottom-h, cur_pos.y - (h/2)));
+	prc->left   = std::max(mi.rcWork.left, std::min(mi.rcWork.right-w, cur_pos.x - (w/2)));
+	prc->top    = std::max(mi.rcWork.top,  std::min(mi.rcWork.bottom-h, cur_pos.y - (h/2)));
 	prc->right  = prc->left + w;
 	prc->bottom = prc->top  + h;
 
@@ -2149,15 +2147,14 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	if (m_bFullScreen || IsD3DFullScreenMode()) {
 		CWnd* cwnd = m_bFullScreen ? this : static_cast<CWnd*>(m_pFullscreenWnd);
 
-		MONITORINFO MonitorInfo = { sizeof(MonitorInfo) };
+		MONITORINFO mi = { sizeof(mi) };
 		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, MONITOR_DEFAULTTONULL);
-		if (GetMonitorInfoW(hMonitor, &MonitorInfo)) {
-			CRect MonitorRect = CRect(MonitorInfo.rcMonitor);
+		if (GetMonitorInfoW(hMonitor, &mi)) {
 			cwnd->SetWindowPos(nullptr,
-							   MonitorRect.left,
-							   MonitorRect.top,
-							   MonitorRect.Width(),
-							   MonitorRect.Height(),
+							   mi.rcMonitor.left,
+							   mi.rcMonitor.top,
+							   mi.rcMonitor.right - mi.rcMonitor.left,
+							   mi.rcMonitor.bottom - mi.rcMonitor.top,
 							   SWP_NOZORDER);
 			MoveVideoWindow();
 		}
@@ -2172,11 +2169,11 @@ void CMainFrame::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 		const HMONITOR hm = MonitorFromPoint(CPoint(lpwndpos->x, lpwndpos->y), MONITOR_DEFAULTTONULL);
 		MONITORINFO mi = { sizeof(mi) };
 		if (GetMonitorInfoW(hm, &mi)) {
-			lpwndpos->flags &= ~SWP_NOSIZE;
+			lpwndpos->x  = mi.rcMonitor.left;
+			lpwndpos->y  = mi.rcMonitor.top;
 			lpwndpos->cx = mi.rcMonitor.right - mi.rcMonitor.left;
 			lpwndpos->cy = mi.rcMonitor.bottom - mi.rcMonitor.top;
-			lpwndpos->x = mi.rcMonitor.left;
-			lpwndpos->y = mi.rcMonitor.top;
+			lpwndpos->flags &= ~SWP_NOSIZE;
 		}
 	}
 
