@@ -1868,70 +1868,6 @@ void CMainFrame::DestroyOSDBar()
 	}
 }
 
-void CMainFrame::OnEnterSizeMove()
-{
-	m_bWndZoomed = false;
-
-	POINT cur_pos;
-	RECT rcWindow;
-	GetWindowRect(&rcWindow);
-	GetCursorPos(&cur_pos);
-
-	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
-
-	if (IsZoomed() // window is maximized
-		|| (rcWindow.top == mi.rcWork.top && rcWindow.bottom == mi.rcWork.bottom) // window is aero snapped (???)
-		|| m_bFullScreen) { // window is fullscreen
-
-		m_bWndZoomed = true;
-	}
-
-	if (!m_bWndZoomed) {
-		WINDOWPLACEMENT wp;
-		wp.length = sizeof(wp);
-		GetWindowPlacement(&wp);
-
-		snap_x = cur_pos.x - wp.rcNormalPosition.left;
-		snap_y = cur_pos.y - wp.rcNormalPosition.top;
-	}
-}
-
-void CMainFrame::OnMove(int x, int y)
-{
-	__super::OnMove(x, y);
-
-	//MoveVideoWindow(); // This isn't needed, based on my limited tests. If it is needed then please add a description the scenario(s) where it is needed.
-	m_wndView.Invalidate();
-
-	WINDOWPLACEMENT wp;
-	wp.length = sizeof(wp);
-	GetWindowPlacement(&wp);
-
-	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen
-			&& IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
-
-		CAppSettings& s = AfxGetAppSettings();
-		CRect rect;
-		GetWindowRect(&rect);
-
-		s.ptLastWindowPos = rect.TopLeft();
-
-		if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
-			s.szLastWindowSize.cx = rect.Width();
-		} else {
-			s.szLastWindowSize = rect.Size();
-		}
-	}
-
-	if (m_wndToolBar && ::IsWindow(m_wndToolBar.GetSafeHwnd())) {
-		m_wndToolBar.Invalidate();
-	}
-
-	FlyBarSetPos();
-	OSDBarSetPos();
-}
-
 void CMainFrame::ClipRectToMonitor(LPRECT prc)
 {
 	WINDOWPLACEMENT wp;
@@ -1960,6 +1896,35 @@ void CMainFrame::ClipRectToMonitor(LPRECT prc)
 	rc_forceNP.right	= prc->right;
 	rc_forceNP.top		= prc->top;
 	rc_forceNP.bottom	= prc->bottom;
+}
+
+void CMainFrame::OnEnterSizeMove()
+{
+	m_bWndZoomed = false;
+
+	POINT cur_pos;
+	RECT rcWindow;
+	GetWindowRect(&rcWindow);
+	GetCursorPos(&cur_pos);
+
+	MONITORINFO mi = { sizeof(mi) };
+	GetMonitorInfoW(MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST), &mi);
+
+	if (IsZoomed() // window is maximized
+		|| (rcWindow.top == mi.rcWork.top && rcWindow.bottom == mi.rcWork.bottom) // window is aero snapped (???)
+		|| m_bFullScreen) { // window is fullscreen
+
+		m_bWndZoomed = true;
+	}
+
+	if (!m_bWndZoomed) {
+		WINDOWPLACEMENT wp;
+		wp.length = sizeof(wp);
+		GetWindowPlacement(&wp);
+
+		snap_x = cur_pos.x - wp.rcNormalPosition.left;
+		snap_y = cur_pos.y - wp.rcNormalPosition.top;
+	}
 }
 
 void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
@@ -2012,6 +1977,95 @@ void CMainFrame::OnMoving(UINT fwSide, LPRECT pRect)
 		}
 
 	}
+}
+
+void CMainFrame::OnMove(int x, int y)
+{
+	__super::OnMove(x, y);
+
+	//MoveVideoWindow(); // This isn't needed, based on my limited tests. If it is needed then please add a description the scenario(s) where it is needed.
+	m_wndView.Invalidate();
+
+	WINDOWPLACEMENT wp;
+	wp.length = sizeof(wp);
+	GetWindowPlacement(&wp);
+
+	if (!m_bFirstFSAfterLaunchOnFullScreen && !m_bFullScreen
+			&& IsWindowVisible() && wp.flags != WPF_RESTORETOMAXIMIZED && wp.showCmd != SW_SHOWMINIMIZED) {
+
+		CAppSettings& s = AfxGetAppSettings();
+		CRect rect;
+		GetWindowRect(&rect);
+
+		s.ptLastWindowPos = rect.TopLeft();
+
+		if (m_bAudioOnly && IsSomethingLoaded() && s.nAudioWindowMode == 2) {
+			s.szLastWindowSize.cx = rect.Width();
+		} else {
+			s.szLastWindowSize = rect.Size();
+		}
+	}
+
+	if (m_wndToolBar && ::IsWindow(m_wndToolBar.GetSafeHwnd())) {
+		m_wndToolBar.Invalidate();
+	}
+
+	FlyBarSetPos();
+	OSDBarSetPos();
+}
+
+void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
+{
+	__super::OnSizing(nSide, pRect);
+
+	const CAppSettings& s = AfxGetAppSettings();
+	const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
+
+	if (m_eMediaLoadState != MLS_LOADED || m_bFullScreen
+			|| m_iVideoSize == DVS_STRETCH
+			|| (bCtrl == s.bLimitWindowProportions)) {
+		return;
+	}
+
+	const CSize videoSize = GetVideoSize();
+	if (!videoSize.cx || !videoSize.cy) {
+		return;
+	}
+
+	CSize decorationsSize;
+	CRect decorationsRect;
+	CalcControlsSize(decorationsSize);
+	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), IsMainMenuVisible(), GetWindowExStyle(m_hWnd)));
+	decorationsSize += decorationsRect.Size();
+
+	const CSize videoAreaSize(pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
+	const bool bWider = videoAreaSize.cy < videoAreaSize.cx;
+
+	// new proportional width and height of the window. only one of these values is used.
+	long w = MulDiv(videoAreaSize.cy, videoSize.cx, videoSize.cy) + decorationsSize.cx;
+	long h = MulDiv(videoAreaSize.cx, videoSize.cy, videoSize.cx) + decorationsSize.cy;
+
+	if (nSide == WMSZ_TOP || nSide == WMSZ_BOTTOM || (!bWider && (nSide == WMSZ_TOPRIGHT || nSide == WMSZ_BOTTOMRIGHT))) {
+		pRect->right = pRect->left + w;
+	}
+	else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
+		pRect->bottom = pRect->top + h;
+	}
+	else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
+		pRect->left = pRect->right - w;
+	}
+	else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
+		pRect->top = pRect->bottom - h;
+	}
+
+	FlyBarSetPos();
+	OSDBarSetPos();
+
+#if _DEBUG
+	CString msg;
+	msg.Format(L"W x H = %d x %d", pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
+	SetStatusMessage(msg);
+#endif
 }
 
 void CMainFrame::OnSize(UINT nType, int cx, int cy)
@@ -2077,60 +2131,6 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 	if (nType == SIZE_RESTORED || nType == SIZE_MINIMIZED || nType == SIZE_MAXIMIZED) {
 		m_bLeftMouseDown = FALSE;
 	}
-}
-
-void CMainFrame::OnSizing(UINT nSide, LPRECT pRect)
-{
-	__super::OnSizing(nSide, pRect);
-
-	const CAppSettings& s = AfxGetAppSettings();
-	const bool bCtrl = !!(GetAsyncKeyState(VK_CONTROL) & 0x80000000);
-
-	if (m_eMediaLoadState != MLS_LOADED || m_bFullScreen
-			|| m_iVideoSize == DVS_STRETCH
-			|| (bCtrl == s.bLimitWindowProportions)) {
-		return;
-	}
-
-	const CSize videoSize = GetVideoSize();
-	if (!videoSize.cx || !videoSize.cy) {
-		return;
-	}
-
-	CSize decorationsSize;
-	CRect decorationsRect;
-	CalcControlsSize(decorationsSize);
-	VERIFY(AdjustWindowRectEx(decorationsRect, GetWindowStyle(m_hWnd), IsMainMenuVisible(), GetWindowExStyle(m_hWnd)));
-	decorationsSize += decorationsRect.Size();
-
-	const CSize videoAreaSize(pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
-	const bool bWider = videoAreaSize.cy < videoAreaSize.cx;
-
-	// new proportional width and height of the window. only one of these values is used.
-	long w = MulDiv(videoAreaSize.cy, videoSize.cx, videoSize.cy) + decorationsSize.cx;
-	long h = MulDiv(videoAreaSize.cx, videoSize.cy, videoSize.cx) + decorationsSize.cy;
-
-	if (nSide == WMSZ_TOP || nSide == WMSZ_BOTTOM || (!bWider && (nSide == WMSZ_TOPRIGHT || nSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->right = pRect->left + w;
-	}
-	else if (nSide == WMSZ_LEFT || nSide == WMSZ_RIGHT || (bWider && (nSide == WMSZ_BOTTOMLEFT || nSide == WMSZ_BOTTOMRIGHT))) {
-		pRect->bottom = pRect->top + h;
-	}
-	else if (!bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_BOTTOMLEFT)) {
-		pRect->left = pRect->right - w;
-	}
-	else if (bWider && (nSide == WMSZ_TOPLEFT || nSide == WMSZ_TOPRIGHT)) {
-		pRect->top = pRect->bottom - h;
-	}
-
-	FlyBarSetPos();
-	OSDBarSetPos();
-
-#if _DEBUG
-	CString msg;
-	msg.Format(L"W x H = %d x %d", pRect->right - pRect->left - decorationsSize.cx, pRect->bottom - pRect->top - decorationsSize.cy);
-	SetStatusMessage(msg);
-#endif
 }
 
 void CMainFrame::OnDisplayChange() // untested, not sure if it's working...

@@ -839,10 +839,18 @@ public:
 	afx_msg LRESULT OnDwmSendIconicLivePreviewBitmap(WPARAM, LPARAM);
 	afx_msg void OnSetFocus(CWnd* pOldWnd);
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
-	afx_msg void OnMove(int x, int y);
+
+	afx_msg void ClipRectToMonitor(LPRECT prc);
+	int snap_x, snap_y;
+	BOOL m_bWndZoomed;
+	RECT rc_forceNP;
+
+	afx_msg void OnEnterSizeMove();
 	afx_msg void OnMoving(UINT fwSide, LPRECT pRect);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnMove(int x, int y);
 	afx_msg void OnSizing(UINT nSide, LPRECT pRect);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+
 	afx_msg void OnDisplayChange();
 	afx_msg void OnWindowPosChanging(WINDOWPOS* lpwndpos);
 	afx_msg BOOL OnQueryEndSession();
@@ -868,12 +876,6 @@ public:
 	afx_msg void SaveAppSettings();
 
 	BOOL MouseMessage(UINT id, UINT nFlags, CPoint point);
-
-	afx_msg void OnEnterSizeMove();
-	afx_msg void ClipRectToMonitor(LPRECT prc);
-	int snap_x, snap_y;
-	BOOL m_bWndZoomed;
-	RECT rc_forceNP;
 
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
