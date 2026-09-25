@@ -2150,8 +2150,9 @@ void CMainFrame::OnDisplayChange() // untested, not sure if it's working...
 	if (m_bFullScreen || IsD3DFullScreenMode()) {
 		CWnd* cwnd = m_bFullScreen ? this : static_cast<CWnd*>(m_pFullscreenWnd);
 
-		MONITORINFO mi = { sizeof(mi) };
 		HMONITOR hMonitor = MonitorFromWindow(cwnd->m_hWnd, MONITOR_DEFAULTTONULL);
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
 		if (GetMonitorInfoW(hMonitor, &mi)) {
 			cwnd->SetWindowPos(nullptr,
 							   mi.rcMonitor.left,
@@ -2170,7 +2171,8 @@ void CMainFrame::OnWindowPosChanging(WINDOWPOS* lpwndpos)
 {
 	if (m_bFullScreen && !(lpwndpos->flags & SWP_NOMOVE)) {
 		const HMONITOR hm = MonitorFromPoint(CPoint(lpwndpos->x, lpwndpos->y), MONITOR_DEFAULTTONULL);
-		MONITORINFO mi = { sizeof(mi) };
+		MONITORINFO mi;
+		mi.cbSize = sizeof(mi);
 		if (GetMonitorInfoW(hm, &mi)) {
 			lpwndpos->x  = mi.rcMonitor.left;
 			lpwndpos->y  = mi.rcMonitor.top;
