@@ -1595,7 +1595,7 @@ CRenderersSettings& GetRenderersSettings()
 	return AfxGetAppSettings().m_VRSettings;
 }
 
-#if _MSC_VER >= 1950 && (defined(_M_X64) || defined(_M_AMD64))
+#if _MSC_PLATFORM_TOOLSET > 143 && (defined(_M_X64) || defined(_M_AMD64))
 // Win7 compat shim: VS 2026 toolset links CreateFile2 (Win8+) through std::filesystem, which breaks loading on Win7.
 // We provide the import symbol ourselves and fall back to CreateFileW.
 
