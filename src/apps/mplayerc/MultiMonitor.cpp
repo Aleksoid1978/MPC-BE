@@ -1,6 +1,6 @@
 /*
 * (C) 2002 Donald Kackman (don@itsEngineering.com)
-* (C) 2006-2021 see Authors.txt
+* (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -141,13 +141,10 @@ void CMonitor::GetMonitorRect( LPRECT lprc ) const
 	ASSERT( IsMonitor() );
 
 	MONITORINFO mi;
-	RECT        rc;
-
 	mi.cbSize = sizeof( mi );
 	::GetMonitorInfoW( m_hMonitor, &mi );
-	rc = mi.rcMonitor;
 
-	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
+	::SetRect( lprc, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right, mi.rcMonitor.bottom );
 }
 
 void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
@@ -155,13 +152,10 @@ void CMonitor::GetWorkAreaRect( LPRECT lprc ) const
 	ASSERT( IsMonitor() );
 
 	MONITORINFO mi;
-	RECT        rc;
-
 	mi.cbSize = sizeof( mi );
 	::GetMonitorInfoW( m_hMonitor, &mi );
-	rc = mi.rcWork;
 
-	::SetRect( lprc, rc.left, rc.top, rc.right, rc.bottom );
+	::SetRect( lprc, mi.rcWork.left, mi.rcWork.top, mi.rcWork.right, mi.rcWork.bottom);
 }
 
 void CMonitor::CenterRectToMonitor( LPRECT lprc, const BOOL UseWorkAreaRect, const CRect& inflateRect) const
