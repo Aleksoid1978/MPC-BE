@@ -114,7 +114,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	case FCC('BIKi'):
 	// Bink Video version b
 	case FCC('BIKb'):
-	// Bink Video 2 (înly audio is supported)
+	// Bink Video 2 (only audio is supported)
 	case FCC('KB2f'):
 	case FCC('KB2g'):
 	case FCC('KB2i'):
