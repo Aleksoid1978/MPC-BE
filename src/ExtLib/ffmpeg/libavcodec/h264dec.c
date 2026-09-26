@@ -42,6 +42,7 @@
 #include "internal.h"
 #include "error_resilience.h"
 #include "avcodec.h"
+#include "decode.h"
 #include "h264.h"
 #include "h264dec.h"
 #include "h2645_parse.h"
@@ -863,7 +864,7 @@ end:
      * causes problems for the first MB line, too.
      */
     if (!FIELD_PICTURE(h) && h->current_slice && h->enable_er &&
-        !ff_h264_skip_all_pixels(h->avctx)) {
+        !ff_decode_skip_all_pixels(h->avctx)) {
 
         H264SliceContext *sl = h->slice_ctx;
         int use_last_pic = h->last_pic_for_ec.f->buf[0] && !sl->ref_count[0];
@@ -1018,7 +1019,7 @@ static int finalize_frame(H264Context *h, AVFrame *dst, H264Picture *out, int *g
         )
             return 0;
 
-        if (!h->avctx->hwaccel && !ff_h264_skip_all_pixels(h->avctx) &&
+        if (!h->avctx->hwaccel && !ff_decode_skip_all_pixels(h->avctx) &&
             (out->field_poc[0] == INT_MAX ||
              out->field_poc[1] == INT_MAX)
            ) {
@@ -1032,8 +1033,8 @@ static int finalize_frame(H264Context *h, AVFrame *dst, H264Picture *out, int *g
             av_log(h->avctx, AV_LOG_DEBUG, "Duplicating field %d to fill missing\n", field);
 
             for (p = 0; p<4; p++) {
-                dst_data[p] = f->data[p] + (field^1)*f->linesize[p];
-                src_data[p] = f->data[p] +  field   *f->linesize[p];
+                dst_data[p] = FF_PTR_ADD(f->data[p], (field^1)*f->linesize[p]);
+                src_data[p] = FF_PTR_ADD(f->data[p],  field   *f->linesize[p]);
                 linesizes[p] = 2*f->linesize[p];
             }
 

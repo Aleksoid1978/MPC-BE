@@ -627,11 +627,19 @@ static int get_pixel_format(AVCodecContext *avctx)
 #endif
         break;
     case AV_PIX_FMT_YUV422P:
+#if CONFIG_AV1_D3D11VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
         break;
     case AV_PIX_FMT_YUV422P10:
+#if CONFIG_AV1_D3D11VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
@@ -642,11 +650,19 @@ static int get_pixel_format(AVCodecContext *avctx)
 #endif
         break;
     case AV_PIX_FMT_YUV444P:
+#if CONFIG_AV1_D3D11VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
         break;
     case AV_PIX_FMT_YUV444P10:
+#if CONFIG_AV1_D3D11VA_HWACCEL
+        *fmtp++ = AV_PIX_FMT_D3D11VA_VLD;
+        *fmtp++ = AV_PIX_FMT_D3D11;
+#endif
 #if CONFIG_AV1_VULKAN_HWACCEL
         *fmtp++ = AV_PIX_FMT_VULKAN;
 #endif
@@ -677,11 +693,14 @@ static int get_pixel_format(AVCodecContext *avctx)
     *fmtp++ = pix_fmt;
     *fmtp = AV_PIX_FMT_NONE;
 
-    for (int i = 0; pix_fmts[i] != pix_fmt; i++)
-        if (pix_fmts[i] == avctx->pix_fmt) {
-            s->pix_fmt = pix_fmt;
-            return 1;
-        }
+    /* the negotiated hwaccel can only be kept if the underlying pixel
+     * format did not change, otherwise its surfaces have the wrong format */
+    if (pix_fmt == avctx->sw_pix_fmt)
+        for (int i = 0; pix_fmts[i] != pix_fmt; i++)
+            if (pix_fmts[i] == avctx->pix_fmt) {
+                s->pix_fmt = pix_fmt;
+                return 1;
+            }
 
     ret = ff_get_format(avctx, pix_fmts);
 

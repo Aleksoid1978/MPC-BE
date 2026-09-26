@@ -24,7 +24,7 @@ yt-dlp
 Обновлен венгерский перевод (автор mickey).
 
 Обновлены библиотеки:
-	ffmpeg n9.1-dev-1348-gbfac54a03b;
+	ffmpeg n9.1-dev-1565-g8864fd0aec;
 	nv-codec-headers n13.0.19.1.
 
 

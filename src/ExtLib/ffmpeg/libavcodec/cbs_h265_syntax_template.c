@@ -1515,7 +1515,6 @@ static int FUNC(slice_segment_header)(CodedBitstreamContext *ctx, RWContext *rw,
     CodedBitstreamH265Context *h265 = ctx->priv_data;
     const H265RawSPS *sps;
     const H265RawPPS *pps;
-    unsigned int min_cb_log2_size_y, ctb_log2_size_y, ctb_size_y;
     unsigned int pic_width_in_ctbs_y, pic_height_in_ctbs_y, pic_size_in_ctbs_y;
     unsigned int num_pic_total_curr = 0;
     int err, i;
@@ -1548,13 +1547,7 @@ static int FUNC(slice_segment_header)(CodedBitstreamContext *ctx, RWContext *rw,
     }
     h265->active_sps = sps;
 
-    min_cb_log2_size_y = sps->log2_min_luma_coding_block_size_minus3 + 3;
-    ctb_log2_size_y = min_cb_log2_size_y + sps->log2_diff_max_min_luma_coding_block_size;
-    ctb_size_y = 1 << ctb_log2_size_y;
-    pic_width_in_ctbs_y =
-        (sps->pic_width_in_luma_samples + ctb_size_y - 1) / ctb_size_y;
-    pic_height_in_ctbs_y =
-        (sps->pic_height_in_luma_samples + ctb_size_y - 1) / ctb_size_y;
+    cbs_h265_pic_size_in_ctbs(sps, &pic_width_in_ctbs_y, &pic_height_in_ctbs_y);
     pic_size_in_ctbs_y = pic_width_in_ctbs_y * pic_height_in_ctbs_y;
 
     if (!current->first_slice_segment_in_pic_flag) {
@@ -1993,8 +1986,14 @@ SEI_FUNC(sei_pic_timing, (CodedBitstreamContext *ctx, RWContext *rw,
 
         if (hrd->sub_pic_hrd_params_present_flag &&
             hrd->sub_pic_cpb_params_in_pic_timing_sei_flag) {
-            // Each decoding unit must contain at least one slice segment.
-            ue(num_decoding_units_minus1, 0, HEVC_MAX_SLICE_SEGMENTS);
+            unsigned int pic_width_in_ctbs_y, pic_height_in_ctbs_y;
+            cbs_h265_pic_size_in_ctbs(sps, &pic_width_in_ctbs_y, &pic_height_in_ctbs_y);
+            // D.3.3 bounds this by PicSizeInCtbsY - 1. A decoding unit holds at
+            // least one VCL NAL unit (3.47) and no level allows a picture more
+            // than HEVC_MAX_SLICE_SEGMENTS slice segments (A.4.2), which is also
+            // the size of the arrays indexed by it.
+            ue(num_decoding_units_minus1, 0,
+               FFMIN(pic_width_in_ctbs_y * pic_height_in_ctbs_y, HEVC_MAX_SLICE_SEGMENTS) - 1);
             flag(du_common_cpb_removal_delay_flag);
 
             length = hrd->du_cpb_removal_delay_increment_length_minus1 + 1;

@@ -42,6 +42,11 @@ static av_cold int decode_init(AVCodecContext *avctx)
 {
     V210DecContext *s = avctx->priv_data;
 
+    if (s->custom_stride > 0 && s->custom_stride & 3) {
+        av_log(avctx, AV_LOG_ERROR, "custom_stride must be a multiple of 4\n");
+        return AVERROR(EINVAL);
+    }
+
     avctx->pix_fmt             = AV_PIX_FMT_YUV422P10;
     avctx->bits_per_raw_sample = 10;
 
@@ -160,6 +165,11 @@ static int decode_frame(AVCodecContext *avctx, AVFrame *pic,
             if (align < 6 && avctx->codec_tag == MKTAG('b', 'x', 'y', '2'))
                 stride = 0;
         }
+    }
+
+    if (stride > 0 && stride < v210_stride(avctx->width, 6)) {
+        av_log(avctx, AV_LOG_ERROR, "custom_stride %d is smaller than one row\n", stride);
+        return AVERROR_INVALIDDATA;
     }
 
     if (stride == 0 && ((avctx->width & 1) || (int64_t)avctx->width * avctx->height > INT_MAX / 6)) {
