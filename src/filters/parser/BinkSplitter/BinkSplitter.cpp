@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -109,7 +109,17 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	UINT32 codec_tag = 0;
 	m_pFile->ByteRead((BYTE*)&codec_tag, 4);
-	if (codec_tag != FCC('BIKb') && codec_tag != FCC('BIKi')) {
+	switch (codec_tag) {
+	// Bink Video
+	case FCC('BIKi'):
+	// Bink Video version b
+	case FCC('BIKb'):
+	// Bink Video 2 (înly audio is supported)
+	case FCC('KB2f'):
+	case FCC('KB2g'):
+	case FCC('KB2i'):
+		break;
+	default:
 		return E_FAIL;
 	}
 
