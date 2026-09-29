@@ -445,7 +445,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Dimensiunea controalelor:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Activează casetele de dialog întunecate (pentru Windows 10 sau versiunile mai noi)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
+    CONTROL         "Activează casetele de dialog întunecate (pt. Windows 10 sau v. mai noi)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Folosește indiciile de timp:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -832,9 +832,9 @@ BEGIN
     LISTBOX         IDC_LIST1,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST2,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     LISTBOX         IDC_LIST3,5,41,210,200,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) AVI",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
-    PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) MPEG",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
-    PUSHBUTTON      "Configurația\ndespicătorului (splitter-ului) Matroska",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
+    PUSHBUTTON      "Configurația\nseparatorului (splitter-ului) AVI",IDC_BUTTON5,220,41,70,30,BS_MULTILINE
+    PUSHBUTTON      "Configurația\nseparatorului (splitter-ului) MPEG",IDC_BUTTON1,220,76,70,30,BS_MULTILINE
+    PUSHBUTTON      "Configurația\nseparatorului (splitter-ului) Matroska",IDC_BUTTON6,220,111,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ncititorului CDDA",IDC_BUTTON8,220,146,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ncititorului VTS(IFO)",IDC_BUTTON7,220,181,70,30,BS_MULTILINE
     PUSHBUTTON      "Configurația\ndecodorului video",IDC_BUTTON2,220,41,70,30,BS_MULTILINE
@@ -2368,9 +2368,9 @@ STRINGTABLE
 BEGIN
     IDS_STATSBAR_SYNC_OFFSET "Sincronizează decalajele"
     IDS_STATSBAR_SYNC_OFFSET_FORMAT "avg (media de): %d (de) ms, dev: %d (de) ms"
-    IDS_STATSBAR_JITTER     "Mișcare ușor neregulată (jitter/frământare)"
+    IDS_STATSBAR_JITTER     "Jitter (Fluctuații ale cadrelor)"
     IDS_STATSBAR_BITRATE    "Rata de biți"
-    IDS_STATSBAR_BITRATE_AVG_CUR " (avg/cur)"
+    IDS_STATSBAR_BITRATE_AVG_CUR " (medie/actuală)"
     IDS_AUTOPLAY_PLAYBDMOVIE "Redă discul Blu-ray"
     IDS_TEXTBAR_NOTHING     "Nimic"
     IDS_TEXTBAR_FILENANE    "Numele fișierului (altfel, titlul sau URL-ul)"
@@ -2390,14 +2390,14 @@ STRINGTABLE
 BEGIN
     IDS_PLAYLIST_ADD_EXPLORER "Tipul de explorator"
     IDS_PLAYLIST_RENAME_CURRENT "Redenumește lista de redare (playlist-ul)"
-    IDS_PLAYLIST_DELETE_CURRENT "Șterge lista de redare (playlist-ul)"
+    IDS_PLAYLIST_DELETE_CURRENT "Șterge lista de redare (Șterge playlist-ul)"
     IDS_PLAYLIST_NAME       "Listă de redare (Playlist)"
     IDS_PLAYLIST_EXPLORER_NAME "Explorator (Explorer)"
     IDS_PLAYLIST_OPEN       "&Deschide"
     IDS_PLAYLIST_ADD        "A&daugă"
     IDS_PLAYLIST_REMOVE     "&Elimină"
-    IDS_PLAYLIST_DELETE     "&Șterge și aruncă în Coșul de gunoi (Coșul de reciclare)"
-    IDS_PLAYLIST_DELETE_QUESTION  "Ești sigur(ă) că vrei să ștergi fișierul(ele) și să le arunci în Coșul de gunoi (Coșul de reciclare)?"
+    IDS_PLAYLIST_DELETE     "&Șterge și aruncă în Coșul de gunoi (în Coșul de reciclare)"
+    IDS_PLAYLIST_DELETE_QUESTION  "Ești sigur(ă) că vrei să ștergi fișierul (fișierele) și să le arunci în Coșul de gunoi (în Coșul de reciclare)?"
     IDS_PLAYLIST_CLEAR      "Ș&terge"
     IDS_PLAYLIST_REMOVEMISSINGFILES "Șterge fișierele lipsă"
 END
@@ -3029,7 +3029,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_MPLAYERC_99         "Comută în modul ecran complet exclusiv (pe tot ecranul exclusiv)"
+    IDS_MPLAYERC_99         "Comută în modul ecran complet exclusiv (Comută pe tot ecranul exclusiv)"
     IDS_MPLAYERC_100        "Mergi la subtitrarea anterioară"
     IDS_MPLAYERC_101        "Mergi la subtitrarea următoare"
     IDS_MPLAYERC_102        "Deplasează subtitrarea la stânga"
@@ -3383,9 +3383,9 @@ STRINGTABLE
 BEGIN
     IDS_MPEGSPLITTER_SUB_FORCING "Încarcă forțat toate subtitrările"
     IDS_MPEGSPLITTER_LANG_ORDER "Ordinea limbilor pentru audio:"
-    IDS_MPEGSPLITTER_SUB_ORDER "Ordinea limbilor pentru subtitrare:"
+    IDS_MPEGSPLITTER_SUB_ORDER "Ordinea limbilor pentru subtitrări:"
     IDS_MPEGSPLITTER_TRUEHD_OUTPUT "Ieşire pentru fluxuri TrueHD + AC-3"
-    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Ieșirea pinului de subtitrare să fie liberă"
+    IDS_MPEGSPLITTER_SUB_EMPTY_PIN "Ieșirea pinului pentru subtitrări să fie liberă"
     IDS_MPEGSPLITTER_SUPPORT_MVC "Suportă extensia 3D MVC"
 END
 
