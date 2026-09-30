@@ -300,8 +300,8 @@ END
 
 BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 6		"ダーク テーマを使用する (既定)"
-7		"明るさ :"
-9		"音量調節の色設定:"
+7		"明るさ:"
+9		"音量表示の色:"
 10		"音量:"
 11		"B"
 12		"背景:"
@@ -313,7 +313,7 @@ BEGIN DIALOGEX IDD_PPAGEINTERFACE LINES 43
 21		"メニューに適用する"
 22		"タイトルに適用する (Windows 10 以降)"
 24		"コントロール サイズ:"
-26		"Enable dark dialogs (Windows 10 or later)"
+26		"ダイアログに適用する (Windows 10 以降)"
 28		"タイム ツールヒントを使用する:"
 30		"検索でプレビュー機能を使用する"
 31		"画面横幅に対するサイズ:"
