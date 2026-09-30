@@ -353,6 +353,7 @@ void CFormatConverter::SetConvertFunc()
 	}
 
 	if (m_pConvertFn) {
+		DLog("CFormatConverter::SetConvertFunc : SSE4 direct function has been selected");
 		return;
 	}
 
@@ -493,6 +494,12 @@ void CFormatConverter::SetConvertFunc()
 		}
 		break;
 	}
+
+	DLog("CFormatConverter::SetConvertFunc : %s has been selected",
+		m_pConvertFn == &CFormatConverter::ConvertGeneric
+		? "swscale"
+		: "custom optimized function"
+	);
 }
 
 void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
