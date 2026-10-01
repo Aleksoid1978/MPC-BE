@@ -306,6 +306,16 @@ void CFormatConverter::UpdateSWSContext()
 
 void CFormatConverter::SetConvertFunc()
 {
+#ifdef DEBUG
+	{
+		auto av_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+		auto swof = GetSWOF(m_out_pixfmt);
+		if (av_pfdesc && swof) {
+			DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", av_pfdesc->name, swof->desc.name);
+		}
+	}
+#endif // DEBUG
+
 	m_pConvertFn = nullptr;
 	m_RequiredAlignment = 16;
 
@@ -350,6 +360,11 @@ void CFormatConverter::SetConvertFunc()
 		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV36 && m_out_pixfmt == PixFmt_Y416) {
 			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		}
+	}
+
+	if (m_pConvertFn) {
+		DLog("CFormatConverter::SetConvertFunc : SSE4 direct function has been selected");
+		return;
 	}
 
 	// optimized function
