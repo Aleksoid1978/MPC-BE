@@ -97,7 +97,6 @@ HRESULT CFormatConverter::ConvertToAYUV(CONV_FUNC_PARAMS)
     const BYTE *v = nullptr;
     ptrdiff_t line, i = 0;
     ptrdiff_t sourceStride = 0;
-    BYTE *pTmpBuffer = nullptr;
 
     if (m_FProps.avpixfmt != AV_PIX_FMT_YUV444P)
     {
@@ -105,9 +104,10 @@ HRESULT CFormatConverter::ConvertToAYUV(CONV_FUNC_PARAMS)
         ptrdiff_t tmpStride[4] = {0};
         ptrdiff_t scaleStride = FFALIGN(width, 32);
 
-        pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 3);
-        if (pTmpBuffer == nullptr)
+        uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(height * scaleStride * 3);
+        if (pTmpBuffer == nullptr) {
             return E_OUTOFMEMORY;
+        }
 
         tmp[0] = pTmpBuffer;
         tmp[1] = tmp[0] + (height * scaleStride);
@@ -160,8 +160,6 @@ HRESULT CFormatConverter::ConvertToAYUV(CONV_FUNC_PARAMS)
         out += dstStride[0];
     }
 
-    av_freep(&pTmpBuffer);
-
     return S_OK;
 }
 
@@ -175,8 +173,6 @@ HRESULT CFormatConverter::ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical)
 
     int shift = 0;
 
-    BYTE *pTmpBuffer = nullptr;
-
     if ((chromaVertical == 1 && m_FProps.pftype != PFType_YUV422Px) ||
         (chromaVertical == 2 && m_FProps.pftype != PFType_YUV420Px))
     {
@@ -184,9 +180,10 @@ HRESULT CFormatConverter::ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical)
         ptrdiff_t tmpStride[4] = {0};
         ptrdiff_t scaleStride = FFALIGN(width, 32) * 2;
 
-        pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 2);
-        if (pTmpBuffer == nullptr)
+        uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(height * scaleStride * 2);
+        if (pTmpBuffer == nullptr) {
             return E_OUTOFMEMORY;
+        }
 
         tmp[0] = pTmpBuffer;
         tmp[1] = tmp[0] + (height * scaleStride);
@@ -264,8 +261,6 @@ HRESULT CFormatConverter::ConvertToPX1X(CONV_FUNC_PARAMS, int chromaVertical)
         out += dstStride[1];
     }
 
-    av_freep(&pTmpBuffer);
-
     return S_OK;
 }
 
@@ -299,17 +294,16 @@ HRESULT CFormatConverter::ConvertToY410(CONV_FUNC_PARAMS)
     ptrdiff_t sourceStride = 0;
     bool b9Bit = false;
 
-    BYTE *pTmpBuffer = nullptr;
-
     if (m_FProps.pftype != PFType_YUV444Px || m_FProps.lumabits > 10)
     {
         uint8_t *tmp[4] = {nullptr};
         ptrdiff_t tmpStride[4] = {0};
         ptrdiff_t scaleStride = FFALIGN(width, 32);
 
-        pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
-        if (pTmpBuffer == nullptr)
+        uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(height * scaleStride * 6);
+        if (pTmpBuffer == nullptr) {
             return E_OUTOFMEMORY;
+        }
 
         tmp[0] = pTmpBuffer;
         tmp[1] = tmp[0] + (height * scaleStride * 2);
@@ -350,8 +344,6 @@ HRESULT CFormatConverter::ConvertToY410(CONV_FUNC_PARAMS)
     YUV444_Y410_PACK
     YUV444_PACKED_LOOP_END(y, u, v, out, sourceStride, dstStride[0])
 
-    av_freep(&pTmpBuffer);
-
     return S_OK;
 }
 
@@ -362,8 +354,6 @@ HRESULT CFormatConverter::ConvertToY416(CONV_FUNC_PARAMS)
     const uint16_t *v = nullptr;
     ptrdiff_t sourceStride = 0;
 
-    BYTE *pTmpBuffer = nullptr;
-
     int shift = (16 - m_FProps.lumabits);
     if (m_FProps.pftype != PFType_YUV444Px)
     {
@@ -371,9 +361,10 @@ HRESULT CFormatConverter::ConvertToY416(CONV_FUNC_PARAMS)
         ptrdiff_t tmpStride[4] = {0};
         ptrdiff_t scaleStride = FFALIGN(width, 32);
 
-        pTmpBuffer = (BYTE *)av_malloc(height * scaleStride * 6);
-        if (pTmpBuffer == nullptr)
+        uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(height * scaleStride * 6);
+        if (pTmpBuffer == nullptr) {
             return E_OUTOFMEMORY;
+        }
 
         tmp[0] = pTmpBuffer;
         tmp[1] = tmp[0] + (height * scaleStride * 2);
@@ -410,8 +401,6 @@ HRESULT CFormatConverter::ConvertToY416(CONV_FUNC_PARAMS)
 
     idst += 2;
     YUV444_PACKED_LOOP_END(y, u, v, out, sourceStride, dstStride[0])
-
-    av_freep(&pTmpBuffer);
 
     return S_OK;
 }

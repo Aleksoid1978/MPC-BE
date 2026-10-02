@@ -234,6 +234,19 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
+void* CFormatConverter::GetTempBuffer(const size_t size)
+{
+	if (size > m_nTempBufferSize) {
+		void* pTmpBuffer = av_realloc(m_pTempBuffer, size);
+		if (pTmpBuffer == nullptr) {
+			return nullptr;
+		}
+		m_pTempBuffer = pTmpBuffer;
+		m_nTempBufferSize = size;
+	}
+	return m_pTempBuffer;
+}
+
 bool CFormatConverter::InitSWSContext()
 {
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE) {
@@ -636,6 +649,9 @@ void CFormatConverter::Cleanup()
 
 	av_freep(&m_pAlignedBuffer);
 	m_nAlignedBufferSize = 0;
+
+	av_freep(&m_pTempBuffer);
+	m_nTempBufferSize = 0;
 
 	if (m_rgbCoeffs) {
 		_aligned_free(m_rgbCoeffs);

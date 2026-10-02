@@ -122,14 +122,19 @@ protected:
 	int				m_planeHeight = 0;
 	int				m_OutHeight   = 0;
 
-	size_t			m_nAlignedBufferSize = 0;
 	uint8_t*		m_pAlignedBuffer = nullptr;
+	size_t			m_nAlignedBufferSize = 0;
+
+	void*			m_pTempBuffer = nullptr;
+	size_t			m_nTempBufferSize = 0;
 
 	int				m_nCPUFlag = 0;
 
 	unsigned		m_RequiredAlignment = 0;
 
 	int				m_NumThreads = 1;
+
+	void* GetTempBuffer(const size_t size);
 
 	bool InitSWSContext();
 	void UpdateSWSContext();
