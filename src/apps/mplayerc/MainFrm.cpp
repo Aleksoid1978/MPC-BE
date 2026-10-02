@@ -1918,12 +1918,8 @@ void CMainFrame::OnEnterSizeMove()
 	}
 
 	if (!m_bWndZoomed) {
-		WINDOWPLACEMENT wp;
-		wp.length = sizeof(wp);
-		GetWindowPlacement(&wp);
-
-		snap_x = cur_pos.x - wp.rcNormalPosition.left;
-		snap_y = cur_pos.y - wp.rcNormalPosition.top;
+		snap_x = cur_pos.x - rcWindow.left;
+		snap_y = cur_pos.y - rcWindow.top;
 	}
 }
 
