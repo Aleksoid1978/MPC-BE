@@ -204,7 +204,7 @@ public:
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
 
 	bool Converting(BYTE* dst, const AVFrame* pFrame);
-	bool Converting(BYTE* dst, const AVFrame* pFrame, const uint8_t* const srcData[4], const ptrdiff_t srcStride[4]);
+	bool Converting(BYTE* dst, const AVFrame* pFrame, const uint8_t* (&srcData)[4], const ptrdiff_t (&srcStride)[4]);
 
 	void SetDirect(const BOOL bDirect) { m_bDirect = bDirect; }
 
