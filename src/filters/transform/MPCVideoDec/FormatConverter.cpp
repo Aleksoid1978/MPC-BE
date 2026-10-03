@@ -234,9 +234,9 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
-void* CFormatConverter::GetTempBuffer(const size_t size)
+void* CFormatConverter::GetTempBuffer(const size_t size, const size_t padsize)
 {
-	if (size > m_nTempBufferSize) {
+	if (size + padsize > m_nTempBufferSize) {
 		void* pTmpBuffer = av_realloc(m_pTempBuffer, size);
 		if (pTmpBuffer == nullptr) {
 			return nullptr;
@@ -582,12 +582,12 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 	if (m_RequiredAlignment && FFALIGN(m_dstStride, m_RequiredAlignment) != m_dstStride || ((uintptr_t)dst % 16u)) {
 		outStride = FFALIGN(outStride, m_RequiredAlignment);
 		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) >> 3;
-		if (requiredSize > m_nAlignedBufferSize) {
-			av_freep(&m_pAlignedBuffer);
-			m_nAlignedBufferSize = requiredSize;
-			m_pAlignedBuffer = (uint8_t*)av_malloc(m_nAlignedBufferSize + AV_INPUT_BUFFER_PADDING_SIZE);
+
+		uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(requiredSize, AV_INPUT_BUFFER_PADDING_SIZE);
+		if (pTmpBuffer == nullptr) {
+			return false;
 		}
-		out = m_pAlignedBuffer;
+		out = pTmpBuffer;
 	}
 
 	uint8_t*  dstArray[4]       = { nullptr };
@@ -646,9 +646,6 @@ void CFormatConverter::Cleanup()
 		sws_freeContext(m_pSwsContext);
 		m_pSwsContext = nullptr;
 	}
-
-	av_freep(&m_pAlignedBuffer);
-	m_nAlignedBufferSize = 0;
 
 	av_freep(&m_pTempBuffer);
 	m_nTempBufferSize = 0;

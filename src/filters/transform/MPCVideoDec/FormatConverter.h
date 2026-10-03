@@ -109,8 +109,7 @@ typedef int (__stdcall *YUVRGBConversionFunc)(const uint8_t *srcY, const uint8_t
 
 class CFormatConverter
 {
-
-protected:
+private:
 	SwsContext*		m_pSwsContext = nullptr;
 	FrameProps		m_FProps;
 
@@ -122,9 +121,6 @@ protected:
 	int				m_planeHeight = 0;
 	int				m_OutHeight   = 0;
 
-	uint8_t*		m_pAlignedBuffer = nullptr;
-	size_t			m_nAlignedBufferSize = 0;
-
 	void*			m_pTempBuffer = nullptr;
 	size_t			m_nTempBufferSize = 0;
 
@@ -134,7 +130,7 @@ protected:
 
 	int				m_NumThreads = 1;
 
-	void* GetTempBuffer(const size_t size);
+	void* GetTempBuffer(const size_t size, const size_t padded = 0);
 
 	bool InitSWSContext();
 	void UpdateSWSContext();
