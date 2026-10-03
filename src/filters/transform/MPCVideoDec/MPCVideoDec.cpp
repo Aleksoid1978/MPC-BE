@@ -3932,6 +3932,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 				cuda_fns->cuStreamSynchronize(cuda_hwctx->stream);
 				cuda_fns->cuCtxPopCurrent(nullptr);
 			} else {
+				av_frame_unref(m_pFrame);
 				ret = av_hwframe_transfer_data(m_pFrame, m_pHWFrame, 0);
 				if (ret < 0) {
 					av_frame_unref(frame);
