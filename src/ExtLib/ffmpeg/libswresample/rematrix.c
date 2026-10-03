@@ -98,21 +98,64 @@ static int even(int64_t layout){
 
 static int clean_layout(AVChannelLayout *out, const AVChannelLayout *in, void *s)
 {
-    int ret = 0;
+    int used = in->nb_channels, idx = 0;
 
-    if (av_channel_layout_index_from_channel(in, AV_CHAN_FRONT_CENTER) < 0 && in->nb_channels == 1) {
-        char buf[128];
-        av_channel_layout_describe(in, buf, sizeof(buf));
-        av_log(s, AV_LOG_VERBOSE, "Treating %s as mono\n", buf);
+    if (in->order == AV_CHANNEL_ORDER_CUSTOM && in->nb_channels > 1) {
+        used = 0;
+        for (int i = 0; i < in->nb_channels; i++) {
+            if (in->u.map[i].id != AV_CHAN_UNUSED) {
+                idx = i;
+                used++;
+            }
+        }
+    }
+
+    if (used != 1 ||
+        av_channel_layout_channel_from_index(in, idx) == AV_CHAN_FRONT_CENTER)
+        return av_channel_layout_copy(out, in);
+
+    char buf[128];
+    av_channel_layout_describe(in, buf, sizeof(buf));
+    av_log(s, AV_LOG_VERBOSE, "Treating %s as mono\n", buf);
+
+    if (in->nb_channels == 1) {
         *out = (AVChannelLayout)AV_CHANNEL_LAYOUT_MONO;
-    } else
-        ret = av_channel_layout_copy(out, in);
+        return 0;
+    }
 
-    return ret;
+    /* the channel keeps its place among the unused ones */
+    int ret = av_channel_layout_copy(out, in);
+    if (ret < 0)
+        return ret;
+    out->u.map[idx].id = AV_CHAN_FRONT_CENTER;
+
+    return 0;
 }
 
-static int sane_layout(const AVChannelLayout *ch_layout) {
-    if(ch_layout->nb_channels >= SWR_CH_MAX)
+/**
+ * Stereo downmix channels are mixed like stereo, unless the other layout has
+ * such channels as well. The channels keep their places.
+ */
+static void clean_downmix(AVChannelLayout *ch_layout, const AVChannelLayout *other)
+{
+    if (av_channel_layout_subset(ch_layout, ~(uint64_t)0) != AV_CH_LAYOUT_STEREO_DOWNMIX ||
+        av_channel_layout_subset(other, AV_CH_LAYOUT_STEREO_DOWNMIX))
+        return;
+
+    if (ch_layout->order == AV_CHANNEL_ORDER_NATIVE) {
+        ch_layout->u.mask = AV_CH_LAYOUT_STEREO;
+    } else if (ch_layout->order == AV_CHANNEL_ORDER_CUSTOM) {
+        for (int i = 0; i < ch_layout->nb_channels; i++) {
+            if (ch_layout->u.map[i].id == AV_CHAN_STEREO_LEFT)
+                ch_layout->u.map[i].id = AV_CHAN_FRONT_LEFT;
+            else if (ch_layout->u.map[i].id == AV_CHAN_STEREO_RIGHT)
+                ch_layout->u.map[i].id = AV_CHAN_FRONT_RIGHT;
+        }
+    }
+}
+
+static int sane_layout(const AVChannelLayout *ch_layout, int mixed) {
+    if(ch_layout->nb_channels > SWR_CH_MAX)
         return 0;
     if(ch_layout->order == AV_CHANNEL_ORDER_CUSTOM)
         for (int i = 0; i < ch_layout->nb_channels; i++) {
@@ -125,6 +168,8 @@ static int sane_layout(const AVChannelLayout *ch_layout) {
         }
     else if (ch_layout->order != AV_CHANNEL_ORDER_NATIVE)
         return 0;
+    if (!mixed)
+        return 1;
     uint64_t mask = av_channel_layout_subset(ch_layout, ~(uint64_t)0);
     if(!(mask & AV_CH_LAYOUT_SURROUND)) // at least 1 front speaker
         return 0;
@@ -575,7 +620,7 @@ av_cold int swr_build_matrix2(const AVChannelLayout *in_layout, const AVChannelL
                               double rematrix_volume, double *matrix_param,
                               ptrdiff_t stride, enum AVMatrixEncoding matrix_encoding, void *log_context)
 {
-    int i, j, ret;
+    int i, j, ret, mixed;
     AVChannelLayout in_ch_layout = { 0 }, out_ch_layout = { 0 };
     char buf[128];
 
@@ -584,25 +629,19 @@ av_cold int swr_build_matrix2(const AVChannelLayout *in_layout, const AVChannelL
     if (ret < 0)
         goto fail;
 
-    if(   !av_channel_layout_compare(&out_ch_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO_DOWNMIX)
-       && !av_channel_layout_subset(&in_ch_layout, AV_CH_LAYOUT_STEREO_DOWNMIX)
-    ) {
-        av_channel_layout_uninit(&out_ch_layout);
-        out_ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
-    }
-    if(   !av_channel_layout_compare(&in_ch_layout, &(AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO_DOWNMIX)
-       && !av_channel_layout_subset(&out_ch_layout, AV_CH_LAYOUT_STEREO_DOWNMIX)
-    ) {
-        av_channel_layout_uninit(&in_ch_layout);
-        in_ch_layout = (AVChannelLayout)AV_CHANNEL_LAYOUT_STEREO;
-    }
+    clean_downmix(&out_ch_layout, &in_ch_layout);
+    clean_downmix(&in_ch_layout, &out_ch_layout);
+
+    /* the same channels on both sides change their places at most */
+    mixed = av_channel_layout_subset(&in_ch_layout,  ~(uint64_t)0) !=
+            av_channel_layout_subset(&out_ch_layout, ~(uint64_t)0);
 
     if(!av_channel_layout_check(&in_ch_layout)) {
         av_log(log_context, AV_LOG_ERROR, "Input channel layout is invalid\n");
         ret = AVERROR(EINVAL);
         goto fail;
     }
-    if(!sane_layout(&in_ch_layout)) {
+    if(!sane_layout(&in_ch_layout, mixed)) {
         av_channel_layout_describe(&in_ch_layout, buf, sizeof(buf));
         av_log(log_context, AV_LOG_ERROR, "Input channel layout '%s' is not supported\n", buf);
         ret = AVERROR(EINVAL);
@@ -614,7 +653,7 @@ av_cold int swr_build_matrix2(const AVChannelLayout *in_layout, const AVChannelL
         ret = AVERROR(EINVAL);
         goto fail;
     }
-    if(!sane_layout(&out_ch_layout)) {
+    if(!sane_layout(&out_ch_layout, mixed)) {
         av_channel_layout_describe(&out_ch_layout, buf, sizeof(buf));
         av_log(log_context, AV_LOG_ERROR, "Output channel layout '%s' is not supported\n", buf);
         ret = AVERROR(EINVAL);
@@ -658,7 +697,8 @@ av_cold static int auto_matrix(SwrContext *s)
     if (s->rematrix_maxval > 0) {
         maxval = s->rematrix_maxval;
     } else if (   av_get_packed_sample_fmt(s->out_sample_fmt) < AV_SAMPLE_FMT_FLT
-               || av_get_packed_sample_fmt(s->int_sample_fmt) < AV_SAMPLE_FMT_FLT) {
+               || (s->user_int_sample_fmt != AV_SAMPLE_FMT_NONE &&
+                   av_get_packed_sample_fmt(s->user_int_sample_fmt) < AV_SAMPLE_FMT_FLT)) {
         maxval = 1.0;
     } else
         maxval = INT_MAX;
@@ -670,12 +710,11 @@ av_cold static int auto_matrix(SwrContext *s)
                              s->matrix[1] - s->matrix[0], s->matrix_encoding, s);
 }
 
-av_cold int swri_rematrix_init(SwrContext *s){
+av_cold int swri_rematrix_build(SwrContext *s)
+{
     int i, j;
     int nb_in  = s->used_ch_layout.nb_channels;
     int nb_out = s->out.ch_count;
-
-    s->mix_any_f = NULL;
 
     if (!s->rematrix_custom) {
         int r = auto_matrix(s);
@@ -695,6 +734,34 @@ av_cold int swri_rematrix_init(SwrContext *s){
             }
             av_log(s, AV_LOG_DEBUG, "\n");
         }
+    }
+
+    /* a channel that is one channel of the input, or silent, is not mixed */
+    for (i = 0; i < nb_out; i++) {
+        int sources = 0;
+        for (j = 0; j < nb_in; j++) {
+            if (s->matrix[i][j] == 0.0)
+                continue;
+            if (s->matrix[i][j] != 1.0 || sources++)
+                return 1;
+        }
+    }
+
+    return 0;
+}
+
+av_cold int swri_rematrix_init(SwrContext *s){
+    int i, j;
+    int nb_in  = s->used_ch_layout.nb_channels;
+    int nb_out = s->out.ch_count;
+
+    s->mix_any_f = NULL;
+
+    /* a matrix that is applied was built by swri_rematrix_build() */
+    if (!s->rematrix) {
+        int r = auto_matrix(s);
+        if (r)
+            return r;
     }
     if (s->midbuf.fmt == AV_SAMPLE_FMT_S16P){
         int maxsum = 0;

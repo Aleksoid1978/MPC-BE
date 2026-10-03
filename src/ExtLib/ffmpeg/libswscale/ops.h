@@ -54,9 +54,9 @@ typedef enum SwsOpType {
     SWS_OP_MIN,             /* numeric minimum */
     SWS_OP_MAX,             /* numeric maximum */
     SWS_OP_SCALE,           /* multiplication by scalar */
+    SWS_OP_LINEAR,          /* generalized linear affine transform */
 
     /* Floating-point only arithmetic operations. */
-    SWS_OP_LINEAR,          /* generalized linear affine transform */
     SWS_OP_DITHER,          /* add dithering noise */
 
     /* Filtering operations. */
@@ -171,7 +171,6 @@ typedef struct SwsClearOp {
 
 typedef struct SwsConvertOp {
     SwsPixelType to; /* type of pixel to convert to */
-    bool expand; /* if true, integers are expanded to the full range */
 } SwsConvertOp;
 
 typedef struct SwsClampOp {
@@ -196,6 +195,11 @@ typedef struct SwsLinearOp {
      *   [ Out.y ] = [ F G H I J ] * [ x y z w 1 ]
      *   [ Out.z ] = [ K L M N O ]
      *   [ Out.w ] = [ P Q R S T ]
+     *
+     * Note: For integer types, these entries may exceed the value range of
+     * the pixel type itself. It's implied that implementations will perform
+     * all intermediate calculations modulo 2^N where N is the bit depth of
+     * the pixel type, including the final result.
      */
     AVRational64 m[4][5];
 } SwsLinearOp;
