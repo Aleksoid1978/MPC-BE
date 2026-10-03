@@ -2163,8 +2163,8 @@ IDR_POPUP_NAVIGATE MENU
 BEGIN
     POPUP ""
     BEGIN
-        MENUITEM "&Precedentul",            ID_NAVIGATE_SKIPBACK
-        MENUITEM "&Următorul",              ID_NAVIGATE_SKIPFORWARD
+        MENUITEM "Fișierul anterior (Fișierul &precedent)",            ID_NAVIGATE_SKIPBACK
+        MENUITEM "Fișierul &următor",              ID_NAVIGATE_SKIPFORWARD
         MENUITEM "&Sari la...",                 ID_SUBMENU_JUMPTO
         MENUITEM SEPARATOR
         MENUITEM "Meniul pentru titluri",                 ID_NAVIGATE_TITLEMENU
@@ -2922,9 +2922,9 @@ BEGIN
     IDS_AG_JUMP_FORWARD_K   "Sari înainte (cadru cheie)"
     IDS_AG_JUMP_BACKWARD_K  "Sari înapoi (cadru cheie)"
     IDS_AG_NEXT             "Următorul"
-    IDS_AG_PREVIOUS         "Precedentul"
+    IDS_AG_PREVIOUS         "Anteriorul"
     IDS_AG_NEXT_FILE        "Fișierul următor"
-    IDS_AG_PREVIOUS_FILE    "Fișierul precedent"
+    IDS_AG_PREVIOUS_FILE    "Fișierul anterior"
 END
 
 STRINGTABLE
@@ -3004,13 +3004,13 @@ BEGIN
     IDS_AG_MENU_FILTERS     "Meniul pentru Filtre"
     IDS_AG_OPTIONS          "Opțiuni"
     IDS_AG_NEXT_AUDIO       "Următorul fișier audio"
-    IDS_AG_PREV_AUDIO       "Fișierul audio precedent"
+    IDS_AG_PREV_AUDIO       "Fișierul audio anterior"
 END
 
 STRINGTABLE
 BEGIN
     IDS_AG_NEXT_SUBTITLE    "Următoarea subtitrare"
-    IDS_AG_PREV_SUBTITLE    "Subtitrarea precedentă"
+    IDS_AG_PREV_SUBTITLE    "Subtitrarea anterioară"
     IDS_AG_SUBTITLE_ONOFF   "Activează/Dezactivează subtitrările"
     IDS_AG_SUBTITLE_RELOAD  "Reîncarcă subtitrările"
     IDS_AG_NEXT_VIDEO       "Următorul fișier video (videoclip) / Unghiul DVD-ului"
@@ -3126,7 +3126,7 @@ BEGIN
     IDS_PROPSHEET_FILE_IMAGE "Imaginea %hs"
     IDS_PROPSHEET_FILE_FONT "Fontul (Scrisul) %hs"
     IDS_AUDIOWINDOW_NONE    "nu schimba dimensiunea ferestrei"
-    IDS_AUDIOWINDOW_COVER   "afișează arta albumului / pozele de pe copertă"
+    IDS_AUDIOWINDOW_COVER   "afișează ilustrația de pe coperta albumului"
     IDS_AUDIOWINDOW_HIDE    "ascunde zona video"
     IDS_ADDTOPLS_FROMDIR_NONE "nimic"
 END
