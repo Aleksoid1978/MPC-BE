@@ -130,7 +130,8 @@ private:
 
 	int				m_NumThreads = 1;
 
-	void* GetTempBuffer(const size_t size, const size_t padded = 0);
+	// allocates an aligned buffer with padding
+	void* GetTempBuffer(const size_t size);
 
 	bool InitSWSContext();
 	void UpdateSWSContext();

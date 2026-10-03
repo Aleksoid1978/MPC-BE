@@ -234,10 +234,10 @@ CFormatConverter::~CFormatConverter()
 	Cleanup();
 }
 
-void* CFormatConverter::GetTempBuffer(const size_t size, const size_t padsize)
+void* CFormatConverter::GetTempBuffer(const size_t size)
 {
-	if (size + padsize > m_nTempBufferSize) {
-		void* pTmpBuffer = av_realloc(m_pTempBuffer, size);
+	if (size > m_nTempBufferSize) {
+		void* pTmpBuffer = av_realloc(m_pTempBuffer, size + AV_INPUT_BUFFER_PADDING_SIZE);
 		if (pTmpBuffer == nullptr) {
 			return nullptr;
 		}
@@ -583,7 +583,7 @@ bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
 		outStride = FFALIGN(outStride, m_RequiredAlignment);
 		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) >> 3;
 
-		uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(requiredSize, AV_INPUT_BUFFER_PADDING_SIZE);
+		uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(requiredSize);
 		if (pTmpBuffer == nullptr) {
 			return false;
 		}
