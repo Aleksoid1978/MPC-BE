@@ -197,20 +197,20 @@ public:
 	CFormatConverter();
 	~CFormatConverter();
 
-	void UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight);
-	void UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biHeight);
-	void SetOptions(int rgblevels);
+	void UpdateOutput(const MPCPixelFormat out_pixfmt, const int dstStride, const int planeHeight);
+	void UpdateOutput2(const DWORD biCompression, const LONG biWidth, const LONG biHeight);
+	void SetOptions(const int rgblevels);
 
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
 
-	bool Converting(BYTE* dst, AVFrame* pFrame);
-	void SetDirect(BOOL bDirect) { m_bDirect = bDirect; }
+	bool Converting(BYTE* dst, const AVFrame* pFrame);
+	void SetDirect(const BOOL bDirect) { m_bDirect = bDirect; }
 
 	void Cleanup();
 
-	bool FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2);
+	bool FormatChanged(const AVPixelFormat fmt1, const AVPixelFormat fmt2) const;
 
-	bool DirectCopyPossible(AVPixelFormat avformat);
+	bool DirectCopyPossible(const AVPixelFormat avformat) const;
 
 	int GetDstStride() const { return m_dstStride; }
 

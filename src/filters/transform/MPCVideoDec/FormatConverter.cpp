@@ -526,7 +526,7 @@ void CFormatConverter::SetConvertFunc()
 	DLog("CFormatConverter::SetConvertFunc : swscale has been selected");
 }
 
-void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, int planeHeight)
+void CFormatConverter::UpdateOutput(const MPCPixelFormat out_pixfmt, const int dstStride, const int planeHeight)
 {
 	if (out_pixfmt != m_out_pixfmt) {
 		Cleanup();
@@ -537,23 +537,23 @@ void CFormatConverter::UpdateOutput(MPCPixelFormat out_pixfmt, int dstStride, in
 	m_planeHeight = planeHeight;
 }
 
-void CFormatConverter::UpdateOutput2(DWORD biCompression, LONG biWidth, LONG biHeight)
+void CFormatConverter::UpdateOutput2(const DWORD biCompression, const LONG biWidth, const LONG biHeight)
 {
 	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
 
 	m_OutHeight = biHeight;
 }
 
-void CFormatConverter::SetOptions(int rgblevels)
+void CFormatConverter::SetOptions(const int rgblevels)
 {
 	m_dstRGBRange = (rgblevels == 1) ? 0 : 1;
 
 	UpdateSWSContext();
 }
 
-bool CFormatConverter::Converting(BYTE* dst, AVFrame* pFrame)
+bool CFormatConverter::Converting(BYTE* dst, const AVFrame* pFrame)
 {
-	if (FormatChanged(&m_FProps.avpixfmt, (AVPixelFormat*)&pFrame->format)
+	if (FormatChanged(m_FProps.avpixfmt, (AVPixelFormat)pFrame->format)
 			|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt   = (AVPixelFormat)pFrame->format;
@@ -658,13 +658,13 @@ void CFormatConverter::Cleanup()
 	m_pConvertFn = nullptr;
 }
 
-bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
+bool CFormatConverter::FormatChanged(const AVPixelFormat fmt1, const AVPixelFormat fmt2) const
 {
-	if (*fmt1 == AV_PIX_FMT_NONE || *fmt2 == AV_PIX_FMT_NONE) {
+	if (fmt1 == AV_PIX_FMT_NONE || fmt2 == AV_PIX_FMT_NONE) {
 		return true;
 	}
-	const AVPixFmtDescriptor* av_pfdesc_fmt1 = av_pix_fmt_desc_get(*fmt1);
-	const AVPixFmtDescriptor* av_pfdesc_fmt2 = av_pix_fmt_desc_get(*fmt2);
+	const AVPixFmtDescriptor* av_pfdesc_fmt1 = av_pix_fmt_desc_get(fmt1);
+	const AVPixFmtDescriptor* av_pfdesc_fmt2 = av_pix_fmt_desc_get(fmt2);
 	if (!av_pfdesc_fmt1 || !av_pfdesc_fmt2) {
 		return false;
 	}
@@ -674,7 +674,7 @@ bool CFormatConverter::FormatChanged(AVPixelFormat* fmt1, AVPixelFormat* fmt2)
 			|| av_pfdesc_fmt1->comp[0].depth != av_pfdesc_fmt2->comp[0].depth;
 }
 
-bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat)
+bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat) const
 {
 	return avformat == AV_PIX_FMT_NV12        && m_out_pixfmt == PixFmt_NV12 ||
 		   avformat == AV_PIX_FMT_P010LE      && m_out_pixfmt == PixFmt_P010 ||
