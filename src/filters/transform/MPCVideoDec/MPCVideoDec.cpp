@@ -2146,6 +2146,7 @@ bool CMPCVideoDecFilter::DirectCopyPossible(const AVPixelFormat avformat) const
 		avformat == AV_PIX_FMT_P010LE      && m_outputFourcc == FCC('P010') ||
 		avformat == AV_PIX_FMT_P012LE      && m_outputFourcc == FCC('P016') ||
 		avformat == AV_PIX_FMT_P016LE      && m_outputFourcc == FCC('P016') ||
+		avformat == AV_PIX_FMT_NV16        && m_outputFourcc == FCC('NV16') ||
 		avformat == AV_PIX_FMT_P210LE      && m_outputFourcc == FCC('P210') ||
 		avformat == AV_PIX_FMT_P212LE      && m_outputFourcc == FCC('P216') ||
 		avformat == AV_PIX_FMT_YUV444P     && m_outputFourcc == FCC('YV24') ||
@@ -2792,6 +2793,10 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 			case AV_PIX_FMT_YUV420P10LE: m_VideoOutputFormats.emplace_back(DXVA_P010); break;
 			}
 		}
+	}
+
+	if (m_hwType == HwType::NVDEC && pix_fmt == AV_PIX_FMT_YUV422P) {
+		m_VideoOutputFormats.emplace_back(VFormat_NV16);
 	}
 
 	// Software rendering

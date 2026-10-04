@@ -78,6 +78,8 @@ constexpr VFormatDesc VFormat_IYUV      = { L"IYUV",      &MEDIASUBTYPE_IYUV,   
 constexpr VFormatDesc VFormat_YUV444P16 = { L"YUV444P16", &MEDIASUBTYPE_YUV444P16, MAKEFOURCC('Y','3',0,16),   Cm_YUV444, 2, 3, 16 };
 
 constexpr VFormatDesc VFormat_NV12      = { L"NV12",      &MEDIASUBTYPE_NV12,      FCC('NV12'),                Cm_YUV420, 1, 2,  8 };
+constexpr VFormatDesc VFormat_NV16      = { L"NV16",      &MEDIASUBTYPE_NV16,      FCC('NV16'),                Cm_YUV422, 1, 2,  8 };
+
 constexpr VFormatDesc VFormat_P010      = { L"P010",      &MEDIASUBTYPE_P010,      FCC('P010'),                Cm_YUV420, 2, 2, 10 };
 constexpr VFormatDesc VFormat_P016      = { L"P016",      &MEDIASUBTYPE_P016,      FCC('P016'),                Cm_YUV420, 2, 2, 16 };
 constexpr VFormatDesc VFormat_P210      = { L"P210",      &MEDIASUBTYPE_P210,      FCC('P210'),                Cm_YUV422, 2, 2, 10 };
