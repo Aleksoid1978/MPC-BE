@@ -64,7 +64,7 @@ const SW_OUT_FMT s_sw_formats[] = {
 
 static_assert(std::size(s_sw_formats) == PixFmt_count);
 
-const SW_OUT_FMT* GetSWOF(int pixfmt)
+const SW_OUT_FMT* GetSWOF(const int pixfmt)
 {
 	if (pixfmt < 0 || pixfmt >= PixFmt_count) {
 		return nullptr;
@@ -72,7 +72,7 @@ const SW_OUT_FMT* GetSWOF(int pixfmt)
 	return &s_sw_formats[pixfmt];
 }
 
-LPCWSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
+LPCWSTR GetChromaSubsamplingStr(const AVPixelFormat av_pix_fmt)
 {
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 	if (pfdesc && pfdesc->nb_components >= 3) {
@@ -91,14 +91,14 @@ LPCWSTR GetChromaSubsamplingStr(AVPixelFormat av_pix_fmt)
 	return L"";
 }
 
-int GetLumaBits(AVPixelFormat av_pix_fmt)
+int GetLumaBits(const AVPixelFormat av_pix_fmt)
 {
 	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 
 	return (pfdesc ? pfdesc->comp[0].depth : 0);
 }
 
-MPCPixelFormat GetPixFormat(GUID& subtype)
+MPCPixelFormat GetPixFormat(const GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (*s_sw_formats[i].desc.subtype == subtype) {
@@ -109,7 +109,7 @@ MPCPixelFormat GetPixFormat(GUID& subtype)
 	return PixFmt_None;
 }
 
-MPCPixelFormat GetPixFormat(AVPixelFormat av_pix_fmt)
+MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (s_sw_formats[i].av_pix_fmt == av_pix_fmt) {
@@ -120,7 +120,7 @@ MPCPixelFormat GetPixFormat(AVPixelFormat av_pix_fmt)
 	return PixFmt_None;
 }
 
-MPCPixelFormat GetPixFormat(DWORD biCompression)
+MPCPixelFormat GetPixFormat(const DWORD biCompression)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (s_sw_formats[i].desc.fourcc == biCompression) {
@@ -131,7 +131,7 @@ MPCPixelFormat GetPixFormat(DWORD biCompression)
 	return PixFmt_None;
 }
 
-MPCPixFmtType GetPixFmtType(AVPixelFormat av_pix_fmt)
+MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt)
 {
 	switch (av_pix_fmt) {
 	case AV_PIX_FMT_YUV420P:
@@ -526,22 +526,17 @@ void CFormatConverter::SetConvertFunc()
 	DLog("CFormatConverter::SetConvertFunc : swscale has been selected");
 }
 
-void CFormatConverter::UpdateOutput(const MPCPixelFormat out_pixfmt, const int dstStride, const int planeHeight)
+void CFormatConverter::UpdateOutput(const BITMAPINFOHEADER* pBIH)
 {
+	MPCPixelFormat out_pixfmt = GetPixFormat(pBIH->biCompression);
 	if (out_pixfmt != m_out_pixfmt) {
 		Cleanup();
 		m_out_pixfmt = out_pixfmt;
 	}
 
-	m_dstStride   = dstStride;
-	m_planeHeight = planeHeight;
-}
-
-void CFormatConverter::UpdateOutput2(const DWORD biCompression, const LONG biWidth, const LONG biHeight)
-{
-	UpdateOutput(GetPixFormat(biCompression), biWidth, abs(biHeight));
-
-	m_OutHeight = biHeight;
+	m_dstStride   = pBIH->biWidth;
+	m_planeHeight = abs(pBIH->biHeight);
+	m_OutHeight   = pBIH->biHeight;
 }
 
 void CFormatConverter::SetOptions(const int rgblevels)

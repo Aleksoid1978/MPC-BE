@@ -1952,11 +1952,11 @@ HRESULT CMPCVideoDecFilter::SetMediaType(PIN_DIRECTION direction, const CMediaTy
 		m_bDecoderAcceptFormat = FALSE;
 		m_pCurrentMediaType    = *pmt;
 	} else if (direction == PINDIR_OUTPUT) {
-		BITMAPINFOHEADER bihOut;
-		if (!ExtractBIH(&m_pOutput->CurrentMediaType(), &bihOut)) {
+		const BITMAPINFOHEADER* bihOut = GetBitmapInfoHeader(&m_pOutput->CurrentMediaType());
+		if (!bihOut) {
 			return E_FAIL;
 		}
-		m_FormatConverter.UpdateOutput2(bihOut.biCompression, bihOut.biWidth, bihOut.biHeight);
+		m_FormatConverter.UpdateOutput(bihOut);
 	}
 
 	return __super::SetMediaType(direction, pmt);

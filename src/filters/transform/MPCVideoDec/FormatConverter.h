@@ -22,6 +22,7 @@
 
 #include "IMPCVideoDec.h"
 #include <stdint.h>
+#include <mfobjects.h>
 #include "../BaseVideoFilter/VideoFormats.h"
 
 const MPCPixelFormat YUV420_8[]  = {PixFmt_NV12, PixFmt_YV12, PixFmt_YUY2, PixFmt_YV16, PixFmt_YV24, PixFmt_AYUV, PixFmt_P010, PixFmt_P016, PixFmt_P210, PixFmt_P216, PixFmt_Y410, PixFmt_YUV444P16, PixFmt_Y416, PixFmt_None};
@@ -197,8 +198,7 @@ public:
 	CFormatConverter();
 	~CFormatConverter();
 
-	void UpdateOutput(const MPCPixelFormat out_pixfmt, const int dstStride, const int planeHeight);
-	void UpdateOutput2(const DWORD biCompression, const LONG biWidth, const LONG biHeight);
+	void UpdateOutput(const BITMAPINFOHEADER* pBIH);
 	void SetOptions(const int rgblevels);
 
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
