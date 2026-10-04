@@ -679,18 +679,6 @@ bool CFormatConverter::FormatChanged(const AVPixelFormat fmt1, const AVPixelForm
 			|| av_pfdesc_fmt1->comp[0].depth != av_pfdesc_fmt2->comp[0].depth;
 }
 
-bool CFormatConverter::DirectCopyPossible(const AVPixelFormat avformat) const
-{
-	return avformat == AV_PIX_FMT_NV12        && m_out_pixfmt == PixFmt_NV12 ||
-		   avformat == AV_PIX_FMT_P010LE      && m_out_pixfmt == PixFmt_P010 ||
-		   avformat == AV_PIX_FMT_P012LE      && m_out_pixfmt == PixFmt_P016 ||
-		   avformat == AV_PIX_FMT_P016LE      && m_out_pixfmt == PixFmt_P016 ||
-		   avformat == AV_PIX_FMT_P210LE      && m_out_pixfmt == PixFmt_P210 ||
-		   avformat == AV_PIX_FMT_P212LE      && m_out_pixfmt == PixFmt_P216 ||
-		   avformat == AV_PIX_FMT_YUV444P     && m_out_pixfmt == PixFmt_YV24 ||
-		   avformat == AV_PIX_FMT_YUV444P16LE && m_out_pixfmt == PixFmt_YUV444P16;
-}
-
 void CFormatConverter::Clear()
 {
 	m_FProps = {};

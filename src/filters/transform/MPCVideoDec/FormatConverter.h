@@ -212,8 +212,6 @@ public:
 
 	bool FormatChanged(const AVPixelFormat fmt1, const AVPixelFormat fmt2) const;
 
-	bool DirectCopyPossible(const AVPixelFormat avformat) const;
-
 	int GetDstStride() const { return m_dstStride; }
 
 	void Clear();
