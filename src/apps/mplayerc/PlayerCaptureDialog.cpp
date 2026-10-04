@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -260,12 +260,11 @@ static void SetupMediaTypes(IAMStreamConfig* pAMSC, CFormatArray<T>& tfa, CCombo
 				};
 
 				VIDEO_STREAM_CONFIG_CAPS* pcaps = (VIDEO_STREAM_CONFIG_CAPS*)&pfe->caps;
-				BITMAPINFOHEADER bihCur;
-				ExtractBIH(&pfe->mt, &bihCur);
+				const BITMAPINFOHEADER* pBIHCur = GetBitmapInfoHeader(&pfe->mt);
 
 				for (size_t j = 0; j < std::size(presets); j++) {
-					if (presets[j].cx == bihCur.biWidth
-							&& presets[j].cy == abs(bihCur.biHeight)
+					if (presets[j].cx == pBIHCur->biWidth
+							&& presets[j].cy == abs(pBIHCur->biHeight)
 							|| presets[j].cx < pcaps->MinOutputSize.cx
 							|| presets[j].cx > pcaps->MaxOutputSize.cx
 							|| presets[j].cy < pcaps->MinOutputSize.cy

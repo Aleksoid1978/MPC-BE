@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -185,10 +185,9 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 		}
 
 		if (!bAdd) {
-			BITMAPINFOHEADER bih;
-			bool fBIH = ExtractBIH(pmt, &bih);
-			if (fBIH) {
-				CString codecName = CMediaTypeEx::GetVideoCodecName(pmt->subtype, bih.biCompression);
+			const BITMAPINFOHEADER* pBIH = GetBitmapInfoHeader(pmt);
+			if (pBIH) {
+				CStringW codecName = CMediaTypeEx::GetVideoCodecName(pmt->subtype, pBIH->biCompression);
 				if (!codecName.IsEmpty()) {
 					Infos.emplace_back(codecName);
 				}
