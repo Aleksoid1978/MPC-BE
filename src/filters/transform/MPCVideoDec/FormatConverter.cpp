@@ -526,9 +526,9 @@ void CFormatConverter::SetConvertFunc()
 	DLog("CFormatConverter::SetConvertFunc : swscale has been selected");
 }
 
-void CFormatConverter::UpdateOutput(const BITMAPINFOHEADER* pBIH)
+void CFormatConverter::UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER* pBIH)
 {
-	MPCPixelFormat out_pixfmt = GetPixFormat(pBIH->biCompression);
+	MPCPixelFormat out_pixfmt = GetPixFormat(subtype);
 	if (out_pixfmt != m_out_pixfmt) {
 		Cleanup();
 		m_out_pixfmt = out_pixfmt;

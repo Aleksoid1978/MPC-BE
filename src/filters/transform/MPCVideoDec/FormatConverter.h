@@ -198,7 +198,7 @@ public:
 	CFormatConverter();
 	~CFormatConverter();
 
-	void UpdateOutput(const BITMAPINFOHEADER* pBIH);
+	void UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER* pBIH);
 	void SetOptions(const int rgblevels);
 
 	MPCPixelFormat GetOutPixFormat() { return m_out_pixfmt; }
