@@ -267,7 +267,7 @@ bool CFormatConverter::InitSWSContext()
 						m_FProps.width,
 						m_FProps.height,
 						swof.av_pix_fmt,
-						SWS_BILINEAR | SWS_ACCURATE_RND | SWS_FULL_CHR_H_INP | SWS_PRINT_INFO,
+						SWS_BILINEAR | SWS_FULL_CHR_H_INT | SWS_PRINT_INFO,
 						nullptr,
 						nullptr,
 						nullptr);
