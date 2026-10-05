@@ -1081,6 +1081,16 @@ namespace DarkTheme
 				case WM_ENABLE:
 					OwnerBorderRefreshFrame(h);
 					break;
+				case WM_SHOWWINDOW:
+					// A control that is shown again (the Internal Filters page swaps its three lists when you
+					// switch tab) repaints its client, but nothing asks for the non-client band - so the
+					// owned border and the scrollbar stayed blank until a hover made Windows repaint the
+					// frame. Ask for it here. (It used to be hidden by the page repainting over its children;
+					// the dialogs clip their children now, so the control has to do it itself.)
+					if (w) {
+						OwnerBorderRefreshFrame(h);
+					}
+					break;
 				case WM_DPICHANGED_AFTERPARENT:
 					OwnerBorderRefreshFrame(h); // SWP_FRAMECHANGED re-runs NCCALCSIZE (new-DPI reserve) + NCPAINT
 					break;
@@ -1918,10 +1928,17 @@ namespace DarkTheme
 		if (n == 0) {
 			return;
 		}
-		// Already fixed? Then the n bottom-most siblings are exactly the group boxes. Check before
-		// touching anything: this runs on every page activation (and the property sheet re-activates
-		// the page after each Apply), and pushing to HWND_BOTTOM again is not a no-op with two or more
-		// boxes - they rotate, the z-order really changes and Windows invalidates them, which flickered.
+		// WS_CLIPSIBLINGS is what actually keeps a group box from painting over the controls it frames:
+		// without it, painting is not clipped against siblings at all, whatever the z-order says. Always
+		// apply it - a dialog whose template already declares the boxes in the right order would
+		// otherwise never get it, and its lists would lose their border and scrollbar on a repaint.
+		for (int i = 0; i < n; ++i) {
+			SetWindowLongW(boxes[i], GWL_STYLE, GetWindowLongW(boxes[i], GWL_STYLE) | WS_CLIPSIBLINGS);
+		}
+		// The z-order shuffle below, on the other hand, is skipped when it is already right: this runs on
+		// every page activation (and the property sheet re-activates the page after each Apply), and
+		// pushing to HWND_BOTTOM again is not a no-op with two or more boxes - they rotate, the z-order
+		// really changes and Windows invalidates them, which flickered.
 		int nBottom = 0;
 		for (HWND c = ::GetWindow(hWndParent, GW_CHILD); c; c = ::GetWindow(c, GW_HWNDNEXT)) {
 			bool isBox = false;
@@ -1934,7 +1951,6 @@ namespace DarkTheme
 			return;
 		}
 		for (int i = 0; i < n; ++i) {
-			SetWindowLongW(boxes[i], GWL_STYLE, GetWindowLongW(boxes[i], GWL_STYLE) | WS_CLIPSIBLINGS);
 			::SetWindowPos(boxes[i], HWND_BOTTOM, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 		}
 	}
