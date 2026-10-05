@@ -148,6 +148,26 @@ void CDarkTabCtrl::OnPaint()
 	}
 
 	memDC.SelectObject(pOldFont);
+
+	// Keep the controls that sit on the pane out of the blit. They are SIBLINGS of this tab control -
+	// the dialog templates declare the tab first, so it is above them in z-order - and painting the
+	// pane background over them wipes whatever they drew outside their client area: the owned border
+	// and the scrollbar of a list. Nothing repaints that afterwards (the page clips its children), so
+	// a list came up without its frame until the mouse passed over it and Windows repainted the frame.
+	if (CWnd* pParent = GetParent()) {
+		for (CWnd* pSibling = pParent->GetWindow(GW_CHILD); pSibling; pSibling = pSibling->GetNextWindow()) {
+			if (pSibling->GetSafeHwnd() == GetSafeHwnd() || !pSibling->IsWindowVisible()) {
+				continue;
+			}
+			CRect rSibling;
+			pSibling->GetWindowRect(rSibling);
+			ScreenToClient(rSibling);
+			if (CRect().IntersectRect(rSibling, rClient)) {
+				dc.ExcludeClipRect(rSibling);
+			}
+		}
+	}
+
 	dc.BitBlt(0, 0, rClient.Width(), rClient.Height(), &memDC, 0, 0, SRCCOPY);
 	memDC.SelectObject(pOldBmp);
 }
