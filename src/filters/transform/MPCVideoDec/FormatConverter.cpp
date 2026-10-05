@@ -284,32 +284,17 @@ bool CFormatConverter::InitSWSContext()
 
 void CFormatConverter::UpdateSWSContext()
 {
-	if (m_pSwsContext) {
+	if (m_pSwsContext && m_FProps.pftype != PFType_RGB && (m_out_pixfmt == PixFmt_RGB32 || m_out_pixfmt == PixFmt_RGB48)) {
+		// needed for correct YUV to RGB conversion
 		int *inv_tbl = nullptr, *tbl = nullptr;
 		int srcRange, dstRange, brightness, contrast, saturation;
 		int ret = sws_getColorspaceDetails(m_pSwsContext, &inv_tbl, &srcRange, &tbl, &dstRange, &brightness, &contrast, &saturation);
 		if (ret >= 0) {
-			if (m_FProps.pftype == PFType_RGB || m_FProps.colorrange == AVCOL_RANGE_JPEG) {
-				srcRange = 1;
-			}
+			srcRange = (m_FProps.colorrange == AVCOL_RANGE_JPEG) ? 1 : 0;
+			dstRange = m_dstRGBRange;
 
-			if (m_out_pixfmt == PixFmt_RGB32 || m_out_pixfmt == PixFmt_RGB48) {
-				dstRange = m_dstRGBRange;
-			}
-			else if (m_FProps.colorrange == AVCOL_RANGE_JPEG) {
-				dstRange = 1;
-			}
-
-			auto isAnyRGB = [](enum AVPixelFormat pix_fmt) {
-				const AVPixFmtDescriptor* desc = av_pix_fmt_desc_get(pix_fmt);
-				ASSERT(desc);
-				return (desc->flags & AV_PIX_FMT_FLAG_RGB) || pix_fmt == AV_PIX_FMT_MONOBLACK || pix_fmt == AV_PIX_FMT_MONOWHITE;
-			};
-
-			if (isAnyRGB(m_FProps.avpixfmt) || isAnyRGB(s_sw_formats[m_out_pixfmt].av_pix_fmt)) {
-				// SWS_CS_* does not fully comply with the AVCOL_SPC_*, but it is well handled in the libswscale.
-				inv_tbl = (int *)sws_getCoefficients(m_FProps.colorspace);
-			}
+			inv_tbl = (int*)sws_getCoefficients(m_FProps.colorspace);
+			tbl = (int*)sws_getCoefficients(AVCOL_SPC_RGB);
 
 			ret = sws_setColorspaceDetails(m_pSwsContext, inv_tbl, srcRange, tbl, dstRange, brightness, contrast, saturation);
 		}
