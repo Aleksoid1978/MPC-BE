@@ -260,8 +260,7 @@ bool CFormatConverter::InitSWSContext()
 
 	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
 
-	m_pSwsContext = sws_getCachedContext(
-						nullptr,
+	m_pSwsContext = sws_getContext(
 						m_FProps.width,
 						m_FProps.height,
 						m_FProps.avpixfmt,
