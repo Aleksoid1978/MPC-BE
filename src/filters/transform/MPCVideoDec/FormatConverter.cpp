@@ -35,6 +35,13 @@ extern "C" {
 }
 #pragma warning(pop)
 
+FrameProps::FrameProps()
+	: avpixfmt(AV_PIX_FMT_NONE)
+	, colorspace(AVCOL_SPC_UNSPECIFIED)
+	, colorrange(AVCOL_RANGE_UNSPECIFIED)
+{
+}
+
 const SW_OUT_FMT s_sw_formats[] = {
 	//name             bpp planeWidth planeHeight  av_pix_fmt   chroma_w chroma_h
 	// YUV 8 bit
@@ -91,11 +98,16 @@ LPCWSTR GetChromaSubsamplingStr(const AVPixelFormat av_pix_fmt)
 	return L"";
 }
 
+static int GetLumaBits(const AVPixFmtDescriptor* avpfdesc)
+{
+	return (avpfdesc ? avpfdesc->comp[0].depth : 0);
+}
+
 int GetLumaBits(const AVPixelFormat av_pix_fmt)
 {
-	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
+	const AVPixFmtDescriptor* avpfdesc = av_pix_fmt_desc_get(av_pix_fmt);
 
-	return (pfdesc ? pfdesc->comp[0].depth : 0);
+	return GetLumaBits(avpfdesc);
 }
 
 MPCPixelFormat GetPixFormat(const GUID& subtype)
@@ -131,7 +143,7 @@ MPCPixelFormat GetPixFormat(const DWORD biCompression)
 	return PixFmt_None;
 }
 
-MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt)
+MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt, const AVPixFmtDescriptor* avpfdesc)
 {
 	switch (av_pix_fmt) {
 	case AV_PIX_FMT_YUV420P:
@@ -202,9 +214,8 @@ MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt)
 		return PFType_Y21x;
 	}
 
-	const AVPixFmtDescriptor* pfdesc = av_pix_fmt_desc_get(av_pix_fmt);
-	if (pfdesc) {
-		if (pfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
+	if (avpfdesc) {
+		if (avpfdesc->flags & (AV_PIX_FMT_FLAG_RGB | AV_PIX_FMT_FLAG_PAL)) {
 			return PFType_RGB;
 		}
 	}
@@ -217,14 +228,6 @@ MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt)
 CFormatConverter::CFormatConverter()
 {
 	ASSERT(PixFmt_count == std::size(s_sw_formats));
-
-	m_FProps.avpixfmt   = AV_PIX_FMT_NONE;
-	m_FProps.width      = 0;
-	m_FProps.height     = 0;
-	m_FProps.lumabits   = 0;
-	m_FProps.pftype     = PFType_unspecified;
-	m_FProps.colorspace = AVCOL_SPC_UNSPECIFIED;
-	m_FProps.colorrange = AVCOL_RANGE_UNSPECIFIED;
 
 	m_NumThreads = std::clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
 }
@@ -305,10 +308,9 @@ void CFormatConverter::SetConvertFunc()
 {
 #ifdef DEBUG
 	{
-		auto av_pfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
 		auto swof = GetSWOF(m_out_pixfmt);
-		if (av_pfdesc && swof) {
-			DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", av_pfdesc->name, swof->desc.name);
+		if (m_FProps.avpfdesc && swof) {
+			DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, swof->desc.name);
 		}
 	}
 #endif // DEBUG
@@ -555,8 +557,9 @@ bool CFormatConverter::Converting(BYTE* dst, const AVFrame* pFrame, const uint8_
 		m_FProps.height     = pFrame->height;
 
 		// update the additional properties (updated only when changing basic properties)
-		m_FProps.lumabits   = GetLumaBits(m_FProps.avpixfmt);
-		m_FProps.pftype     = GetPixFmtType(m_FProps.avpixfmt);
+		m_FProps.avpfdesc   = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+		m_FProps.lumabits   = GetLumaBits(m_FProps.avpfdesc);
+		m_FProps.pftype     = GetPixFmtType(m_FProps.avpixfmt, m_FProps.avpfdesc);
 		m_FProps.colorspace = pFrame->colorspace;
 		m_FProps.colorrange = pFrame->color_range;
 

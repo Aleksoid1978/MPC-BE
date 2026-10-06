@@ -60,6 +60,7 @@ int GetLumaBits(enum AVPixelFormat av_pix_fmt);
 
 struct AVFrame;
 struct SwsContext;
+struct AVPixFmtDescriptor;
 
 enum MPCPixFmtType {
 	PFType_unspecified,
@@ -82,14 +83,17 @@ enum MPCPixFmtType {
 
 struct FrameProps {
 	// basic properties
-	enum AVPixelFormat	avpixfmt;
-	int					width;
-	int					height;
+	enum AVPixelFormat        avpixfmt;
+	int                       width = 0;
+	int                       height = 0;
 	// additional properties
-	int					lumabits;
-	MPCPixFmtType		pftype;
-	enum AVColorSpace	colorspace;
-	enum AVColorRange	colorrange;
+	const AVPixFmtDescriptor* avpfdesc = nullptr;
+	int                       lumabits = 0;
+	MPCPixFmtType             pftype = PFType_unspecified;
+	enum AVColorSpace         colorspace;
+	enum AVColorRange         colorrange;
+
+	FrameProps();
 };
 
 MPCPixFmtType GetPixFmtType(enum AVPixelFormat av_pix_fmt);
