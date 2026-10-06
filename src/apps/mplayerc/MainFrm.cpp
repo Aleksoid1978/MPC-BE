@@ -3793,7 +3793,19 @@ bool CMainFrame::CancelLeftLongPressSpeed(bool bRestoreRate)
 	m_bLeftLongPressSpeedActive = false;
 
 	if (bWasActive && bRestoreRate) {
-		SetPlayingRate(m_leftLongPressSpeedPreviousRate);
+		if (GetPlaybackMode() == PM_FILE) {
+			if (m_pMS) {
+				m_pMS->SetRate(m_leftLongPressSpeedPreviousRate);
+			}
+		} else if (GetPlaybackMode() == PM_DVD) {
+			if (m_pDVDC) {
+				if (m_leftLongPressSpeedPreviousRate > 0) {
+					m_pDVDC->PlayForwards(m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
+				} else {
+					m_pDVDC->PlayBackwards(-m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
+				}
+			}
+		}
 	}
 
 	return bWasActive;
