@@ -110,7 +110,7 @@ int GetLumaBits(const AVPixelFormat av_pix_fmt)
 	return GetLumaBits(avpfdesc);
 }
 
-MPCPixelFormat GetPixFormat(const GUID& subtype)
+static MPCPixelFormat GetPixFormat(const GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (*s_sw_formats[i].desc.subtype == subtype) {
@@ -121,7 +121,7 @@ MPCPixelFormat GetPixFormat(const GUID& subtype)
 	return PixFmt_None;
 }
 
-MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
+static MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (s_sw_formats[i].av_pix_fmt == av_pix_fmt) {
@@ -132,7 +132,7 @@ MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
 	return PixFmt_None;
 }
 
-MPCPixelFormat GetPixFormat(const DWORD biCompression)
+static MPCPixelFormat GetPixFormat(const DWORD biCompression)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
 		if (s_sw_formats[i].desc.fourcc == biCompression) {
