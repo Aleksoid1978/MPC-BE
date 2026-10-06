@@ -34,7 +34,7 @@ inline constexpr MPCPixelFormat YUV422_10[] = {PixFmt_P210, PixFmt_P216, PixFmt_
 inline constexpr MPCPixelFormat YUV422_16[] = {PixFmt_P216, PixFmt_P210, PixFmt_YUY2, PixFmt_YV16, PixFmt_YUV444P16, PixFmt_Y416, PixFmt_P016, PixFmt_Y410, PixFmt_P010, PixFmt_YV24, PixFmt_AYUV, PixFmt_NV12, PixFmt_YV12, PixFmt_None};
 
 inline constexpr MPCPixelFormat YUV444_8[]  = {PixFmt_YV24, PixFmt_AYUV, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_Y410, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_YUV444P16, PixFmt_Y416, PixFmt_None};
-inline constexpr MPCPixelFormat YUV444_10[] = {PixFmt_Y410, PixFmt_YV24, PixFmt_AYUV, PixFmt_YUV444P16, PixFmt_Y416, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_None};
+inline constexpr MPCPixelFormat YUV444_10[] = {PixFmt_Y410, PixFmt_YUV444P16, PixFmt_Y416, PixFmt_YV24, PixFmt_AYUV, PixFmt_P210, PixFmt_P216, PixFmt_P010, PixFmt_P016, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_None};
 inline constexpr MPCPixelFormat YUV444_16[] = {PixFmt_YUV444P16, PixFmt_Y416, PixFmt_Y410, PixFmt_YV24, PixFmt_AYUV, PixFmt_P216, PixFmt_P016, PixFmt_P210, PixFmt_P010, PixFmt_YUY2, PixFmt_YV16, PixFmt_NV12, PixFmt_YV12, PixFmt_None};
 
 inline constexpr MPCPixelFormat RGB_8[]     = {PixFmt_RGB32, PixFmt_RGB48, PixFmt_None};
