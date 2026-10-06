@@ -2142,15 +2142,17 @@ bool CMPCVideoDecFilter::CheckDXVACompatible(const enum AVCodecID codec, const e
 bool CMPCVideoDecFilter::DirectCopyPossible(const AVPixelFormat avformat) const
 {
 	return
-		avformat == AV_PIX_FMT_NV12        && m_outputFourcc == FCC('NV12') ||
-		avformat == AV_PIX_FMT_P010LE      && m_outputFourcc == FCC('P010') ||
-		avformat == AV_PIX_FMT_P012LE      && m_outputFourcc == FCC('P016') ||
-		avformat == AV_PIX_FMT_P016LE      && m_outputFourcc == FCC('P016') ||
-		avformat == AV_PIX_FMT_NV16        && m_outputFourcc == FCC('NV16') ||
-		avformat == AV_PIX_FMT_P210LE      && m_outputFourcc == FCC('P210') ||
-		avformat == AV_PIX_FMT_P212LE      && m_outputFourcc == FCC('P216') ||
-		avformat == AV_PIX_FMT_YUV444P     && m_outputFourcc == FCC('YV24') ||
-		avformat == AV_PIX_FMT_YUV444P16LE && m_outputFourcc == MAKEFOURCC('Y','3',0,16);
+		avformat == AV_PIX_FMT_NV12           && m_outputFourcc == FCC('NV12') ||
+		avformat == AV_PIX_FMT_P010LE         && m_outputFourcc == FCC('P010') ||
+		avformat == AV_PIX_FMT_P012LE         && m_outputFourcc == FCC('P016') ||
+		avformat == AV_PIX_FMT_P016LE         && m_outputFourcc == FCC('P016') ||
+		avformat == AV_PIX_FMT_NV16           && m_outputFourcc == FCC('NV16') ||
+		avformat == AV_PIX_FMT_P210LE         && m_outputFourcc == FCC('P210') ||
+		avformat == AV_PIX_FMT_P212LE         && m_outputFourcc == FCC('P216') ||
+		avformat == AV_PIX_FMT_YUV444P        && m_outputFourcc == FCC('YV24') ||
+		avformat == AV_PIX_FMT_YUV444P10MSBLE && m_outputFourcc == MAKEFOURCC('Y','3',0,16) ||
+		avformat == AV_PIX_FMT_YUV444P12MSBLE && m_outputFourcc == MAKEFOURCC('Y','3',0,16) ||
+		avformat == AV_PIX_FMT_YUV444P16LE    && m_outputFourcc == MAKEFOURCC('Y','3',0,16);
 }
 
 HRESULT CMPCVideoDecFilter::InitDecoder(const CMediaType* pmt)
