@@ -3131,10 +3131,7 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 		m_OutputFilterClsid = GetCLSID(pReceivePin);
 
 		HRESULT hr = S_OK;
-		bool isDXVASupported = false;
 		if (IsDXVASupported(m_hwType == HwType::DXVA2 || m_hwType == HwType::D3D11)) {
-			isDXVASupported = true;
-
 			const auto& mt = m_pOutput->CurrentMediaType();
 			if (!(m_hwType == HwType::D3D11 && m_CodecId == AV_CODEC_ID_HEVC && m_pAVCtx->profile == AV_PROFILE_HEVC_REXT)
 					&& mt.subtype != MEDIASUBTYPE_NV12 && mt.subtype != MEDIASUBTYPE_P010) {
@@ -3149,8 +3146,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 
 				hr = VFW_E_TYPE_NOT_ACCEPTED;
 			} else if (IsDXVASupported(m_hwType == HwType::D3D11)) {
-				isDXVASupported = true;
-
 				if (m_OutputFilterClsid == CLSID_madVR && (mt.subtype == MEDIASUBTYPE_Y410 || mt.subtype == MEDIASUBTYPE_Y416)) {
 					DLog(L"CMPCVideoDecFilter::CompleteConnect() - madVR don't support media type '%s' for D3D11 H/W decoding, fallback to software decoding", GetGUIDString(mt.subtype));
 					hr = E_FAIL;
@@ -3173,8 +3168,6 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 					m_hwType = HwType::DXVA2;
 				}
 			} else if (IsDXVASupported(m_hwType == HwType::DXVA2)) {
-				isDXVASupported = true;
-
 				for (;;) {
 					hr = ConfigureDXVA2(pReceivePin);
 					if (FAILED(hr)) {
@@ -3247,15 +3240,12 @@ HRESULT CMPCVideoDecFilter::CompleteConnect(PIN_DIRECTION direction, IPin* pRece
 			}
 
 			if (FAILED(hr)) {
-				m_bDXVACompatible = false;
 				HRESULT hr2 = InitDecoder(&m_pCurrentMediaType);
 				if (FAILED(hr2)) {
 					return hr2;
 				}
 
-				if (hr != VFW_E_TYPE_NOT_ACCEPTED || isDXVASupported) {
-					ChangeOutputMediaFormat(2);
-				}
+				ChangeOutputMediaFormat(2);
 			}
 		}
 
