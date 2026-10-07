@@ -1803,7 +1803,7 @@ namespace DarkTheme
 	// run through ThemeRGB) so it stays readable wherever the sliders are, instead of being
 	// driven to black when a channel is lowered.
 	COLORREF FaceColor()       { return DialogThemeRGB(22, 27, 32); }
-	COLORREF TextColor()       { return RGB(165, 170, 175); }
+	COLORREF TextColor()       { return RGB(190, 195, 200); }
 	// Sunken interiors (edits, list boxes, the combo field, the slider groove) sit a little darker than
 	// the background - or lighter, if the theme is so dark there is no room to go down.
 	COLORREF CtrlBackColor()   { return Shade(FaceColor(), -12); }
