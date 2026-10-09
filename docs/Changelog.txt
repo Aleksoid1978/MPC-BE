@@ -2,18 +2,40 @@
 
 1.9.1.x dev
 =============================
+AviSplitter
+Fixed playback of some MPC audio files.
+
+BinkSplitter
+Added support for audio in Bink Video 2 files.
+
+MpaDecFilter
+Expanded mixer functionality for unsupported channel layouts.
+The DSD stream will be converted to Float 96000 Hz.
+
 MPCVideoDec
 Improved support for Color Transfer Characteristic BT.2020.
+Added H.264/HEVC 4:2:2 support for the NVDEC decoder.
+Added VP9 4:2:0 12-bit support for NVDEC.
+NVDEC operation has been optimized.
 
 VideoRenderers
 Fixed retrieval of the original video frame size for MPC VR and madVR.
+Fixed rare EVR-CP freezes.
+
+Subtitles
+BT.2020 support added for PGS subtitles.
 
 yt-dlp
 The ability to select a preferred audio track language has been restored.
 
 Player
 Fixed the issue with the Space bar when Japanese character input is active.
-Add "Dark dialogs".
+Added dark theme for dialog boxes.
+Fixed Windows Media Controls behavior in full-screen mode.
+Additional search paths for audio tracks and subtitles have been added.
+Fixed an issue with moving the player window while screen-edge snapping is enabled and the Windows taskbar is positioned at the sides or top.
+Fixed the playback acceleration function when long-pressing the left mouse button.
+Various interface fixes.
 
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
