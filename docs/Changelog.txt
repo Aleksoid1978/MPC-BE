@@ -37,6 +37,9 @@ Fixed an issue with moving the player window while screen-edge snapping is enabl
 Fixed the playback acceleration function when long-pressing the left mouse button.
 Various interface fixes.
 
+Installer
+Updated MPC Video Renderer 0.10.9.
+
 Updated Bulgarian translation (by jekovcar).
 Updated Romanian translation (by Andrei Miloiu).
 Updated Dutch translation (by beter).
