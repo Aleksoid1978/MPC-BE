@@ -316,11 +316,8 @@ void CFormatConverter::SetConvertFunc()
 	}
 
 #ifdef DEBUG
-	{
-		auto swof = GetSWOF(m_out_pixfmt);
-		if (m_FProps.avpfdesc && swof) {
-			DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, swof->desc.name);
-		}
+	if (auto swof = GetSWOF(m_out_pixfmt); swof && m_FProps.avpfdesc) {
+		DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, swof->desc.name);
 	}
 #endif // DEBUG
 
