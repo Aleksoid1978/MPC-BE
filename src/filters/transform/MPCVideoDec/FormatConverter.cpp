@@ -44,7 +44,7 @@ FrameProps::FrameProps()
 {
 }
 
-const SW_OUT_FMT s_sw_formats[] = {
+const OutputFormatDesc s_outputFormats[] = {
 	//name             bpp planeWidth planeHeight  av_pix_fmt   chroma_w chroma_h
 	// YUV 8 bit
 	{ VFormat_NV12,      12, {1,1},   {1,2},   AV_PIX_FMT_NV12,        1, 1 }, // PixFmt_NV12
@@ -71,14 +71,14 @@ const SW_OUT_FMT s_sw_formats[] = {
 	// AV_PIX_FMT_YUV422P16LE not equal to P210, but is used as an intermediate format.
 };
 
-static_assert(std::size(s_sw_formats) == PixFmt_count);
+static_assert(std::size(s_outputFormats) == PixFmt_count);
 
-const SW_OUT_FMT* GetSWOF(const int pixfmt)
+const OutputFormatDesc* GetOutputFormatDesc(const int pixfmt)
 {
 	if (pixfmt < 0 || pixfmt >= PixFmt_count) {
 		return nullptr;
 	}
-	return &s_sw_formats[pixfmt];
+	return &s_outputFormats[pixfmt];
 }
 
 LPCWSTR GetChromaSubsamplingStr(const AVPixelFormat av_pix_fmt)
@@ -115,7 +115,7 @@ int GetLumaBits(const AVPixelFormat av_pix_fmt)
 static MPCPixelFormat GetPixFormat(const GUID& subtype)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (*s_sw_formats[i].desc.subtype == subtype) {
+		if (*s_outputFormats[i].vdesc.subtype == subtype) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -126,7 +126,7 @@ static MPCPixelFormat GetPixFormat(const GUID& subtype)
 static MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (s_sw_formats[i].av_pix_fmt == av_pix_fmt) {
+		if (s_outputFormats[i].av_pix_fmt == av_pix_fmt) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -137,7 +137,7 @@ static MPCPixelFormat GetPixFormat(const AVPixelFormat av_pix_fmt)
 static MPCPixelFormat GetPixFormat(const DWORD biCompression)
 {
 	for (int i = 0; i < PixFmt_count; i++) {
-		if (s_sw_formats[i].desc.fourcc == biCompression) {
+		if (s_outputFormats[i].vdesc.fourcc == biCompression) {
 			return (MPCPixelFormat)i;
 		}
 	}
@@ -229,8 +229,6 @@ MPCPixFmtType GetPixFmtType(const AVPixelFormat av_pix_fmt, const AVPixFmtDescri
 
 CFormatConverter::CFormatConverter()
 {
-	ASSERT(PixFmt_count == std::size(s_sw_formats));
-
 	m_NumThreads = std::clamp(CPUInfo::GetProcessorNumber() / 2, 1uL, 8uL);
 }
 
@@ -263,7 +261,7 @@ bool CFormatConverter::InitSWSContext()
 		return false;
 	}
 
-	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
+	auto& outputFormat = s_outputFormats[m_out_pixfmt];
 
 	m_pSwsContext = sws_getContext(
 						m_FProps.width,
@@ -271,7 +269,7 @@ bool CFormatConverter::InitSWSContext()
 						m_FProps.avpixfmt,
 						m_FProps.width,
 						m_FProps.height,
-						swof.av_pix_fmt,
+						outputFormat.av_pix_fmt,
 						SWS_BILINEAR | SWS_FULL_CHR_H_INT | SWS_PRINT_INFO,
 						nullptr,
 						nullptr,
@@ -316,8 +314,8 @@ void CFormatConverter::SetConvertFunc()
 	}
 
 #ifdef DEBUG
-	if (auto swof = GetSWOF(m_out_pixfmt); swof && m_FProps.avpfdesc) {
-		DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, swof->desc.name);
+	if (auto outputFormat = GetOutputFormatDesc(m_out_pixfmt); outputFormat && m_FProps.avpfdesc) {
+		DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, outputFormat->vdesc.name);
 	}
 #endif // DEBUG
 
@@ -519,7 +517,7 @@ void CFormatConverter::SetConvertFunc()
 
 void CFormatConverter::UpdateInput(const AVFrame* pFrame)
 {
-	if (m_FProps.avpixfmt != (AVPixelFormat)pFrame->format|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
+	if (m_FProps.avpixfmt != (AVPixelFormat)pFrame->format || pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
 		// update the basic properties
 		m_FProps.avpixfmt = (AVPixelFormat)pFrame->format;
 		m_FProps.width = pFrame->width;
@@ -582,7 +580,7 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 		return false;
 	}
 
-	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
+	auto& outputFormat = s_outputFormats[m_out_pixfmt];
 
 	// From LAVVideo...
 	uint8_t *out = dst;
@@ -590,7 +588,7 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 	// Check if we have proper pixel alignment and the dst memory is actually aligned
 	if (m_RequiredAlignment && FFALIGN(m_dstStride, m_RequiredAlignment) != m_dstStride || ((uintptr_t)dst % 16u)) {
 		outStride = FFALIGN(outStride, m_RequiredAlignment);
-		size_t requiredSize = (outStride * m_planeHeight * swof.bpp) >> 3;
+		size_t requiredSize = (outStride * m_planeHeight * outputFormat.bpp) >> 3;
 
 		uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(requiredSize);
 		if (pTmpBuffer == nullptr) {
@@ -601,13 +599,13 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 
 	uint8_t*  dstArray[4]       = { nullptr };
 	ptrdiff_t dstStrideArray[4] = { 0 };
-	ptrdiff_t byteStride        = outStride * swof.desc.packsize;
+	ptrdiff_t byteStride        = outStride * outputFormat.vdesc.packsize;
 
 	dstArray[0] = out;
 	dstStrideArray[0] = byteStride;
-	for (int i = 1; i < swof.desc.planes; ++i) {
-		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / swof.planeHeight[i - 1]);
-		dstStrideArray[i] = byteStride / swof.planeWidth[i];
+	for (int i = 1; i < outputFormat.vdesc.planes; ++i) {
+		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / outputFormat.planeHeight[i - 1]);
+		dstStrideArray[i] = byteStride / outputFormat.planeWidth[i];
 	}
 
 	(this->*m_pConvertFn)(srcData, srcStride, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
@@ -616,9 +614,9 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 		int line = 0;
 
 		// Copy first plane
-		const size_t widthBytes        = m_FProps.width * swof.desc.packsize;
-		const ptrdiff_t srcStrideBytes = outStride * swof.desc.packsize;
-		const ptrdiff_t dstStrideBytes = m_dstStride * swof.desc.packsize;
+		const size_t widthBytes        = m_FProps.width * outputFormat.vdesc.packsize;
+		const ptrdiff_t srcStrideBytes = outStride * outputFormat.vdesc.packsize;
+		const ptrdiff_t dstStrideBytes = m_dstStride * outputFormat.vdesc.packsize;
 		for (line = 0; line < m_FProps.height; ++line) {
 			memcpy(dst, out, widthBytes);
 			out += srcStrideBytes;
@@ -626,12 +624,13 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 		}
 		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
 
-		for (int plane = 1; plane < swof.desc.planes; ++plane) {
-			const size_t planeWidth        = widthBytes      / swof.planeWidth[plane];
-			const int activePlaneHeight    = m_FProps.height / swof.planeHeight[plane];
-			const int totalPlaneHeight     = m_planeHeight   / swof.planeHeight[plane];
-			const ptrdiff_t srcPlaneStride = srcStrideBytes  / swof.planeWidth[plane];
-			const ptrdiff_t dstPlaneStride = dstStrideBytes  / swof.planeWidth[plane];
+		for (int plane = 1; plane < outputFormat.vdesc.planes; ++plane) {
+			const size_t planeWidth        = widthBytes      / outputFormat.planeWidth[plane];
+			const int activePlaneHeight    = m_FProps.height / outputFormat.planeHeight[plane];
+			const int totalPlaneHeight     = m_planeHeight   / outputFormat.planeHeight[plane];
+			const ptrdiff_t srcPlaneStride = srcStrideBytes  / outputFormat.planeWidth[plane];
+			const ptrdiff_t dstPlaneStride = dstStrideBytes  / outputFormat.planeWidth[plane];
+
 			for (line = 0; line < activePlaneHeight; ++line) {
 				memcpy(dst, out, planeWidth);
 				out += srcPlaneStride;

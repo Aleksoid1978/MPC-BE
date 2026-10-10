@@ -1157,7 +1157,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 
 		for (int i = 0; i < PixFmt_count; i++) {
 			CString optname = OPT_SW_prefix;
-			optname += GetSWOF(i)->desc.name;
+			optname += GetOutputFormatDesc(i)->vdesc.name;
 			if (ERROR_SUCCESS == key.QueryDWORDValue(optname, dw)) {
 				m_fPixFmts[i] = !!dw;
 			}
@@ -1207,7 +1207,7 @@ CMPCVideoDecFilter::CMPCVideoDecFilter(LPUNKNOWN lpunk, HRESULT* phr)
 	profile.ReadInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
-		optname += GetSWOF(i)->desc.name;
+		optname += GetOutputFormatDesc(i)->vdesc.name;
 		profile.ReadBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
 #endif
@@ -2804,8 +2804,8 @@ void CMPCVideoDecFilter::BuildOutputFormat()
 	// Software rendering
 	if (m_bUseFFmpeg) {
 		for (int i = 0; i < nSwCount; i++) {
-			const SW_OUT_FMT* swof = GetSWOF(nSwIndex[i]);
-			m_VideoOutputFormats.emplace_back(swof->desc);
+			auto outputFormat = GetOutputFormatDesc(nSwIndex[i]);
+			m_VideoOutputFormats.emplace_back(outputFormat->vdesc);
 		}
 	}
 }
@@ -4730,7 +4730,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 
 		for (int i = 0; i < PixFmt_count; i++) {
 			CString optname = OPT_SW_prefix;
-			optname += GetSWOF(i)->desc.name;
+			optname += GetOutputFormatDesc(i)->vdesc.name;
 			key.SetDWORDValue(optname, m_fPixFmts[i]);
 		}
 		key.SetDWORDValue(OPT_SwConvertToRGB, m_bSwConvertToRGB);
@@ -4761,7 +4761,7 @@ STDMETHODIMP CMPCVideoDecFilter::SaveSettings()
 	profile.WriteInt(OPT_SECTION_VideoDec, OPT_SwRGBLevels, m_nSwRGBLevels);
 	for (int i = 0; i < PixFmt_count; i++) {
 		CString optname = OPT_SW_prefix;
-		optname += GetSWOF(i)->desc.name;
+		optname += GetOutputFormatDesc(i)->vdesc.name;
 		profile.WriteBool(OPT_SECTION_VideoDec, optname, m_fPixFmts[i]);
 	}
 #endif
@@ -5088,8 +5088,8 @@ STDMETHODIMP_(CString) CMPCVideoDecFilter::GetInformation(MPCInfo index)
 				case HwType::D3D12CopyBack: infostr = L"D3D12 Copy-back: "; break;
 				case HwType::NVDEC:         infostr = L"NVDEC: ";           break;
 			}
-			if (const SW_OUT_FMT* swof = GetSWOF(m_FormatConverter.GetOutPixFormat())) {
-				infostr.AppendFormat(L"%s (%d-bit %s)", swof->desc.name, swof->desc.cdepth, GetChromaSubsamplingStr(swof->av_pix_fmt));
+			if (auto outputFormat = GetOutputFormatDesc(m_FormatConverter.GetOutPixFormat())) {
+				infostr.AppendFormat(L"%s (%d-bit %s)", outputFormat->vdesc.name, outputFormat->vdesc.cdepth, GetChromaSubsamplingStr(outputFormat->av_pix_fmt));
 			}
 			break;
 		case INFO_GraphicsAdapter:

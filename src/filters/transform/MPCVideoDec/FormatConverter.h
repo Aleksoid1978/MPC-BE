@@ -40,8 +40,8 @@ inline constexpr MPCPixelFormat YUV444_16[] = {PixFmt_YUV444P16, PixFmt_Y416, Pi
 inline constexpr MPCPixelFormat RGB_8[]     = {PixFmt_RGB32, PixFmt_RGB48, PixFmt_None};
 inline constexpr MPCPixelFormat RGB_16[]    = {PixFmt_RGB48, PixFmt_RGB32, PixFmt_None};
 
-struct SW_OUT_FMT {
-	VFormatDesc desc;
+struct OutputFormatDesc {
+	VFormatDesc					vdesc;
 	const int					bpp;
 	const int					planeWidth[4];
 	const int					planeHeight[4];
@@ -50,9 +50,9 @@ struct SW_OUT_FMT {
 	const uint8_t				chroma_h;
 };
 
-extern const SW_OUT_FMT s_sw_formats[];
+extern const OutputFormatDesc s_outputFormats[];
 
-const SW_OUT_FMT* GetSWOF(int pixfmt);
+const OutputFormatDesc* GetOutputFormatDesc(const int pixfmt);
 
 LPCWSTR GetChromaSubsamplingStr(enum AVPixelFormat av_pix_fmt);
 int GetLumaBits(enum AVPixelFormat av_pix_fmt);
@@ -146,7 +146,6 @@ private:
 	int m_swsHeight = 0;
 
 	RGBCoeffs *m_rgbCoeffs = nullptr;
-	BOOL m_bRGBConverter   = FALSE;
 	BOOL m_bRGBConvInit    = FALSE;
 
 	// [out32][dithermode][ycgco][format][shift]
