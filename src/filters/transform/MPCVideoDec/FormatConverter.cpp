@@ -25,6 +25,8 @@
 #include "DSUtil/CPUInfo.h"
 #include "DSUtil/Utils.h"
 
+#define ENABLE_OPTIMIZED_FUNCTIONS 1
+
 #pragma warning(push)
 #pragma warning(disable: 4005)
 #pragma warning(disable: 5033)
@@ -370,6 +372,7 @@ void CFormatConverter::SetConvertFunc()
 		return;
 	}
 
+#if ENABLE_OPTIMIZED_FUNCTIONS
 	// optimized function
 	switch (m_out_pixfmt) {
 	case PixFmt_NV12:
@@ -510,6 +513,7 @@ void CFormatConverter::SetConvertFunc()
 		DLog("CFormatConverter::SetConvertFunc : optimized function has been selected");
 		return;
 	}
+#endif
 
 	m_pConvertFn = &CFormatConverter::ConvertGeneric;
 
