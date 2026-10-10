@@ -3793,18 +3793,26 @@ bool CMainFrame::CancelLeftLongPressSpeed(bool bRestoreRate)
 	m_bLeftLongPressSpeedActive = false;
 
 	if (bWasActive && bRestoreRate) {
+		HRESULT hr = E_FAIL;
 		if (GetPlaybackMode() == PM_FILE) {
 			if (m_pMS) {
-				m_pMS->SetRate(m_leftLongPressSpeedPreviousRate);
+				hr = m_pMS->SetRate(m_leftLongPressSpeedPreviousRate);
 			}
 		} else if (GetPlaybackMode() == PM_DVD) {
 			if (m_pDVDC) {
 				if (m_leftLongPressSpeedPreviousRate > 0) {
-					m_pDVDC->PlayForwards(m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
+					hr = m_pDVDC->PlayForwards(m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
 				} else {
-					m_pDVDC->PlayBackwards(-m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
+					hr = m_pDVDC->PlayBackwards(-m_leftLongPressSpeedPreviousRate, DVD_CMD_FLAG_Block, nullptr);
 				}
 			}
+		}
+
+		if (SUCCEEDED(hr)) {
+			m_PlaybackRate = m_leftLongPressSpeedPreviousRate;
+			CString strODSMessage;
+			strODSMessage.Format(ResStr(IDS_OSD_SPEED), Rate2String(m_PlaybackRate));
+			m_OSD.DisplayMessage(OSD_TOPRIGHT, strODSMessage);
 		}
 	}
 
