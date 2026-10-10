@@ -30,8 +30,10 @@
 
 #include "libavutil/opt.h"
 #include "avcodec.h"
+#include "avcodec_internal.h"
 #include "version_major.h"
 
+#define FFOFFSET(x) offsetof(FFCodecContext,x)
 #define OFFSET(x) offsetof(AVCodecContext,x)
 #define DEFAULT 0 //should be NAN but it does not work as it is not a constant in glibc as required by ANSI/ISO C
 //these names are too long to be readable
@@ -144,7 +146,7 @@ static const AVOption avcodec_options[] = {
 {"aggressive", "consider things that a sane encoder should not do as an error", 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_AGGRESSIVE | AV_EF_COMPLIANT | AV_EF_CAREFUL}, INT_MIN, INT_MAX, A|V|S|D|E, .unit = "err_detect"},
 {"has_b_frames", NULL, OFFSET(has_b_frames), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, 0, INT_MAX},
 {"block_align", NULL, OFFSET(block_align), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, 0, INT_MAX},
-{"rc_override_count", NULL, OFFSET(rc_override_count), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
+{"rc_override_count", NULL, OFFSET(rc_override_count), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, AV_OPT_FLAG_READONLY},
 {"maxrate", "maximum bitrate (in bits/s). Used for VBV together with bufsize.", OFFSET(rc_max_rate), AV_OPT_TYPE_INT64, {.i64 = DEFAULT }, 0, INT_MAX, V|A|E},
 {"minrate", "minimum bitrate (in bits/s). Most useful in setting up a CBR encode. It is of little use otherwise.",
             OFFSET(rc_min_rate), AV_OPT_TYPE_INT64, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|A|E},
@@ -420,6 +422,9 @@ static const AVOption avcodec_options[] = {
     {"content_light_level",         .default_val.i64 = AV_PKT_DATA_CONTENT_LIGHT_LEVEL,         .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
     {"icc_profile",                 .default_val.i64 = AV_PKT_DATA_ICC_PROFILE,                 .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
     {"exif",                        .default_val.i64 = AV_PKT_DATA_EXIF,                        .type = AV_OPT_TYPE_CONST, .flags = A|D, .unit = "side_data_pkt" },
+
+// FFCodecContext options
+{"lcevc-dec-params", "Configure liblcevc-dec using a :-separated list of key=value parameters", FFOFFSET(lcevc_params), AV_OPT_TYPE_DICT, { 0 }, 0, 0, V|D },
 {NULL},
 };
 
@@ -431,5 +436,6 @@ static const AVOption avcodec_options[] = {
 #undef CC
 #undef DEFAULT
 #undef OFFSET
+#undef FFOFFSET
 
 #endif /* AVCODEC_OPTIONS_TABLE_H */

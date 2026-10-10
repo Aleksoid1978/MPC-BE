@@ -49,7 +49,7 @@ Updated Chinese (Simplified) translation (by wushantao).
 Updated Hungarian translation (by mickey).
 
 Updated libraries:
-	ffmpeg n9.1-dev-1828-g6120b70d66;
+	ffmpeg n9.1-dev-1964-gba987fe24d;
 	nv-codec-headers n13.0.19.1.
 
 

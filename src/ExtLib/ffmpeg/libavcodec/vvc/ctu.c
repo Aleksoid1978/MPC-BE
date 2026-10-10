@@ -1315,10 +1315,13 @@ static void derive_mmvd(const VVCLocalContext *lc, MvField *mvf, const Mv *mmvd_
         mvf->mv[0].y += mmvd[0].y;
         mvf->mv[1].x += mmvd[1].x;
         mvf->mv[1].y += mmvd[1].y;
+        ff_vvc_clip_mv(&mvf->mv[0]);
+        ff_vvc_clip_mv(&mvf->mv[1]);
     } else {
         const int idx = mvf->pred_flag - PF_L0;
         mvf->mv[idx].x += mmvd_offset->x;
         mvf->mv[idx].y += mmvd_offset->y;
+        ff_vvc_clip_mv(&mvf->mv[idx]);
     }
 
 }
@@ -1616,6 +1619,7 @@ static void mvp_add_difference(MotionInfo *mi, const int num_cp_mv,
                 const Mv *mvd = &mvds[i][j];
                 mi->mv[i][j].x += mvd->x * (1 << amvr_shift);
                 mi->mv[i][j].y += mvd->y * (1 << amvr_shift);
+                ff_vvc_wrap_mv(&mi->mv[i][j]);
             }
         }
     }
@@ -2826,7 +2830,9 @@ int ff_vvc_coding_tree_unit(VVCLocalContext *lc,
     lc->coeffs = fc->tab.coeffs + rs * ctb_size * VVC_MAX_SAMPLE_ARRAYS;
     lc->cu     = NULL;
 
-    ff_vvc_cabac_init(lc, ctu_idx, rx, ry);
+    ret = ff_vvc_cabac_init(lc, ctu_idx, rx, ry);
+    if (ret < 0)
+        return ret;
     ff_vvc_decode_neighbour(lc, x_ctb, y_ctb, rx, ry, rs);
     ret = hls_coding_tree_unit(lc, x_ctb, y_ctb, ctu_idx, rx, ry);
     if (ret < 0)

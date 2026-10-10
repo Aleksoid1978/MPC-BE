@@ -2001,6 +2001,14 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .profiles  = NULL_IF_CONFIG_SMALL(ff_astc_profiles),
         .mime_types= MT("image/astc"),
     },
+    {
+        .id        = AV_CODEC_ID_RW2,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "rw2",
+        .long_name = NULL_IF_CONFIG_SMALL("Panasonic RW2"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+        .mime_types= MT("image/x-panasonic-rw2"),
+    },
 
     /* various PCM "codecs" */
     {
@@ -2703,6 +2711,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "adpcm_rhetorex",
         .long_name = NULL_IF_CONFIG_SMALL("ADPCM Rhetorex"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_ADPCM_IMA_CITRIX,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "adpcm_citrix",
+        .long_name = NULL_IF_CONFIG_SMALL("ADPCM IMA Citrix"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
     },
 

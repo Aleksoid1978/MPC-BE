@@ -2330,6 +2330,8 @@ static void mpeg12_execute_slice_threads(AVCodecContext *avctx,
                 av_log(avctx, AV_LOG_WARNING, "ignoring picture start code in AVmp extradata\n");
                 break;
             }
+            if (buf == avctx->extradata)
+                return AVERROR_INVALIDDATA;
 
             if (s2->width <= 0 || s2->height <= 0) {
                 av_log(avctx, AV_LOG_ERROR, "Invalid frame dimensions %dx%d.\n",
