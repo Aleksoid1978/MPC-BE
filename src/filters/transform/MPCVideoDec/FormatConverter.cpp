@@ -306,6 +306,13 @@ void CFormatConverter::UpdateSWSContext()
 
 void CFormatConverter::SetConvertFunc()
 {
+	m_pConvertFn = nullptr;
+	m_RequiredAlignment = 16;
+
+	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE || m_out_pixfmt == PixFmt_None) {
+		return;
+	}
+
 #ifdef DEBUG
 	{
 		auto swof = GetSWOF(m_out_pixfmt);
@@ -314,9 +321,6 @@ void CFormatConverter::SetConvertFunc()
 		}
 	}
 #endif // DEBUG
-
-	m_pConvertFn = nullptr;
-	m_RequiredAlignment = 16;
 
 	// optimized direct function
 	if (m_bDirect && CPUInfo::HaveSSE4()) {
@@ -512,12 +516,34 @@ void CFormatConverter::SetConvertFunc()
 	DLog("CFormatConverter::SetConvertFunc : swscale has been selected");
 }
 
+void CFormatConverter::UpdateInput(const AVFrame* pFrame)
+{
+	if (m_FProps.avpixfmt != (AVPixelFormat)pFrame->format|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
+		// update the basic properties
+		m_FProps.avpixfmt = (AVPixelFormat)pFrame->format;
+		m_FProps.width = pFrame->width;
+		m_FProps.height = pFrame->height;
+
+		// update the additional properties (updated only when changing basic properties)
+		m_FProps.avpfdesc = av_pix_fmt_desc_get(m_FProps.avpixfmt);
+		m_FProps.lumabits = GetLumaBits(m_FProps.avpfdesc);
+		m_FProps.pftype   = GetPixFmtType(m_FProps.avpixfmt, m_FProps.avpfdesc);
+		m_FProps.colorspace = pFrame->colorspace;
+		m_FProps.colorrange = pFrame->color_range;
+
+		Cleanup();
+		SetConvertFunc();
+	}
+}
+
 void CFormatConverter::UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER* pBIH)
 {
 	MPCPixelFormat out_pixfmt = GetPixFormat(subtype);
 	if (out_pixfmt != m_out_pixfmt) {
-		Cleanup();
 		m_out_pixfmt = out_pixfmt;
+
+		Cleanup();
+		SetConvertFunc();
 	}
 
 	m_dstStride   = pBIH->biWidth;
@@ -534,6 +560,8 @@ void CFormatConverter::SetOptions(const int rgblevels)
 
 bool CFormatConverter::Converting(BYTE* dst, const AVFrame* pFrame)
 {
+	UpdateInput(pFrame);
+
 	ptrdiff_t srcStride[4];
 	for (int i = 0; i < 4; i++) {
 		srcStride[i] = pFrame->linesize[i];
@@ -544,30 +572,13 @@ bool CFormatConverter::Converting(BYTE* dst, const AVFrame* pFrame)
 		srcData[i] = pFrame->data[i];
 	}
 
-	return Converting(dst, pFrame, srcData, srcStride);
+	return Converting(dst, srcData, srcStride);
 }
 
-bool CFormatConverter::Converting(BYTE* dst, const AVFrame* pFrame, const uint8_t* (&srcData)[4], const ptrdiff_t(&srcStride)[4])
+bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const ptrdiff_t(&srcStride)[4])
 {
-	if (FormatChanged(m_FProps.avpixfmt, (AVPixelFormat)pFrame->format)
-			|| pFrame->width != m_FProps.width || pFrame->height != m_FProps.height) {
-		// update the basic properties
-		m_FProps.avpixfmt   = (AVPixelFormat)pFrame->format;
-		m_FProps.width      = pFrame->width;
-		m_FProps.height     = pFrame->height;
-
-		// update the additional properties (updated only when changing basic properties)
-		m_FProps.avpfdesc   = av_pix_fmt_desc_get(m_FProps.avpixfmt);
-		m_FProps.lumabits   = GetLumaBits(m_FProps.avpfdesc);
-		m_FProps.pftype     = GetPixFmtType(m_FProps.avpixfmt, m_FProps.avpfdesc);
-		m_FProps.colorspace = pFrame->colorspace;
-		m_FProps.colorrange = pFrame->color_range;
-
-		Cleanup();
-	}
-
 	if (!m_pConvertFn) {
-		SetConvertFunc();
+		return false;
 	}
 
 	const SW_OUT_FMT& swof = s_sw_formats[m_out_pixfmt];
@@ -648,22 +659,6 @@ void CFormatConverter::Cleanup()
 	}
 
 	m_pConvertFn = nullptr;
-}
-
-bool CFormatConverter::FormatChanged(const AVPixelFormat fmt1, const AVPixelFormat fmt2) const
-{
-	if (fmt1 == AV_PIX_FMT_NONE || fmt2 == AV_PIX_FMT_NONE) {
-		return true;
-	}
-	const AVPixFmtDescriptor* av_pfdesc_fmt1 = av_pix_fmt_desc_get(fmt1);
-	const AVPixFmtDescriptor* av_pfdesc_fmt2 = av_pix_fmt_desc_get(fmt2);
-	if (!av_pfdesc_fmt1 || !av_pfdesc_fmt2) {
-		return false;
-	}
-	return av_pfdesc_fmt1->log2_chroma_h != av_pfdesc_fmt2->log2_chroma_h
-			|| av_pfdesc_fmt1->log2_chroma_w != av_pfdesc_fmt2->log2_chroma_w
-			|| av_pfdesc_fmt1->nb_components != av_pfdesc_fmt2->nb_components
-			|| av_pfdesc_fmt1->comp[0].depth != av_pfdesc_fmt2->comp[0].depth;
 }
 
 void CFormatConverter::Clear()
