@@ -306,10 +306,8 @@ void CFormatConverter::UpdateSWSContext()
 
 void CFormatConverter::SetConvertFunc()
 {
-	m_pConvertFn = nullptr;
-	m_RequiredAlignment = 16;
-
 	if (m_FProps.avpixfmt == AV_PIX_FMT_NONE || m_out_pixfmt == PixFmt_None) {
+		m_pConvertFn = nullptr;
 		return;
 	}
 
@@ -318,6 +316,8 @@ void CFormatConverter::SetConvertFunc()
 		DLog(L"CFormatConverter::SetConvertFunc : %hs -> %s", m_FProps.avpfdesc->name, outputFormat->vdesc.name);
 	}
 #endif // DEBUG
+
+	m_RequiredAlignment = 16;
 
 	// optimized direct function
 	if (m_bDirect && CPUInfo::HaveSSE4()) {
@@ -531,6 +531,9 @@ void CFormatConverter::UpdateInput(const AVFrame* pFrame)
 		m_FProps.colorrange = pFrame->color_range;
 
 		Cleanup();
+	}
+
+	if (!m_pConvertFn) {
 		SetConvertFunc();
 	}
 }
@@ -540,8 +543,10 @@ void CFormatConverter::UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER*
 	MPCPixelFormat out_pixfmt = GetPixFormat(subtype);
 	if (out_pixfmt != m_out_pixfmt) {
 		m_out_pixfmt = out_pixfmt;
-
 		Cleanup();
+	}
+
+	if (!m_pConvertFn) {
 		SetConvertFunc();
 	}
 
