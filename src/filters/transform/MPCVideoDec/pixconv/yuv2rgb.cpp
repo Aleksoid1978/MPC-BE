@@ -17,7 +17,7 @@
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  *
  *
- *  Adaptation for MPC-BE (C) 2013-2024 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+ *  Adaptation for MPC-BE (C) 2013-2026 v0lt & Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
  */
 
 #include "stdafx.h"
@@ -613,7 +613,7 @@ HRESULT CFormatConverter::convert_yuv_rgb(CONV_FUNC_PARAMS)
     }
 
   ptrdiff_t dstStride0 = dstStride[0];
-  if (m_out_pixfmt == PixFmt_RGB32 && m_OutHeight > 0) {
+  if (m_dstBottomUp) {
     // flip the image, if necessary
     dst[0] += dstStride0 * (height - 1);
     dstStride0 = -dstStride0;

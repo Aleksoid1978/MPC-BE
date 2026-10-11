@@ -125,7 +125,7 @@ private:
 
 	int				m_dstStride   = 0;
 	int				m_planeHeight = 0;
-	int				m_OutHeight   = 0;
+	bool			m_dstBottomUp = false;
 
 	void*			m_pTempBuffer = nullptr;
 	size_t			m_nTempBufferSize = 0;

@@ -547,7 +547,7 @@ void CFormatConverter::UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER*
 
 	m_dstStride   = pBIH->biWidth;
 	m_planeHeight = abs(pBIH->biHeight);
-	m_OutHeight   = pBIH->biHeight;
+	m_dstBottomUp = (pBIH->biCompression == BI_RGB && pBIH->biHeight > 0);
 }
 
 void CFormatConverter::SetOptions(const int rgblevels)
