@@ -123,8 +123,8 @@ private:
 
 	int				m_dstRGBRange = 0;
 
-	int				m_dstStride   = 0;
-	int				m_planeHeight = 0;
+	unsigned		m_dstStrides[4] = {};
+	unsigned		m_dstHeights[4] = {};
 	bool			m_dstBottomUp = false;
 
 	void*			m_pTempBuffer = nullptr;
@@ -214,8 +214,6 @@ public:
 	void SetDirect(const BOOL bDirect) { m_bDirect = bDirect; }
 
 	void Cleanup();
-
-	int GetDstStride() const { return m_dstStride; }
 
 	void Clear();
 };

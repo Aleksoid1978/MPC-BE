@@ -410,13 +410,13 @@ void CFormatConverter::SetConvertFunc()
 		}
 		else if (m_FProps.pftype == PFType_YUV422Px) {
 			m_pConvertFn = &CFormatConverter::convert_yuv422_yuy2_uyvy_dither_le;
-			m_RequiredAlignment = 8;
+			m_RequiredAlignment = 16; // 8 pixel alignment
 		}
 		else if (m_FProps.pftype == PFType_YUV420
 			|| (m_FProps.pftype == PFType_YUV420Px && m_FProps.lumabits <= 14)
 			|| m_FProps.pftype == PFType_NV12) {
 			m_pConvertFn = &CFormatConverter::convert_yuv420_yuy2;
-			m_RequiredAlignment = 8;
+			m_RequiredAlignment = 16; // 8 pixel alignment
 		}
 		break;
 	case PixFmt_YV16:
@@ -467,7 +467,7 @@ void CFormatConverter::SetConvertFunc()
 	case PixFmt_P216:
 		if (m_FProps.pftype == PFType_Y21x && CPUInfo::HaveSSE4()) {
 			m_pConvertFn = &CFormatConverter::convert_y210_p210_sse4;
-			m_RequiredAlignment = 4;
+			m_RequiredAlignment = 16; // 4 pixel alignment
 		}
 		else if (m_FProps.pftype == PFType_YUV422Px) {
 			m_pConvertFn = &CFormatConverter::convert_yuv420_px1x_le;
@@ -499,7 +499,7 @@ void CFormatConverter::SetConvertFunc()
 		case PFType_NV12:
 		case PFType_P01x:
 			m_pConvertFn = &CFormatConverter::convert_yuv_rgb;
-			m_RequiredAlignment = 4;
+			m_RequiredAlignment = 16; // 4 pixel alignment
 		}
 		break;
 	}
@@ -545,8 +545,24 @@ void CFormatConverter::UpdateOutput(const GUID& subtype, const BITMAPINFOHEADER*
 		SetConvertFunc();
 	}
 
-	m_dstStride   = pBIH->biWidth;
-	m_planeHeight = abs(pBIH->biHeight);
+	auto outputFormat = GetOutputFormatDesc(m_out_pixfmt);
+	if (outputFormat) {
+		const unsigned widthBytes = pBIH->biWidth * outputFormat->vdesc.packsize;
+		const unsigned height     = abs(pBIH->biHeight);
+
+		for (size_t i = 0; i < 4; i++) {
+			auto& planeWidth  = outputFormat->planeWidth[i];
+			auto& planeHeight = outputFormat->planeHeight[i];
+
+			m_dstStrides[i] = (planeWidth) ? widthBytes / planeWidth : 0;
+			m_dstHeights[i] = (planeHeight) ? height / planeHeight : 0;
+		}
+	}
+	else {
+		std::fill(std::begin(m_dstStrides), std::end(m_dstStrides), 0);
+		std::fill(std::begin(m_dstHeights), std::end(m_dstHeights), 0);
+	}
+
 	m_dstBottomUp = (pBIH->biCompression == BI_RGB && pBIH->biHeight > 0);
 }
 
@@ -582,13 +598,16 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 
 	auto& outputFormat = s_outputFormats[m_out_pixfmt];
 
-	// From LAVVideo...
-	uint8_t *out = dst;
-	int outStride = m_dstStride;
-	// Check if we have proper pixel alignment and the dst memory is actually aligned
-	if (m_RequiredAlignment && FFALIGN(m_dstStride, m_RequiredAlignment) != m_dstStride || ((uintptr_t)dst % 16u)) {
-		outStride = FFALIGN(outStride, m_RequiredAlignment);
-		size_t requiredSize = (outStride * m_planeHeight * outputFormat.bpp) >> 3;
+	ptrdiff_t dstStrideArray[4] = {};
+	uint8_t* out;
+
+	if (m_RequiredAlignment && FFALIGN(m_dstStrides[0], m_RequiredAlignment) != m_dstStrides[0] || ((uintptr_t)dst % 16u)) {
+		size_t requiredSize = 0;
+
+		for (size_t i = 0; i < 4; i++) {
+			dstStrideArray[i] = FFALIGN(m_dstStrides[i], m_RequiredAlignment);
+			requiredSize += dstStrideArray[i] * m_dstHeights[i];
+		}
 
 		uint8_t* pTmpBuffer = (uint8_t*)GetTempBuffer(requiredSize);
 		if (pTmpBuffer == nullptr) {
@@ -596,48 +615,35 @@ bool CFormatConverter::Converting(BYTE* dst, const uint8_t* (&srcData)[4], const
 		}
 		out = pTmpBuffer;
 	}
-
-	uint8_t*  dstArray[4]       = { nullptr };
-	ptrdiff_t dstStrideArray[4] = { 0 };
-	ptrdiff_t byteStride        = outStride * outputFormat.vdesc.packsize;
-
-	dstArray[0] = out;
-	dstStrideArray[0] = byteStride;
-	for (int i = 1; i < outputFormat.vdesc.planes; ++i) {
-		dstArray[i] = dstArray[i - 1] + dstStrideArray[i - 1] * (m_planeHeight / outputFormat.planeHeight[i - 1]);
-		dstStrideArray[i] = byteStride / outputFormat.planeWidth[i];
+	else {
+		out = dst;
+		dstStrideArray[0] = m_dstStrides[0];
+		dstStrideArray[1] = m_dstStrides[1];
+		dstStrideArray[2] = m_dstStrides[2];
+		dstStrideArray[3] = m_dstStrides[3];
 	}
+
+	uint8_t* dstArray[4];
+	dstArray[0] = out;
+	dstArray[1] = dstArray[0] + dstStrideArray[0] * m_dstHeights[0];
+	dstArray[2] = dstArray[1] + dstStrideArray[1] * m_dstHeights[1];
+	dstArray[3] = dstArray[2] + dstStrideArray[2] * m_dstHeights[2];
 
 	(this->*m_pConvertFn)(srcData, srcStride, dstArray, m_FProps.width, m_FProps.height, dstStrideArray);
 
 	if (out != dst) {
-		int line = 0;
+		for (int i = 0; i < outputFormat.vdesc.planes; ++i) {
+			auto& planeHeight = m_dstHeights[i];
+			auto& outStride = dstStrideArray[i];
+			auto& dstStride = m_dstStrides[i];
+			const size_t linesize = std::min<size_t>(outStride, dstStride);
 
-		// Copy first plane
-		const size_t widthBytes        = m_FProps.width * outputFormat.vdesc.packsize;
-		const ptrdiff_t srcStrideBytes = outStride * outputFormat.vdesc.packsize;
-		const ptrdiff_t dstStrideBytes = m_dstStride * outputFormat.vdesc.packsize;
-		for (line = 0; line < m_FProps.height; ++line) {
-			memcpy(dst, out, widthBytes);
-			out += srcStrideBytes;
-			dst += dstStrideBytes;
-		}
-		dst += (m_planeHeight - m_FProps.height) * dstStrideBytes;
-
-		for (int plane = 1; plane < outputFormat.vdesc.planes; ++plane) {
-			const size_t planeWidth        = widthBytes      / outputFormat.planeWidth[plane];
-			const int activePlaneHeight    = m_FProps.height / outputFormat.planeHeight[plane];
-			const int totalPlaneHeight     = m_planeHeight   / outputFormat.planeHeight[plane];
-			const ptrdiff_t srcPlaneStride = srcStrideBytes  / outputFormat.planeWidth[plane];
-			const ptrdiff_t dstPlaneStride = dstStrideBytes  / outputFormat.planeWidth[plane];
-
-			for (line = 0; line < activePlaneHeight; ++line) {
-				memcpy(dst, out, planeWidth);
-				out += srcPlaneStride;
-				dst += dstPlaneStride;
+			for (unsigned line = 0; line < planeHeight; ++line) {
+				memcpy(dst, out, linesize);
+				out += outStride;
+				dst += dstStride;
 			}
-			dst += (totalPlaneHeight - activePlaneHeight) * dstPlaneStride;
-		}
+ 		}
 	}
 
 	return true;
