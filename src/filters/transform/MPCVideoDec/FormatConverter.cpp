@@ -45,26 +45,26 @@ FrameProps::FrameProps()
 }
 
 const OutputFormatDesc s_outputFormats[] = {
-	//name             bpp planeWidth planeHeight  av_pix_fmt   chroma_w chroma_h
+	//name             planeWidth planeHeight  av_pix_fmt          bpp
 	// YUV 8 bit
-	{ VFormat_NV12,      12, {1,1},   {1,2},   AV_PIX_FMT_NV12,        1, 1 }, // PixFmt_NV12
-	{ VFormat_YV12,      12, {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     1, 1 }, // PixFmt_YV12
-	{ VFormat_YUY2,      16, {1},     {1},     AV_PIX_FMT_YUYV422,     1, 0 }, // PixFmt_YUY2
-	{ VFormat_YV16,      16, {1,2,2}, {1,1,1}, AV_PIX_FMT_YUV422P,     1, 0 }, // PixFmt_YV16
-	{ VFormat_AYUV,      32, {1},     {1},     AV_PIX_FMT_YUV444P,     0, 0 }, // PixFmt_AYUV
-	{ VFormat_YV24,      24, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     0, 0 }, // PixFmt_YV24
+	{ VFormat_NV12,      {1,1},   {1,2},   AV_PIX_FMT_NV12,        12 }, // PixFmt_NV12
+	{ VFormat_YV12,      {1,2,2}, {1,2,2}, AV_PIX_FMT_YUV420P,     12 }, // PixFmt_YV12
+	{ VFormat_YUY2,      {1},     {1},     AV_PIX_FMT_YUYV422,     16 }, // PixFmt_YUY2
+	{ VFormat_YV16,      {1,2,2}, {1,1,1}, AV_PIX_FMT_YUV422P,     16 }, // PixFmt_YV16
+	{ VFormat_AYUV,      {1},     {1},     AV_PIX_FMT_YUV444P,     32 }, // PixFmt_AYUV
+	{ VFormat_YV24,      {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P,     24 }, // PixFmt_YV24
 	// YUV 10 bit
-	{ VFormat_P010,      24, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P010
-	{ VFormat_P210,      32, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P210
-	{ VFormat_Y410,      32, {1},     {1},     AV_PIX_FMT_YUV444P10LE, 0, 0 }, // PixFmt_Y410
+	{ VFormat_P010,      {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 24 }, // PixFmt_P010
+	{ VFormat_P210,      {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 32 }, // PixFmt_P210
+	{ VFormat_Y410,      {1},     {1},     AV_PIX_FMT_YUV444P10LE, 32 }, // PixFmt_Y410
 	// YUV 16 bit
-	{ VFormat_P016,      24, {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 1, 1 }, // PixFmt_P016
-	{ VFormat_P216,      32, {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 1, 0 }, // PixFmt_P216
-	{ VFormat_Y416,      64, {1},     {1},     AV_PIX_FMT_YUV444P16LE, 0, 0 }, // PixFmt_Y416
-	{ VFormat_YUV444P16, 48, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P16LE, 0, 0 }, // PixFmt_YUV444P16
+	{ VFormat_P016,      {1,1},   {1,2},   AV_PIX_FMT_YUV420P16LE, 24 }, // PixFmt_P016
+	{ VFormat_P216,      {1,1},   {1,1},   AV_PIX_FMT_YUV422P16LE, 32 }, // PixFmt_P216
+	{ VFormat_Y416,      {1},     {1},     AV_PIX_FMT_YUV444P16LE, 64 }, // PixFmt_Y416
+	{ VFormat_YUV444P16, {1,1,1}, {1,1,1}, AV_PIX_FMT_YUV444P16LE, 48 }, // PixFmt_YUV444P16
 	// RGB
-	{ VFormat_RGB32,     32, {1},     {1},     AV_PIX_FMT_BGRA,        0, 0 }, // PixFmt_RGB32
-	{ VFormat_RGB48,     48, {1},     {1},     AV_PIX_FMT_RGB48LE,     0, 0 }, // PixFmt_RGB48
+	{ VFormat_RGB32,     {1},     {1},     AV_PIX_FMT_BGRA,        32 }, // PixFmt_RGB32
+	{ VFormat_RGB48,     {1},     {1},     AV_PIX_FMT_RGB48LE,     48 }, // PixFmt_RGB48
 	// PS:
 	// AV_PIX_FMT_YUV444P not equal to AYUV, but is used as an intermediate format.
 	// AV_PIX_FMT_YUV420P16LE not equal to P010, but is used as an intermediate format.

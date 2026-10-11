@@ -42,12 +42,10 @@ inline constexpr MPCPixelFormat RGB_16[]    = {PixFmt_RGB48, PixFmt_RGB32, PixFm
 
 struct OutputFormatDesc {
 	VFormatDesc					vdesc;
-	const int					bpp;
 	const int					planeWidth[4];
 	const int					planeHeight[4];
 	const enum AVPixelFormat	av_pix_fmt;
-	const uint8_t				chroma_w;
-	const uint8_t				chroma_h;
+	const int					bpp;
 };
 
 extern const OutputFormatDesc s_outputFormats[];
@@ -132,7 +130,7 @@ private:
 
 	int				m_nCPUFlag = 0;
 
-	unsigned		m_RequiredAlignment = 0;
+	unsigned		m_RequiredAlignment = 0; // in bytes
 
 	int				m_NumThreads = 1;
 
