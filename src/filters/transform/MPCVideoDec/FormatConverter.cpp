@@ -354,10 +354,10 @@ void CFormatConverter::SetConvertFunc()
 		else if (m_FProps.avpixfmt == AV_PIX_FMT_VUYX && m_out_pixfmt == PixFmt_AYUV) {
 			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		}
-		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV30 && m_out_pixfmt == PixFmt_Y410) {
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV30LE && m_out_pixfmt == PixFmt_Y410) {
 			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		}
-		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV36 && m_out_pixfmt == PixFmt_Y416) {
+		else if (m_FProps.avpixfmt == AV_PIX_FMT_XV36LE && m_out_pixfmt == PixFmt_Y416) {
 			m_pConvertFn = &CFormatConverter::plane_copy_direct_sse4;
 		}
 	}
@@ -474,7 +474,7 @@ void CFormatConverter::SetConvertFunc()
 		}
 		break;
 	case PixFmt_Y410:
-		if (m_FProps.avpixfmt == AV_PIX_FMT_XV30) {
+		if (m_FProps.avpixfmt == AV_PIX_FMT_XV30LE) {
 			m_pConvertFn = &CFormatConverter::plane_copy_sse2;
 			m_RequiredAlignment = 0;
 		}
@@ -483,7 +483,7 @@ void CFormatConverter::SetConvertFunc()
 		}
 		break;
 	case PixFmt_Y416:
-		if (m_FProps.avpixfmt == AV_PIX_FMT_XV36) {
+		if (m_FProps.avpixfmt == AV_PIX_FMT_XV36LE) {
 			m_pConvertFn = &CFormatConverter::plane_copy_sse2;
 			m_RequiredAlignment = 0;
 		}
