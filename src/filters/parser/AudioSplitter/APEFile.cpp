@@ -187,6 +187,10 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		DLog(L"CAPEFile::Open() : No frames in the file!");
 		return E_FAIL;
 	}
+	if (!ape.samplerate) {
+		DLog(L"CAPEFile::Open() : Invalid sample rate");
+		return E_FAIL;
+	}
 	if(ape.totalframes > UINT_MAX / sizeof(APEFrame)){
 		DLog(L"CAPEFile::Open() : Too many frames: %u", ape.totalframes);
 		return E_FAIL;
