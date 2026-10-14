@@ -143,6 +143,9 @@ REFERENCE_TIME CTTAFile::Seek(REFERENCE_TIME rt)
 	int64_t pts = rt * m_samplerate / 10000000;
 
 	m_currentframe = pts / m_framesamples;
+	if (m_currentframe >= m_totalframes) {
+		m_currentframe = m_totalframes - 1;
+	}
 	pts = m_currentframe * m_framesamples;
 
 	m_pFile->Seek(m_index[m_currentframe]);
