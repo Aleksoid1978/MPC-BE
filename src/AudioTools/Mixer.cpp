@@ -318,7 +318,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, const int
 	const BYTE* pInputs[64/*SWR_CH_MAX*/] = {};
 
 	if (sample_fmt_is_planar(m_in_sf)) {
-		const int in_plane_size = in_samples * m_in_channels * get_bytes_per_sample(m_in_sf);
+		const int in_plane_size = in_samples * get_bytes_per_sample(m_in_sf);
 		for (int i = 0; i < m_in_channels; i++) {
 			pInputs[i] = pInput + i * in_plane_size;
 		}
