@@ -3996,7 +3996,7 @@ HRESULT CMPCVideoDecFilter::DecodeInternal(AVPacket *avpkt, REFERENCE_TIME rtSta
 		pOut->SetMediaTime(nullptr, nullptr);
 		SetTypeSpecificFlags(pOut);
 
-		AddFrameSideData(pOut, m_pFrame);
+		AddFrameSideData(pOut, frame);
 
 		hr = m_pOutput->Deliver(pOut);
 
