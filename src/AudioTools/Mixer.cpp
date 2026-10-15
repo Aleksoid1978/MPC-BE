@@ -333,7 +333,7 @@ int CMixer::Mixing(BYTE* pOutput, int out_samples, const BYTE* pInput, const int
 		pInputs[0] = pInput;
 	}
 
-	return Mixing2(pOutput, out_samples, &pInput, in_samples);
+	return Mixing2(pOutput, out_samples, pInputs, in_samples);
 }
 
 int CMixer::Mixing2(BYTE* pOutput, int out_samples, const BYTE** const ppInputs, const int in_samples)
