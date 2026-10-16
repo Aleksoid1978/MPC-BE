@@ -2,6 +2,14 @@
 
 1.9.2.x dev
 =============================
+AudioSplitter
+Potential crashes have been fixed.
+
+MpaDecFilter
+Fixed AC3 audio encoding for S/PDIF and HDMI output.
+
+MPCVideoDec
+Fixed DolbyVision support for D3D11cb, D3D12cb and NVDEC decoders.
 
 
 1.9.2 - 2026-10-13
