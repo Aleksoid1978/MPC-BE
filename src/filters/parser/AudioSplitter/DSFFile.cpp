@@ -82,13 +82,13 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	UINT32 channel_type = type32;
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK) {
+	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 == 0) {
 		return E_FAIL;
 	}
 	m_channels = type32;
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK) {
+	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 < 8) {
 		return E_FAIL;
 	}
 	m_samplerate = type32 / 8; // hack for ffmpeg decoder
@@ -114,7 +114,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Skip(8);
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 > INT_MAX / (UINT32)m_channels) {
+	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 == 0 || type32 > INT_MAX / (UINT32)m_channels) {
 		return E_FAIL;
 	}
 	m_block_size = type32 * m_channels;
