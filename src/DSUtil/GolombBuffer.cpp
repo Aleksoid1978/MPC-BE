@@ -51,7 +51,7 @@ static void RemoveMpegEscapeCode(BYTE* dst, const BYTE* src, int& length)
 	length = di;
 }
 
-CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes/* = false*/)
+CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, const int nSize, const bool bRemoveMpegEscapes/* = false*/)
 	: m_bRemoveMpegEscapes(bRemoveMpegEscapes)
 {
 	Reset(pBuffer, nSize);
@@ -64,11 +64,11 @@ UINT64 CGolombBuffer::BitRead(const int nBits)
 	while (m_bitlen < nBits) {
 		m_bitbuff <<= 8;
 
-		if (m_nBitPos >= m_nSize) {
+		if (m_nPos >= m_nSize) {
 			return 0;
 		}
 
-		*(BYTE*)&m_bitbuff = m_pBuffer[m_nBitPos++];
+		*(BYTE*)&m_bitbuff = m_pBuffer[m_nPos++];
 		m_bitlen += 8;
 	}
 
@@ -92,13 +92,13 @@ UINT64 CGolombBuffer::BitRead(const int nBits)
 UINT64 CGolombBuffer::BitPeak(const int nBits)
 {
 	const INT64 tmp_bitbuff = m_bitbuff;
-	const int tmp_nBitPos   = m_nBitPos;
-	const int tmp_bitlen    = m_bitlen;
+	const int   tmp_nPos    = m_nPos;
+	const int   tmp_bitlen  = m_bitlen;
 
 	UINT64 ret = BitRead(nBits);
 
 	m_bitbuff = tmp_bitbuff;
-	m_nBitPos = tmp_nBitPos;
+	m_nPos    = tmp_nPos;
 	m_bitlen  = tmp_bitlen;
 
 	return ret;
@@ -138,27 +138,27 @@ void CGolombBuffer::BitByteAlign()
 
 int CGolombBuffer::GetPos() const
 {
-	return m_nBitPos - (m_bitlen >> 3);
+	return m_nPos - (m_bitlen >> 3);
 }
 
 int CGolombBuffer::GetBitsPos() const
 {
-	return m_nBitPos * 8 - m_bitlen;
+	return m_nPos * 8 - m_bitlen;
 }
 
 void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
 {
-	ASSERT(m_nBitPos + nSize <= m_nSize);
+	ASSERT(m_nPos + nSize <= m_nSize);
 	ASSERT(m_bitlen == 0);
-	nSize = std::min(nSize, m_nSize - m_nBitPos);
+	nSize = std::min(nSize, m_nSize - m_nPos);
 
-	memcpy(pDest, m_pBuffer + m_nBitPos, nSize);
-	m_nBitPos += nSize;
+	memcpy(pDest, m_pBuffer + m_nPos, nSize);
+	m_nPos += nSize;
 }
 
 void CGolombBuffer::Reset()
 {
-	m_nBitPos = 0;
+	m_nPos    = 0;
 	m_bitlen  = 0;
 	m_bitbuff = 0;
 }
@@ -181,14 +181,14 @@ void CGolombBuffer::Reset(const BYTE* pNewBuffer, int nNewSize)
 
 void CGolombBuffer::SkipBytes(const int nCount)
 {
-	m_nBitPos += nCount;
-	m_bitlen   = 0;
-	m_bitbuff  = 0;
+	m_nPos   += nCount;
+	m_bitlen  = 0;
+	m_bitbuff = 0;
 }
 
-void CGolombBuffer::Seek(const int nCount)
+void CGolombBuffer::Seek(const int nPos)
 {
-	m_nBitPos = nCount;
+	m_nPos    = nPos;
 	m_bitlen  = 0;
 	m_bitbuff = 0;
 }
