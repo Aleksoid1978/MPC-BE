@@ -21,15 +21,13 @@
 #include "stdafx.h"
 #include "RF64File.h"
 
-#pragma pack(push, 1)
-typedef union {
+union  chunk_t{
 	struct {
 		DWORD id;
 		DWORD size;
 	};
 	BYTE data[8];
-} chunk_t;
-#pragma pack(pop)
+};
 
 //
 // Wave64File

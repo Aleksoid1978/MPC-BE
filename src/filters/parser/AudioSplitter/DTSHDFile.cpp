@@ -37,15 +37,13 @@ const uint8_t chk_BUILDVER[8] = {'B', 'U', 'I', 'L', 'D', 'V', 'E', 'R'};
 const uint8_t chk_BLACKOUT[8] = {'B', 'L', 'A', 'C', 'K', 'O', 'U', 'T'};
 const uint8_t chk_BRANCHPT[8] = {'B', 'R', 'A', 'N', 'C', 'H', 'P', 'T'};
 
-#pragma pack(push, 1)
-typedef union {
-		struct {
-			uint8_t id[8];
-			uint64_t size;
-		};
-		BYTE data[16];
-	} chunk_t;
-#pragma pack(pop)
+union chunk_t {
+	struct {
+		uint8_t id[8];
+		uint64_t size;
+	};
+	BYTE data[16];
+};
 
 //
 // DTSHDFile
