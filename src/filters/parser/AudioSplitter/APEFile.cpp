@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -92,12 +92,12 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(start_offset);
 
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('MAC ')) {
+	if (m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('MAC ')) {
 		return E_FAIL;
 	}
 
 	int version = 0;
-	m_pFile->ByteRead((BYTE*)&version, 2);
+	m_pFile->ByteRead(&version, 2);
 	if (version < APE_MIN_VERSION) {
 		DLog(L"CAPEFile::Open() : Attempting to open an APE file with unsupported version. APE file version : %d, MIN Supported version : %d", version, APE_MIN_VERSION);
 		return E_FAIL;
@@ -111,15 +111,15 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 	ape.fileversion = version;
 
 	if (ape.fileversion >= 3980) {
-		m_pFile->ByteRead((BYTE*)&ape.padding1            , 2);
-		m_pFile->ByteRead((BYTE*)&ape.descriptorlength    , 4);
-		m_pFile->ByteRead((BYTE*)&ape.headerlength        , 4);
-		m_pFile->ByteRead((BYTE*)&ape.seektablelength     , 4);
-		m_pFile->ByteRead((BYTE*)&ape.wavheaderlength     , 4);
-		m_pFile->ByteRead((BYTE*)&ape.audiodatalength     , 4);
-		m_pFile->ByteRead((BYTE*)&ape.audiodatalength_high, 4);
-		m_pFile->ByteRead((BYTE*)&ape.wavtaillength       , 4);
-		m_pFile->ByteRead((BYTE*)&ape.md5                 , 16);
+		m_pFile->ByteRead(&ape.padding1            , 2);
+		m_pFile->ByteRead(&ape.descriptorlength    , 4);
+		m_pFile->ByteRead(&ape.headerlength        , 4);
+		m_pFile->ByteRead(&ape.seektablelength     , 4);
+		m_pFile->ByteRead(&ape.wavheaderlength     , 4);
+		m_pFile->ByteRead(&ape.audiodatalength     , 4);
+		m_pFile->ByteRead(&ape.audiodatalength_high, 4);
+		m_pFile->ByteRead(&ape.wavtaillength       , 4);
+		m_pFile->ByteRead(&ape.md5                 , 16);
 
 		// Skip any unknown bytes at the end of the descriptor. This is for future compatibility
 		if (ape.descriptorlength > 52) {
@@ -127,26 +127,26 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		}
 
 		// Read header data
-		m_pFile->ByteRead((BYTE*)&ape.compressiontype , 2);
-		m_pFile->ByteRead((BYTE*)&ape.formatflags     , 2);
-		m_pFile->ByteRead((BYTE*)&ape.blocksperframe  , 4);
-		m_pFile->ByteRead((BYTE*)&ape.finalframeblocks, 4);
-		m_pFile->ByteRead((BYTE*)&ape.totalframes     , 4);
-		m_pFile->ByteRead((BYTE*)&ape.bps             , 2);
-		m_pFile->ByteRead((BYTE*)&ape.channels        , 2);
-		m_pFile->ByteRead((BYTE*)&ape.samplerate      , 4);
+		m_pFile->ByteRead(&ape.compressiontype , 2);
+		m_pFile->ByteRead(&ape.formatflags     , 2);
+		m_pFile->ByteRead(&ape.blocksperframe  , 4);
+		m_pFile->ByteRead(&ape.finalframeblocks, 4);
+		m_pFile->ByteRead(&ape.totalframes     , 4);
+		m_pFile->ByteRead(&ape.bps             , 2);
+		m_pFile->ByteRead(&ape.channels        , 2);
+		m_pFile->ByteRead(&ape.samplerate      , 4);
 	} else {
 		ape.descriptorlength = 0;
 		ape.headerlength = 32;
 
-		m_pFile->ByteRead((BYTE*)&ape.compressiontype , 2);
-		m_pFile->ByteRead((BYTE*)&ape.formatflags     , 2);
-		m_pFile->ByteRead((BYTE*)&ape.channels        , 2);
-		m_pFile->ByteRead((BYTE*)&ape.samplerate      , 4);
-		m_pFile->ByteRead((BYTE*)&ape.wavheaderlength , 4);
-		m_pFile->ByteRead((BYTE*)&ape.wavtaillength   , 4);
-		m_pFile->ByteRead((BYTE*)&ape.totalframes     , 4);
-		m_pFile->ByteRead((BYTE*)&ape.finalframeblocks, 4);
+		m_pFile->ByteRead(&ape.compressiontype , 2);
+		m_pFile->ByteRead(&ape.formatflags     , 2);
+		m_pFile->ByteRead(&ape.channels        , 2);
+		m_pFile->ByteRead(&ape.samplerate      , 4);
+		m_pFile->ByteRead(&ape.wavheaderlength , 4);
+		m_pFile->ByteRead(&ape.wavtaillength   , 4);
+		m_pFile->ByteRead(&ape.totalframes     , 4);
+		m_pFile->ByteRead(&ape.finalframeblocks, 4);
 
 		if (ape.formatflags & MAC_FORMAT_FLAG_HAS_PEAK_LEVEL) {
 			m_pFile->Seek(m_pFile->GetPos() + 4);
@@ -154,7 +154,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		}
 
 		if (ape.formatflags & MAC_FORMAT_FLAG_HAS_SEEK_ELEMENTS) {
-			m_pFile->ByteRead((BYTE*)&ape.seektablelength, 4);
+			m_pFile->ByteRead(&ape.seektablelength, 4);
 			ape.headerlength += 4;
 			ape.seektablelength *= sizeof(int32_t);
 		} else {
@@ -217,7 +217,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 		}
 		memset(ape.seektable.get(), 0, ape.seektablelength);
 		for (size_t i = 0; i < ape.seektablelength / sizeof(uint32_t) && m_pFile->GetRemaining() >= 4; i++) {
-			m_pFile->ByteRead((BYTE*)&ape.seektable[i], 4);
+			m_pFile->ByteRead(&ape.seektable[i], 4);
 		}
 		if (ape.fileversion < 3810) {
 			ape.bittable.reset(new(std::nothrow) uint8_t[ape.totalframes]);
@@ -228,7 +228,7 @@ HRESULT CAPEFile::Open(CBaseSplitterFile* pFile)
 			}
 			memset(ape.bittable.get(), 0, ape.totalframes);
 			for (size_t i = 0; i < ape.totalframes && m_pFile->GetRemaining(); i++) {
-				m_pFile->ByteRead((BYTE*)&ape.bittable[i], 1);
+				m_pFile->ByteRead(&ape.bittable[i], 1);
 			}
 		}
 		if (!m_pFile->GetRemaining()) {

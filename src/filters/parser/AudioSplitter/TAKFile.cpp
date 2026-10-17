@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -232,7 +232,7 @@ HRESULT CTAKFile::Open(CBaseSplitterFile* pFile)
 
 	m_pFile->Seek(0);
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('tBaK')) {
+	if (m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('tBaK')) {
 		return E_FAIL;
 	}
 
@@ -348,7 +348,7 @@ REFERENCE_TIME CTAKFile::Seek(REFERENCE_TIME rt)
 	while (pos >= m_startpos && pos < end) {
 		m_pFile->Seek(pos);
 		WORD sync = 0;
-		m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+		m_pFile->ByteRead(&sync, sizeof(sync));
 		if (sync == 0xA0FF) {
 			m_pFile->Seek(pos);
 			m_pFile->ByteRead(buf, BUFSIZE);

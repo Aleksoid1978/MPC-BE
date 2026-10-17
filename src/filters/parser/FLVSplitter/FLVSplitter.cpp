@@ -197,7 +197,7 @@ CString CFLVSplitterFilter::AMF0GetString(UINT64 end)
 		return L"";
 	}
 
-	m_pFile->ByteRead((BYTE*)name, length);
+	m_pFile->ByteRead(name, length);
 
 	return UTF8orLocalToWStr(name);
 }
@@ -613,7 +613,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			if (type == AMF_DATA_TYPE_STRING && length <= 11) {
 				char name[11];
 				memset(name, 0, 11);
-				m_pFile->ByteRead((BYTE*)name, length);
+				m_pFile->ByteRead(name, length);
 				if (!strncmp(name, "onTextData", length) || (!strncmp(name, "onMetaData", length))) {
 					std::vector<AMF0> AMF0Array;
 					ParseAMF0(next, CString(name), AMF0Array);
@@ -773,7 +773,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						wfe->cbSize         = configSize;
 
 						m_pFile->Seek(configOffset);
-						m_pFile->ByteRead((BYTE*)(wfe+1), configSize);
+						m_pFile->ByteRead((wfe+1), configSize);
 
 						break;
 					}
@@ -790,7 +790,7 @@ HRESULT CFLVSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 								wfe->cbSize = dataSize - 4;
 								wfe = (WAVEFORMATEX*)mt.ReallocFormatBuffer(sizeof(WAVEFORMATEX) + wfe->cbSize);
-								m_pFile->ByteRead((BYTE*)(wfe + 1), wfe->cbSize);
+								m_pFile->ByteRead((wfe + 1), wfe->cbSize);
 
 								wfe->nChannels = ((BYTE*)(wfe + 1))[9];
 

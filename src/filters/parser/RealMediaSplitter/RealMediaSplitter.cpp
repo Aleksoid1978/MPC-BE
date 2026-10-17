@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -1062,7 +1062,7 @@ CRMFile::CRMFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 template<typename T>
 HRESULT CRMFile::Read(T& var)
 {
-	HRESULT hr = ByteRead((BYTE*)&var, sizeof(var));
+	HRESULT hr = ByteRead(&var, sizeof(var));
 	bswap(var);
 	return hr;
 }
@@ -1173,25 +1173,25 @@ HRESULT CRMFile::Init()
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)m_cd.title.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(m_cd.title.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)m_cd.author.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(m_cd.author.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)m_cd.copyright.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(m_cd.copyright.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)m_cd.comment.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(m_cd.comment.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					break;
@@ -1262,13 +1262,13 @@ HRESULT CRMFile::Init()
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)mp->name.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(mp->name.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					if (S_OK != (hr = Read(slen))) {
 						return hr;
 					}
-					if (slen > 0 && S_OK != (hr = ByteRead((BYTE*)mp->mime.GetBufferSetLength(slen), slen))) {
+					if (slen > 0 && S_OK != (hr = ByteRead(mp->mime.GetBufferSetLength(slen), slen))) {
 						return hr;
 					}
 					UINT32 tsdlen;
@@ -1341,7 +1341,7 @@ HRESULT CRMFile::Init()
 						}
 
 						char* p = buff.get();
-						if (S_OK != (hr = ByteRead((BYTE*)p, size))) {
+						if (S_OK != (hr = ByteRead(p, size))) {
 							return hr;
 						}
 						for (char* end = p + size; p < end; ) {

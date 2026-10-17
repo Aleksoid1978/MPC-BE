@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -32,17 +32,17 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	UINT32 type32 = 0;
 	UINT64 type64 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 != FCC('DSD ')) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 != FCC('DSD ')) {
 		return E_FAIL;
 	}
-	if (m_pFile->ByteRead((BYTE*)&type64, 8) != S_OK || type64 != 0x1C) {
+	if (m_pFile->ByteRead(&type64, 8) != S_OK || type64 != 0x1C) {
 		return E_FAIL;
 	}
 
 	m_pFile->Skip(8);
 
 	type64 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type64, 8) != S_OK) {
+	if (m_pFile->ByteRead(&type64, 8) != S_OK) {
 		return E_FAIL;
 	}
 	UINT64 id3pos = type64;
@@ -55,47 +55,47 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	}
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 != FCC('fmt ')) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 != FCC('fmt ')) {
 		return E_FAIL;
 	}
 
 	type64 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type64, 8) != S_OK || type64 != 0x34) {
+	if (m_pFile->ByteRead(&type64, 8) != S_OK || type64 != 0x34) {
 		return E_FAIL;
 	}
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 != 1) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 != 1) {
 		return E_FAIL;
 	}
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32) {
 		return E_FAIL;
 	}
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK) {
 		return E_FAIL;
 	}
 
 	UINT32 channel_type = type32;
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 == 0) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 == 0) {
 		return E_FAIL;
 	}
 	m_channels = type32;
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 < 8) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 < 8) {
 		return E_FAIL;
 	}
 	m_samplerate = type32 / 8; // hack for ffmpeg decoder
 	m_bitdepth = 8; // hack for ffmpeg decoder
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK) {
 		return E_FAIL;
 	}
 
@@ -114,7 +114,7 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Skip(8);
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 == 0 || type32 > INT_MAX / (UINT32)m_channels) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 == 0 || type32 > INT_MAX / (UINT32)m_channels) {
 		return E_FAIL;
 	}
 	m_block_size = type32 * m_channels;
@@ -123,12 +123,12 @@ HRESULT CDSFFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Skip(4);
 
 	type32 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type32, 4) != S_OK || type32 != FCC('data')) {
+	if (m_pFile->ByteRead(&type32, 4) != S_OK || type32 != FCC('data')) {
 		return E_FAIL;
 	}
 
 	type64 = 0;
-	if (m_pFile->ByteRead((BYTE*)&type64, 8) != S_OK) {
+	if (m_pFile->ByteRead(&type64, 8) != S_OK) {
 		return E_FAIL;
 	}
 	m_length = type64;

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2023 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -37,7 +37,7 @@ public:
 	template<typename T>
 	HRESULT ReadAvi(T& var, int offset = 0) {
 		memset(&var, 0, sizeof(var));
-		HRESULT hr = ByteRead((BYTE*)&var + offset, sizeof(var) - offset);
+		HRESULT hr = ByteRead(&var + offset, sizeof(var) - offset);
 		return hr;
 	}
 

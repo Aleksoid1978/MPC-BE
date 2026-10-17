@@ -372,7 +372,7 @@ HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 	m_info.clear();
 	DWORD id = 0;
 
-	if (chunk_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('INFO')) {
+	if (chunk_size < 4 || m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('INFO')) {
 		return E_FAIL;
 	}
 
@@ -385,7 +385,7 @@ HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 
 		if (Chunk.size > 0 && (Chunk.id == FCC('INAM') || Chunk.id == FCC('IART') || Chunk.id == FCC('ICOP') || Chunk.id == FCC('ISBJ'))) {
 			CStringA value;
-			if (S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(Chunk.size), Chunk.size)) {
+			if (S_OK != m_pFile->ByteRead(value.GetBufferSetLength(Chunk.size), Chunk.size)) {
 				return S_FALSE;
 			}
 			m_info[Chunk.id] = value;
@@ -401,7 +401,7 @@ HRESULT CWAVFile::ReadADTLTag(const DWORD chunk_size)
 {
 	DWORD id = 0;
 
-	if (m_chapters.empty() || chunk_size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('adtl')) {
+	if (m_chapters.empty() || chunk_size < 4 || m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('adtl')) {
 		return E_FAIL;
 	}
 
@@ -413,11 +413,11 @@ HRESULT CWAVFile::ReadADTLTag(const DWORD chunk_size)
 		__int64 pos = m_pFile->GetPos();
 
 		if (Chunk.size >= 5 && Chunk.id == FCC('labl')) {
-			if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
+			if (m_pFile->ByteRead(&id, 4) != S_OK) {
 				return S_FALSE;
 			}
 			CStringA value;
-			if (S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(Chunk.size - 4), Chunk.size - 4)) {
+			if (S_OK != m_pFile->ByteRead(value.GetBufferSetLength(Chunk.size - 4), Chunk.size - 4)) {
 				return S_FALSE;
 			}
 			m_pFile->Skip(m_pFile->GetPos() & 1);
@@ -445,19 +445,19 @@ HRESULT CWAVFile::ReadCueTag(const DWORD chunk_size)
 	if (chunk_size > 4 && wfe->nSamplesPerSec) {
 		const auto& samplerate = wfe->nSamplesPerSec;
 		unsigned cues;
-		if (m_pFile->ByteRead((BYTE*)&cues, 4) != S_OK) {
+		if (m_pFile->ByteRead(&cues, 4) != S_OK) {
 			return S_FALSE;
 		}
 
 		if (chunk_size >= cues * 24UL + 4UL) {
 			for (unsigned i = 0; i < cues; i++) {
 				DWORD id;
-				if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
+				if (m_pFile->ByteRead(&id, 4) != S_OK) {
 					return S_FALSE;
 				}
 				m_pFile->Skip(16);
 				DWORD offset;
-				if (m_pFile->ByteRead((BYTE*)&offset, 4) != S_OK) {
+				if (m_pFile->ByteRead(&offset, 4) != S_OK) {
 					return S_FALSE;
 				}
 

@@ -1,5 +1,5 @@
 /*
- * (C) 2018-2025 see Authors.txt
+ * (C) 2018-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -199,9 +199,9 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		if (m_pFile->GetLength() > (HXVS_FooterSize + HXVS_HeaderSize + HXVS_HeaderSize)) {
 			m_pFile->Seek(m_pFile->GetLength() - HXVS_FooterSize);
 			DWORD sync = 0;
-			if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync == HXVS_FOOTER_INFO) {
+			if (S_OK == m_pFile->ByteRead(&sync, sizeof(sync)) && sync == HXVS_FOOTER_INFO) {
 				m_pFile->Skip(4);
-				if (S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync)) && sync) {
+				if (S_OK == m_pFile->ByteRead(&sync, sizeof(sync)) && sync) {
 					m_rtNewStop = m_rtStop = m_rtDuration = sync * 10000ll;
 				}
 				m_endpos = m_pFile->GetLength() - HXVS_FooterSize;
@@ -213,7 +213,7 @@ HRESULT CDVRSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 						DWORD pos, pts;
 					} keyframe;
 
-					if (S_OK != m_pFile->ByteRead((BYTE*)&keyframe, sizeof(keyframe)) || keyframe.pos == 0) {
+					if (S_OK != m_pFile->ByteRead(&keyframe, sizeof(keyframe)) || keyframe.pos == 0) {
 						break;
 					}
 
@@ -803,7 +803,7 @@ bool CDVRSplitterFilter::HXVSSync()
 	const __int64 start = m_pFile->GetPos();
 	DWORD sync;
 	for (__int64 i = 0, j = m_endpos - start - HXVS_HeaderSize - 4;
-			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead(&sync, sizeof(sync));
 			i++, m_pFile->Seek(start + i)) {
 		if (sync == HXVS_VIDEO || sync == HXVS_AUDIO) {
 			m_pFile->Seek(start + i);
@@ -817,7 +817,7 @@ bool CDVRSplitterFilter::HXVSSync()
 
 bool CDVRSplitterFilter::HXVSReadHeader(HXVSHeader& hdr)
 {
-	const auto ret = HXVSSync() && S_OK == m_pFile->ByteRead((BYTE*)&hdr, HXVS_HeaderSize);
+	const auto ret = HXVSSync() && S_OK == m_pFile->ByteRead(&hdr, HXVS_HeaderSize);
 	if (ret) {
 		hdr.rt = hdr.pts * 10000ll;
 		hdr.key_frame = hdr.dummy == 1;
@@ -836,7 +836,7 @@ bool CDVRSplitterFilter::DHAVSync(__int64& pos)
 	const __int64 start = pos = m_pFile->GetPos();
 	DWORD sync;
 	for (__int64 i = 0, j = m_endpos - start - DHAV_HeaderSize - DHAV_FooterSize;
-			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+			i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead(&sync, sizeof(sync));
 			i++, m_pFile->Seek(start + i)) {
 		if (sync == DHAV_SYNC_START) {
 			pos = start + i;
@@ -861,7 +861,7 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 
 	__int64 sync_pos = 0;
 	for (;;) {
-		const auto ret = DHAVSync(sync_pos) && S_OK == m_pFile->ByteRead((BYTE*)&hdr, DHAV_HeaderSize);
+		const auto ret = DHAVSync(sync_pos) && S_OK == m_pFile->ByteRead(&hdr, DHAV_HeaderSize);
 		if (ret) {
 			if ((hdr.size - hdr.ext_size) <= DHAV_HeaderSize + DHAV_FooterSize) {
 				m_pFile->Seek(sync_pos + 1);
@@ -878,7 +878,7 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 			sync_pos = m_pFile->GetPos();
 			m_pFile->Seek(sync_pos + hdr.size);
 			DWORD sync;
-			if (FAILED(m_pFile->ByteRead((BYTE*)&sync, sizeof(sync))) || sync != DHAV_SYNC_END) {
+			if (FAILED(m_pFile->ByteRead(&sync, sizeof(sync))) || sync != DHAV_SYNC_END) {
 				return false;
 			}
 			m_pFile->Seek(sync_pos);
@@ -906,8 +906,8 @@ bool CDVRSplitterFilter::DHAVReadHeader(DHAVHeader& hdr, const bool bParseExt/* 
 								break;
 							case 0x82:
 								m_pFile->Skip(3);
-								m_pFile->ByteRead((BYTE*)&hdr.video.width, sizeof(hdr.video.width));
-								m_pFile->ByteRead((BYTE*)&hdr.video.height, sizeof(hdr.video.height));
+								m_pFile->ByteRead(&hdr.video.width, sizeof(hdr.video.width));
+								m_pFile->ByteRead(&hdr.video.height, sizeof(hdr.video.height));
 								ext_size -= 7;
 								break;
 							case 0x83:
@@ -980,7 +980,7 @@ bool CDVRSplitterFilter::CCTVSync(__int64& pos)
 	const __int64 start = pos = m_pFile->GetPos();
 	DWORD sync;
 	for (__int64 i = 0, j = m_endpos - start - 128;
-		i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+		i <= MEGABYTE && i < j && S_OK == m_pFile->ByteRead(&sync, sizeof(sync));
 		i++, m_pFile->Seek(start + i)) {
 		if (sync == CCTV_PACKET_HEADER_SYNC) {
 			pos = start + i;
@@ -998,7 +998,7 @@ bool CDVRSplitterFilter::CCTVReadHeader(CCTVHeader& hdr)
 	__int64 sync_pos = 0;
 	if (CCTVSync(sync_pos) && m_pFile->GetRemaining() >= sizeof(hdr)) {
 		m_pFile->Seek(sync_pos);
-		if (FAILED(m_pFile->ByteRead((BYTE*)&hdr, sizeof(hdr))) || hdr.end_sync != CCTV_PACKET_HEADER_END_SYNC) {
+		if (FAILED(m_pFile->ByteRead(&hdr, sizeof(hdr))) || hdr.end_sync != CCTV_PACKET_HEADER_END_SYNC) {
 			return false;
 		}
 

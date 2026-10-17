@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2021 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,11 +40,11 @@ CDFFFile::~CDFFFile()
 
 bool CDFFFile::ReadDFFChunk(dffchunk_t& chunk)
 {
-	if (m_pFile->ByteRead((BYTE*)&chunk.id, 4) != S_OK) {
+	if (m_pFile->ByteRead(&chunk.id, 4) != S_OK) {
 		return false;
 	}
 
-	if (m_pFile->ByteRead((BYTE*)&chunk.size, 8) != S_OK) {
+	if (m_pFile->ByteRead(&chunk.size, 8) != S_OK) {
 		return false;
 	}
 	chunk.size = _byteswap_uint64(chunk.size);
@@ -76,7 +76,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			break;
 
 		case FCC('CHNL'):
-			if (chunk.size < 2 || m_pFile->ByteRead((BYTE*)&channels, 2) != S_OK) {
+			if (chunk.size < 2 || m_pFile->ByteRead(&channels, 2) != S_OK) {
 				return false;
 			}
 			channels = _byteswap_ushort(channels);
@@ -93,7 +93,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 
 			for (int i = 0; i < m_channels; i++) {
 				uint32_t dsd_layout;
-				if (m_pFile->ByteRead((BYTE*)&dsd_layout, 4) != S_OK) {
+				if (m_pFile->ByteRead(&dsd_layout, 4) != S_OK) {
 					return false;
 				}
 
@@ -126,7 +126,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			}
 			break;
 		case FCC('CMPR'):
-			if (chunk.size < 4 || m_pFile->ByteRead((BYTE*)&tag, 4) != S_OK) {
+			if (chunk.size < 4 || m_pFile->ByteRead(&tag, 4) != S_OK) {
 				return false;
 			}
 			switch (tag) {
@@ -136,7 +136,7 @@ bool CDFFFile::parse_dsd_prop(__int64 eof)
 			}
 			break;
 		case FCC('FS  '):
-			if (chunk.size < 4 || m_pFile->ByteRead((BYTE*)&sample_rate, 4) != S_OK) {
+			if (chunk.size < 4 || m_pFile->ByteRead(&sample_rate, 4) != S_OK) {
 				return false;
 			}
 			m_samplerate = sample_rate = _byteswap_ulong(sample_rate);
@@ -188,11 +188,11 @@ bool CDFFFile::parse_dsd_diin(__int64 eof)
 			uint32_t size;
 			CStringA value;
 
-			if (S_OK != m_pFile->ByteRead((BYTE*)&size, 4)) {
+			if (S_OK != m_pFile->ByteRead(&size, 4)) {
 				break;
 			}
 			size = _byteswap_ulong(size);
-			if (size + 4 > chunk.size || S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(size), size)) {
+			if (size + 4 > chunk.size || S_OK != m_pFile->ByteRead(value.GetBufferSetLength(size), size)) {
 				break;
 			}
 
@@ -214,7 +214,7 @@ bool CDFFFile::parse_dsd_dst(__int64 eof)
 
 		if (chunk.size >= 4 && chunk.id == FCC('FRTE')) {
 			uint32_t count;
-			if (S_OK != m_pFile->ByteRead((BYTE*)&count, 4)) {
+			if (S_OK != m_pFile->ByteRead(&count, 4)) {
 				break;
 			}
 			count = _byteswap_ulong(count);
@@ -248,7 +248,7 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 	if (!ReadDFFChunk(Chunk)
 			|| Chunk.id != FCC('FRM8')
 			|| Chunk.size < 16
-			|| m_pFile->ByteRead((BYTE*)&id, sizeof(id)) != S_OK
+			|| m_pFile->ByteRead(&id, sizeof(id)) != S_OK
 			|| id != FCC('DSD ')) {
 		return E_FAIL;
 	}
@@ -271,13 +271,13 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 
 		switch (Chunk.id) {
 		case FCC('FVER'):
-			if (Chunk.size < 4 || m_pFile->ByteRead((BYTE*)&version, 4) != S_OK) {
+			if (Chunk.size < 4 || m_pFile->ByteRead(&version, 4) != S_OK) {
 				ABORT;
 			}
 			DLog(L"CDFFFile::Open() : DSIFF v%u.%u.%u.%u", version >> 24, (version >> 16) & 0xFF, (version >> 8) & 0xFF, version & 0xFF);
 			break;
 		case FCC('PROP'):
-			if (Chunk.size < 4 || m_pFile->ByteRead((BYTE*)&id, 4) != S_OK) {
+			if (Chunk.size < 4 || m_pFile->ByteRead(&id, 4) != S_OK) {
 				ABORT;
 			}
 			if (id != FCC('SND ')) {
@@ -305,20 +305,20 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 			{
 				__int64 endpos = m_pFile->GetPos() + Chunk.size;
 				uint16_t nb_comments;
-				if (m_pFile->ByteRead((BYTE*)&nb_comments, 2) != S_OK) {
+				if (m_pFile->ByteRead(&nb_comments, 2) != S_OK) {
 					ABORT;
 				}
 				nb_comments = _byteswap_ushort(nb_comments);
 				for (int i = 0; i < nb_comments; i++) {
 					m_pFile->Skip(6); // skip comment time
 					uint16_t type;
-					if (m_pFile->ByteRead((BYTE*)&type, 2) != S_OK) {
+					if (m_pFile->ByteRead(&type, 2) != S_OK) {
 						ABORT;
 					}
 					type = _byteswap_ushort(type);
 					m_pFile->Skip(2);
 					uint32_t metadata_size;
-					if (m_pFile->ByteRead((BYTE*)&metadata_size, 4) != S_OK) {
+					if (m_pFile->ByteRead(&metadata_size, 4) != S_OK) {
 						ABORT;
 					}
 					metadata_size = _byteswap_ulong(metadata_size);
@@ -331,7 +331,7 @@ HRESULT CDFFFile::Open(CBaseSplitterFile* pFile)
 						default:
 							CStringA value;
 							if ((m_pFile->GetPos() + metadata_size) > endpos ||
-									S_OK != m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(metadata_size), metadata_size)) {
+									S_OK != m_pFile->ByteRead(value.GetBufferSetLength(metadata_size), metadata_size)) {
 								break;
 							}
 
@@ -449,7 +449,7 @@ int CDFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	if (m_subtype == MEDIASUBTYPE_DST) {
 		DWORD dw;
 		for (__int64 i = 0, j = m_endpos - start - sizeof(dffchunk_t);
-				i <= 10 * MEGABYTE && i < j && S_OK == m_pFile->ByteRead((BYTE*)&dw, sizeof(dw));
+				i <= 10 * MEGABYTE && i < j && S_OK == m_pFile->ByteRead(&dw, sizeof(dw));
 				i++, m_pFile->Seek(start + i)) {
 			if (dw == FCC('DSTF')) {
 				// sync

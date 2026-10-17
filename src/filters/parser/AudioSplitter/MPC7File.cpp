@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2024 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,11 +60,11 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 	}
 
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || (id & 0x0fffffff) != MAKEFOURCC('M','P','+',7)) {
+	if (m_pFile->ByteRead(&id, 4) != S_OK || (id & 0x0fffffff) != MAKEFOURCC('M','P','+',7)) {
 		return E_FAIL;
 	}
 
-	if (m_pFile->ByteRead((BYTE*)&m_frames_cnt, 4) != S_OK || !m_frames_cnt) {
+	if (m_pFile->ByteRead(&m_frames_cnt, 4) != S_OK || !m_frames_cnt) {
 		return E_FAIL;
 	}
 
@@ -114,7 +114,7 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 	for (auto& frame : m_frames) {
 		const auto pos = m_pFile->GetPos();
 		uint32_t tmp, size2, curbits;
-		if (m_pFile->ByteRead((BYTE*)&tmp, 4) != S_OK) {
+		if (m_pFile->ByteRead(&tmp, 4) != S_OK) {
 			return E_FAIL;
 		}
 		curbits = stream_curbits;
@@ -122,7 +122,7 @@ HRESULT CMPC7File::Open(CBaseSplitterFile* pFile)
 			size2 = (tmp >> (12 - curbits)) & 0xFFFFF;
 		} else {
 			uint32_t tmp2;
-			if (m_pFile->ByteRead((BYTE*)&tmp2, 4) != S_OK) {
+			if (m_pFile->ByteRead(&tmp2, 4) != S_OK) {
 				return E_FAIL;
 			}
 			size2 = (tmp << (curbits - 12) | tmp2 >> (44 - curbits)) & 0xFFFFF;

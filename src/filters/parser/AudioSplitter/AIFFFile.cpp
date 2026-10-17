@@ -197,7 +197,7 @@ HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 HRESULT CAIFFFile::ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size)
 {
 	CStringA value;
-	if (m_pFile->ByteRead((BYTE*)value.GetBufferSetLength(chunk_size), chunk_size) == S_OK) {
+	if (m_pFile->ByteRead(value.GetBufferSetLength(chunk_size), chunk_size) == S_OK) {
 		m_info[chunk_id] = UTF8orLocalToWStr(value);
 
 		return S_OK;

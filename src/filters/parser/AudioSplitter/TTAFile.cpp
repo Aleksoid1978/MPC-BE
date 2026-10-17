@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -54,19 +54,19 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(start_offset);
 
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('TTA1')) {
+	if (m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('TTA1')) {
 		return E_FAIL;
 	}
 
 	tta_header_t tta;
 	memset(&tta, 0, sizeof(tta));
 
-	m_pFile->ByteRead((BYTE*)&tta.flags,      2);
-	m_pFile->ByteRead((BYTE*)&tta.channels,   2);
-	m_pFile->ByteRead((BYTE*)&tta.bps,        2);
-	m_pFile->ByteRead((BYTE*)&tta.samplerate, 4);
-	m_pFile->ByteRead((BYTE*)&tta.nb_samples, 4);
-	m_pFile->ByteRead((BYTE*)&tta.crc,        4);
+	m_pFile->ByteRead(&tta.flags,      2);
+	m_pFile->ByteRead(&tta.channels,   2);
+	m_pFile->ByteRead(&tta.bps,        2);
+	m_pFile->ByteRead(&tta.samplerate, 4);
+	m_pFile->ByteRead(&tta.nb_samples, 4);
+	m_pFile->ByteRead(&tta.crc,        4);
 
 	if (tta.samplerate == 0 || tta.samplerate > 1000000 || !tta.nb_samples) {
 		return E_FAIL;
@@ -101,7 +101,7 @@ HRESULT CTTAFile::Open(CBaseSplitterFile* pFile)
 
 	for (int i = 0; i < m_totalframes; i++) {
 		uint32_t size;
-		if (m_pFile->ByteRead((BYTE*)&size, 4) != S_OK) {
+		if (m_pFile->ByteRead(&size, 4) != S_OK) {
 			return E_FAIL;
 		}
 		m_index[i] = framepos;

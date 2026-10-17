@@ -108,7 +108,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_pFile->SetBreakHandle(GetRequestHandle());
 
 	UINT32 codec_tag = 0;
-	m_pFile->ByteRead((BYTE*)&codec_tag, 4);
+	m_pFile->ByteRead(&codec_tag, 4);
 	switch (codec_tag) {
 	// Bink Video
 	case FCC('BIKi'):
@@ -132,29 +132,29 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	UINT32 fps_den			= 0;
 	UINT32 video_flags		= 0;
 
-	m_pFile->ByteRead((BYTE*)&file_size, 4);
+	m_pFile->ByteRead(&file_size, 4);
 	file_size += 8;
-	m_pFile->ByteRead((BYTE*)&num_frames, 4);
+	m_pFile->ByteRead(&num_frames, 4);
 	if (num_frames > 1000000) {
 		DLog(L"CBinkSplitter: invalid header: more than 1000000 frames");
 		return E_FAIL;
 	}
-	m_pFile->ByteRead((BYTE*)&larges_framesize, 4);
+	m_pFile->ByteRead(&larges_framesize, 4);
 	if (larges_framesize > file_size) {
 		DLog(L"CBinkSplitter: invalid header: largest frame size greater than file size");
 		return E_FAIL;
 	}
 	m_pFile->Skip(4);
-	m_pFile->ByteRead((BYTE*)&width, 4);
-	m_pFile->ByteRead((BYTE*)&height, 4);
-	m_pFile->ByteRead((BYTE*)&fps_num, 4);
-	m_pFile->ByteRead((BYTE*)&fps_den, 4);
+	m_pFile->ByteRead(&width, 4);
+	m_pFile->ByteRead(&height, 4);
+	m_pFile->ByteRead(&fps_num, 4);
+	m_pFile->ByteRead(&fps_den, 4);
 	if (fps_num == 0 || fps_den == 0) {
 		DLog(L"CBinkSplitter: invalid header: invalid fps (%u / %u)", fps_num, fps_den);
 		return E_FAIL;
 	}
-	m_pFile->ByteRead((BYTE*)&video_flags, 4);
-	m_pFile->ByteRead((BYTE*)&num_audio_tracks, 4);
+	m_pFile->ByteRead(&video_flags, 4);
+	m_pFile->ByteRead(&num_audio_tracks, 4);
 	if (num_audio_tracks > 256) {
 		DLog(L"CBinkSplitter: invalid header: more than 256 audio tracks (%u)", num_audio_tracks);
 		return E_FAIL;
@@ -193,8 +193,8 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		m_pFile->Skip(4 * num_audio_tracks);
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].sample_rate, 2);
-			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].audio_flags, 2);
+			m_pFile->ByteRead(&m_audiotracks[i].sample_rate, 2);
+			m_pFile->ByteRead(&m_audiotracks[i].audio_flags, 2);
 
 			mts.clear();
 			mt.InitMediaType();
@@ -216,7 +216,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		}
 
 		for (unsigned i = 0; i < num_audio_tracks; i++) {
-			m_pFile->ByteRead((BYTE*)&m_audiotracks[i].track_ID, 4);
+			m_pFile->ByteRead(&m_audiotracks[i].track_ID, 4);
 		}
 	}
 
@@ -224,7 +224,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 	m_seektable.clear();
 	m_seektable.reserve(num_frames);
 	UINT32 next_pos = 0;
-	m_pFile->ByteRead((BYTE*)&next_pos, 4);
+	m_pFile->ByteRead(&next_pos, 4);
 	for (unsigned i = 0; i < num_frames; i++) {
 		UINT32 pos = next_pos;
 		UINT32 keyframe;
@@ -233,7 +233,7 @@ HRESULT CBinkSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			next_pos = file_size;
 			keyframe = 0;
 		} else {
-			m_pFile->ByteRead((BYTE*)&next_pos, 4);
+			m_pFile->ByteRead(&next_pos, 4);
 			keyframe = pos & 1;
 		}
 		pos &= ~1;
@@ -302,7 +302,7 @@ bool CBinkSplitterFilter::DemuxLoop()
 		if (num_audio_tracks) {
 			for (unsigned i = 0; i < num_audio_tracks; i++) {
 				UINT32 packet_size = 0;
-				m_pFile->ByteRead((BYTE*)&packet_size, 4);
+				m_pFile->ByteRead(&packet_size, 4);
 				if (packet_size >= 4) {
 					std::unique_ptr<CPacket> pa(DNew CPacket());
 					if (pa->SetCount(packet_size)) {

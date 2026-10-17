@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -203,7 +203,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					case FCC('ISRF'): // Source Form. Identifies the original form of the material that was digitized, such as "slide," "paper," "map," and so on. This is not necessarily the same as IMED.
 					case FCC('ITCH'): { // Technician. Identifies the technician who digitized the subject file; for example, "Smith, John."
 						CStringA str;
-						if (S_OK != ByteRead((BYTE*)str.GetBufferSetLength(size), size)) {
+						if (S_OK != ByteRead(str.GetBufferSetLength(size), size)) {
 							return E_FAIL;
 						}
 						m_info[id] = str;
@@ -238,7 +238,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 					}
 					break;
 				case FCC('strn'):
-					if (S_OK != ByteRead((BYTE*)strm->strn.GetBufferSetLength(size), size)) {
+					if (S_OK != ByteRead(strm->strn.GetBufferSetLength(size), size)) {
 						return E_FAIL;
 					}
 					break;
@@ -291,7 +291,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 							strm->indx.reset(std::move(pSuperIndex));
 							strm->indx->fcc = FCC('indx');
 							strm->indx->cb = size;
-							if (S_OK != ByteRead((BYTE*)strm->indx.get() + 8, size)) {
+							if (S_OK != ByteRead(strm->indx.get() + 8, size)) {
 								return E_FAIL;
 							}
 							ASSERT(strm->indx->wLongsPerEntry == 4 && strm->indx->bIndexType == AVI_INDEX_OF_INDEXES);
@@ -403,7 +403,7 @@ HRESULT CAviFile::BuildIndex()
 				Seek(idx->aIndex[j].qwOffset);
 
 				AVISTDINDEX stdidx;
-				if (S_OK != ByteRead((BYTE*)&stdidx, FIELD_OFFSET(AVISTDINDEX, aIndex)) || (WORD)stdidx.fcc != 'xi') { // fcc = 'ix00', 'ix01', 'ix02',...
+				if (S_OK != ByteRead(&stdidx, FIELD_OFFSET(AVISTDINDEX, aIndex)) || (WORD)stdidx.fcc != 'xi') { // fcc = 'ix00', 'ix01', 'ix02',...
 					EmptyIndex();
 					return E_FAIL;
 				}

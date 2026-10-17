@@ -151,9 +151,9 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 			int size = 0;
 			pFile->ByteRead(&id, 1);
 			if (id & 0x80) {
-				pFile->ByteRead((BYTE*)&size, 3);
+				pFile->ByteRead(&size, 3);
 			} else {
-				pFile->ByteRead((BYTE*)&size, 1);
+				pFile->ByteRead(&size, 1);
 			}
 			size <<= 1;
 			if (id & 0x40) {
@@ -167,19 +167,19 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 				}
 				chan = 0;
 				chmask = 0;
-				pFile->ByteRead((BYTE*)&chan, 1);
+				pFile->ByteRead(&chan, 1);
 				switch (size - 2) {
 				case 0:
-					pFile->ByteRead((BYTE*)&chmask, 1);
+					pFile->ByteRead(&chmask, 1);
 					break;
 				case 1:
-					pFile->ByteRead((BYTE*)&chmask, 2);
+					pFile->ByteRead(&chmask, 2);
 					break;
 				case 2:
-					pFile->ByteRead((BYTE*)&chmask, 3);
+					pFile->ByteRead(&chmask, 3);
 					break;
 				case 3:
-					pFile->ByteRead((BYTE*)&chmask, 4);
+					pFile->ByteRead(&chmask, 4);
 					break;
 				case 4:
 					pFile->Skip(1);
@@ -189,7 +189,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 						chan |= (tmp & 0x0F) << 8;
 						chan += 1;
 					}
-					pFile->ByteRead((BYTE*)&chmask, 3);
+					pFile->ByteRead(&chmask, 3);
 					break;
 				case 5:
 					pFile->Skip(1);
@@ -199,7 +199,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 						chan |= (tmp & 0x0F) << 8;
 						chan += 1;
 					}
-					pFile->ByteRead((BYTE*)&chmask, 4);
+					pFile->ByteRead(&chmask, 4);
 					break;
 				default:
 					DLog(L"wv_read_block_header : Invalid channel info size %d", size);
@@ -213,7 +213,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 				}
 				{
 					uint32_t shift = 0;
-					pFile->ByteRead((BYTE*)&shift, 1);
+					pFile->ByteRead(&shift, 1);
 					rate_x = 1U << shift;
 				}
 				if (size) {
@@ -222,7 +222,7 @@ HRESULT wv_read_block_header(wv_context_t* wvc, CBaseSplitterFile* pFile)
 				break;
 			case 0x27:
 				rate = 0;
-				pFile->ByteRead((BYTE*)&rate, 3);
+				pFile->ByteRead(&rate, 3);
 				break;
 			default:
 				pFile->Seek(pFile->GetPos() + size);
@@ -389,7 +389,7 @@ REFERENCE_TIME CWavPackFile::Seek(REFERENCE_TIME rt)
 	while (pos >= m_startpos && pos < end) {
 		m_pFile->Seek(pos);
 		DWORD sync = 0;
-		m_pFile->ByteRead((BYTE*)&sync, sizeof(sync));
+		m_pFile->ByteRead(&sync, sizeof(sync));
 		if (sync == FCC('wvpk')) {
 			m_pFile->Seek(pos);
 			m_pFile->ByteRead(buf, BUFSIZE);

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -160,12 +160,12 @@ bool CDSMSplitterFile::Sync(UINT64& syncpos, dsmp_t& type, UINT64& len, __int64 
 bool CDSMSplitterFile::Read(__int64 len, BYTE& id, CMediaType& mt)
 {
 	id = (BYTE)BitRead(8);
-	ByteRead((BYTE*)&mt.majortype, sizeof(mt.majortype));
-	ByteRead((BYTE*)&mt.subtype, sizeof(mt.subtype));
+	ByteRead(&mt.majortype, sizeof(mt.majortype));
+	ByteRead(&mt.subtype, sizeof(mt.subtype));
 	mt.bFixedSizeSamples = (BOOL)BitRead(1);
 	mt.bTemporalCompression = (BOOL)BitRead(1);
 	mt.lSampleSize = (ULONG)BitRead(30);
-	ByteRead((BYTE*)&mt.formattype, sizeof(mt.formattype));
+	ByteRead(&mt.formattype, sizeof(mt.formattype));
 	len -= 5 + sizeof(GUID)*3;
 	ASSERT(len >= 0);
 	if (len > 0) {
@@ -238,7 +238,7 @@ bool CDSMSplitterFile::Read(__int64 len, CStreamInfoMap& im)
 {
 	while (len >= 5) {
 		CStringA key;
-		ByteRead((BYTE*)key.GetBufferSetLength(4), 4);
+		ByteRead(key.GetBufferSetLength(4), 4);
 		len -= 4;
 		len -= Read(len, im[key]);
 	}

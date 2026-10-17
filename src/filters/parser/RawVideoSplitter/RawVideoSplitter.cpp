@@ -457,7 +457,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 		// Polyvision PVDR ?
 		if (GETU32(buf) == FCC('CMS1') && GETU32(buf + 20) == FCC('PDVR')) {
 			m_pFile->Seek(24);
-			if (S_OK != m_pFile->ByteRead((BYTE*)&value, 4)) {
+			if (S_OK != m_pFile->ByteRead(&value, 4)) {
 				return E_FAIL;
 			}
 			m_pFile->Skip(value);
@@ -478,7 +478,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			// simple search first AnnexB Nal
 			// TODO: to alter in accordance with the specification
 			__int64 pos = m_pFile->GetPos();
-			while (pos < maxpos && S_OK == m_pFile->ByteRead((BYTE*)&value, 4)) {
+			while (pos < maxpos && S_OK == m_pFile->ByteRead(&value, 4)) {
 				if ((value & 0x00FFFFFF) == 0x00010000) {
 					m_pFile->Seek(pos);
 					if (S_OK != m_pFile->ByteRead(buf, 255)) {
@@ -858,7 +858,7 @@ HRESULT CRawVideoSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 			vih2->dwPictAspectRatioX = par_x;
 			vih2->dwPictAspectRatioY = par_y;
 			m_pFile->Seek(0);
-			m_pFile->ByteRead((BYTE*)(vih2 + 1), extrasize);
+			m_pFile->ByteRead((vih2 + 1), extrasize);
 
 			mts.push_back(mt);
 

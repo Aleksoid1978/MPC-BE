@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2014 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -50,7 +50,7 @@ void AP4_AsyncReaderStream::Release()
 
 AP4_Result AP4_AsyncReaderStream::Read(void* buffer, AP4_Size bytesToRead, AP4_Size* bytesRead)
 {
-	if (FAILED(m_pFile->ByteRead((BYTE*)buffer, bytesToRead))) {
+	if (FAILED(m_pFile->ByteRead(buffer, bytesToRead))) {
 		if (bytesRead) {
 			*bytesRead = 0;
 		}

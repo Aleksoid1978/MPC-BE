@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -115,7 +115,7 @@ HRESULT CMatroskaFile::Init()
 template <class T>
 HRESULT CMatroskaFile::Read(T& var)
 {
-	HRESULT hr = ByteRead((BYTE*)&var, sizeof(var));
+	HRESULT hr = ByteRead(&var, sizeof(var));
 	if (S_OK == hr) {
 		bswap((BYTE*)&var, sizeof(var));
 	}

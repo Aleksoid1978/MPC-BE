@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2025 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -66,7 +66,7 @@ HRESULT CMPC8File::Open(CBaseSplitterFile* pFile)
 	m_pFile->Seek(0);
 	m_header_pos = m_pFile->GetPos();
 	DWORD id = 0;
-	if (m_pFile->ByteRead((BYTE*)&id, 4) != S_OK || id != FCC('MPCK')) {
+	if (m_pFile->ByteRead(&id, 4) != S_OK || id != FCC('MPCK')) {
 		return E_FAIL;
 	}
 
@@ -155,7 +155,7 @@ bool CMPC8File::ReadChunkHeader(chunk_t& chunk)
 {
 	chunk.pos = m_pFile->GetPos();
 
-	if (m_pFile->ByteRead((BYTE*)&chunk.id, 2) != S_OK) {
+	if (m_pFile->ByteRead(&chunk.id, 2) != S_OK) {
 		return false;
 	}
 

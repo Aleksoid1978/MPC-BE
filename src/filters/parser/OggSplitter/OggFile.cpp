@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2020 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -52,7 +52,7 @@ bool COggFile::Sync(HANDLE hBreak)
 
 	DWORD dw;
 	for (__int64 i = 0, j = (hBreak && IsRandomAccess()) ? GetLength() - start : MAX_PAGE_SIZE;
-			i < j && S_OK == ByteRead((BYTE*)&dw, sizeof(dw))
+			i < j && S_OK == ByteRead(&dw, sizeof(dw))
 			&& ((i&0xffff) || !hBreak || WaitForSingleObject(hBreak, 0) != WAIT_OBJECT_0);
 			i++, Seek(start + i)) {
 		if (dw == 'SggO') {
@@ -68,7 +68,7 @@ bool COggFile::Sync(HANDLE hBreak)
 
 bool COggFile::Read(OggPageHeader& hdr, HANDLE hBreak)
 {
-	return Sync(hBreak) && S_OK == ByteRead((BYTE*)&hdr, sizeof(hdr)) && hdr.capture_pattern == 'SggO';
+	return Sync(hBreak) && S_OK == ByteRead(&hdr, sizeof(hdr)) && hdr.capture_pattern == 'SggO';
 }
 
 bool COggFile::Read(OggPage& page, const bool bFull, HANDLE hBreak)
