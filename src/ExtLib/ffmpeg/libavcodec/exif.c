@@ -415,6 +415,7 @@ static void exif_write_values(PutByteContext *pb, int le, const AVExifEntry *ent
 }
 
 static const uint8_t aoc_header[] = { 'A', 'O', 'C', 0, };
+static const uint8_t apple_header[] = { 'A', 'p', 'p', 'l', 'e', ' ', 'i', 'O', 'S', 0, 0, 1, 'M', 'M'};
 static const uint8_t casio_header[] = { 'Q', 'V', 'C', 0, 0, 0, };
 static const uint8_t foveon_header[] = { 'F', 'O', 'V', 'E', 'O', 'N', 0, 0, };
 static const uint8_t fuji_header[] = { 'F', 'U', 'J', 'I', };
@@ -439,6 +440,7 @@ struct exif_makernote_data {
 
 static const struct exif_makernote_data makernote_data[] = {
     MAKERNOTE_STRUCT(aoc_header, 6),
+    MAKERNOTE_STRUCT(apple_header, 14),
     MAKERNOTE_STRUCT(casio_header, -1),
     MAKERNOTE_STRUCT(foveon_header, 10),
     MAKERNOTE_STRUCT(fuji_header, -1),
@@ -476,10 +478,12 @@ static int exif_get_makernote_offset(GetByteContext *gb)
 }
 
 static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
-                               int depth, AVExifMetadata *ifd, int guess);
+                               int depth, int *entries_left,
+                               AVExifMetadata *ifd, int guess);
 
 static int exif_decode_tag(void *logctx, GetByteContext *gb, int le,
-                           int depth, AVExifEntry *entry)
+                           int depth, int *entries_left, int guess,
+                           AVExifEntry *entry)
 {
     int ret = 0, makernote_offset = -1, tell, is_ifd, count;
     enum AVTiffDataType type;
@@ -532,7 +536,8 @@ static int exif_decode_tag(void *logctx, GetByteContext *gb, int le,
                 return AVERROR(ENOMEM);
             bytestream2_get_buffer(gb, entry->ifd_lead, entry->ifd_offset);
         }
-        ret = exif_parse_ifd_list(logctx, gb, le, depth + 1, &entry->value.ifd, entry->id == MAKERNOTE_TAG);
+        ret = exif_parse_ifd_list(logctx, gb, le, depth + 1, entries_left,
+                                  &entry->value.ifd, guess || entry->id == MAKERNOTE_TAG);
         if (ret < 0 && entry->id == MAKERNOTE_TAG) {
             /*
              * we guessed that MakerNote was an IFD
@@ -559,7 +564,8 @@ end:
 }
 
 static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
-                               int depth, AVExifMetadata *ifd, int guess)
+                               int depth, int *entries_left,
+                               AVExifMetadata *ifd, int guess)
 {
     uint32_t entries;
     size_t required_size;
@@ -589,6 +595,13 @@ static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
         ret = AVERROR_INVALIDDATA;
         goto end;
     }
+    if (entries > entries_left[guess]) {
+        av_log(logctx, guess ? AV_LOG_DEBUG : AV_LOG_ERROR,
+               "IFD tree has more entries than the EXIF buffer can hold\n");
+        ret = AVERROR_INVALIDDATA;
+        goto end;
+    }
+    entries_left[guess] -= entries;
 
     ifd->count = entries;
     av_log(logctx, AV_LOG_DEBUG, "entry count for IFD: %u\n", ifd->count);
@@ -616,7 +629,7 @@ static int exif_parse_ifd_list(void *logctx, GetByteContext *gb, int le,
     memset(ifd->entries, 0, required_size);
 
     for (uint32_t i = 0; i < entries; i++) {
-        ret = exif_decode_tag(logctx, gb, le, depth, &ifd->entries[i]);
+        ret = exif_decode_tag(logctx, gb, le, depth, entries_left, guess, &ifd->entries[i]);
         if (ret < 0)
             goto end;
     }
@@ -930,7 +943,10 @@ int av_exif_parse_buffer(void *logctx, const uint8_t *buf, size_t size,
      * parse IFD0 here. If the return value is positive that tells us
      * there is subimage metadata, but we don't parse that IFD here
      */
-    ret = exif_parse_ifd_list(logctx, &gbytes, le, 0, ifd, 0);
+    int ifd_offsets[17] = { bytestream2_tell(&gbytes) };
+    int nb_ifds = 1;
+    int entries_left[2] = { size / BASE_TAG_SIZE, size / BASE_TAG_SIZE };
+    ret = exif_parse_ifd_list(logctx, &gbytes, le, 0, entries_left, ifd, 0);
     if (ret < 0) {
         av_log(logctx, AV_LOG_ERROR, "error decoding EXIF data: %s\n", av_err2str(ret));
         return ret;
@@ -943,7 +959,14 @@ int av_exif_parse_buffer(void *logctx, const uint8_t *buf, size_t size,
     /* cap at 16 extra IFDs for sanity/parse security */
     for (int extra_tag = 0xFFFCu; extra_tag > 0xFFECu; extra_tag--) {
         AVExifMetadata extra_ifd = { 0 };
-        ret = exif_parse_ifd_list(logctx, &gbytes, le, 0, &extra_ifd, 1);
+        for (int i = 0; i < nb_ifds; i++) {
+            if (ifd_offsets[i] == next) {
+                av_log(logctx, AV_LOG_WARNING, "EXIF IFD chain loops back to offset %d\n", next);
+                goto finish;
+            }
+        }
+        ifd_offsets[nb_ifds++] = next;
+        ret = exif_parse_ifd_list(logctx, &gbytes, le, 0, entries_left, &extra_ifd, 1);
         if (ret < 0) {
             av_exif_free(&extra_ifd);
             break;

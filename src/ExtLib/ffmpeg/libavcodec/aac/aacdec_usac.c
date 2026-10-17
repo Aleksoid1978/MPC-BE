@@ -562,6 +562,7 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
     MPEG4AudioConfig *m4ac = &oc->m4ac;
     AACUSACConfig *usac = &oc->usac;
     int elem_id[3 /* SCE, CPE, LFE */];
+    int nb_elems;
 
     int map_pos_set = 0;
     int nb_elements = 0;
@@ -570,6 +571,8 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
     if (!ac)
         return AVERROR_PATCHWELCOME;
 
+    for (int i = 0; i < usac->nb_elems; i++)
+        av_refstruct_unref(&usac->elems[i].ext.pl_buf);
     memset(usac, 0, sizeof(*usac));
     usac->loudness.input_method_val = -1;
 
@@ -624,24 +627,22 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
         if (nb_channels > 64)
             return AVERROR(EINVAL);
 
-        av_channel_layout_uninit(&ac->oc[1].ch_layout);
+        AVChannelLayout ch_layout = { 0 };
 
-        ret = av_channel_layout_custom_init(&ac->oc[1].ch_layout, nb_channels);
+        ret = av_channel_layout_custom_init(&ch_layout, nb_channels);
         if (ret < 0)
             return ret;
 
         for (int i = 0; i < nb_channels; i++) {
-            AVChannelCustom *cm = &ac->oc[1].ch_layout.u.map[i];
+            AVChannelCustom *cm = &ch_layout.u.map[i];
             cm->id = usac_ch_pos_to_av[get_bits(gb, 5)]; /* bsOutputChannelPos */
         }
 
-        ret = av_channel_layout_retype(&ac->oc[1].ch_layout,
-                                       AV_CHANNEL_ORDER_NATIVE,
+        ret = av_channel_layout_retype(&ch_layout, AV_CHANNEL_ORDER_NATIVE,
                                        AV_CHANNEL_LAYOUT_RETYPE_FLAG_CANONICAL);
-        if (ret < 0)
-            return ret;
-
-        ret = av_channel_layout_copy(&avctx->ch_layout, &ac->oc[1].ch_layout);
+        if (ret >= 0)
+            ret = av_channel_layout_copy(&avctx->ch_layout, &ch_layout);
+        av_channel_layout_uninit(&ch_layout);
         if (ret < 0)
             return ret;
     } else {
@@ -658,15 +659,14 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
 
     /* UsacDecoderConfig */
     elem_id[0] = elem_id[1] = elem_id[2] = 0;
-    usac->nb_elems = get_escaped_value(gb, 4, 8, 16) + 1;
-    if (usac->nb_elems > 64) {
+    nb_elems = get_escaped_value(gb, 4, 8, 16) + 1;
+    if (nb_elems > 64) {
         av_log(ac->avctx, AV_LOG_ERROR, "Too many elements: %i\n",
-               usac->nb_elems);
-        usac->nb_elems = 0;
+               nb_elems);
         return AVERROR(EINVAL);
     }
 
-    for (int i = 0; i < usac->nb_elems; i++) {
+    for (int i = 0; i < nb_elems; i++) {
         int map_count = elem_id[0] + elem_id[1] + elem_id[2];
         AACUsacElemConfig *e = &usac->elems[i];
         memset(e, 0, sizeof(*e));
@@ -675,7 +675,6 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
         if (e->type != ID_USAC_EXT && (map_count + 1) > nb_channels) {
             av_log(ac->avctx, AV_LOG_ERROR, "Too many channels for the channel "
                                             "configuration\n");
-            usac->nb_elems = 0;
             return AVERROR(EINVAL);
         }
         if (map_pos_set && e->type != ID_USAC_EXT &&
@@ -746,7 +745,6 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
                                   OC_GLOBAL_HDR, 0);
     if (ret < 0) {
         av_log(avctx, AV_LOG_ERROR, "Unable to parse channel config!\n");
-        usac->nb_elems = 0;
         return ret;
     }
 
@@ -792,6 +790,7 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
                -57.75f + 0.25f * usac->loudness.input_method_val,
                usac->loudness.input_method_val);
 
+    usac->nb_elems = nb_elems;
     ret = ff_aac_usac_reset_state(ac, oc);
     if (ret < 0)
         return ret;
@@ -2096,8 +2095,10 @@ int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
         ratio_dec = 1;
     }
 
-    ff_aac_output_configure(ac, ac->oc[1].layout_map, ac->oc[1].layout_map_tags,
-                            ac->oc[1].status, 0);
+    ret = ff_aac_output_configure(ac, ac->oc[1].layout_map, ac->oc[1].layout_map_tags,
+                                  ac->oc[1].status, 0);
+    if (ret < 0)
+        return ret;
 
     ac->avctx->profile = AV_PROFILE_AAC_USAC;
 

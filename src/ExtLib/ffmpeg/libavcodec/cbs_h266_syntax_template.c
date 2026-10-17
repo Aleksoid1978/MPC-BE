@@ -930,6 +930,9 @@ static int FUNC(vps) (CodedBitstreamContext *ctx, RWContext *rw,
             return AVERROR_INVALIDDATA;
     }
 
+    allocate(current->vps_profile_tier_level,
+             (current->vps_num_ptls_minus1 + 1) *
+             sizeof(*current->vps_profile_tier_level));
     for (i = 0; i <= current->vps_num_ptls_minus1; i++) {
         CHECK(FUNC(profile_tier_level) (ctx, rw,
                                         current->vps_profile_tier_level + i,
@@ -2162,6 +2165,8 @@ static int FUNC(pps) (CodedBitstreamContext *ctx, RWContext *rw,
                         current->num_slices_in_subpic[i]++;
                     }
                 }
+                if (!current->num_slices_in_subpic[i])
+                    return AVERROR_INVALIDDATA;
                 num_slices += current->num_slices_in_subpic[i];
             }
             if (current->pps_num_slices_in_pic_minus1 + 1 != num_slices)
@@ -3461,6 +3466,10 @@ static int FUNC(slice_header) (CodedBitstreamContext *ctx, RWContext *rw,
             int slice_idx = current->sh_slice_address;
             for (i = 0; i < current->curr_subpic_idx; i++) {
                 slice_idx += pps->num_slices_in_subpic[i];
+            }
+            if (slice_idx > pps->pps_num_slices_in_pic_minus1) {
+                av_log(ctx->log_ctx, AV_LOG_ERROR, "Invalid slice address %d\n", slice_idx);
+                return AVERROR_INVALIDDATA;
             }
 
             if (pps->pps_single_slice_per_subpic_flag) {

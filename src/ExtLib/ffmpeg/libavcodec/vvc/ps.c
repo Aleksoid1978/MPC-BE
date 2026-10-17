@@ -1374,6 +1374,8 @@ static int sh_slice_address(VVCSH *sh, const H266RawSPS *sps, const VVCPPS *pps)
         int pic_level_slice_idx = slice_address;
         for (int j = 0; j < sh->r->curr_subpic_idx; j++)
             pic_level_slice_idx += pps->r->num_slices_in_subpic[j];
+        if (pic_level_slice_idx > pps->r->pps_num_slices_in_pic_minus1)
+            return AVERROR_INVALIDDATA;
         sh->ctb_addr_in_curr_slice = pps->ctb_addr_in_slice + pps->slice_start_offset[pic_level_slice_idx];
         sh->num_ctus_in_curr_slice = pps->num_ctus_in_slice[pic_level_slice_idx];
     } else {
@@ -1470,7 +1472,8 @@ static void sh_partition_constraints(VVCSH *sh, const H266RawSPS *sps, const H26
 static int sh_entry_points(VVCSH *sh, const H266RawSPS *sps, const VVCPPS *pps)
 {
     if (sps->sps_entry_point_offsets_present_flag) {
-        for (int i = 1, j = 0; i < sh->num_ctus_in_curr_slice; i++) {
+        int j = 0;
+        for (int i = 1; i < sh->num_ctus_in_curr_slice; i++) {
             const int pre_ctb_addr_x = sh->ctb_addr_in_curr_slice[i - 1] % pps->ctb_width;
             const int pre_ctb_addr_y = sh->ctb_addr_in_curr_slice[i - 1] / pps->ctb_width;
             const int ctb_addr_x     = sh->ctb_addr_in_curr_slice[i] % pps->ctb_width;
@@ -1483,6 +1486,8 @@ static int sh_entry_points(VVCSH *sh, const H266RawSPS *sps, const VVCPPS *pps)
                 sh->entry_point_start_ctu[j++] = i;
             }
         }
+        if (j != sh->r->num_entry_points)
+            return AVERROR_INVALIDDATA;
     }
 
     return 0;

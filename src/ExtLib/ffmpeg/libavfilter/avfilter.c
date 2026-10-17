@@ -450,6 +450,9 @@ int ff_filter_config_links(AVFilterContext *filter)
                     return ret;
                 }
 
+            li->cfg_format = link->format;
+            li->cfg_w      = link->w;
+            li->cfg_h      = link->h;
             li->init_state = AVLINK_INIT;
         }
     }
@@ -1078,19 +1081,15 @@ int ff_filter_frame(AVFilterLink *link, AVFrame *frame)
 
     /* Consistency checks */
     if (link->type == AVMEDIA_TYPE_VIDEO) {
-        if (strcmp(link->dst->filter->name, "buffersink") &&
-            strcmp(link->dst->filter->name, "format") &&
-            strcmp(link->dst->filter->name, "idet") &&
-            strcmp(link->dst->filter->name, "null") &&
-            strcmp(link->dst->filter->name, "scale") &&
-            strcmp(link->dst->filter->name, "libplacebo") &&
-            strcmp(link->dst->filter->name, "hqdn3d")) {
-            av_assert1(frame->format        == link->format);
-            av_assert1(frame->width         == link->w);
-            av_assert1(frame->height        == link->h);
-            if (av_pix_fmt_desc_get(link->format)->flags & AV_PIX_FMT_FLAG_ALPHA)
-                av_assert1(frame->alpha_mode == link->alpha_mode);
+        int dynamic_flags = fffilter(link->dst->filter)->flags_internal;
+
+        if ((ret = ff_inlink_check_frame_params(link, frame, dynamic_flags)) < 0) {
+            av_frame_free(&frame);
+            return ret;
         }
+        if (!(dynamic_flags & FF_FILTER_FLAG_DYNAMIC_FRAME_FORMAT) &&
+            av_pix_fmt_desc_get(link->format)->flags & AV_PIX_FMT_FLAG_ALPHA)
+            av_assert1(frame->alpha_mode == link->alpha_mode);
     } else {
         if (frame->format != link->format) {
             av_log(link->dst, AV_LOG_ERROR, "Format change is not supported\n");
@@ -1569,6 +1568,22 @@ AVFrame *ff_inlink_peek_frame(AVFilterLink *link, size_t idx)
     return ff_framequeue_peek(&li->fifo, idx);
 }
 
+int ff_inlink_check_frame_params(AVFilterLink *link, const AVFrame *frame,
+                                 int dynamic_flags)
+{
+    const FilterLinkInternal *li = ff_link_internal(link);
+
+    if ((frame->format == li->cfg_format ||
+         dynamic_flags & FF_FILTER_FLAG_DYNAMIC_FRAME_FORMAT) &&
+        (frame->width == li->cfg_w && frame->height == li->cfg_h ||
+         dynamic_flags & FF_FILTER_FLAG_DYNAMIC_FRAME_SIZE))
+        return 0;
+
+    av_log(link->dst, AV_LOG_ERROR,
+           "Frame size or format changed without filter graph reinitialization\n");
+    return AVERROR(EINVAL);
+}
+
 int ff_inlink_make_frame_writable(AVFilterLink *link, AVFrame **rframe)
 {
     AVFrame *frame = *rframe;
@@ -1581,7 +1596,7 @@ int ff_inlink_make_frame_writable(AVFilterLink *link, AVFrame **rframe)
 
     switch (link->type) {
     case AVMEDIA_TYPE_VIDEO:
-        out = ff_get_video_buffer(link, link->w, link->h);
+        out = ff_get_video_buffer(link, frame->width, frame->height);
         break;
     case AVMEDIA_TYPE_AUDIO:
         out = ff_get_audio_buffer(link, frame->nb_samples);

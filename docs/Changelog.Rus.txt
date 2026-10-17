@@ -11,6 +11,9 @@ MpaDecFilter
 MPCVideoDec
 Исправлена поддержка DolbyVision для декодеров D3D11cb, D3D12cb и NVDEC.
 
+Обновлены библиотеки:
+	ffmpeg n9.1-dev-2302-g34370c0ffd.
+
 
 1.9.2 - 2026-10-13
 =============================
