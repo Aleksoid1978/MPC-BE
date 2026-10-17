@@ -51,70 +51,83 @@ CAudioFile::~CAudioFile()
 CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 {
 	CAudioFile* pAudioFile = nullptr;
-	BYTE data[40];
+	union {
+		DWORD dw[10];
+		BYTE b[40];
+	} data;
 
 	pFile->Seek(0);
-	if (pFile->ByteRead(data, sizeof(data)) != S_OK) {
+	if (pFile->ByteRead(&data, sizeof(data)) != S_OK) {
 		return nullptr;
 	}
 
-	DWORD* id = (DWORD*)data;
-	if (*id == FCC('MAC ')) {
+	const DWORD& id = data.dw[0];
+
+	if (id == FCC('MAC ')) {
 		pAudioFile = DNew CAPEFile();
 	}
-	else if (*id == FCC('tBaK')) {
+	else if (id == FCC('tBaK')) {
 		pAudioFile = DNew CTAKFile();
 	}
-	else if (*id == FCC('TTA1')) {
+	else if (id == FCC('TTA1')) {
 		pAudioFile = DNew CTTAFile();
 	}
-	else if (*id == FCC('wvpk')) {
+	else if (id == FCC('wvpk')) {
 		pAudioFile = DNew CWavPackFile();
 	}
-	else if (memcmp(data, AMR_header, 6) == 0 || memcmp(data, AMRWB_header, 9) == 0) {
+	else if (memcmp(&data, AMR_header, 6) == 0 || memcmp(&data, AMRWB_header, 9) == 0) {
 		pAudioFile = DNew CAMRFile();
 	}
-	else if (*id == FCC('RIFF') && GETU32(data+8) == FCC('WAVE')) {
+	else if (id == FCC('RIFF') && data.dw[2] == FCC('WAVE')) {
 		pAudioFile = DNew CWAVFile();
 	}
-	else if (memcmp(data, w64_guid_riff, 16) == 0 &&  memcmp(data+24, w64_guid_wave, 16) == 0) {
+	else if (memcmp(&data, w64_guid_riff, 16) == 0 &&  memcmp(&data.b[24], w64_guid_wave, 16) == 0) {
 		pAudioFile = DNew CWave64File();
 	}
-	else if (*id == FCC('RF64') && GETU32(data+8) == FCC('WAVE') && GETU32(data+12) == FCC('ds64')) {
+	else if (id == FCC('RF64') && data.dw[2] == FCC('WAVE') && data.dw[3] == FCC('ds64')) {
 		pAudioFile = DNew CRF64File();
 	}
-	else if (memcmp(data, chk_DTSHDHDR, 8) == 0) {
+	else if (memcmp(&data, chk_DTSHDHDR, 8) == 0) {
 		pAudioFile = DNew CDTSHDFile();
 	}
-	else if (*id == FCC('FRM8') && GETU32(data+12) == FCC('DSD ')) {
+	else if (id == FCC('FRM8') && data.dw[3] == FCC('DSD ')) {
 		pAudioFile = DNew CDFFFile();
 	}
-	else if (*id == FCC('DSD ') && data[4] == 0x1C) {
+	else if (id == FCC('DSD ') && data.b[4] == 0x1C) {
 		pAudioFile = DNew CDSFFile();
-	} else if (*id == FCC('MPCK')) {
+	}
+	else if (id == FCC('MPCK')) {
 		pAudioFile = DNew CMPC8File();
-	} else if ((*id & 0x0fffffff) == MAKEFOURCC('M','P','+',7)) {
+	}
+	else if ((id & 0x0fffffff) == MAKEFOURCC('M','P','+',7)) {
 		pAudioFile = DNew CMPC7File();
-	} else if (*id == FCC('fLaC')) {
+	}
+	else if (id == FCC('fLaC')) {
 		pAudioFile = DNew CFLACFile();
-	}  else if (*id == FCC('FORM') && GETU32(data + 8) == FCC('AIFF')) {
+	}
+	else if (id == FCC('FORM') && data.dw[2] == FCC('AIFF')) {
 		pAudioFile = DNew CAIFFFile();
 	}
-	else if (int id3v2_size = id3v2_match_len(data)) {
+	else if (int id3v2_size = id3v2_match_len(data.b)) {
 		// skip ID3V2 metadata for formats that can contain it
 		pFile->Seek(id3v2_size);
-		if (pFile->ByteRead(data, 4) != S_OK) {
+		if (pFile->ByteRead(&data, 4) != S_OK) {
 			return nullptr;
 		}
-		if (*id == FCC('TTA1')) {
+
+		if (id == FCC('TTA1')) {
 			pAudioFile = DNew CTTAFile();
-		} else if (*id == FCC('MAC ')) {
+		}
+		else if (id == FCC('MAC ')) {
 			pAudioFile = DNew CAPEFile();
-		}  else if (*id == FCC('wvpk')) {
+		}
+		else if (id == FCC('wvpk')) {
 			pAudioFile = DNew CWavPackFile();
-		} else if (*id == FCC('fLaC')) {
+		}
+		else if (id == FCC('fLaC')) {
 			pAudioFile = DNew CFLACFile();
-		} else {
+		}
+		else {
 			return nullptr;
 		}
 	}
