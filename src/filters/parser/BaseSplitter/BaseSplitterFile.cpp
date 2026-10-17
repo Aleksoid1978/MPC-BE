@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -217,7 +217,7 @@ void CBaseSplitterFile::Seek(__int64 pos)
 	BitFlush();
 }
 
-void CBaseSplitterFile::Skip(__int64 offset)
+void CBaseSplitterFile::Skip(const __int64 offset)
 {
 	ASSERT(offset >= 0);
 	if (offset > 0) {
@@ -377,10 +377,10 @@ void CBaseSplitterFile::BitFlush()
 	m_bitlen = 0;
 }
 
-HRESULT CBaseSplitterFile::ByteRead(BYTE* pData, __int64 len)
+HRESULT CBaseSplitterFile::ByteRead(void* pData, const __int64 len)
 {
 	Seek(GetPos());
-	return Read(pData, (int)len);
+	return Read((BYTE*)pData, (int)len);
 }
 
 UINT64 CBaseSplitterFile::UExpGolombRead()

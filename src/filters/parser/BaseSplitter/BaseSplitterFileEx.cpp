@@ -1069,13 +1069,13 @@ bool CBaseSplitterFileEx::Read(ps2audhdr& h, CMediaType* pmt)
 
 		if (tag == 'SShd') {
 			BitRead(32);
-			ByteRead((BYTE*)&size, sizeof(size));
+			ByteRead(&size, sizeof(size));
 			ASSERT(size == 0x18);
 			Seek(GetPos());
-			ByteRead((BYTE*)&h, sizeof(h));
+			ByteRead(&h, sizeof(h));
 		} else if (tag == 'SSbd') {
 			BitRead(32);
-			ByteRead((BYTE*)&size, sizeof(size));
+			ByteRead(&size, sizeof(size));
 			break;
 		}
 	}
@@ -2034,7 +2034,7 @@ bool CBaseSplitterFileEx::Read(mpeg4videohdr& h, int len, CMediaType* pmt/* = nu
 
 		mvih->cbSequenceHeader = extralen;
 		Seek(extrapos);
-		ByteRead((BYTE*)mvih->dwSequenceHeader, extralen);
+		ByteRead(mvih->dwSequenceHeader, extralen);
 	}
 
 	return true;
@@ -2251,7 +2251,7 @@ bool CBaseSplitterFileEx::ReadDVDLPCMHdr(CMediaType* pmt)
 		UINT8 drc;            // 0x80: off
 	} h;
 
-	if (S_OK != ByteRead((BYTE*)&h, sizeof(h))) {
+	if (S_OK != ByteRead(&h, sizeof(h))) {
 		memset(&h, 0, sizeof(h));
 		return false;
 	}
@@ -2300,7 +2300,7 @@ bool CBaseSplitterFileEx::ReadDVDALPCMHdr(CMediaType* pmt)
 		UINT8  unknown3;        // Unknown - e.g. 0x80
 	} h;
 
-	if (S_OK != ByteRead((BYTE*)&h, sizeof(h))) {
+	if (S_OK != ByteRead(&h, sizeof(h))) {
 		memset(&h, 0, sizeof(h));
 		return false;
 	}
@@ -2377,7 +2377,7 @@ bool CBaseSplitterFileEx::ReadHDMVLPCMHdr(CMediaType* pmt)
 		UINT8  bitpersample:2;
 	} h;
 
-	if (S_OK != ByteRead((BYTE*)&h, sizeof(h))) {
+	if (S_OK != ByteRead(&h, sizeof(h))) {
 		memset(&h, 0, sizeof(h));
 		return false;
 	}

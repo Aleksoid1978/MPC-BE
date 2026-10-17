@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -88,7 +88,7 @@ public:
 	void BitByteAlign();
 	void BitFlush();
 	UINT64 BitRead(int nBits, bool fPeek = false);
-	HRESULT ByteRead(BYTE* pData, __int64 len);
+	HRESULT ByteRead(void* pData, const __int64 len);
 
 	bool IsStreaming()    const { return m_fmode == FM_STREAM; }
 	bool IsRandomAccess() const { return m_fmode == FM_FILE || m_fmode == FM_FILE_VAR; }
