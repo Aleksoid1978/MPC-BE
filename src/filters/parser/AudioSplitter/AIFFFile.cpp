@@ -173,16 +173,25 @@ int CAIFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 {
-	BYTE data[18];
-	if (m_pFile->ByteRead(&data, sizeof(data)) != S_OK) {
+#pragma pack(push, 2)
+	struct {
+		uint16_t numChannels;
+		uint32_t numSampleFrames;
+		uint16_t sampleSize;
+		uint16_t sampleRate_exp;
+		uint64_t sampleRate_val;
+	} data;
+#pragma pack(pop)
+
+	if (chunk_size < sizeof(data) || m_pFile->ByteRead(&data, sizeof(data)) != S_OK) {
 		return E_FAIL;
 	};
 
-	m_channels = _byteswap_ushort(GETU16(data + 0));
-	m_bitdepth = _byteswap_ushort(GETU16(data + 6));
+	m_channels = _byteswap_ushort(data.numChannels);
+	m_bitdepth = _byteswap_ushort(data.sampleSize);
 
-	int16_t exp = _byteswap_ushort(GETU16(data + 8)) - 16383 - 63;
-	uint64_t val = _byteswap_uint64(GETU16(data + 10));
+	int16_t exp = _byteswap_ushort(data.sampleRate_exp) - 16383 - 63;
+	uint64_t val = _byteswap_uint64(data.sampleRate_val);
 	if (exp < -63 || exp > 63) {
 		DLog(L"CAIFFFile::ReadCommonTag() : exp %d is out of range", exp);
 		return E_FAIL;
