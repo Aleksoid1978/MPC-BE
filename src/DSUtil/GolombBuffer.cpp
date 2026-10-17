@@ -1,5 +1,5 @@
 ﻿/*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -57,12 +57,9 @@ CGolombBuffer::CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveM
 	Reset(pBuffer, nSize);
 }
 
-UINT64 CGolombBuffer::BitRead(const int nBits, const bool bPeek/* = false*/)
+UINT64 CGolombBuffer::BitRead(const int nBits)
 {
 	//ASSERT(nBits >= 0 && nBits <= 64);
-	const INT64 tmp_bitbuff = m_bitbuff;
-	const int tmp_nBitPos   = m_nBitPos;
-	const int tmp_bitlen    = m_bitlen;
 
 	while (m_bitlen < nBits) {
 		m_bitbuff <<= 8;
@@ -86,14 +83,23 @@ UINT64 CGolombBuffer::BitRead(const int nBits, const bool bPeek/* = false*/)
 		ret = (m_bitbuff >> bitlen) & ((1ui64 << nBits) - 1);
 	}
 
-	if (!bPeek) {
-		m_bitbuff &= ((1ui64 << bitlen) - 1);
-		m_bitlen  = bitlen;
-	} else {
-		m_bitbuff = tmp_bitbuff;
-		m_nBitPos = tmp_nBitPos;
-		m_bitlen  = tmp_bitlen;
-	}
+	m_bitbuff &= ((1ui64 << bitlen) - 1);
+	m_bitlen  = bitlen;
+
+	return ret;
+}
+
+UINT64 CGolombBuffer::BitPeak(const int nBits)
+{
+	const INT64 tmp_bitbuff = m_bitbuff;
+	const int tmp_nBitPos   = m_nBitPos;
+	const int tmp_bitlen    = m_bitlen;
+
+	UINT64 ret = BitRead(nBits);
+
+	m_bitbuff = tmp_bitbuff;
+	m_nBitPos = tmp_nBitPos;
+	m_bitlen  = tmp_bitlen;
 
 	return ret;
 }

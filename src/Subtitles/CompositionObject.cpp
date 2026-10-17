@@ -363,7 +363,7 @@ void CompositionObject::RenderXSUB(SubPicDesc& spd)
 		}
 		nX = m_horizontal_position;
 		while (nX < (m_horizontal_position + m_width)) {
-			int log2		= ff_log2_tab[gb.BitRead(8, true)];
+			int log2		= ff_log2_tab[gb.BitPeak(8)];
 			nCount			= gb.BitRead(14 - 4 * (log2 >> 1));
 			nCount			= std::min(nCount, m_width - (nX - m_horizontal_position));
 			nPaletteIndex	= gb.BitRead(2);

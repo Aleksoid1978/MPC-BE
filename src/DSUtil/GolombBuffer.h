@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,8 @@ public:
 	CGolombBuffer(const BYTE* pBuffer, int nSize, const bool bRemoveMpegEscapes = false);
 	~CGolombBuffer() = default;
 
-	UINT64       BitRead(const int nBits, const bool bPeek = false);
+	UINT64       BitRead(const int nBits);
+	UINT64       BitPeak(const int nBits); // the data will be returned, and the buffer not advanced
 	UINT64       UExpGolombRead();
 	unsigned int UintGolombRead();
 	INT64        SExpGolombRead();

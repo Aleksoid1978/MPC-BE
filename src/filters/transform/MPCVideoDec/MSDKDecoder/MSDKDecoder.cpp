@@ -16,7 +16,7 @@
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 *
-*  Adaptation for MPC-BE (C) 2016-2024 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
+*  Adaptation for MPC-BE (C) 2016-2026 Alexandr Vodiannikov aka "Aleksoid1978" (Aleksoid1978@mail.ru)
 */
 
 #include "stdafx.h"
@@ -277,20 +277,20 @@ HRESULT CMSDKDecoder::InitDecoder(const CMediaType *pmt)
 HRESULT CMSDKDecoder::ParseSEI(const BYTE *buffer, size_t size, mfxU64 timestamp)
 {
   CGolombBuffer seiParser(buffer, size);
-  while (seiParser.BitsLeft() > 16 && seiParser.BitRead(16, true)) {
+  while (seiParser.BitsLeft() > 16 && seiParser.BitPeak(16)) {
     int type = 0;
     unsigned size = 0;
 
     do {
       if (seiParser.BitsLeft() < 8)
         return E_FAIL;
-      type += seiParser.BitRead(8, true);
+      type += seiParser.BitPeak(8);
     } while (seiParser.BitRead(8) == 0xFF);
 
     do {
       if (seiParser.BitsLeft() < 8)
         return E_FAIL;
-      size += seiParser.BitRead(8, true);
+      size += seiParser.BitPeak(8);
     } while (seiParser.BitRead(8) == 0xFF);
 
     if (size > static_cast<unsigned>(seiParser.RemainingSize())) {
