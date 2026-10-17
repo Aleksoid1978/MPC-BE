@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2021 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -106,7 +106,9 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 		case FCC('SSND'):
 			m_endpos = m_pFile->GetPos() + Chunk.size;
 
-			m_startpos = m_pFile->BitRead(32);
+			m_pFile->ByteRead(data, 4);
+			m_startpos = _byteswap_ushort(GETU32(data));
+
 			m_pFile->Skip(4);
 			m_startpos += m_pFile->GetPos();
 			break;
@@ -169,12 +171,14 @@ int CAIFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 {
-	m_channels = m_pFile->BitRead(16);
-	m_pFile->Skip(4);
-	m_bitdepth = m_pFile->BitRead(16);
+	BYTE data[18];
+	m_pFile->ByteRead(&data, sizeof(data));
 
-	int16_t exp = m_pFile->BitRead(16) - 16383 - 63;
-	uint64_t val = m_pFile->BitRead(64);
+	m_channels = _byteswap_ushort(GETU16(data + 0));
+	m_bitdepth = _byteswap_ushort(GETU16(data + 6));
+
+	int16_t exp = _byteswap_ushort(GETU16(data + 8)) - 16383 - 63;
+	uint64_t val = _byteswap_uint64(GETU16(data + 10));
 	if (exp < -63 || exp > 63) {
 		DLog(L"CAIFFFile::ReadCommonTag() : exp %d is out of range", exp);
 		return E_FAIL;
