@@ -106,7 +106,9 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 		case FCC('SSND'):
 			m_endpos = m_pFile->GetPos() + Chunk.size;
 
-			m_pFile->ByteRead(data, 4);
+			if (m_pFile->ByteRead(data, 4) != S_OK) {
+				return E_FAIL;
+			}
 			m_startpos = _byteswap_ushort(GETU32(data));
 
 			m_pFile->Skip(4);
@@ -172,7 +174,9 @@ int CAIFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 {
 	BYTE data[18];
-	m_pFile->ByteRead(&data, sizeof(data));
+	if (m_pFile->ByteRead(&data, sizeof(data)) != S_OK) {
+		return E_FAIL;
+	};
 
 	m_channels = _byteswap_ushort(GETU16(data + 0));
 	m_bitdepth = _byteswap_ushort(GETU16(data + 6));
