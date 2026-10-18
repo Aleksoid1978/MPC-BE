@@ -291,7 +291,7 @@ HRESULT CWAVFile::Open(CBaseSplitterFile* pFile)
 			break;
 		}
 
-		m_pFile->Seek(pos + ((Chunk.size + 1) & ~1));
+		m_pFile->Seek(pos + ALIGN(Chunk.size, 2));
 	}
 	stop:
 
@@ -389,7 +389,7 @@ HRESULT CWAVFile::ReadRIFFINFO(const DWORD chunk_size)
 			m_info[Chunk.id] = value;
 		}
 
-		m_pFile->Seek(pos + ((Chunk.size + 1) & ~1));
+		m_pFile->Seek(pos + ALIGN(Chunk.size, 2));
 	}
 
 	return S_OK;
@@ -427,7 +427,7 @@ HRESULT CWAVFile::ReadADTLTag(const DWORD chunk_size)
 			}
 		}
 
-		m_pFile->Seek(pos + ((Chunk.size + 1) & ~1));
+		m_pFile->Seek(pos + ALIGN(Chunk.size, 2));
 	}
 
 	return S_OK;

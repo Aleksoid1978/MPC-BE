@@ -109,7 +109,7 @@ HRESULT CWave64File::Open(CBaseSplitterFile* pFile)
 		}
 #endif
 
-		m_pFile->Seek((pos + Chunk64.size + 7) & ~7i64);
+		m_pFile->Seek(ALIGN(pos + Chunk64.size, 8));
 	}
 
 	if (!m_startpos || !ProcessWAVEFORMATEX()) {
