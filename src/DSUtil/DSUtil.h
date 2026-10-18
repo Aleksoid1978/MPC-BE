@@ -113,7 +113,8 @@ extern bool				IsLikelyFilePath(const CStringW &str);
 extern GUID				GUIDFromCString(CStringW str);
 extern HRESULT			GUIDFromCString(CStringW str, GUID& guid);
 extern CStringW			CStringFromGUID(const GUID& guid);
-extern bool				GetMediaTypeFourcc(const GUID& guid, DWORD& fourcc);
+extern GUID				GetMediaSubtypeGUID(const DWORD fourcc);
+extern bool				GetMediaSubtypeFourcc(const GUID& subtype, DWORD& fourcc);
 
 extern bool				DeleteRegKey(LPCWSTR pszKey, LPCWSTR pszSubkey);
 extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValueName, LPCWSTR pszValue);

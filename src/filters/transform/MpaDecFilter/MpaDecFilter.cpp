@@ -2150,7 +2150,7 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 	}
 	else {
 		DWORD fourcc = 0;
-		if (GetMediaTypeFourcc(mtIn->subtype, fourcc) && mtIn->FormatLength() >= sizeof(WAVEFORMATEX)) {
+		if (GetMediaSubtypeFourcc(mtIn->subtype, fourcc) && mtIn->FormatLength() >= sizeof(WAVEFORMATEX)) {
 			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
 
 			switch (fourcc) {
