@@ -195,6 +195,9 @@ HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 	}
 	m_samplerate = exp >= 0 ? val << exp : (val + (1ULL << (-exp - 1))) >> -exp;
 
+	m_block_align = m_channels * m_bitdepth / 8;
+	m_nAvgBytesPerSec = m_samplerate * m_block_align;
+
 	if (m_version == AIFF_C_VERSION1) {
 		if (chunk_size < 18+4 || m_pFile->ByteRead(&data, 4) != S_OK) {
 			return E_FAIL;
@@ -218,13 +221,15 @@ HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 		case FCC('ulaw'):
 			m_subtype = MEDIASUBTYPE_MULAW;
 			break;
+		case FCC('ima4'):
+			m_subtype = MEDIASUBTYPE_IMA4;
+			m_block_align = m_channels * 34;
+			m_nAvgBytesPerSec = m_samplerate * m_block_align / 64;
+			break;
 		default:
 			return E_FAIL;
 		}
 	}
-
-	m_block_align = m_channels * m_bitdepth / 8;
-	m_nAvgBytesPerSec = m_samplerate * m_block_align;
 
 	m_block_size = std::max((DWORD)m_block_align, m_nAvgBytesPerSec / 16);
 	m_block_size -= m_block_size % m_block_align;
