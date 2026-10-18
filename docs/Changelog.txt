@@ -4,6 +4,7 @@
 =============================
 AudioSplitter
 Potential crashes have been fixed.
+Added partial support for AIFF-C files.
 
 MpaDecFilter
 Fixed AC3 audio encoding for S/PDIF and HDMI output.
