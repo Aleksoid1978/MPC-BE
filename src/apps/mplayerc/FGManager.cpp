@@ -2145,6 +2145,7 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	if (src[SRC_AIFF] && !IsPreview) {
 		pFGF = DNew CFGFilterInternal<CAudioSourceFilter>(AudioSourceName);
 		pFGF->m_chkbytes.emplace_back(L"0,4,,464F524D,8,4,,41494646"); // 'FORM....AIFF'
+		pFGF->m_chkbytes.emplace_back(L"0,4,,464F524D,8,4,,41494643"); // 'FORM....AIFC'
 		m_source.emplace_back(pFGF);
 	}
 

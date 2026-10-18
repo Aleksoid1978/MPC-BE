@@ -25,6 +25,7 @@
 class CAIFFFile : public CAudioFile
 {
 protected:
+	uint32_t m_version = 0;
 	__int64 m_length = 0;
 
 	WORD m_block_align = 0;

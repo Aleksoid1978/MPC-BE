@@ -21,6 +21,8 @@
 #include "stdafx.h"
 #include "AIFFFile.h"
 
+#define AIFF_C_VERSION1 FCC(0xA2805140)
+
 union chunk_t {
 	struct {
 		DWORD id;
@@ -74,7 +76,7 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 	BYTE data[12];
 	if (m_pFile->ByteRead(data, sizeof(data)) != S_OK
 			|| GETU32(data+0) != FCC('FORM')
-			|| GETU32(data+8) != FCC('AIFF')) {
+			|| (GETU32(data+8) != FCC('AIFF') && (GETU32(data+8) != FCC('AIFC')))) {
 		return E_FAIL;
 	}
 
@@ -98,6 +100,11 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 		switch (Chunk.id) {
 		case FCC('COMM'):
 			if (FAILED(ReadCommonTag(Chunk.size))) {
+				return E_FAIL;
+			}
+			break;
+		case FCC('FVER'):
+			if (m_pFile->ByteRead(&m_version, 4) != S_OK || m_version != AIFF_C_VERSION1) {
 				return E_FAIL;
 			}
 			break;
@@ -171,30 +178,50 @@ int CAIFFFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 
 HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 {
-#pragma pack(push, 2)
-	struct {
-		uint16_t numChannels;
-		uint32_t numSampleFrames;
-		uint16_t sampleSize;
-		uint16_t sampleRate_exp;
-		uint64_t sampleRate_val;
-	} data;
-#pragma pack(pop)
+	uint16_t data[9];
 
-	if (chunk_size < sizeof(data) || m_pFile->ByteRead(&data, sizeof(data)) != S_OK) {
+	if (chunk_size < 18 || m_pFile->ByteRead(&data, 18) != S_OK) {
 		return E_FAIL;
 	};
 
-	m_channels = _byteswap_ushort(data.numChannels);
-	m_bitdepth = _byteswap_ushort(data.sampleSize);
+	m_channels = _byteswap_ushort(data[0]);
+	m_bitdepth = _byteswap_ushort(data[3]);
 
-	int16_t exp = _byteswap_ushort(data.sampleRate_exp) - 16383 - 63;
-	uint64_t val = _byteswap_uint64(data.sampleRate_val);
+	int16_t exp = _byteswap_ushort(data[4]) - 16383 - 63;
+	uint64_t val = _byteswap_uint64(GETU64(&data[5]));
 	if (exp < -63 || exp > 63) {
 		DLog(L"CAIFFFile::ReadCommonTag() : exp %d is out of range", exp);
 		return E_FAIL;
 	}
 	m_samplerate = exp >= 0 ? val << exp : (val + (1ULL << (-exp - 1))) >> -exp;
+
+	if (m_version == AIFF_C_VERSION1) {
+		if (chunk_size < 18+4 || m_pFile->ByteRead(&data, 4) != S_OK) {
+			return E_FAIL;
+		};
+
+		uint32_t fourcc = GETU32(&data);
+		switch (fourcc) {
+		case FCC('NONE'):
+		case FCC('raw '):
+		case FCC('twos'):
+		case FCC('sowt'):
+		case FCC('in24'):
+		case FCC('in32'):
+		case FCC('fl32'):
+		case FCC('fl64'):
+			m_subtype = GetMediaSubtypeGUID(fourcc);
+			break;
+		case FCC('alaw'):
+			m_subtype = MEDIASUBTYPE_ALAW;
+			break;
+		case FCC('ulaw'):
+			m_subtype = MEDIASUBTYPE_MULAW;
+			break;
+		default:
+			return E_FAIL;
+		}
+	}
 
 	m_block_align = m_channels * m_bitdepth / 8;
 	m_nAvgBytesPerSec = m_samplerate * m_block_align;

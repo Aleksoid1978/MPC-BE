@@ -105,7 +105,7 @@ CAudioFile* CAudioFile::CreateFilter(CBaseSplitterFile* pFile)
 	else if (id == FCC('fLaC')) {
 		pAudioFile = DNew CFLACFile();
 	}
-	else if (id == FCC('FORM') && data.dw[2] == FCC('AIFF')) {
+	else if (id == FCC('FORM') && (data.dw[2] == FCC('AIFF') || data.dw[2] == FCC('AIFC'))) {
 		pAudioFile = DNew CAIFFFile();
 	}
 	else if (int id3v2_size = id3v2_match_len(data.b)) {
