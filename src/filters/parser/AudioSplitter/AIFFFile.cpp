@@ -123,7 +123,7 @@ HRESULT CAIFFFile::Open(CBaseSplitterFile* pFile)
 			break;
 		}
 
-		m_pFile->Seek(pos + Chunk.size);
+		m_pFile->Seek(pos + ALIGN(Chunk.size, 2));
 	}
 
 	m_pFile->Seek(m_startpos);
