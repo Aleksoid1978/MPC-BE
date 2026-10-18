@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2016 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,6 +30,6 @@ class CWave64File : public CWAVFile
 public:
 	CWave64File();
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	CString GetName() const { return L"Wave64"; };
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	LPCWSTR GetName() const override { return L"Wave64"; };
 };

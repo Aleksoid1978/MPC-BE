@@ -71,7 +71,7 @@ public:
 	virtual HRESULT Open(CBaseSplitterFile* pFile) PURE;
 	virtual REFERENCE_TIME Seek(REFERENCE_TIME rt) PURE;
 	virtual int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) PURE;
-	virtual CString GetName() const PURE;
+	virtual LPCWSTR GetName() const PURE;
 
 	bool ReadApeTag(size_t& size);
 	bool ReadID3Tag(const int64_t size);

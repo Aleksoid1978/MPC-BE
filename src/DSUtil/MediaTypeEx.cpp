@@ -344,8 +344,10 @@ CString CMediaTypeEx::ToString(IPin* pPin)
 					|| subtype != GUID_NULL) {
 				codec = GetAudioCodecName(subtype, wfe->wFormatTag);
 				if (codec == L"DTS" && wfe->cbSize == 1) {
-					const auto profile = (reinterpret_cast<const BYTE*>(wfe + 1))[0];
-					GetDTSHDDescription(profile, codec);
+					LPCWSTR desc = GetDTSHDDescription((reinterpret_cast<const BYTE*>(wfe + 1))[0]);
+					if (desc) {
+						codec = desc;
+					}
 				}
 				dim.Format(L"%uHz", wfe->nSamplesPerSec);
 				if (wfe->nChannels) {

@@ -247,8 +247,10 @@ CString GetMediaTypeDesc(const CMediaType* pmt, LPCWSTR pName)
 					CString codecName = CMediaTypeEx::GetAudioCodecName(pmt->subtype, pInfo->wFormatTag);
 					if (!codecName.IsEmpty()) {
 						if (codecName == L"DTS" && pInfo->cbSize == 1) {
-							const auto profile = (reinterpret_cast<const BYTE *>(pInfo + 1))[0];
-							GetDTSHDDescription(profile, codecName);
+							LPCWSTR desc = GetDTSHDDescription((reinterpret_cast<const BYTE*>(pInfo + 1))[0]);
+							if (desc) {
+								codecName = desc;
+							}
 						} else if (codecName == "TrueHD" && pInfo->cbSize == 1) {
 							const auto flag = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
 							if (flag == 1) {

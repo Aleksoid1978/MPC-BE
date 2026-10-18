@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2023 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -38,10 +38,10 @@ public:
 	CMPC7File();
 	~CMPC7File();
 
-	void SetProperties(IBaseFilter* pBF);
+	void SetProperties(IBaseFilter* pBF) override;
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"MusePack 7"; };
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	REFERENCE_TIME Seek(REFERENCE_TIME rt) override;
+	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) override;
+	LPCWSTR GetName() const override { return L"MusePack 7"; };
 };

@@ -1123,31 +1123,25 @@ int ParseDTSHDHeader(const BYTE* buf, const int buffsize /* = 0*/, audioframe_t*
 	return 0;
 }
 
-void GetDTSHDDescription(BYTE profile, CStringW& description)
+LPCWSTR GetDTSHDDescription(const BYTE profile)
 {
 	switch (profile) {
-		case DCA_PROFILE_HD_HRA:
-			description = L"DTS-HD HRA";
-			break;
-		case DCA_PROFILE_HD_MA:
-			description = L"DTS-HD MA";
-			break;
-		case DCA_PROFILE_EXPRESS:
-			description = L"DTS Express";
-			break;
-		case DCA_PROFILE_HD_MA_X:
-			description = L"DTS-HD MA + DTS:X";
-			break;
-		case DCA_PROFILE_HD_MA_X_IMAX:
-			description = L"DTS-HD MA + DTS:X IMAX";
-			break;
-		case DCA_PROFILE_HD_HRA_X:
-			description = L"DTS-HD HRA + DTS:X";
-			break;
-		case DCA_PROFILE_HD_HRA_X_IMAX:
-			description = L"DTS-HD HRA + DTS:X IMAX";
-			break;
+	case DCA_PROFILE_HD_HRA:
+		return L"DTS-HD HRA";
+	case DCA_PROFILE_HD_MA:
+		return L"DTS-HD MA";
+	case DCA_PROFILE_EXPRESS:
+		return L"DTS Express";
+	case DCA_PROFILE_HD_MA_X:
+		return L"DTS-HD MA + DTS:X";
+	case DCA_PROFILE_HD_MA_X_IMAX:
+		return L"DTS-HD MA + DTS:X IMAX";
+	case DCA_PROFILE_HD_HRA_X:
+		return L"DTS-HD HRA + DTS:X";
+	case DCA_PROFILE_HD_HRA_X_IMAX:
+		return L"DTS-HD HRA + DTS:X IMAX";
 	}
+	return nullptr;
 }
 
 // HDMV LPCM

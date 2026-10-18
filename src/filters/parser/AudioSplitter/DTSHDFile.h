@@ -1,5 +1,5 @@
 /*
- * (C) 2016-2023 see Authors.txt
+ * (C) 2016-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,8 +30,8 @@ class CDTSHDFile : public CAudioFile
 public:
 	CDTSHDFile();
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const;
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	REFERENCE_TIME Seek(REFERENCE_TIME rt) override;
+	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) override;
+	LPCWSTR GetName() const override;
 };

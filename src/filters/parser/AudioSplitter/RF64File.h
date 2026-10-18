@@ -27,6 +27,6 @@ class CRF64File : public CWAVFile
 public:
 	CRF64File();
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	CString GetName() const { return L"RF64"; };
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	LPCWSTR GetName() const override { return L"RF64"; };
 };

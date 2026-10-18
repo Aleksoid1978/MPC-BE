@@ -39,10 +39,10 @@ public:
 	CAIFFFile();
 	virtual ~CAIFFFile() = default;
 
-	void SetProperties(IBaseFilter* pBF);
+	void SetProperties(IBaseFilter* pBF) override;
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"AIFF"; };
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	REFERENCE_TIME Seek(REFERENCE_TIME rt) override;
+	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) override;
+	LPCWSTR GetName() const override { return L"AIFF"; };
 };

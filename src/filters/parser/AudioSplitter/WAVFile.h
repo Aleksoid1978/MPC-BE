@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2023 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -60,11 +60,11 @@ public:
 	CWAVFile() = default;
 	virtual ~CWAVFile();
 
-	bool SetMediaType(CMediaType& mt);
-	void SetProperties(IBaseFilter* pBF);
+	bool SetMediaType(CMediaType& mt) override;
+	void SetProperties(IBaseFilter* pBF) override;
 
-	HRESULT Open(CBaseSplitterFile* pFile);
-	REFERENCE_TIME Seek(REFERENCE_TIME rt);
-	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart);
-	CString GetName() const { return L"WAVE"; };
+	HRESULT Open(CBaseSplitterFile* pFile) override;
+	REFERENCE_TIME Seek(REFERENCE_TIME rt) override;
+	int GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart) override;
+	LPCWSTR GetName() const override { return L"WAVE"; };
 };

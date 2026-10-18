@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -401,22 +401,20 @@ static CString GetMediaTypeDesc(const CMediaType *pMediaType, const CHdmvClipInf
 						Infos.emplace_back(L"ADX ADPCM");
 					}
 					break;
-					case WAVE_FORMAT_DTS2: {
-						CStringW codecName;
+					case WAVE_FORMAT_DTS2:
 						if (pInfo->cbSize == 1) {
-							const auto profile = (reinterpret_cast<const BYTE*>(pInfo + 1))[0];
-							GetDTSHDDescription(profile, codecName);
-							Infos.emplace_back(codecName);
-						}
-						if (codecName.IsEmpty()) {
-							if (pPresentationDesc) {
-								Infos.emplace_back(pPresentationDesc);
-							} else {
-								Infos.emplace_back(L"DTS");
+							LPCWSTR desc = GetDTSHDDescription((reinterpret_cast<const BYTE*>(pInfo + 1))[0]);
+							if (desc) {
+								Infos.emplace_back(desc);
+								break;
 							}
 						}
-					}
-					break;
+						if (pPresentationDesc) {
+							Infos.emplace_back(pPresentationDesc);
+						} else {
+							Infos.emplace_back(L"DTS");
+						}
+						break;
 					case WAVE_FORMAT_DOLBY_AC3: {
 						Infos.emplace_back(L"Dolby Digital");
 					}

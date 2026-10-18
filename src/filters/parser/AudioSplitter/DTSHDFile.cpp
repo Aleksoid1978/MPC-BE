@@ -205,13 +205,15 @@ int CDTSHDFile::GetAudioFrame(CPacket* packet, REFERENCE_TIME rtStart)
 	return size;
 }
 
-CString CDTSHDFile::GetName() const {
-	CString name = L"DTS-HD";
-
+LPCWSTR CDTSHDFile::GetName() const
+{
 	if (m_extradata.Size() == 1) {
 		const auto profile = m_extradata[0];
-		GetDTSHDDescription(profile, name);
+		LPCWSTR desc = GetDTSHDDescription(profile);
+		if (desc) {
+			return desc;
+		}
 	}
 
-	return name;
+	return L"DTS-HD";
 };
