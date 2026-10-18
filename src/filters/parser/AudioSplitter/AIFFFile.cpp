@@ -216,15 +216,17 @@ HRESULT CAIFFFile::ReadCommonTag(const DWORD chunk_size)
 			m_subtype = GetMediaSubtypeGUID(fourcc);
 			break;
 		case FCC('alaw'):
+			m_wFormatTag = WAVE_FORMAT_ALAW;
 			m_subtype = MEDIASUBTYPE_ALAW;
 			break;
 		case FCC('ulaw'):
+			m_wFormatTag = WAVE_FORMAT_MULAW;
 			m_subtype = MEDIASUBTYPE_MULAW;
 			break;
 		case FCC('ima4'):
 			m_subtype = MEDIASUBTYPE_IMA4;
 			m_block_align = m_channels * 34;
-			m_nAvgBytesPerSec = m_samplerate * m_block_align / 64;
+			m_block_align_samples = 64;
 			break;
 		default:
 			return E_FAIL;

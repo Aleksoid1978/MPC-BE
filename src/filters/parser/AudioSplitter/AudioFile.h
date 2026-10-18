@@ -1,5 +1,5 @@
 /*
- * (C) 2014-2024 see Authors.txt
+ * (C) 2014-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,6 +40,10 @@ protected:
 	int   m_bitdepth = 0;
 	int   m_channels = 0;
 	DWORD m_layout = 0;
+
+	int   m_block_align = 0;
+	int   m_block_align_samples = 1;
+
 	GUID  m_subtype = GUID_NULL;
 	WORD  m_wFormatTag = 0;
 

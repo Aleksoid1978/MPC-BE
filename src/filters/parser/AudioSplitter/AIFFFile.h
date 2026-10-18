@@ -1,5 +1,5 @@
 /*
- * (C) 2020 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -28,7 +28,6 @@ protected:
 	uint32_t m_version = 0;
 	__int64 m_length = 0;
 
-	WORD m_block_align = 0;
 	int  m_block_size = 0;
 
 	std::map<DWORD, CString> m_info;

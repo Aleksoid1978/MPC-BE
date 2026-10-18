@@ -156,13 +156,18 @@ bool CAudioFile::SetMediaType(CMediaType& mt)
 	mt.subtype				= m_subtype;
 	mt.SetSampleSize(256000);
 
+	if (!m_block_align) {
+		m_block_align = m_channels * m_bitdepth / 8;
+		m_block_align_samples = 1;
+	}
+
 	WAVEFORMATEX* wfe		= (WAVEFORMATEX*)mt.AllocFormatBuffer(sizeof(WAVEFORMATEX) + m_extradata.Bytes());
 	wfe->wFormatTag			= m_wFormatTag;
 	wfe->nChannels			= m_channels;
 	wfe->nSamplesPerSec		= m_samplerate;
 	wfe->wBitsPerSample		= m_bitdepth;
-	wfe->nBlockAlign		= m_channels * m_bitdepth / 8;
-	wfe->nAvgBytesPerSec	= wfe->nSamplesPerSec * wfe->nBlockAlign;
+	wfe->nBlockAlign		= m_block_align;
+	wfe->nAvgBytesPerSec	= m_block_align * m_samplerate / m_block_align_samples;
 	wfe->cbSize				= static_cast<WORD>(m_extradata.Bytes());
 	memcpy(wfe + 1, m_extradata.Data(), m_extradata.Bytes());
 
