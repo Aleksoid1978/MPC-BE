@@ -2147,15 +2147,50 @@ HRESULT CMpaDecFilter::CheckInputType(const CMediaType* mtIn)
 				}
 			}
 		}
-	} else if (mtIn->subtype == MEDIASUBTYPE_PS2_ADPCM) {
-		WAVEFORMATEXPS2* wfe = (WAVEFORMATEXPS2*)mtIn->Format();
-		if (wfe->dwInterleave & 0xf) { // has to be a multiple of the block size (16 bytes)
-			return VFW_E_TYPE_NOT_ACCEPTED;
-		}
-	} else if (mtIn->subtype == MEDIASUBTYPE_IEEE_FLOAT) {
-		WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
-		if (wfe->wBitsPerSample != 64) {    // only for 64-bit float PCM
-			return VFW_E_TYPE_NOT_ACCEPTED; // not needed any decoders for 32-bit float
+	}
+	else {
+		DWORD fourcc = 0;
+		if (GetMediaTypeFourcc(mtIn->subtype, fourcc) && mtIn->FormatLength() >= sizeof(WAVEFORMATEX)) {
+			WAVEFORMATEX* wfe = (WAVEFORMATEX*)mtIn->Format();
+
+			switch (fourcc) {
+			case WAVE_FORMAT_PS2_ADPCM:
+				if (mtIn->FormatLength() < sizeof(WAVEFORMATEXPS2)
+					|| ((WAVEFORMATEXPS2*)wfe)->dwInterleave & 0xf) // has to be a multiple of the block size (16 bytes)
+				{
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			case FCC('NONE'):
+				if (wfe->wBitsPerSample != 8) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			case MAKEFOURCC('r','a','w',0x20):
+			case FCC('twos'):
+			case FCC('sowt'):
+				if (wfe->wBitsPerSample != 16 && wfe->wBitsPerSample != 8) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			case FCC('in24'):
+				if (wfe->wBitsPerSample != 24) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			case FCC('in32'):
+			case FCC('fl32'):
+				if (wfe->wBitsPerSample != 32) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			case WAVE_FORMAT_IEEE_FLOAT: // only for 64-bit float WAVE PCM, not needed any decoders for 32-bit float
+			case FCC('fl64'):
+				if (wfe->wBitsPerSample != 64) {
+					return VFW_E_TYPE_NOT_ACCEPTED;
+				}
+				break;
+			}
 		}
 	}
 

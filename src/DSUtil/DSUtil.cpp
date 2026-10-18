@@ -1442,6 +1442,15 @@ CStringW CStringFromGUID(const GUID& guid)
 	return str;
 }
 
+bool GetMediaTypeFourcc(const GUID& guid, DWORD& fourcc)
+{
+	if (memcmp(&guid.Data2, &MEDIASUBTYPE_YUY2.Data2, sizeof(GUID) - sizeof(GUID::Data1)) == 0) {
+		fourcc = guid.Data1;
+		return true;
+	}
+	return false;
+}
+
 int MakeAACInitData(BYTE* pData, int profile, int freq, int channels)
 {
 	int srate_idx;
