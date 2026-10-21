@@ -66,7 +66,7 @@ int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	const std::list<CString> chkbytes = {
+	const std::vector<LPCWSTR> chkbytes = {
 		L"0,4,,52494646,8,4,,41564920", // 'RIFF....AVI '
 		L"0,4,,52494646,8,4,,41564958", // 'RIFF....AVIX'
 		L"0,4,,52494646,8,4,,414D5620", // 'RIFF....AMV '

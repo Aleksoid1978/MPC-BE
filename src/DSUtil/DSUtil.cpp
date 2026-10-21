@@ -1602,17 +1602,16 @@ void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkb
 	va_end(marker);
 }
 
-void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CStringW>& chkbytes, LPCWSTR ext, ...)
+void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::vector<LPCWSTR>& chkbytes, LPCWSTR ext, ...)
 {
 	CStringW null = CStringFromGUID(GUID_NULL);
 	CStringW majortype = CStringFromGUID(MEDIATYPE_Stream);
 	CStringW subtype = CStringFromGUID(subtype2);
 
-	auto it = chkbytes.begin();
-	for (int i = 0; it != chkbytes.end(); i++) {
+	for (int i = 0; i < chkbytes.size(); i++) {
 		CStringW idx;
 		idx.Format(L"%d", i);
-		SetRegKeyValue(L"Media Type\\" + majortype, subtype, idx, *it++);
+		SetRegKeyValue(L"Media Type\\" + majortype, subtype, idx, chkbytes[i]);
 	}
 
 	SetRegKeyValue(L"Media Type\\" + majortype, subtype, L"Source Filter", CStringFromGUID(clsid));

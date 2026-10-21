@@ -78,7 +78,7 @@ STDAPI DllRegisterServer()
 	DeleteRegKey(L"Media Type\\Extensions\\", L".mp4");
 	DeleteRegKey(L"Media Type\\Extensions\\", L".mov");
 
-	const std::list<CString> chkbytes = {
+	const std::vector<LPCWSTR> chkbytes = {
 		L"4,4,,66747970", // '....ftyp'
 		L"4,4,,6d6f6f76", // '....moov'
 		L"4,4,,6d646174", // '....mdat'

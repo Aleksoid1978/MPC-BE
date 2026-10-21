@@ -121,7 +121,7 @@ extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValu
 extern bool				SetRegKeyValue(LPCWSTR pszKey, LPCWSTR pszSubkey, LPCWSTR pszValue);
 
 extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, LPCWSTR chkbytes, LPCWSTR ext = nullptr, ...);
-extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::list<CStringW>& chkbytes, LPCWSTR ext = nullptr, ...);
+extern void				RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::vector<LPCWSTR>& chkbytes, LPCWSTR ext = nullptr, ...);
 extern void				UnRegisterSourceFilter(const GUID& subtype);
 
 extern CStringW			GetDXVAModeString(const GUID& guidDecoder);

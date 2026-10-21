@@ -114,7 +114,7 @@ STDAPI DllRegisterServer()
 {
 	DeleteRegKey(L"Media Type\\Extensions\\", L".flv");
 
-	const std::list<CString> chkbytes = {
+	const std::vector<LPCWSTR> chkbytes = {
 		L"0,4,,464C5601",   // 'FLV\01'
 		L"0,4,,584C5646",   // 'XLVF'
 		L"0,5,,4B444B0000", // 'KDK\00\00'

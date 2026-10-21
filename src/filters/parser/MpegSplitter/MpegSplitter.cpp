@@ -78,7 +78,7 @@ STDAPI DllRegisterServer()
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PROGRAM, L"0,5,FFFFFFFFC0,000001BA40", nullptr);
 	RegisterSourceFilter(CLSID_AsyncReader, MEDIASUBTYPE_MPEG2_PVA, L"0,8,fffffc00ffe00000,4156000055000000", nullptr);
 
-	const std::list<CString> chkbytes = {
+	const std::vector<LPCWSTR> chkbytes = {
 		L"0,1,,47,188,1,,47,376,1,,47",
 		L"4,1,,47,196,1,,47,388,1,,47",
 		L"0,4,,54467263,1660,1,,47",    // TFrc

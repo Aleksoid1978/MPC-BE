@@ -53,7 +53,7 @@ int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	const std::list<CStringW> chkbytes = {
+	const std::vector<LPCWSTR> chkbytes = {
 		L"0,4,,4D414320",                  // 'MAC '
 		L"0,4,,7442614B",                  // 'tBaK'
 		L"0,4,,54544131",                  // 'TTA1'
