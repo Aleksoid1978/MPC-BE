@@ -261,22 +261,22 @@ void CMPC8File::ReadChapter(const uint64_t size)
 		if (APEChapters.ReadFooter(ptr.get(), footer_size) && APEChapters.GetTagSize()) {
 			const auto tag_size = APEChapters.GetTagSize();
 			if (tag_size == (buf_size - footer_size) && APEChapters.ReadTags(ptr.get() + footer_size, tag_size)) {
-				CString track, title;
+				CStringW track, title;
 				for (const auto& [key, desc, value] : APEChapters.TagItems) {
 					std::visit(overloaded{
 						[&](const CStringW& tagValue) {
-							CString tagKey(key); tagKey.MakeLower();
+							CStringW tagKey(key); tagKey.MakeLower();
 							if (tagKey == L"track") {
-								track = std::get<CString>(value);
+								track = std::get<CStringW>(value);
 							} else if (tagKey == L"title") {
-								title = std::get<CString>(value);
+								title = std::get<CStringW>(value);
 							}
 						},
 						[&](const auto& tagValue) {},
 					}, value);
 				}
 
-				CString chapterTitle;
+				CStringW chapterTitle;
 				if (!track.IsEmpty() && !title.IsEmpty()) {
 					chapterTitle.Format(L"%s - %s", title.GetString(), track.GetString());
 				} else if (!title.IsEmpty()) {

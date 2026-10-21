@@ -402,13 +402,13 @@ void CDFFFile::SetProperties(IBaseFilter* pBF)
 			for (const auto& [tag, value] : m_info) {
 				switch (tag) {
 				case FCC('DITI'):
-					pPB->SetProperty(L"TITL", CString(value));
+					pPB->SetProperty(L"TITL", CStringW(value));
 					break;
 				case FCC('DIAR'):
-					pPB->SetProperty(L"AUTH", CString(value));
+					pPB->SetProperty(L"AUTH", CStringW(value));
 					break;
 				case FCC('COMT'):
-					pPB->SetProperty(L"DESC", CString(value));
+					pPB->SetProperty(L"DESC", CStringW(value));
 				}
 			}
 		}

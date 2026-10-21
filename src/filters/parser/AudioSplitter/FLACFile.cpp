@@ -58,7 +58,7 @@ void CFLACFile::SetProperties(IBaseFilter* pBF)
 {
 	if (m_info.got_vorbis_comments) {
 		if (CComQIPtr<IDSMPropertyBag> pPB = pBF) {
-			CString title = m_info.title;
+			CStringW title = m_info.title;
 			if (!title.IsEmpty() && !m_info.year.IsEmpty()) {
 				title += L" (" + m_info.year + L")";
 			}
@@ -224,10 +224,10 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 		m_totalsamples = si.total_samples;
 		m_rtduration   = (m_totalsamples * UNITS) / m_samplerate;
 	} else if (pMetadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
-		const auto ParseVorbisTag = [](const CString& field_name, const CString& VorbisTag, CString& TagValue) {
+		const auto ParseVorbisTag = [](const CStringW& field_name, const CStringW& VorbisTag, CStringW& TagValue) {
 			TagValue.Empty();
 
-			CString vorbis_data(VorbisTag);
+			CStringW vorbis_data(VorbisTag);
 			vorbis_data.MakeLower().Trim();
 			if (vorbis_data.Find(field_name + L'=') != 0) {
 				return false;
@@ -244,8 +244,8 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 
 		m_info.got_vorbis_comments = (vc.num_comments > 0);
 		for (unsigned i = 0; i < vc.num_comments; i++) {
-			CString TagValue;
-			CString VorbisTag = AltUTF8ToWStr((LPCSTR)vc.comments[i].entry);
+			CStringW TagValue;
+			CStringW VorbisTag = AltUTF8ToWStr((LPCSTR)vc.comments[i].entry);
 			if (VorbisTag.GetLength() > 0) {
 				if (ParseVorbisTag(L"artist", VorbisTag, TagValue)) {
 					if (m_info.artist.IsEmpty()) {
@@ -264,7 +264,7 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 				} else if (ParseVorbisTag(L"album", VorbisTag, TagValue)) {
 					m_info.album = TagValue;
 				} else if (ParseVorbisTag(L"cuesheet", VorbisTag, TagValue)) {
-					CString Title, Performer;
+					CStringW Title, Performer;
 					std::list<Chapters> chapters;
 					if (ParseCUESheet(TagValue, chapters, Title, Performer)) {
 						m_chapters = chapters;
@@ -306,16 +306,16 @@ void CFLACFile::UpdateFromMetadata(void* pBuffer)
 			}
 
 			REFERENCE_TIME rt = MILLISECONDS_TO_100NS_UNITS(1000 * track.offset / m_samplerate);
-			CString s;
-			s.Format(L"Track %02u", i + 1);
-			m_chapters.emplace_back(s, rt);
+			CStringW str;
+			str.Format(L"Track %02u", i + 1);
+			m_chapters.emplace_back(str, rt);
 
 			if (track.num_indices > 1) {
 				for (int j = 0; j < track.num_indices; ++j) {
 					const auto& index = track.indices[j];
-					s.Format(L"+ INDEX %02d", index.number);
+					str.Format(L"+ INDEX %02d", index.number);
 					const auto rtIndex = rt + MILLISECONDS_TO_100NS_UNITS(1000 * index.offset / m_samplerate);
-					m_chapters.emplace_back(s, rtIndex);
+					m_chapters.emplace_back(str, rtIndex);
 				}
 			}
 		}

@@ -53,7 +53,7 @@ int g_cTemplates = std::size(g_Templates);
 
 STDAPI DllRegisterServer()
 {
-	const std::list<CString> chkbytes = {
+	const std::list<CStringW> chkbytes = {
 		L"0,4,,4D414320",                  // 'MAC '
 		L"0,4,,7442614B",                  // 'tBaK'
 		L"0,4,,54544131",                  // 'TTA1'
@@ -196,7 +196,7 @@ HRESULT CAudioSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 			CStringW cuetextW = UTF8ToWStr(cuetextA);
 			std::list<Chapters> ChaptersList;
-			CString sTitle, sPerformer;
+			CStringW sTitle, sPerformer;
 
 			if (ParseCUESheet(cuetextW, ChaptersList, sTitle, sPerformer)) {
 				if (CComQIPtr<IDSMPropertyBag> pPB = this) {

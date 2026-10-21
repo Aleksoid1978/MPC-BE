@@ -173,16 +173,16 @@ void CWAVFile::SetProperties(IBaseFilter* pBF)
 			for (const auto& [tag, value] : m_info) {
 				switch (tag) {
 				case FCC('INAM'):
-					pPB->SetProperty(L"TITL", CString(value));
+					pPB->SetProperty(L"TITL", CStringW(value));
 					break;
 				case FCC('IART'):
-					pPB->SetProperty(L"AUTH", CString(value));
+					pPB->SetProperty(L"AUTH", CStringW(value));
 					break;
 				case FCC('ICOP'):
-					pPB->SetProperty(L"CPYR", CString(value));
+					pPB->SetProperty(L"CPYR", CStringW(value));
 					break;
 				case FCC('ISBJ'):
-					pPB->SetProperty(L"DESC", CString(value));
+					pPB->SetProperty(L"DESC", CStringW(value));
 					break;
 				}
 			}

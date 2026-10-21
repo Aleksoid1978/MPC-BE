@@ -31,11 +31,11 @@ class CFLACFile : public CAudioFile
 	uint64_t m_totalsamples = 0;
 
 	struct {
-		CString title;
-		CString artist;
-		CString comment;
-		CString year;
-		CString album;
+		CStringW title;
+		CStringW artist;
+		CStringW comment;
+		CStringW year;
+		CStringW album;
 		bool got_vorbis_comments = false;
 	} m_info;
 

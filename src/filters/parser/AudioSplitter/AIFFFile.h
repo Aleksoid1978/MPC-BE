@@ -30,7 +30,7 @@ protected:
 
 	int  m_block_size = 0;
 
-	std::map<DWORD, CString> m_info;
+	std::map<DWORD, CStringW> m_info;
 
 	HRESULT ReadCommonTag(const DWORD chunk_size);
 	HRESULT ReadMetadataTag(const DWORD chunk_id, const DWORD chunk_size);
