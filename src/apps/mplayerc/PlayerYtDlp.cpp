@@ -1065,7 +1065,7 @@ bool YT_DLP::Parse_URL(const CStringW& url)
 
 	CAppSettings& s = AfxGetAppSettings();
 
-	const CStringA audioLang = s.strYdlAudioLang;
+	const CStringA audioLang(s.strYdlAudioLang);
 	const CStringW ydl_path = GetFullExePath(s.strYdlExePath, true);
 	if (ydl_path.IsEmpty()) {
 		return false;
