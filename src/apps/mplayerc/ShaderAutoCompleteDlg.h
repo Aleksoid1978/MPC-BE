@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -40,7 +40,6 @@ public:
 		LPCWSTR name;
 		LPCWSTR desc;
 	};
-	static const std::vector<hlslfunc_t> m_HLSLFuncs;
 
 	enum { IDD = IDD_SHADERAUTOCOMPLETE_DLG };
 
