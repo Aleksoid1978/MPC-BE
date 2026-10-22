@@ -1,5 +1,5 @@
 /*
- * (C) 2017-2022 see Authors.txt
+ * (C) 2017-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -19,6 +19,9 @@
  */
 
 #pragma once
+
+extern CStringW GetDXVAModeString(const GUID& guidDecoder);
+extern CStringW GetDXVAModeStringAndName(const GUID& guidDecoder);
 
 namespace DXVAState {
 	void ClearState();
