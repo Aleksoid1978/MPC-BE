@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -479,7 +479,7 @@ bool CIfoFile::OpenVOB(CVobFile* vobfile)
 	}
 
 	CStringW fn = m_ifoFilename.Left(m_ifoFilename.GetLength() - 5);
-	std::list<CStringW> vobs;
+	std::vector<CStringW> vobs;
 	for(int i = 1; i < 9; i++) { // skip VTS_xx_0.VOB
 		CStringW vob;
 		if (m_bAOB) {

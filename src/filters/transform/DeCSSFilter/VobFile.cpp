@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -375,7 +375,7 @@ CVobFile::~CVobFile()
 	Close();
 }
 
-bool CVobFile::OpenVOBs(const std::list<CStringW>& vobs)
+bool CVobFile::OpenVOBs(const std::vector<CStringW>& vobs)
 {
 	Close();
 

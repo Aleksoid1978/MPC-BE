@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -100,7 +100,7 @@ public:
 	CVobFile();
 	virtual ~CVobFile();
 
-	bool OpenVOBs(const std::list<CStringW>& files); // vts vobs
+	bool OpenVOBs(const std::vector<CStringW>& files); // vts vobs
 	bool SetOffsets(int start_sector, int end_sector = -1); // video vob offset in lba
 	void Close();
 
