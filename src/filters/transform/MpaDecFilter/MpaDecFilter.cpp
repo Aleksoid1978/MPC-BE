@@ -1879,6 +1879,9 @@ HRESULT CMpaDecFilter::AC3Encode(const BYTE* pBuff, const size_t size, REFERENCE
 		m_Mixer.UpdateInput(sfmt, dwChannelMask, nSamplesPerSec);
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, new_layout, new_samplerate);
 		int added = m_Mixer.CalcOutSamples(nSamples) * new_channels;
+		if (added <= 0) {
+			return E_FAIL;
+		}
 		m_encbuff.resize(remain + added);
 		p = m_encbuff.data() + remain;
 

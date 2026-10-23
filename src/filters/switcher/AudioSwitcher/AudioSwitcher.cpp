@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -295,6 +295,9 @@ HRESULT CAudioSwitcherFilter::Transform(IMediaSample* pIn, IMediaSample* pOut)
 		m_Mixer.UpdateOutput(SAMPLE_FMT_FLT, output_layout, output_samplerate);
 
 		int mix_samples = m_Mixer.CalcOutSamples(audio_samples);
+		if (mix_samples <= 0) {
+			return E_FAIL;
+		}
 
 		BYTE* mix_data;
 		if (output_sampleformat == SAMPLE_FMT_FLT) {

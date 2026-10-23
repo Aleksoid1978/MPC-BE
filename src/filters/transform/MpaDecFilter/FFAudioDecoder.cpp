@@ -593,6 +593,9 @@ HRESULT CFFAudioDecoder::ReceiveData(std::vector<BYTE>& BuffOut, size_t& outputS
 				samplefmt = SAMPLE_FMT_FLT;
 
 				auto out_samples = m_Mixer.CalcOutSamples(nSamples);
+				if (out_samples <= 0) {
+					return E_INVALIDARG;
+				}
 				outputSize = static_cast<size_t>(out_samples) * m_MixerChannels * sizeof(float);
 				if (outputSize > BuffOut.size()) {
 					BuffOut.resize(outputSize);
