@@ -588,6 +588,10 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
     }
 
     usac->core_sbr_frame_len_idx = get_bits(gb, 3); /* coreSbrFrameLengthIndex */
+    if (usac->core_sbr_frame_len_idx == 2 || usac->core_sbr_frame_len_idx == 4) {
+        avpriv_report_missing_feature(avctx, "USAC SBR with a ratio other than 2:1");
+        return AVERROR_PATCHWELCOME;
+    }
     m4ac->frame_length_short = usac->core_sbr_frame_len_idx == 0 ||
                                usac->core_sbr_frame_len_idx == 2;
 
@@ -619,6 +623,7 @@ int ff_aac_usac_config_decode(AACDecContext *ac, AVCodecContext *avctx,
 
     m4ac->sampling_index = ff_aac_sample_rate_idx(m4ac->sample_rate);
     m4ac->sbr = sbr_ratio > 0;
+    m4ac->chan_config = 0;
 
     channel_config_idx = get_bits(gb, 5); /* channelConfigurationIndex */
     if (!channel_config_idx) {
@@ -1784,7 +1789,8 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
             ret = ff_aac_ldp_parse_channel_stream(ac, usac, ue, gb);
             if (ret < 0)
                 return ret;
-            continue;
+            avpriv_report_missing_feature(ac->avctx, "AAC USAC LPD");
+            return AVERROR_PATCHWELCOME;
         }
 
         if ((core_nb_channels == 1) ||
@@ -1871,12 +1877,12 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
         }
     }
 
-    if (ec->sbr.ratio) {
-        int sbr_ch = nb_channels;
-        if (nb_channels == 2 &&
-            !(ec->stereo_config_index == 0 || ec->stereo_config_index == 3))
-            sbr_ch = 1;
+    int sbr_ch = nb_channels;
+    if (nb_channels == 2 &&
+        !(ec->stereo_config_index == 0 || ec->stereo_config_index == 3))
+        sbr_ch = 1;
 
+    if (ec->sbr.ratio) {
         ret = ff_aac_sbr_decode_usac_data(ac, che, ec, gb, sbr_ch, indep_flag);
         if (ret < 0)
             return ret;
@@ -1891,10 +1897,15 @@ static int decode_usac_core_coder(AACDecContext *ac, AACUSACConfig *usac,
     spectrum_decode(ac, usac, che, core_nb_channels);
 
     if (ac->oc[1].m4ac.sbr > 0) {
-        ac->proc.sbr_apply(ac, che, nb_channels == 2 ? TYPE_CPE : TYPE_SCE, 0,
+        ac->proc.sbr_apply(ac, che, sbr_ch == 2 ? TYPE_CPE : TYPE_SCE, 0,
                            che->ch[0].output,
                            che->ch[1].output);
     }
+
+    /* The MPS212 upmix is not implemented, output the downmix on both channels */
+    if (sbr_ch < nb_channels)
+        memcpy(che->ch[1].output, che->ch[0].output,
+               ac->frame->nb_samples * sizeof(*che->ch[0].output));
 
     return 0;
 }
@@ -1922,8 +1933,6 @@ static int parse_audio_preroll(AACDecContext *ac, GetBitContext *gb)
     if (ret < 0) {
         *m4ac = m4ac_bak;
         return ret;
-    } else {
-        ac->oc[1].m4ac.chan_config = 0;
     }
 
     /* 7.18.3.3 Bitrate adaption
@@ -2168,6 +2177,7 @@ int ff_aac_usac_decode_frame(AVCodecContext *avctx, AACDecContext *ac,
     if (ac->oc[1].status && audio_found) {
         avctx->sample_rate = ac->oc[1].m4ac.ext_sample_rate;
         avctx->frame_size = samples;
+        avctx->seek_preroll = FFMAX(avctx->seek_preroll, samples);
         ac->oc[1].status = OC_LOCKED;
     }
 

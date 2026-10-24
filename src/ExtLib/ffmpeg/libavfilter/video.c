@@ -46,6 +46,15 @@ AVFrame *ff_null_get_video_buffer(AVFilterLink *link, int w, int h)
     return ff_get_video_buffer(link->dst->outputs[0], w, h);
 }
 
+static void set_link_props(AVFrame *frame, const AVFilterLink *link)
+{
+    frame->sample_aspect_ratio = link->sample_aspect_ratio;
+    frame->colorspace  = link->colorspace;
+    frame->color_range = link->color_range;
+    frame->alpha_mode  = link->alpha_mode;
+    frame->chroma_location = link->chroma_location;
+}
+
 AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int align)
 {
     FilterLinkInternal *const li = ff_link_internal(link);
@@ -73,11 +82,7 @@ AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int alig
     if (!frame)
         return NULL;
 
-    frame->sample_aspect_ratio = link->sample_aspect_ratio;
-    frame->colorspace  = link->colorspace;
-    frame->color_range = link->color_range;
-    frame->alpha_mode  = link->alpha_mode;
-    frame->chroma_location = link->chroma_location;
+    set_link_props(frame, link);
 
     return frame;
 }
@@ -85,6 +90,31 @@ AVFrame *ff_default_get_video_buffer2(AVFilterLink *link, int w, int h, int alig
 AVFrame *ff_default_get_video_buffer(AVFilterLink *link, int w, int h)
 {
     return ff_default_get_video_buffer2(link, w, h, av_cpu_max_align());
+}
+
+AVFrame *ff_hwupload_get_video_buffer(AVFilterLink *link, int w, int h)
+{
+    AVBufferRef *hw_frames_ctx = ff_filter_link(link->dst->outputs[0])->hw_frames_ctx;
+    AVFrame *frame;
+
+    if (!hw_frames_ctx || ff_filter_link(link)->hw_frames_ctx)
+        return ff_default_get_video_buffer(link, w, h);
+
+    frame = av_frame_alloc();
+    if (!frame)
+        return NULL;
+
+    frame->format = link->format;
+    frame->width  = w;
+    frame->height = h;
+    if (av_hwframe_get_transfer_buffer(hw_frames_ctx, frame) < 0) {
+        av_frame_free(&frame);
+        return NULL;
+    }
+
+    set_link_props(frame, link);
+
+    return frame;
 }
 
 AVFrame *ff_get_video_buffer(AVFilterLink *link, int w, int h)

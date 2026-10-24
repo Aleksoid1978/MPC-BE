@@ -74,26 +74,6 @@ const char *ff_sws_op_type_name(SwsOpType op);
 /* Compute SwsCompMask from values with denominator != 0 */
 SwsCompMask ff_sws_comp_mask_q4(const AVRational64 q[4]);
 
-typedef enum SwsCompFlags {
-    SWS_COMP_GARBAGE = 1 << 0, /* contents are undefined / garbage data */
-    SWS_COMP_EXACT   = 1 << 1, /* value is an exact integer */
-    SWS_COMP_ZERO    = 1 << 2, /* known to be a constant zero */
-    SWS_COMP_SWAPPED = 1 << 3, /* byte order is swapped */
-    SWS_COMP_COPY    = 1 << 4, /* value is unmodified from the source plane */
-    SWS_COMP_CONST   = 1 << 5, /* value is a fixed constant */
-} SwsCompFlags;
-
-typedef struct SwsComps {
-    SwsCompFlags flags[4]; /* knowledge about (output) component contents */
-
-    /* Keeps track of the known possible value range, or {0, 0} for undefined
-     * or (unknown range) floating point inputs */
-    AVRational64 min[4], max[4];
-
-    /* Keeps track of input (forward) and output (reverse) dependencies */
-    SwsCompMask dep_in[4], dep_out[4];
-} SwsComps;
-
 typedef enum SwsReadWriteMode {
     /**
      * Note: 1-component reads are either SWS_RW_PLANAR or SWS_RW_PACKED,
@@ -119,6 +99,7 @@ typedef struct SwsReadWriteOp {
      *   rgb4      = 1x u8 (frac 1)
      *   pal8      = 4x u8 (palette)
      */
+    SwsPixelType type;     /* pixel type to read */
     SwsReadWriteMode mode; /* how data is laid out in memory */
     uint8_t elems; /* number of elements (of type `op.type`) to read/write */
     uint8_t frac;  /* fractional pixel step factor (log2) */
@@ -165,7 +146,8 @@ typedef struct SwsShiftOp {
 } SwsShiftOp;
 
 typedef struct SwsClearOp {
-    SwsCompMask mask;    /* mask of components to clear */
+    SwsPixelType type[4];  /* type of each value */
+    SwsCompMask mask;      /* mask of components to clear */
     AVRational64 value[4]; /* value to set */
 } SwsClearOp;
 
@@ -189,6 +171,12 @@ typedef struct SwsDitherOp {
 } SwsDitherOp;
 
 typedef struct SwsLinearOp {
+    /**
+     * Pixel type per output component. This must match the type of incoming
+     * values, as determined by the weights matrix.
+     */
+    SwsPixelType type[4];
+
     /**
      * Generalized 5x5 affine transformation:
      *   [ Out.x ] = [ A B C D E ]
@@ -238,9 +226,31 @@ typedef struct SwsLut3dOp {
     bool dynamic;
 } SwsLut3dOp;
 
-typedef struct SwsOp {
-    SwsOpType op;      /* operation to perform */
-    SwsPixelType type; /* pixel type to operate on */
+typedef enum SwsCompFlags {
+    SWS_COMP_EXACT   = 1 << 0, /* value is an exact integer */
+    SWS_COMP_ZERO    = 1 << 1, /* known to be a constant zero */
+    SWS_COMP_SWAPPED = 1 << 2, /* byte order is swapped */
+    SWS_COMP_COPY    = 1 << 3, /* value is unmodified from the source plane */
+    SWS_COMP_CONST   = 1 << 4, /* value is a fixed constant */
+} SwsCompFlags;
+
+typedef struct SwsOpPad {
+    SwsPixelType type;  /* pixel type of this output component */
+    SwsCompFlags flags; /* knowledge about component contents */
+
+    /* Keeps track of the known possible value range, or {0, 0} for undefined
+     * or (unknown range) floating point inputs */
+    AVRational64 min, max;
+
+    /* Keeps track of input (forward) and output (reverse) dependencies */
+    SwsCompMask dep_in, dep_out;
+} SwsOpPad;
+
+typedef struct SwsOp     SwsOp;
+typedef struct SwsOpList SwsOpList;
+
+struct SwsOp {
+    SwsOpType op;
     union {
         SwsLinearOp     lin;
         SwsReadWriteOp  rw;
@@ -258,15 +268,18 @@ typedef struct SwsOp {
 
     /**
      * Metadata about the operation's input/output components. Discarded
-     * and regenerated automatically by `ff_sws_op_list_update_comps()`.
+     * and regenerated automatically by `ff_sws_op_list_update()`.
      *
      * Note that backends may rely on the presence and accuracy of this
      * metadata for all operations, during ff_sws_ops_compile().
      */
-    SwsComps comps;
-} SwsOp;
+    SwsOpPad outputs[4];
 
-#define SWS_OP_NEEDED(op, idx) (!((op)->comps.flags[idx] & SWS_COMP_GARBAGE))
+    /* Link back to the SwsOpList that owns this operation */
+    SwsOpList *ops;
+};
+
+#define SWS_OP_NEEDED(op, idx) ((op)->outputs[idx].dep_out != 0)
 
 /* Compute SwsCompMask from a mask of needed components */
 SwsCompMask ff_sws_comp_mask_needed(const SwsOp *op);
@@ -277,19 +290,27 @@ SwsCompMask ff_sws_comp_mask_needed(const SwsOp *op);
 int ff_sws_rw_op_planes(const SwsOp *op);
 
 /**
+ * Return the input/output type of an operation, if all inputs/outputs are
+ * the same type, or SWS_PIXEL_NONE if no type can be established.
+ */
+SwsPixelType ff_sws_op_input_type(const SwsOp *op);
+SwsPixelType ff_sws_op_output_type(const SwsOp *op);
+
+/**
  * Describe an operation in human-readable form.
  */
 void ff_sws_op_desc(AVBPrint *bp, const SwsOp *op);
 
 /**
- * Frees any allocations associated with an SwsOp and sets it to {0}.
- */
-void ff_sws_op_uninit(SwsOp *op);
-
-/**
  * Apply an operation to an AVRational64. No-op for read/write operations.
  */
 void ff_sws_apply_op_q(const SwsOp *op, AVRational64 x[4]);
+
+/**
+ * Return the previous/next operation in the list, or NULL if there is none.
+ */
+const SwsOp *ff_sws_op_prev(const SwsOp *op);
+const SwsOp *ff_sws_op_next(const SwsOp *op);
 
 /**
  * Helper struct for representing a list of operations.
@@ -313,7 +334,7 @@ typedef struct SwsOpList {
      * The default value of {0} is safe to pass in the case that no additional
      * information is known.
      */
-    SwsComps comps_src;
+    SwsOpPad inputs[4];
 } SwsOpList;
 
 SwsOpList *ff_sws_op_list_alloc(void);
@@ -346,11 +367,6 @@ const SwsOp *ff_sws_op_list_output(const SwsOpList *ops);
 bool ff_sws_op_list_is_noop(const SwsOpList *ops);
 
 /**
- * Returns the size of the largest pixel type used in `ops`.
- */
-int ff_sws_op_list_max_size(const SwsOpList *ops);
-
-/**
  * These will take over ownership of `op` and set it to {0}, even on failure.
  */
 int ff_sws_op_list_append(SwsOpList *ops, SwsOp *op);
@@ -360,6 +376,9 @@ void ff_sws_op_list_remove_at(SwsOpList *ops, int index, int count);
 
 /**
  * Print out the contents of an operation list.
+ *
+ * Note: This requires having called `ff_sws_op_list_update()` to
+ * refresh the output pads, or the output may be stale/missing.
  */
 void ff_sws_op_list_print(void *log_ctx, int log_level, int log_level_extra,
                           const SwsOpList *ops);
@@ -368,7 +387,7 @@ void ff_sws_op_list_print(void *log_ctx, int log_level, int log_level_extra,
  * Infer + propagate known information about components. Called automatically
  * when needed by the optimizer and compiler.
  */
-void ff_sws_op_list_update_comps(SwsOpList *ops);
+void ff_sws_op_list_update(SwsOpList *ops);
 
 /**
  * Fuse compatible and eliminate redundant operations, as well as replacing

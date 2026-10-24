@@ -751,6 +751,7 @@ SRCS_LU = \
 	libavutil/float_scalarproduct.c \
 	libavutil/float2half.c \
 	libavutil/frame.c \
+	libavutil/gain_map.c \
 	libavutil/half2float.c \
 	libavutil/hdr_dynamic_metadata.c \
 	libavutil/hdr_dynamic_vivid_metadata.c \

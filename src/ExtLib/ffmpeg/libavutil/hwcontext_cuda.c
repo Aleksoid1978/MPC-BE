@@ -196,6 +196,44 @@ done:
     return ret;
 }
 
+#if HAVE_CUDAFUNCTIONS_CUMEMHOSTALLOC
+static void cuda_transfer_buffer_free(void *opaque, uint8_t *data)
+{
+    AVHWDeviceContext *device_ctx = opaque;
+    AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
+    CudaFunctions             *cu = hwctx->internal->cuda_dl;
+    CUcontext dummy;
+
+    CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
+    CHECK_CU(cu->cuMemFreeHost(data));
+    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+}
+
+/* The device transfers directly to and from page-locked memory, other memory
+ * goes through a buffer of the driver. */
+static AVBufferRef *cuda_transfer_buffer_alloc(void *device_ref, size_t size)
+{
+    AVHWDeviceContext *device_ctx = (AVHWDeviceContext *)((AVBufferRef *)device_ref)->data;
+    AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
+    CudaFunctions             *cu = hwctx->internal->cuda_dl;
+    AVBufferRef *ret = NULL;
+    CUcontext dummy;
+    void *host;
+
+    if (CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx)) < 0)
+        return av_buffer_alloc(size);
+
+    if (CHECK_CU(cu->cuMemHostAlloc(&host, size, 0)) >= 0) {
+        ret = av_buffer_create(host, size, cuda_transfer_buffer_free, device_ctx, 0);
+        if (!ret)
+            CHECK_CU(cu->cuMemFreeHost(host));
+    }
+
+    CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+    return ret ? ret : av_buffer_alloc(size);
+}
+#endif
+
 static void cuda_frames_uninit(AVHWFramesContext *ctx)
 {
     AVHWDeviceContext *device_ctx = ctx->device_ctx;
@@ -528,8 +566,10 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
     AVCUDADeviceContext    *hwctx = device_ctx->hwctx;
     CudaFunctions             *cu = hwctx->internal->cuda_dl;
 
+    const AVFrame *sw_frame = src->hw_frames_ctx ? dst : src;
+    AVFrame *top_down = NULL, *bottom_up_dst = NULL;
     CUcontext dummy;
-    int i, ret, copy_queued = 0;
+    int i, ret, copy_queued = 0, bottom_up = 0;
 
     {
         enum AVPixelFormat src_fmt = cuda_frame_hw_format(src);
@@ -541,9 +581,37 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             return AVERROR(ENOSYS);
     }
 
+    for (i = 0; i < FF_ARRAY_ELEMS(sw_frame->linesize); i++)
+        bottom_up |= sw_frame->linesize[i] < 0;
+
+    /* The device copies rows upwards through memory, so a bottom-up frame is
+     * transferred through a top-down copy of it. */
+    if (bottom_up) {
+        top_down = av_frame_alloc();
+        if (!top_down)
+            return AVERROR(ENOMEM);
+        top_down->format = ctx->sw_format;
+        top_down->width  = ctx->width;
+        top_down->height = ctx->height;
+        ret = av_hwframe_get_transfer_buffer((src->hw_frames_ctx ? src : dst)->hw_frames_ctx,
+                                             top_down);
+        if (ret < 0)
+            goto free_top_down;
+        top_down->width  = src->width;
+        top_down->height = src->height;
+        if (sw_frame == src) {
+            av_image_copy2(top_down->data, top_down->linesize, src->data, src->linesize,
+                           ctx->sw_format, src->width, src->height);
+            src = top_down;
+        } else {
+            bottom_up_dst = dst;
+            dst           = top_down;
+        }
+    }
+
     ret = CHECK_CU(cu->cuCtxPushCurrent(hwctx->cuda_ctx));
     if (ret < 0)
-        return ret;
+        goto free_top_down;
 
     /*
      * Copy one plane per iteration, bounded by the AVFrame linesizes. src and
@@ -567,10 +635,16 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
         int src_is_nonplanar_cuarray = 0;
         int dst_is_nonplanar_cuarray = 0;
 
+        int bytewidth = av_image_get_linesize(ctx->sw_format, src->width, i);
+        if (bytewidth < 0) {
+            ret = bytewidth;
+            goto fail;
+        }
+
         CUDA_MEMCPY2D cpy = {
             .srcPitch      = src->linesize[i],
             .dstPitch      = dst->linesize[i],
-            .WidthInBytes  = FFMIN(src->linesize[i], dst->linesize[i]),
+            .WidthInBytes  = bytewidth,
             .Height        = AV_CEIL_RSHIFT(src->height, ((i == 0 || i == 3) ? 0 : priv->shift_height)),
         };
 
@@ -639,7 +713,8 @@ static int cuda_transfer_data(AVHWFramesContext *ctx, AVFrame *dst,
             break;
     }
 
-    if (!dst->hw_frames_ctx) {
+    /* The caller may reuse host memory once the transfer returns. */
+    if (!src->hw_frames_ctx || !dst->hw_frames_ctx) {
         ret = CHECK_CU(cu->cuStreamSynchronize(hwctx->stream));
         if (ret < 0)
             goto exit;
@@ -650,6 +725,13 @@ fail:
         CHECK_CU(cu->cuStreamSynchronize(hwctx->stream));
 exit:
     CHECK_CU(cu->cuCtxPopCurrent(&dummy));
+
+    if (bottom_up_dst && ret >= 0)
+        av_image_copy2(bottom_up_dst->data, bottom_up_dst->linesize,
+                       top_down->data, top_down->linesize,
+                       ctx->sw_format, src->width, src->height);
+free_top_down:
+    av_frame_free(&top_down);
 
     return ret;
 }
@@ -945,6 +1027,9 @@ const HWContextType ff_hwcontext_type_cuda = {
     .frames_uninit        = cuda_frames_uninit,
     .frames_get_buffer    = cuda_get_buffer,
     .transfer_get_formats = cuda_transfer_get_formats,
+#if HAVE_CUDAFUNCTIONS_CUMEMHOSTALLOC
+    .transfer_buffer_alloc = cuda_transfer_buffer_alloc,
+#endif
     .transfer_data_to     = cuda_transfer_data,
     .transfer_data_from   = cuda_transfer_data,
 

@@ -13,7 +13,7 @@ MPCVideoDec
 Fixed DolbyVision support for D3D11cb, D3D12cb and NVDEC decoders.
 
 Updated libraries:
-	ffmpeg n9.1-dev-2302-g34370c0ffd;
+	ffmpeg n9.1-dev-2704-g9d2d5b1aa3;
 	vvdec v3.2.1.
 
 

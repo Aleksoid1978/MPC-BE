@@ -373,6 +373,21 @@ int av_hwframe_ctx_init(AVBufferRef *ref);
 int av_hwframe_get_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame, int flags);
 
 /**
+ * Allocate the buffers of a software frame that data is transferred to or
+ * from frames of the given AVHWFramesContext.
+ *
+ * Frames allocated otherwise can be transferred as well, as described for
+ * av_hwframe_transfer_data(). The buffers allocated here are pooled, and may be
+ * in memory that the device transfers faster.
+ *
+ * @param hwframe_ctx a reference to an AVHWFramesContext
+ * @param frame       a video frame with format, width and height set and no
+ *                    data buffers
+ * @return 0 on success, a negative AVERROR code on failure
+ */
+int av_hwframe_get_transfer_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame);
+
+/**
  * Copy data to or from a hw surface. At least one of dst/src must have an
  * AVHWFramesContext attached.
  *
@@ -384,7 +399,7 @@ int av_hwframe_get_buffer(AVBufferRef *hwframe_ctx, AVFrame *frame, int flags);
  * AV_HWFRAME_TRANSFER_DIRECTION_TO)
  *
  * dst may be "clean" (i.e. with data/buf pointers unset), in which case the
- * data buffers will be allocated by this function using av_frame_get_buffer().
+ * data buffers will be allocated by this function.
  * If dst->format is set, then this format will be used, otherwise (when
  * dst->format is AV_PIX_FMT_NONE) the first acceptable format will be chosen.
  *

@@ -324,6 +324,7 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
     AVCodecInternal *avci = avctx->internal;
     AVFrameSideData *side;
     uint32_t discard_padding = 0;
+    int nb_samples = frame->nb_samples;
     uint8_t skip_reason = 0;
     uint8_t discard_reason = 0;
 
@@ -399,7 +400,9 @@ static int discard_samples(AVCodecContext *avctx, AVFrame *frame, int64_t *disca
         }
     }
 
-    if (discard_padding > 0 && discard_padding <= frame->nb_samples) {
+    if (discard_padding > 0 && discard_padding <= nb_samples) {
+        // The padding may overlap the samples skipped at the start.
+        discard_padding = FFMIN(discard_padding, frame->nb_samples);
         if (discard_padding == frame->nb_samples) {
             av_log(avctx, AV_LOG_DEBUG, "discard whole frame\n");
             *discarded_samples += frame->nb_samples;
@@ -896,8 +899,8 @@ static int recode_subtitle(AVCodecContext *avctx, const AVPacket **outpkt,
         iconv(cd, NULL, NULL, &outb, &outl) == (size_t)-1 ||
         outl >= buf_pkt->size || inl != 0) {
         ret = FFMIN(AVERROR(errno), -1);
-        av_log(avctx, AV_LOG_ERROR, "Unable to recode subtitle event \"%s\" "
-               "from %s to UTF-8\n", inpkt->data, avctx->sub_charenc);
+        av_log(avctx, AV_LOG_ERROR, "Unable to recode subtitle event \"%.*s\" "
+               "from %s to UTF-8\n", inpkt->size, inpkt->data, avctx->sub_charenc);
         goto end;
     }
     buf_pkt->size -= outl;
@@ -936,6 +939,18 @@ static int utf8_check(const uint8_t *str)
     return 1;
 }
 
+const char *ff_decode_subtitle_text(AVCodecContext *avctx, const AVPacket *avpkt)
+{
+    AVPacket *copy = avctx->internal->buffer_pkt;
+
+    if (avpkt->size <= 0 || !avpkt->data[avpkt->size])
+        return avpkt->data;
+    if (av_new_packet(copy, avpkt->size) < 0)
+        return NULL;
+    memcpy(copy->data, avpkt->data, avpkt->size);
+    return copy->data;
+}
+
 int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
                              int *got_sub_ptr, const AVPacket *avpkt)
 {
@@ -967,8 +982,7 @@ int avcodec_decode_subtitle2(AVCodecContext *avctx, AVSubtitle *sub,
             sub->pts = av_rescale_q(avpkt->pts,
                                     avctx->pkt_timebase, AV_TIME_BASE_Q);
         ret = ffcodec(avctx->codec)->cb.decode_sub(avctx, sub, got_sub_ptr, pkt);
-        if (pkt == avci->buffer_pkt) // did we recode?
-            av_packet_unref(avci->buffer_pkt);
+        av_packet_unref(avci->buffer_pkt);
         if (ret < 0) {
             *got_sub_ptr = 0;
             avsubtitle_free(sub);
@@ -1019,7 +1033,7 @@ enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *avctx,
         AVHWDeviceContext *device_ctx =
             (AVHWDeviceContext*)avctx->hw_device_ctx->data;
         for (i = 0;; i++) {
-            config = &ffcodec(avctx->codec)->hw_configs[i]->public;
+            config = avcodec_get_hw_config(avctx->codec, i);
             if (!config)
                 break;
             if (!(config->methods &
@@ -2107,6 +2121,7 @@ av_cold int ff_decode_preinit(AVCodecContext *avctx)
     else {
         for (unsigned i = 0; i < avctx->nb_side_data_prefer_packet; i++) {
             int val = avctx->side_data_prefer_packet[i];
+            int mapped = 0;
 
             if (val < 0 || val >= AV_PKT_DATA_NB) {
                 av_log(avctx, AV_LOG_ERROR, "Invalid side data type: %d\n", val);
@@ -2115,6 +2130,7 @@ av_cold int ff_decode_preinit(AVCodecContext *avctx)
 
             for (unsigned j = 0; ff_sd_global_map[j].packet < AV_PKT_DATA_NB; j++) {
                 if (ff_sd_global_map[j].packet == val) {
+                    mapped = 1;
                     val = ff_sd_global_map[j].frame;
 
                     // this code will need to be changed when we have more than
@@ -2127,6 +2143,12 @@ av_cold int ff_decode_preinit(AVCodecContext *avctx)
                     dc->side_data_pref_mask |= 1ULL << val;
                 }
             }
+
+            if (!mapped)
+                av_log(avctx, AV_LOG_WARNING,
+                       "Side data type %s has no frame side data counterpart, "
+                       "ignoring it in side_data_prefer_packet\n",
+                       av_packet_side_data_name(val));
         }
     }
 

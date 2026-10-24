@@ -23,6 +23,7 @@
 
 #include "buffer.h"
 #include "hwcontext.h"
+#include "thread.h"
 #include "frame.h"
 #include "pixfmt.h"
 
@@ -71,6 +72,14 @@ typedef struct HWContextType {
     void             (*frames_uninit)(AVHWFramesContext *ctx);
 
     int              (*frames_get_buffer)(AVHWFramesContext *ctx, AVFrame *frame);
+
+    /**
+     * Allocate a buffer of size bytes for av_hwframe_get_transfer_buffer(),
+     * av_buffer_alloc() is used if this is not set or returns NULL.
+     *
+     * @param device_ref the AVBufferRef of the AVHWDeviceContext
+     */
+    AVBufferRef     *(*transfer_buffer_alloc)(void *device_ref, size_t size);
     int              (*transfer_get_formats)(AVHWFramesContext *ctx,
                                              enum AVHWFrameTransferDirection dir,
                                              enum AVPixelFormat **formats);
@@ -99,6 +108,14 @@ typedef struct FFHWFramesContext {
     const HWContextType *hw_type;
 
     AVBufferPool *pool_internal;
+
+    /**
+     * Buffers of transfer_pool_size bytes for av_hwframe_get_transfer_buffer(),
+     * both guarded by transfer_pool_lock.
+     */
+    AVBufferPool *transfer_pool;
+    size_t        transfer_pool_size;
+    AVMutex       transfer_pool_lock;
 
     /**
      * For a derived context, a reference to the original frames
