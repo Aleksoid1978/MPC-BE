@@ -145,42 +145,7 @@ SET START_DATE=%DATE%
 
 IF /I "%BUILDPLATFORM%" == "Win32" (GOTO Win32) ELSE IF /I "%BUILDPLATFORM%" == "x64" (GOTO x64)
 
-:Win32
-CALL "%VCVARS%" -arch=x86
-REM again set the source directory (fix possible bug in VS2017)
-CD /D %~dp0
-
-IF /I "%CONFIG%" == "Filters" (
-  CALL :SubFilters Win32
-  IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-  IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters Win32
-  GOTO x64
-)
-
-IF /I "%CONFIG%" == "Resources" CALL :SubResources Win32 && GOTO x64
-
-CALL :SubMPCBE Win32
-IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-
-IF /I "%CONFIG%" == "Main" GOTO x64
-
-CALL :SubResources Win32
-IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-
-IF /I "%INSTALLER%" == "True" CALL :SubCreateInstaller Win32
-IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-IF /I "%ZIP%" == "True"       CALL :SubCreatePackages MPC-BE Win32
-IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-
-IF /I "%CONFIG%" == "All" (
-  CALL :SubFilters Win32
-  IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
-  IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters Win32
-)
-
 :x64
-IF /I "%BUILDPLATFORM%" == "Win32" GOTO End
-
 CALL "%VCVARS%" -arch=amd64
 REM again set the source directory (fix possible bug in VS2017)
 CD /D %~dp0
@@ -189,15 +154,15 @@ IF /I "%CONFIG%" == "Filters" (
   CALL :SubFilters x64
   IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
   IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters x64
-  GOTO END
+  GOTO Win32
 )
 
-IF /I "%CONFIG%" == "Resources" CALL :SubResources x64 && GOTO END
+IF /I "%CONFIG%" == "Resources" CALL :SubResources x64 && GOTO Win32
 
 CALL :SubMPCBE x64
 IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
 
-IF /I "%CONFIG%" == "Main" GOTO End
+IF /I "%CONFIG%" == "Main" GOTO Win32
 
 CALL :SubResources x64
 IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
@@ -211,6 +176,41 @@ IF /I "%CONFIG%" == "All" (
   CALL :SubFilters x64
   IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
   IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters x64
+)
+
+:Win32
+IF /I "%BUILDPLATFORM%" == "x64" GOTO End
+
+CALL "%VCVARS%" -arch=x86
+REM again set the source directory (fix possible bug in VS2017)
+CD /D %~dp0
+
+IF /I "%CONFIG%" == "Filters" (
+  CALL :SubFilters Win32
+  IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+  IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters Win32
+  GOTO END
+)
+
+IF /I "%CONFIG%" == "Resources" CALL :SubResources Win32 && GOTO END
+
+CALL :SubMPCBE Win32
+IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+
+IF /I "%CONFIG%" == "Main" GOTO END
+
+CALL :SubResources Win32
+IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+
+IF /I "%INSTALLER%" == "True" CALL :SubCreateInstaller Win32
+IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+IF /I "%ZIP%" == "True"       CALL :SubCreatePackages MPC-BE Win32
+IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+
+IF /I "%CONFIG%" == "All" (
+  CALL :SubFilters Win32
+  IF !ERRORLEVEL! NEQ 0 EXIT /B !ERRORLEVEL!
+  IF /I "%ZIP%" == "True" CALL :SubCreatePackages Filters Win32
 )
 
 :End
