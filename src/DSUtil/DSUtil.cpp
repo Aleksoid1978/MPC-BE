@@ -1606,9 +1606,9 @@ void RegisterSourceFilter(const CLSID& clsid, const GUID& subtype2, const std::v
 	CStringW majortype = CStringFromGUID(MEDIATYPE_Stream);
 	CStringW subtype = CStringFromGUID(subtype2);
 
-	for (int i = 0; i < chkbytes.size(); i++) {
+	for (unsigned i = 0; i < chkbytes.size(); i++) {
 		CStringW idx;
-		idx.Format(L"%d", i);
+		idx.Format(L"%u", i);
 		SetRegKeyValue(L"Media Type\\" + majortype, subtype, idx, chkbytes[i]);
 	}
 
