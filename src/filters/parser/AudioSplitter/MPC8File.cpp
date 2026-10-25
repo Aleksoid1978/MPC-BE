@@ -189,7 +189,7 @@ bool CMPC8File::ReadStreamHeader()
 	}
 
 	m_channels = (m_extradata[1] >> 4) + 1;
-	const auto samplerateidx = m_extradata[0] >> 5;
+	const unsigned samplerateidx = m_extradata[0] >> 5u;
 	if (samplerateidx >= std::size(freq)) {
 		return false;
 	}
