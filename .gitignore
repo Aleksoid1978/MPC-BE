@@ -9,6 +9,7 @@
 *.bak
 /.vs
 /_bin
+/_obj
 /environments.bat
 /revision.h
 /contrib/signinfo.txt
