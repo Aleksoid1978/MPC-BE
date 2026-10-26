@@ -130,7 +130,7 @@ BEGIN
     CONTROL         "",IDC_SLIDER2,"msctls_trackbar32",TBS_AUTOTICKS | TBS_TOOLTIPS | WS_TABSTOP | 0x400,176,79,85,19
     LTEXT           "R",IDC_STATIC,262,80,27,8
     GROUPBOX        "Otvoriť nastavenia zvuku",IDC_STATIC,5,102,285,51
-    CONTROL         "Aut. načítanie zvuk. stôp",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
+    CONTROL         "Aut. načítať zvuk. stopy",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,113,276,9
     EDITTEXT        IDC_EDIT4,10,124,222,13,ES_AUTOHSCROLL
     PUSHBUTTON      "Resetovať",IDC_BUTTON2,235,124,50,13
     CONTROL         "Uprednostňovať externé zvukové súbory pred vloženou zvukovou stopou",IDC_CHECK3,
@@ -170,7 +170,7 @@ BEGIN
     CONTROL         "Int16",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,218,32,9
     CONTROL         "Int24",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,52,218,32,9
     CONTROL         "Int32",IDC_CHECK11,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,94,218,32,9
-    CONTROL         "Plávajúci",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
+    CONTROL         "Plávací",IDC_CHECK12,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,137,218,32,9
     CONTROL         "Čas. posun zvuku (ms):",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,240,115,9
     EDITTEXT        IDC_EDIT2,129,238,46,13,ES_RIGHT | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN2,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,174,238,12,13
@@ -187,7 +187,7 @@ BEGIN
     LTEXT           "Čas",IDC_STATIC,10,42,35,8
     CONTROL         "00:00:00.000",IDC_EDIT1,"MfcMaskedEdit",WS_BORDER | WS_TABSTOP | 0x80,47,39,80,14
     DEFPUSHBUTTON   "Prejsť!",IDC_OK1,131,39,50,14
-    LTEXT           "Ak chcete preskočiť na konkrétnu snímku, zadajte dve čísla (prvé číslo je číslom snímky, druhé číslo udáva jej pomer).",IDC_STATIC,5,64,173,26
+    LTEXT           "Ak chcete preskočiť na konkrétnu snímku, zadajte dve čísla (prvé číslo je číslom snímky, druhé udáva jej pomer).",IDC_STATIC,5,64,173,26
     LTEXT           "Snímka",IDC_STATIC,10,99,35,8
     EDITTEXT        IDC_EDIT2,47,96,81,14,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "Prejsť!",IDC_OK2,131,96,50,14
@@ -310,7 +310,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Umiestnenie priečinka ""VIDEO_TS"" na disku DVD",IDC_STATIC,5,5,286,53
     CONTROL         "Štandardný",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,280,8
-    CONTROL         "Určuje používateľ:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
+    CONTROL         "Určí používateľ:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,29,280,8
     EDITTEXT        IDC_DVDPATH,20,41,249,13,ES_AUTOHSCROLL | WS_GROUP
     PUSHBUTTON      "...",IDC_BUTTON1,273,41,13,13
     GROUPBOX        "Preferovaný jazyk pre DVD Navigator",IDC_STATIC,5,62,286,74
@@ -350,7 +350,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,190,37,94,13,ES_AUTOHSCROLL
     LTEXT           "(príklad: eng jap swe)",IDC_STATIC,147,53,132,8
     GROUPBOX        "Nastavenie otvárania súborov",IDC_STATIC,5,124,286,79
-    LTEXT           "Pri otvorení audio súboru,",IDC_STATIC,10,137,99,8
+    LTEXT           "Pri otvorení audio súboru:",IDC_STATIC,10,137,99,8
     COMBOBOX        IDC_COMBO4,113,134,172,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Okrem toho pridať do zoznamu skladieb:",IDC_STATIC,10,153,139,8
     COMBOBOX        IDC_COMBO5,150,150,135,47,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -445,7 +445,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,83,238,9,WS_EX_TRANSPARENT
     LTEXT           "Veľkosť ovládacích prvkov:",IDC_STATIC8,14,96,99,8
     COMBOBOX        IDC_CONTROLS_SIZE_COMBO,116,95,28,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Enable dark dialogs (Windows 10 or later)",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
+    CONTROL         "Povoliť tmavé dialógové okná",IDC_CHECK_DARKDIALOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,71,238,9,WS_EX_TRANSPARENT
     GROUPBOX        "",IDC_STATIC,7,112,282,91
     CONTROL         "Použiť popis času:",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,121,152,9
     COMBOBOX        IDC_COMBO3,170,119,115,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -575,7 +575,7 @@ BEGIN
     EDITTEXT        IDC_EDIT3,62,51,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "Album:",IDC_STATIC,10,66,50,8
     EDITTEXT        IDC_EDIT8,62,66,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
-    LTEXT           "Autorské prava:",IDC_STATIC,10,81,50,8
+    LTEXT           "Autorské práva:",IDC_STATIC,10,81,50,8
     EDITTEXT        IDC_EDIT2,62,81,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     LTEXT           "Hodnotenie:",IDC_STATIC,10,96,50,8
     EDITTEXT        IDC_EDIT5,62,96,162,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
@@ -812,10 +812,10 @@ BEGIN
     LTEXT           "Dvojklik",IDC_STATIC,10,49,60,8
     COMBOBOX        IDC_COMBO2,70,47,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Presunúť okno podľa oblasti videa",IDC_CHECK2,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,65,133,10
-    CONTROL         "Enable long press speed-up",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
-    LTEXT           "Long press speed",IDC_STATIC,20,97,130,8
+    CONTROL         "Povoliť zrýchlenie pri dlhom stlačení",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,81,202,10
+    LTEXT           "Rýchlosť dlhého stlačenia",IDC_STATIC,20,97,130,8
     COMBOBOX        IDC_COMBO4,153,95,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Long press delay",IDC_STATIC,20,113,130,8
+    LTEXT           "Oneskorenie dlhého stlačenia",IDC_STATIC,20,113,130,8
     COMBOBOX        IDC_COMBO5,153,111,55,70,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Klik pravým tlačidlom",IDC_STATIC,10,134,60,8
     COMBOBOX        IDC_COMBO3,70,133,166,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -893,7 +893,7 @@ BEGIN
     GROUPBOX        "Vykresľovač videa",IDC_STATIC,5,5,285,29
     COMBOBOX        IDC_VIDRND_COMBO,10,15,213,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Vlastnosti",IDC_BUTTON1,226,14,60,14
-    GROUPBOX        "Nastavenia EVR-CP and EVR Sync",IDC_STATIC,5,37,285,137
+    GROUPBOX        "Nastavenia EVR-CP a EVR Sync",IDC_STATIC,5,37,285,137
     CONTROL         "Vybrať Vykresľovacie zariadenie D3D9",IDC_D3D9DEVICE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,120,10
     COMBOBOX        IDC_D3D9DEVICE_COMBO,144,49,142,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Exkluzívna celá obrazovka na ďalšom okne",IDC_EXCLUSIVE_FULLSCREEN_CHECK,
@@ -907,14 +907,14 @@ BEGIN
     COMBOBOX        IDC_COMBO1,188,122,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Zmena veľkosti:",IDC_STATIC3,115,141,72,8
     COMBOBOX        IDC_DX9RESIZER_COMBO,188,139,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "Zníženie mierky <50%:",IDC_STATIC10,115,158,72,8
+    LTEXT           "Zmenšenie mierky<50%:",IDC_STATIC10,115,158,72,8
     COMBOBOX        IDC_COMBO7,188,156,98,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "Rozsah výstupu:",IDC_STATIC4,10,141,65,8
     COMBOBOX        IDC_COMBO2,10,156,40,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Nastavenia MPC Video Renderera",IDC_STATIC,5,177,285,27
     CONTROL         "Exkluzívna celá obrazovka v ďalšom okne (experimentálne)",IDC_CHECK2,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,190,276,10
-    GROUPBOX        "Rámovanie",IDC_STATIC,5,208,212,53
+    GROUPBOX        "Orámovanie",IDC_STATIC,5,208,212,53
     LTEXT           "Predvolený režim:",IDC_STATIC,10,220,79,8
     COMBOBOX        IDC_COMBO8,90,218,124,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Nezmenšovať pri malých zväčšeniach veľkosti rámu",IDC_CHECK7,
@@ -933,7 +933,7 @@ BEGIN
     LTEXT           "Preferovaný formát videa:",IDC_STATIC2,10,33,120,8
     COMBOBOX        IDC_COMBO1,10,43,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     COMBOBOX        IDC_COMBO2,66,43,50,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "50/60 fps",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,45,48,10
+    CONTROL         "50/60 obr/s",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,120,45,48,10
     CONTROL         "HDR",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,45,30,10
     LTEXT           "Preferovaný formát zvuku:",IDC_STATIC3,10,58,120,8
     COMBOBOX        IDC_COMBO3,10,68,52,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -941,12 +941,12 @@ BEGIN
     COMBOBOX        IDC_COMBO4,10,93,130,46,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL         "Načítať zoznam skladieb",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,130,10
     GROUPBOX        "",IDC_STATIC,6,5,285,145
-    CONTROL         "Use the built-in YouTube playlist parser",IDC_CHECK7,
+    CONTROL         "Použiť vstavaný analyzátor playlistov YouTube",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,137,206,10
     CONTROL         "yt-dlp",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,4,74,10
     LTEXT           "Spustiteľný súbor:",IDC_STATIC,10,17,77,8
     COMBOBOX        IDC_COMBO5,91,15,195,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "Select max bitrate",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
+    CONTROL         "Vybrať max. dátový tok",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,108,276,10
     LTEXT           "Adresa AceStreamu:",IDC_STATIC,10,156,77,8
     EDITTEXT        IDC_EDIT1,91,154,195,13,ES_AUTOHSCROLL
     LTEXT           "Adresa MatriXu (TorrServer):",IDC_STATIC,10,173,103,8
@@ -954,7 +954,7 @@ BEGIN
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,205,283,1
     LTEXT           "Webprehliadač:",IDC_STATIC,10,214,77,8
     EDITTEXT        IDC_EDIT3,91,212,195,13,ES_AUTOHSCROLL
-    PUSHBUTTON      "Predvolené",IDC_BUTTON3,224,246,66,14
+    PUSHBUTTON      "Predvolený",IDC_BUTTON3,224,246,66,14
 END
 
 IDD_AUTH_DLG DIALOGEX 0, 0, 213, 127
@@ -1017,7 +1017,7 @@ BEGIN
     EDITTEXT        IDC_EDIT1,32,13,197,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,5,29,224,1
     CONTROL         "",IDC_LIST1,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,33,224,96
-    PUSHBUTTON      "Uložiť ako..",IDC_BUTTON1,84,183,64,14
+    PUSHBUTTON      "Uložiť ako...",IDC_BUTTON1,84,183,64,14
     CONTROL         "",IDC_STATIC1,"Static",SS_BITMAP | SS_CENTERIMAGE | WS_BORDER,5,131,76,66
 END
 
@@ -1100,9 +1100,9 @@ BEGIN
     EDITTEXT        IDC_EDIT2,64,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     EDITTEXT        IDC_EDIT3,110,17,40,14,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
     PUSHBUTTON      "Predvolené",IDC_BUTTON1,158,17,56,14
-    CONTROL         "Nepoužívať „hľadať v priečinku“ pri príkazoch „Preskočiť späť/vpred“, keď je v zozname skladieb iba jedna položka",IDC_CHECK7,
+    CONTROL         "Nepoužívať „Hľadať v priečinku“ pri príkazoch „Preskočiť späť/vpred“, keď je v zozname skladieb iba jedna položka",IDC_CHECK7,
                     "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,41,282,18
-    CONTROL         "Zabrániť MINIMALIZOVAŤ pri zobrazení na celú obrazovku na inom ako predvolenom monitore",IDC_CHECK6,
+    CONTROL         "Zabrániť MINIMALIZOVAŤ pri zobrazení na celú obrazovku na inom ako predvol. monitore",IDC_CHECK6,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,61,282,9
     CONTROL         "Automaticky skryť ukazovateľ počas prehrávania v režime okna",IDC_CHECK5,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,282,9
@@ -1183,7 +1183,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     GROUPBOX        "Nastavenia EVR(vlastná prezentácia)",IDC_STATIC,5,3,286,61
     CONTROL         "VSync",IDC_VSYNC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,14,121,10
-    CONTROL         "Internná VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
+    CONTROL         "Interná VSync",IDC_VSYNC_INTERNAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,26,127,10
     CONTROL         "Povoliť opravu času snímky",IDC_CHECK8,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,51,170,10
     CONTROL         "Vyčistiť GPU pred VSync",IDC_CHECK5,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,14,140,10
     CONTROL         "Vyčistiť GPU po prezentácii",IDC_CHECK6,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,140,26,142,10
@@ -1191,7 +1191,7 @@ BEGIN
     GROUPBOX        "Nastavenia EVR Sync",IDC_STATIC2,5,67,286,117
     CONTROL         "Synchronizovať video s displejom",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,79,142,8
     CONTROL         "Prezentovať pri najbližšej vsync",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,109,274,8
-    LTEXT           "Prispôsobenie frekvencie o:",IDC_STATIC5,20,93,85,8
+    LTEXT           "Prispôsobiť frekvenciu o:",IDC_STATIC5,20,93,85,8
     EDITTEXT        IDC_CYCLEDELTA,109,91,40,13,ES_RIGHT | ES_AUTOHSCROLL,WS_EX_RIGHT
     CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,10,123,278,1
     LTEXT           "Cieľový offset synch.:",IDC_STATIC3,10,129,100,8
@@ -1209,7 +1209,7 @@ STYLE DS_SETFONT | WS_CHILD
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Spustiť súbory v celoobrazovkovom režime",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,3,274,9
-    CONTROL         "V celoobraz. rezime zobraziť ovládače na:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
+    CONTROL         "V celoobraz. režime zobraziť ovládače na:",IDC_CHECK4,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,15,275,9
     EDITTEXT        IDC_EDIT1,14,27,32,13,ES_CENTER | ES_AUTOHSCROLL
     CONTROL         "",IDC_SPIN1,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS | UDS_HOTTRACK,35,27,12,13
     LTEXT           "sekúnd",IDC_STATIC1,51,29,30,8
@@ -1680,8 +1680,8 @@ BEGIN
         MENUITEM "&Hlavná ponuka",          ID_VIEW_CAPTIONMENU
         MENUITEM "Panel s &vyhľadávaním",   ID_VIEW_SEEKER
         MENUITEM "Ovl&ádanie",            ID_VIEW_CONTROLS
-        MENUITEM "&Informácia",           ID_VIEW_INFORMATION
-        MENUITEM "Š&tatistika",           ID_VIEW_STATISTICS
+        MENUITEM "&Informácie",           ID_VIEW_INFORMATION
+        MENUITEM "Š&tatistiky",           ID_VIEW_STATISTICS
         MENUITEM "Sta&v",                 ID_VIEW_STATUS
         MENUITEM "Opätovná synchronizácia",             ID_VIEW_SUBRESYNC
         MENUITEM "Zoznam skladieb",              ID_VIEW_PLAYLIST
@@ -1871,8 +1871,8 @@ BEGIN
             MENUITEM "Hlavná ponuka",           ID_VIEW_CAPTIONMENU
             MENUITEM "Panel s vy&hľadávaním",   ID_VIEW_SEEKER
             MENUITEM "Ovl&ádanie",            ID_VIEW_CONTROLS
-            MENUITEM "&Informácia",           ID_VIEW_INFORMATION
-            MENUITEM "Š&tatistika",           ID_VIEW_STATISTICS
+            MENUITEM "&Informácie",           ID_VIEW_INFORMATION
+            MENUITEM "Š&tatistiky",           ID_VIEW_STATISTICS
             MENUITEM "Sta&v",                 ID_VIEW_STATUS
             MENUITEM "Opätovná synchronizácia",             ID_VIEW_SUBRESYNC
             MENUITEM "Zoznam skladieb",              ID_VIEW_PLAYLIST
@@ -1950,8 +1950,8 @@ BEGIN
             MENUITEM "&Hlavná ponuka",          ID_VIEW_CAPTIONMENU
             MENUITEM "Panel s vy&hľadávaním",   ID_VIEW_SEEKER
             MENUITEM "Ovl&ádanie",            ID_VIEW_CONTROLS
-            MENUITEM "&Informácia",           ID_VIEW_INFORMATION
-            MENUITEM "Š&tatistika",           ID_VIEW_STATISTICS
+            MENUITEM "&Informácie",           ID_VIEW_INFORMATION
+            MENUITEM "Š&tatistiky",           ID_VIEW_STATISTICS
             MENUITEM "Sta&v",                 ID_VIEW_STATUS
             MENUITEM "Opätovná synchronizácia",             ID_VIEW_SUBRESYNC
             MENUITEM "Zoznam skladieb",              ID_VIEW_PLAYLIST
@@ -2153,7 +2153,7 @@ BEGIN
         MENUITEM "------ Zakaždým ------",    ID_AFTERPLAYBACK_EVERYTIME
         MENUITEM "Zatvoriť",                        ID_AFTERPLAYBACK_EXIT
         MENUITEM "Zatvoriť súbor",                  ID_AFTERPLAYBACK_CLOSE_FILE
-        MENUITEM "Close file and minimize player", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
+        MENUITEM "Zatvoriť súbor a minimalizovať prehrávač", ID_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE
         MENUITEM "Prehrať ďalší v priečinku",     ID_AFTERPLAYBACK_NEXT
         MENUITEM "Prehrať ďalší v priečinku (ako v slučke)", ID_AFTERPLAYBACK_NEXT_LOOPED
         MENUITEM "Nerobiť nič",                  ID_AFTERPLAYBACK_EVERYTIMEDONOTHING
@@ -2687,7 +2687,7 @@ BEGIN
     IDC_CHECK_RELATIVETO    "Predvolené hodnoty sa nastavia aj v iných štýloch, ak užívateľ nastavenia nezmení"
     IDC_CHECK_ALLOW_DROPPING_SUBPIC  "Vypnutie tejto možnosti zabráni blikaniu titulkov, ale môže spôsobiť, že vykresľovač videa preskočí niektoré snímky videa."
     IDC_CHECK_SPCANIMWITHBUFFER  "Ak je použitá vyrovnávacia pamäť pre podobrázky väčšia ako 0, môžu sa titulky animovať. Zablokovaním tejto voľby znížite vyťaženie procesora. Voľbu zablokujte aj v prípade, že titulky blikajú."
-    IDC_BUTTON_EXT_SET      "Po kliknutí na toto tlačidlo, sa zmenia asociácie vybraných koncoviek súborov a súbory sa budú otvárať v programe MPC-BE. Po pridaní nejakého ďalšieho rozšírenia programu sa však asociácie môžu opäť zmeniť. Preto si ich pred zatvorením tohto dialógového okna nezabudnite skontrolovať, prípadne nastaviť znova!"
+    IDC_BUTTON_EXT_SET      "Po kliknutí na toto tlačidlo sa zmenia asociácie vybraných koncoviek súborov a súbory sa budú otvárať v programe MPC-BE. Po pridaní nejakého ďalšieho rozšírenia programu sa však asociácie môžu opäť zmeniť. Preto si ich pred zatvorením tohto dialógového okna nezabudnite skontrolovať, prípadne nastaviť znova!"
 END
 
 STRINGTABLE
@@ -3073,7 +3073,7 @@ BEGIN
     IDS_FIRST_IN_FOLDER     "Prvý súbor v priečinku je práve načítaný."
     IDS_LAST_IN_FOLDER      "Posledný súbor v priečinku je práve načítaný."
     IDS_MERGING_FILES       "Prebieha zlučovanie súborov..."
-    IDS_MERGE_USING_FFMPEG  "Merge files using FFmpeg"
+    IDS_MERGE_USING_FFMPEG  "Zlúčenie súborov pomocou FFmpeg"
 END
 
 STRINGTABLE
@@ -3114,18 +3114,18 @@ BEGIN
     IDS_ADD_TO_PLAYLIST     "Pridať do playlistu programu MPC-BE"
     IDS_OPEN_WITH_MPC       "Prehrať programom MPC-BE"
     IDS_CANNOT_CHANGE_FORMAT  "Program MPC-BE nemá dostatočné oprávnenia na zmenu asociácií k formátom. Kliknite prosím na tlačidlo ""Modifikovať"" a preberte práva administrátora PC."
-    IDS_APP_DESCRIPTION     "Jeden z najvýkonnejších, konfigurovateľných multimediálnych prehrávačov pre OS Windows. Pôvodne vyvinutý maďarským vývojárom známym pod prezývkou Gabest. Táto verzia má pridané aj niektoré nové funkcie, ako napríklad celoobrazovkový režim Direct 3D a lepšiu podporu OS Windows Vista/7."
+    IDS_APP_DESCRIPTION     "Jeden z najvýkonnejších, konfigurovateľných multimediálnych prehrávačov pre OS Windows. Pôvodne vyvinutý maďarským vývojárom, známym pod prezývkou Gabest. Táto verzia má pridané aj niektoré nové funkcie, ako napríklad celoobrazovkový režim Direct 3D a lepšiu podporu OS Windows Vista/7."
     IDS_MAINFRM_12          "kanál"
     IDS_MAINFRM_13          "kanálov"
 END
 
 STRINGTABLE
 BEGIN
-    IDS_PROPSHEET_NAME      "Name"
-    IDS_PROPSHEET_MIME      "MIME type"
-    IDS_PROPSHEET_DESC      "Description"
+    IDS_PROPSHEET_NAME      "Názov"
+    IDS_PROPSHEET_MIME      "Typ MIME"
+    IDS_PROPSHEET_DESC      "Popis"
     IDS_PROPSHEET_FILE_IMAGE "%hs image"
-    IDS_PROPSHEET_FILE_FONT "%hs font"
+    IDS_PROPSHEET_FILE_FONT "%hs písmo"
     IDS_AUDIOWINDOW_NONE    "nezmeniť veľkosť okna"
     IDS_AUDIOWINDOW_COVER   "zobraziť obal albumu/obrázky obalu"
     IDS_AUDIOWINDOW_HIDE    "skryť oblasť videa"
@@ -3325,7 +3325,7 @@ BEGIN
     IDS_CMD_DUBDELAY        "/dubdelay ""súbor""\t- Načítať prídavný zvukový súbor, oneskorený\no XXms (ak súbor obsahuje ""...DELAY XXms..."")"
     IDS_CMD_D3DFS           "/d3dfs\tSpustiť vykreslovanie v celoobrazovkovom režime D3D"
     IDS_CMD_SUB             "/sub ""názov titulkov""\t- Načítať prídavný súbor s titulkami"
-    IDS_CMD_FILTER          "/filter ""nazov filtra""\t- Načítať filtre DirectShow z DLL\nknižnice (zástupne znaky sú povolené)"
+    IDS_CMD_FILTER          "/filter ""názov filtra""\t- Načítať filtre DirectShow z DLL\nknižnice (zástupne znaky sú povolené)"
     IDS_CMD_DVD             "/dvd\tSpustiť v režime DVD, kde ""cesta"" je údaj o ceste k priečinku\nna DVD (volitelné)"
     IDS_CMD_DVDPOS1         "/dvdpos T#C\tSpustiť prehrávanie od titulu T, kapitoly C"
     IDS_CMD_DVDPOS2         "/dvdpos T#hh:mm\tSpustiť prehrávanie od titulu T, pozície hh:mm:ss"
@@ -3498,20 +3498,20 @@ BEGIN
     IDS_ARS_CHANNELS        "Kanály:"
     IDS_ARS_WASAPI_METHOD   "Metóda WASAPI:"
     IDS_ARS_DUMMY_CHANNELS  "Nevypĺňať kanály pri miešaní"
-    IDS_ARS_PAUSE_KEEP_ACTIVE "Keep audio device active when paused"
+    IDS_ARS_PAUSE_KEEP_ACTIVE "Ponechať zvukové zariadenie aktívne pri pozastavení"
     IDS_ARS_TIP_BITEXACT_OUTPUT  "Ak je to možné, zvuk sa odošle v pôvodnom formáte.\nV opačnom prípade sa použije formát určený v systémových nastaveniach."
 END
 
 STRINGTABLE
 BEGIN
     IDS_ARS_TIP_ALT_CHECK_FORMAT  "Vykresľovací modul sa pokúsi inicializovať zariadenie a preskočí niektoré kontroly."
-    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "The renderer will send inaudible noise to the audio device."
+    IDS_ARS_TIP_PAUSE_KEEP_ACTIVE  "Renderer odošle do zvukového zariadenia nepočuteľný šum."
 END
 
 STRINGTABLE
 BEGIN
     IDS_MKVSPLT_LOAD_EMBEDDED_FONTS "Načítať vložené písma"
-    IDS_MKVSPLT_CALC_DURATION "Vypočítť trvanie na základe údajov o videu"
+    IDS_MKVSPLT_CALC_DURATION "Vypočítať trvanie na základe údajov o videu"
     IDS_MKVSPLT_REINDEX     "V prípade potreby opätovné indexovanie"
 END
 
@@ -3765,7 +3765,7 @@ STRINGTABLE
 BEGIN
     IDS_AFTERPLAYBACK_CLOSE "Po prehratí: Ukončiť"
     IDS_AFTERPLAYBACK_STANDBY "Po prehratí: Úsporný režim"
-    IDS_AFTERPLAYBACK_HIBERNATE "Po prehratí: Hibernácia"
+    IDS_AFTERPLAYBACK_HIBERNATE "Po prehratí: Uspať"
     IDS_AFTERPLAYBACK_SHUTDOWN "Po prehratí: Vypnúť"
     IDS_AFTERPLAYBACK_LOGOFF "Po prehratí: Odhlásiť"
     IDS_AFTERPLAYBACK_LOCK  "Po prehratí: Uzamknúť"
@@ -3773,7 +3773,7 @@ BEGIN
     IDS_AFTERPLAYBACK_DONOTHING "Po prehratí: Neurobiť nič"
     IDS_AFTERPLAYBACK_NEXT  "Po prehratí: Prehrať ďalšie v priečinku"
     IDS_AFTERPLAYBACK_CLOSE_FILE "Po prehratí: Vždy zatvoriť súbor"
-    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "After Playback: Always close file and minimize player"
+    IDS_AFTERPLAYBACK_CLOSE_FILE_AND_MINIMIZE  "Po prehratí: Vždy zatvoriť súbor a minimalizovať prehrávač"
 END
 
 STRINGTABLE
