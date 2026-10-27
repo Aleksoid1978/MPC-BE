@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -62,6 +62,10 @@ HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen
 	else if (clsid == CLSID_MPCVRAllocatorPresenter) {
 		*ppAP = DNew CMPCVRAllocatorPresenter(hWnd, hr, Error);
 		ap_name = L"MPC VR allocator presenter";
+	}
+	else if (clsid == CLSID_FrankyAllocatorPresenter) {
+		// TODO
+		return E_NOTIMPL;
 	}
 	else {
 		return E_NOTIMPL;

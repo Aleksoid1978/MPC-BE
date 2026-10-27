@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -46,6 +46,8 @@ static HRESULT IsRendererAvailable(int VideoRendererType)
 			return CheckFilterCLSID(CLSID_DXR);
 		case VIDRNDT_MADVR:
 			return CheckFilterCLSID(CLSID_madVR);
+		case VIDRNDT_FRANKY:
+			return CheckFilterCLSID(CLSID_FrankyRenderer);
 		default:
 		return S_OK;
 	}
@@ -173,6 +175,7 @@ BOOL CPPageVideo::OnInitDialog()
 		case VIDRNDT_MPCVR:
 		case VIDRNDT_DXR:
 		case VIDRNDT_MADVR:
+		case VIDRNDT_FRANKY:
 		case VIDRNDT_NULL_ANY:
 		case VIDRNDT_NULL_UNCOMP:
 			break;
@@ -180,7 +183,9 @@ BOOL CPPageVideo::OnInitDialog()
 			ASSERT(FALSE);
 			return;
 		}
-		CString sName = ResStr(nID);
+		CStringW sName = (iVR == VIDRNDT_FRANKY)
+			? CStringW(L"FrankyRenderer (experimental)")
+			: ResStr(nID);
 
 		HRESULT hr = IsRendererAvailable(iVR);
 		if (S_FALSE == hr) {
@@ -201,6 +206,7 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_MPCVR,       IDS_PPAGE_OUTPUT_MPCVR);
 	addRenderer(VIDRNDT_DXR,         IDS_PPAGE_OUTPUT_DXR);
 	addRenderer(VIDRNDT_MADVR,       IDS_PPAGE_OUTPUT_MADVR);
+	addRenderer(VIDRNDT_FRANKY,      0); // TODO
 	addRenderer(VIDRNDT_NULL_ANY,    IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP, IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
@@ -451,8 +457,20 @@ void CPPageVideo::OnVideoRendererChange()
 
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_EVR_SYNC), &m_cbVideoRenderer);
 			break;
+		case VIDRNDT_MPCVR:
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MPC_VR), &m_cbVideoRenderer);
+			m_chkMPCVRFullscreenControl.EnableWindow(TRUE);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			break;
 		case VIDRNDT_DXR:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_HAALI_VR), &m_cbVideoRenderer);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			break;
+		case VIDRNDT_MADVR:
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
+			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
+			break;
+		case VIDRNDT_FRANKY:
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_NULL_ANY:
@@ -460,15 +478,6 @@ void CPPageVideo::OnVideoRendererChange()
 			break;
 		case VIDRNDT_NULL_UNCOMP:
 			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_NULLVR_UNCOMP), &m_cbVideoRenderer);
-			break;
-		case VIDRNDT_MADVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MADVR), &m_cbVideoRenderer);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
-			break;
-		case VIDRNDT_MPCVR:
-			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_MPC_VR), &m_cbVideoRenderer);
-			m_chkMPCVRFullscreenControl.EnableWindow(TRUE);
-			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		default:
 			m_wndToolTip.UpdateTipText(L"", &m_cbVideoRenderer);
@@ -569,9 +578,10 @@ void CPPageVideo::OnVideoRenderPropClick()
 
 	CLSID clsid;
 	switch (s.iSelectedVideoRenderer) {
-	case VIDRNDT_MPCVR: clsid = CLSID_MPCVR; break;
-	case VIDRNDT_DXR:   clsid = CLSID_DXR;   break;
-	case VIDRNDT_MADVR: clsid = CLSID_madVR; break;
+	case VIDRNDT_MPCVR:  clsid = CLSID_MPCVR;          break;
+	case VIDRNDT_DXR:    clsid = CLSID_DXR;            break;
+	case VIDRNDT_MADVR:  clsid = CLSID_madVR;          break;
+	case VIDRNDT_FRANKY: clsid = CLSID_FrankyRenderer; break;
 	default:
 		return;
 	}

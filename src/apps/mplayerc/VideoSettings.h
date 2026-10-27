@@ -1,5 +1,5 @@
 /*
- * (C) 2022 see Authors.txt
+ * (C) 2022-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -23,16 +23,17 @@
 #include "filters/renderer/VideoRenderers/IAllocatorPresenter.h"
 
 enum : int {
-	//VIDRNDT_VMR7 = 0, // obsolete
-	//VIDRNDT_VMR9_W = 1, // obsolete
-	VIDRNDT_EVR = 2,
-	VIDRNDT_EVR_CP,
-	VIDRNDT_SYNC,
-	VIDRNDT_MPCVR,
-	VIDRNDT_DXR,
-	VIDRNDT_MADVR,
-	VIDRNDT_NULL_ANY = 10,
-	VIDRNDT_NULL_UNCOMP,
+	//VIDRNDT_VMR7      = 0, // obsolete
+	//VIDRNDT_VMR9_W    = 1, // obsolete
+	VIDRNDT_EVR         = 2,
+	VIDRNDT_EVR_CP      = 3,
+	VIDRNDT_SYNC        = 4,
+	VIDRNDT_MPCVR       = 5,
+	VIDRNDT_DXR         = 6,
+	VIDRNDT_MADVR       = 7,
+	VIDRNDT_FRANKY      = 8,
+	VIDRNDT_NULL_ANY    = 10,
+	VIDRNDT_NULL_UNCOMP = 11,
 };
 
 class CRenderersSettings

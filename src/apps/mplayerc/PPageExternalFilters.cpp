@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -39,7 +39,12 @@
 bool IsSupportedExternalVideoRenderer(CLSID clsid)
 {
 #if 1
-	return clsid == CLSID_EnhancedVideoRenderer || clsid == CLSID_MPCVR || clsid == CLSID_DXR || clsid == CLSID_madVR;
+	return 
+		clsid == CLSID_EnhancedVideoRenderer ||
+		clsid == CLSID_MPCVR ||
+		clsid == CLSID_DXR   ||
+		clsid == CLSID_madVR ||
+		clsid == CLSID_FrankyRenderer;
 #else
 	return false;
 #endif

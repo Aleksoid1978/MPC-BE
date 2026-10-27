@@ -1,5 +1,5 @@
 /*
- * (C) 2020-2025 see Authors.txt
+ * (C) 2020-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -80,6 +80,9 @@ DEFINE_GUID(CLSID_madVRAllocatorPresenter,
 // {28789E29-5BDD-4374-ADEC-AB2EB9212C0D}
 DEFINE_GUID(CLSID_MPCVRAllocatorPresenter,
 			0x28789E29, 0x5BDD, 0x4374, 0xAD, 0xEC, 0xAB, 0x2E, 0xB9, 0x21, 0x2C, 0x0D);
+// {B3504ECB-3835-4728-8E9A-CF52A423C9F0}
+DEFINE_GUID(CLSID_FrankyAllocatorPresenter,
+			0xB3504ECB, 0x3835, 0x4728, 0x8E, 0x9A, 0xCF, 0x52, 0xA4, 0x23, 0xC9, 0xF0);
 
 // video renderers
 
@@ -90,6 +93,10 @@ DEFINE_GUID(CLSID_DXR,
 // {71F080AA-8661-4093-B15E-4F6903E77D0A} MPC Video Renderer
 DEFINE_GUID(CLSID_MPCVR,
 			0x71F080AA, 0x8661, 0x4093, 0xB1, 0x5E, 0x4F, 0x69, 0x03, 0xE7, 0x7D, 0x0A);
+
+// {B864E92A-1BDF-4DA1-9004-CBF467DF239A}
+DEFINE_GUID(CLSID_FrankyRenderer,
+			0xb864e92a, 0x1bdf, 0x4da1, 0x90, 0x04, 0xcb, 0xf4, 0x67, 0xdf, 0x23, 0x9a);
 
 // audio renderers
 

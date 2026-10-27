@@ -199,6 +199,8 @@ bool IsVideoRenderer(const CLSID clsid)
 		|| clsid == CLSID_madVRAllocatorPresenter // AP for madVR
 		|| clsid == CLSID_MPCVR                   // MPC VR
 		|| clsid == CLSID_MPCVRAllocatorPresenter // AP for MPC VR
+		|| clsid == CLSID_FrankyRenderer
+		|| clsid == CLSID_FrankyAllocatorPresenter
 		|| clsid == CLSID_OverlayMixer) {
 		return true;
 	}
