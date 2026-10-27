@@ -12,6 +12,12 @@ Fixed AC3 audio encoding for S/PDIF and HDMI output.
 MPCVideoDec
 Fixed DolbyVision support for D3D11cb, D3D12cb and NVDEC decoders.
 
+VideoRenderers
+Added support for FrankyRenderer.
+
+Player
+Updated Slovak translation.
+
 Updated libraries:
 	ffmpeg n9.1-dev-2704-g9d2d5b1aa3;
 	vvdec v3.2.1.
