@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (any)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (uncompressed)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "The selected renderer is not installed."
     IDS_REND_NOT_AVAILABLE  "**unavailable**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Ansluts till vilken som helst video-liknande media typ och kommer att skicka inkommande prover till ingenstans. Använd det när du inte behöver bildskärmen och vill spara cpu från att arbeta i onödan."
-    IDS_DESC_NULLVR_UNCOMP  "Samma som de vanliga Null renderaren, men denna kommer endast att ansluta till okomprimerad typer."
     IDS_DESC_EVR            "Video renderer with hardware decoding support."
     IDS_DESC_EVR_CP         "Same as the EVR, but with the Allocator-Presenter for subtitling and postprocessing."
-    IDS_DESC_MADVR          "High-quality renderer, requires a GPU that supports D3D9 or later."
     IDS_DESC_EVR_SYNC       "Same as the EVR (CP), but offers several options to synchronize the video frame rate with the display refresh rate to eliminate skipped or duplicated video frames."
     IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MADVR          "High-quality renderer, requires a GPU that supports D3D9 or later."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Ansluts till vilken som helst video-liknande media typ och kommer att skicka inkommande prover till ingenstans. Använd det när du inte behöver bildskärmen och vill spara cpu från att arbeta i onödan."
+    IDS_DESC_NULLVR_UNCOMP  "Samma som de vanliga Null renderaren, men denna kommer endast att ansluta till okomprimerad typer."
 END
 
 STRINGTABLE

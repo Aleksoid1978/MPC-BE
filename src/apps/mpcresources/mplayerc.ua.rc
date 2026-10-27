@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (користув.)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (стиснений)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (нестиснений)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Вибраний рендерер не встановлено."
     IDS_REND_NOT_AVAILABLE  "**недоступний**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Підключається до будь-якого типу відеоданих і відправляє вхідні кадри в нікуди. Може бути корисний для економії ресурсів процесора, якщо потрібен лише звук."
-    IDS_DESC_NULLVR_UNCOMP  "Так само як нормальний Null-рендерер, але підключається лише до нестиснених даних."
     IDS_DESC_EVR            "Відеорендерер з підтримкою апаратного декодування."
     IDS_DESC_EVR_CP         "Так само як і EVR, але з Allocator-Presenter для відображення субтитрів і виконання післяобробки."
-    IDS_DESC_MADVR          "Високоякісний рендерер, вимагає GPU, що підтримує D3D9 або пізніший."
     IDS_DESC_EVR_SYNC       "Так само як і EVR (користув.), але має опції для синхронізування частоти кадрів відео з частотою поновлення екрану для уникнення пропущенних або тих, що дублюються, кадрів відео."
     IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MADVR          "Високоякісний рендерер, вимагає GPU, що підтримує D3D9 або пізніший."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Підключається до будь-якого типу відеоданих і відправляє вхідні кадри в нікуди. Може бути корисний для економії ресурсів процесора, якщо потрібен лише звук."
+    IDS_DESC_NULLVR_UNCOMP  "Так само як нормальний Null-рендерер, але підключається лише до нестиснених даних."
 END
 
 STRINGTABLE

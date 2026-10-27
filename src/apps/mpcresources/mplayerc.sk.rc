@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "Nástroj na vykresľovanie videa MPC"
     IDS_PPAGE_OUTPUT_EVR    "Nástroj na vylepšené vykresľovanie videa"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Nástroj na vylepšené vykresľovanie videa (vlastná prezentácia)"
+    IDS_PPAGE_OUTPUT_SYNC   "Nástroj na synchronizáciu vykresľovania videa"
+    IDS_PPAGE_OUTPUT_MPCVR  "Nástroj na vykresľovanie videa MPC"
     IDS_PPAGE_OUTPUT_DXR    "Nástroj na vykresľovanie videa Haali"
+    IDS_PPAGE_OUTPUT_MADVR  "Nástroj na vykresľovanie videa madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Nulový(akýkoľvek)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Nulový (nekomprimovaný)"
-    IDS_PPAGE_OUTPUT_MADVR  "Nástroj na vykresľovanie videa madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Nástroj na synchronizáciu vykresľovania videa"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Vybraný vykresľovací nástroj nie je nainštalovaný."
     IDS_REND_NOT_AVAILABLE  "**nedostupné**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Pripája sa k videu, neodosiela však prichádzajúce pakety. Môžete ho použiť vtedy, ak nepotrebujete obrazový výstup videa a chcete obmedziť zbytočnú prácu procesora."
-    IDS_DESC_NULLVR_UNCOMP  "To isté, ako Nulový vykresľovač, ale spracovávať sa dajú iba nekomprimované súbory."
     IDS_DESC_EVR            "Vykresľovač videa s podporou hardvérového dekódovania."
     IDS_DESC_EVR_CP         "Rovnaká ako EVR, ale s Allocator-Presenterom na titulkovanie a následné spracovanie."
-    IDS_DESC_MADVR          "Vysokokvalitný vykresľovací modul vyžaduje GPU, ktorý podporuje D3D9 alebo novší."
     IDS_DESC_EVR_SYNC       "Rovnaká ako EVR (CP), ale ponúka niekoľko možností synchronizácie snímkovej frekvencie videa s obnovovacou frekvenciou displeja, aby sa eliminovali vynechané alebo duplicitné snímky videa."
     IDS_DESC_MPC_VR         "Vykresľovací modul videa s podporou Direct3D 11"
+    IDS_DESC_MADVR          "Vysokokvalitný vykresľovací modul vyžaduje GPU, ktorý podporuje D3D9 alebo novší."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Pripája sa k videu, neodosiela však prichádzajúce pakety. Môžete ho použiť vtedy, ak nepotrebujete obrazový výstup videa a chcete obmedziť zbytočnú prácu procesora."
+    IDS_DESC_NULLVR_UNCOMP  "To isté, ako Nulový vykresľovač, ale spracovávať sa dajú iba nekomprimované súbory."
 END
 
 STRINGTABLE

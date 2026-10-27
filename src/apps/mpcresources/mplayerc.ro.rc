@@ -2613,14 +2613,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "Randorul video MPC (MPC Video Renderer)"
     IDS_PPAGE_OUTPUT_EVR    "Randorul video îmbunătăţit - EVR"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Randorul video îmbunătăţit (cu prezentator personalizat) - EVR (CP)"
+    IDS_PPAGE_OUTPUT_SYNC   "Randorul (de sincronizare) Sync"
+    IDS_PPAGE_OUTPUT_MPCVR  "Randorul video MPC (MPC Video Renderer)"
     IDS_PPAGE_OUTPUT_DXR    "Randorul video Haali"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (orice)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (necompresat)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Randorul (de sincronizare) Sync"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Randorul selectat nu este instalat."
     IDS_REND_NOT_AVAILABLE  "**indisponibil**"
 END
@@ -3302,13 +3303,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosește-l atunci când nu ai nevoie de afișarea video și vrei să salvezi procesorul de la o muncă inutilă."
-    IDS_DESC_NULLVR_UNCOMP  "La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
     IDS_DESC_EVR            "Randor video cu suport pentru decodare (decodificare) hardware."
     IDS_DESC_EVR_CP         "La fel ca EVR, dar cu modul Alocator-Prezentator (Allocator-Presenter) pentru subtitrare și postprocesare."
-    IDS_DESC_MADVR          "Randor de calitate ridicată, necesită un GPU (o placă video/grafică) ce suportă D3D9 sau o versiune mai nouă."
     IDS_DESC_EVR_SYNC       "La fel ca EVR (CP), dar oferă mai multe opțiuni pentru a sincroniza rata de cadre video cu rata de reîmprospătare a afișajului pentru a elimina cadrele video sărite sau duplicate."
     IDS_DESC_MPC_VR         "Randor video cu suport pentru Direct3D 11."
+    IDS_DESC_MADVR          "Randor de calitate ridicată, necesită un GPU (o placă video/grafică) ce suportă D3D9 sau o versiune mai nouă."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Se conectează la orice mediu de tip video și mostrele video nu vor fi trimise niciunde. Folosește-l atunci când nu ai nevoie de afișarea video și vrei să salvezi procesorul de la o muncă inutilă."
+    IDS_DESC_NULLVR_UNCOMP  "La fel ca randorul normal Null, dar acesta se va conecta doar la tipurile necomprimate."
 END
 
 STRINGTABLE

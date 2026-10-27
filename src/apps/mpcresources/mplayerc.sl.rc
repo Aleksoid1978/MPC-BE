@@ -2612,14 +2612,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video izrisovalnik"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video izrisovalnik"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video izrisovalnik (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video izrisovalnik"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video izrisovalnik"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video izrisovalnik"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (any)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (uncompressed)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video izrisovalnik"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Izbrani izrisovalnik ni nameščen."
     IDS_REND_NOT_AVAILABLE  "**ni na voljo**"
 END
@@ -3301,13 +3302,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Connects to any video-like media type and will send the incoming samples to nowhere. Use it when you don't need the video display and want to save the cpu from working unnecessarily."
-    IDS_DESC_NULLVR_UNCOMP  "Enako kot normalni Null izrisovalnik, but this will only connect to uncompressed types."
     IDS_DESC_EVR            "Video izrisovalnik with hardware decoding support."
     IDS_DESC_EVR_CP         "Same as the EVR, but with the Allocator-Presenter for subtitling and postprocessing."
-    IDS_DESC_MADVR          "Visoko kvalitetni izrisovalnik, ki zahteva GPU s podporo za D3D9 ali novejše."
     IDS_DESC_EVR_SYNC       "Same as the EVR (CP), but offers several options to synchronize the video frame rate with the display refresh rate to eliminate skipped or duplicated video frames."
     IDS_DESC_MPC_VR         "Video izrisovalnik s podporo za Direct3D 11."
+    IDS_DESC_MADVR          "Visoko kvalitetni izrisovalnik, ki zahteva GPU s podporo za D3D9 ali novejše."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Connects to any video-like media type and will send the incoming samples to nowhere. Use it when you don't need the video display and want to save the cpu from working unnecessarily."
+    IDS_DESC_NULLVR_UNCOMP  "Enako kot normalni Null izrisovalnik, but this will only connect to uncompressed types."
 END
 
 STRINGTABLE

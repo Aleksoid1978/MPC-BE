@@ -2433,11 +2433,17 @@ CDVBChannel* CAppSettings::FindChannelByPref(int nPrefNumber)
 
 bool CAppSettings::IsISRSelect() const
 {
-	return (m_VRSettings.iVideoRenderer == VIDRNDT_EVR_CP ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_DXR    ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_SYNC   ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_MADVR  ||
-			m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR);
+	switch (m_VRSettings.iVideoRenderer) {
+	case VIDRNDT_EVR_CP:
+	case VIDRNDT_SYNC:
+	case VIDRNDT_MPCVR:
+	case VIDRNDT_DXR:
+	case VIDRNDT_MADVR:
+	case VIDRNDT_FRANKY:
+		return true;
+	}
+
+	return false;
 }
 
 bool CAppSettings::IsISRAutoLoadEnabled() const

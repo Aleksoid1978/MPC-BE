@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (any)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (uncompressed)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Избраният рендер не е инсталиран в системата"
     IDS_REND_NOT_AVAILABLE  "**Не е наличен**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Свързва се с всякакъв вид видео данни и изпраща входящите кадри до никъде. Режимът може да бъде полезен за пестене на процесорни ресурси, когато е необходим само звук."
-    IDS_DESC_NULLVR_UNCOMP  "Същото като нормален Null-рендер, но се свързва само с некомпресирани типове данни."
     IDS_DESC_EVR            "Видео рендер с поддръжка на хардуерно декодиране."
     IDS_DESC_EVR_CP         "Същото като EVR, но използва Allocator-Presenter за субтитри и обработка."
-    IDS_DESC_MADVR          "Висококачествен рендер, изисква видеокарта с поддръжка на D3D9."
     IDS_DESC_EVR_SYNC       "Същото като EVR (CP), но има допълнителни средства за синхронизиране на кадровата честота с честотата на опресняване на екрана."
     IDS_DESC_MPC_VR         "Видео рендър с поддръжка на Direct3D 11."
+    IDS_DESC_MADVR          "Висококачествен рендер, изисква видеокарта с поддръжка на D3D9."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Свързва се с всякакъв вид видео данни и изпраща входящите кадри до никъде. Режимът може да бъде полезен за пестене на процесорни ресурси, когато е необходим само звук."
+    IDS_DESC_NULLVR_UNCOMP  "Същото като нормален Null-рендер, но се свързва само с некомпресирани типове данни."
 END
 
 STRINGTABLE

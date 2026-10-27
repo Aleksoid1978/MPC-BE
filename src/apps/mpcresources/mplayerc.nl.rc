@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Enhanced Video Renderer (Sync)"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (gecomprimeerd)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (niet gecomprimeerd)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Enhanced Video Renderer (Sync)"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "De geselecteerde renderer is niet geïnstalleerd."
     IDS_REND_NOT_AVAILABLE  "**niet beschikbaar**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Verbind met elk video-achtig mediatype en zal de inkomende signalen in het, grote dan wel kleine, niets zenden. Gebruik dit als geen uitvoersignaal nodig is en de om de CPU te ontlasten."
-    IDS_DESC_NULLVR_UNCOMP  "Hetzelfde als de normale Null renderer, maar deze zal alleen verbinding maken met ongecomprimeerde types."
     IDS_DESC_EVR            "Videorenderer met mogelijkheid tot hardwaredecoding."
     IDS_DESC_EVR_CP         "Hetzelfde als EVR, maar met de Allocator-Presenter plugin voor ondertiteling en nabewerking."
-    IDS_DESC_MADVR          "Renderer in hoge kwaliteit, vereist een GPU die D3D9 of hoger ondersteunt."
     IDS_DESC_EVR_SYNC       "Hetzelfde als EVR (CP), maar biedt een paar opties om de framesnelheid en vernieuwingsfrequentie te synchroniseren. Deze kan het aantal overgeslagen of gedupliceerd videoframes verminderen."
     IDS_DESC_MPC_VR         "Videorenderer met ondersteuning voor Direct3D 11."
+    IDS_DESC_MADVR          "Renderer in hoge kwaliteit, vereist een GPU die D3D9 of hoger ondersteunt."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Verbind met elk video-achtig mediatype en zal de inkomende signalen in het, grote dan wel kleine, niets zenden. Gebruik dit als geen uitvoersignaal nodig is en de om de CPU te ontlasten."
+    IDS_DESC_NULLVR_UNCOMP  "Hetzelfde als de normale Null renderer, maar deze zal alleen verbinding maken met ongecomprimeerde types."
 END
 
 STRINGTABLE

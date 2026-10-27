@@ -9035,7 +9035,8 @@ void CMainFrame::OnUpdatePlayFilters(CCmdUI* pCmdUI)
 
 void CMainFrame::OnSelectShaders()
 {
-	const bool bEnableD3D11 = IsWindows7SP1OrGreater() && AfxGetAppSettings().m_VRSettings.iVideoRenderer == VIDRNDT_MPCVR;
+	const CRenderersSettings& rs = AfxGetAppSettings().m_VRSettings;
+	const bool bEnableD3D11 = IsWindows7SP1OrGreater() && rs.iVideoRenderer == VIDRNDT_MPCVR;
 
 	if (IDOK != CShaderCombineDlg(GetModalParent(), bEnableD3D11).DoModal()) {
 		return;

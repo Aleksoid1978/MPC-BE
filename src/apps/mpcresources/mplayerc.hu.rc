@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Video Renderer szinkronizálása"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (bármely)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (tömörítetlen)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Video Renderer szinkronizálása"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "A kiválasztott megjelenítő nincs telepítve."
     IDS_REND_NOT_AVAILABLE  "**nem érhető el**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
-    IDS_DESC_NULLVR_UNCOMP  "Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
     IDS_DESC_EVR            "Videó megjelenítő hardveres dekódolási támogatással."
     IDS_DESC_EVR_CP         "Ugyanaz, mint az EVR, de az Allocator-Presenterrel a feliratozáshoz és az utófeldolgozáshoz."
-    IDS_DESC_MADVR          "Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
     IDS_DESC_EVR_SYNC       "Ugyanaz, mint az EVR (CP), de számos lehetőséget kínál a képkocka sebességének szinkronizálására a képernyő frissítési gyakoriságával, hogy kiküszöbölje a kihagyott vagy duplikált képkockákat."
     IDS_DESC_MPC_VR         "Videó megjelenítő Direct3D 11 támogatással."
+    IDS_DESC_MADVR          "Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
+    IDS_DESC_NULLVR_UNCOMP  "Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
 END
 
 STRINGTABLE

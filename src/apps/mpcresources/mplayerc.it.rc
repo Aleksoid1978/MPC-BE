@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "Rendering video MPC"
     IDS_PPAGE_OUTPUT_EVR    "Rendering video avanzato"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Rendering video avanzato (presentatore personalizzato)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sincronizza il rendering video"
+    IDS_PPAGE_OUTPUT_MPCVR  "Rendering video MPC"
     IDS_PPAGE_OUTPUT_DXR    "Rendering video Haali"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (tutto)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (non compresso)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sincronizza il rendering video"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Il renderer selezionato non è installato."
     IDS_REND_NOT_AVAILABLE  "**non disponibile**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Si collega a qualsiasi tipo di supporto simile a un video e non invierà i campioni in arrivo da nessuna parte. Usalo quando non hai bisogno del display video e vuoi evitare che la CPU funzioni inutilmente."
-    IDS_DESC_NULLVR_UNCOMP  "Come il normale renderer Null, ma questo si collegherà solo ai tipi non compressi."
     IDS_DESC_EVR            "Renderer video con supporto per decodifica hardware."
     IDS_DESC_EVR_CP         "Come l'EVR, ma con Allocator-Presenter per la sottotitolazione e la postelaborazione."
-    IDS_DESC_MADVR          "Renderer di alta qualità, richiede una GPU che supporti D3D9 o successivo."
     IDS_DESC_EVR_SYNC       "Come il EVR (CP), ma offre diverse opzioni per sincronizzare il video frame rate con la frequenza di aggiornamento display per eliminare video frame duplicati."
     IDS_DESC_MPC_VR         "Renderer video con supporto per Direct3D 11."
+    IDS_DESC_MADVR          "Renderer di alta qualità, richiede una GPU che supporti D3D9 o successivo."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Si collega a qualsiasi tipo di supporto simile a un video e non invierà i campioni in arrivo da nessuna parte. Usalo quando non hai bisogno del display video e vuoi evitare che la CPU funzioni inutilmente."
+    IDS_DESC_NULLVR_UNCOMP  "Come il normale renderer Null, ma questo si collegherà solo ai tipi non compressi."
 END
 
 STRINGTABLE

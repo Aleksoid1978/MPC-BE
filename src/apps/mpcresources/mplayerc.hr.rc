@@ -2612,14 +2612,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (any)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (uncompressed)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "The selected renderer is not installed."
     IDS_REND_NOT_AVAILABLE  "**nedotupno**"
 END
@@ -3301,13 +3302,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Povezuje se na bilo koji video-liki tip medija i pristigle uzorke šalje u prazno. Koristite kad nemate potrebu za zaslonom i želite uštedjeti CPU od praznog hoda."
-    IDS_DESC_NULLVR_UNCOMP  "Jednako kao normalan Null render, jedino što se ovaj povezuje na nekomprimirane tipove."
     IDS_DESC_EVR            "Video render uz hardversku podršku za dekodiranje."
     IDS_DESC_EVR_CP         "Jednako kao EVR, uz Allocator-Presenter za podnaslove i postprocesing."
-    IDS_DESC_MADVR          "Visoko-kvalitetni render, zahtjeva GPU koji podržava D3D9 ili kasnije."
     IDS_DESC_EVR_SYNC       "Jednako kao EVR (CP), uz nekoliko mogućnosti za sinkronizaciju video sličica skladnu vrijednosti osvježenja na monitoru za poništenje preskočenih ili udvostručenih sličica."
     IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MADVR          "Visoko-kvalitetni render, zahtjeva GPU koji podržava D3D9 ili kasnije."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Povezuje se na bilo koji video-liki tip medija i pristigle uzorke šalje u prazno. Koristite kad nemate potrebu za zaslonom i želite uštedjeti CPU od praznog hoda."
+    IDS_DESC_NULLVR_UNCOMP  "Jednako kao normalan Null render, jedino što se ovaj povezuje na nekomprimirane tipove."
 END
 
 STRINGTABLE

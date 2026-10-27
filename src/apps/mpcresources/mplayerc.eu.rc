@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Bideo Aurkezle Hobetua"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Bideo Aurkezle Hobetua (norberea)"
+    IDS_PPAGE_OUTPUT_SYNC   "Aldb Bideo Aurkezlea"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Bideo Aurkezlea"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (konprimitua)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (konprimitugabea)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Aldb Bideo Aurkezlea"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Hautaturiko aurkezlea ez dago ezarrita."
     IDS_REND_NOT_AVAILABLE  "**eskuraezina**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Edozein bideo-erako multimedia motarekin elkarketatzen da eta barrurako laginak inora ez bidaliko ditu. Erabili bideo erakuspenik behar ez duzunean eta cpu-a gordetzea nahi duzunean alperrik lan egitetik."
-    IDS_DESC_NULLVR_UNCOMP  "Null aurkezle arrunta bezalakoa, baina honek hertsatugabeko motak bakarrik elkartzen ditu."
     IDS_DESC_EVR            "Video renderer with hardware decoding support."
     IDS_DESC_EVR_CP         "Same as the EVR, but with the Allocator-Presenter for subtitling and postprocessing."
-    IDS_DESC_MADVR          "Ontasun-handiko aurkezlea, D3D9 edo berriagoa sostengatzen duen GPU-a behar du."
     IDS_DESC_EVR_SYNC       "EVR (CP)-ren berdina, baina aukera ugari eskaintzen ditu bideo frame neurria erakuspen berritze neurriarekin aldiberetzeko jauzitako edo bikoiztutako bideo frameak ezabatzeko."
     IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MADVR          "Ontasun-handiko aurkezlea, D3D9 edo berriagoa sostengatzen duen GPU-a behar du."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Edozein bideo-erako multimedia motarekin elkarketatzen da eta barrurako laginak inora ez bidaliko ditu. Erabili bideo erakuspenik behar ez duzunean eta cpu-a gordetzea nahi duzunean alperrik lan egitetik."
+    IDS_DESC_NULLVR_UNCOMP  "Null aurkezle arrunta bezalakoa, baina honek hertsatugabeko motak bakarrik elkartzen ditu."
 END
 
 STRINGTABLE

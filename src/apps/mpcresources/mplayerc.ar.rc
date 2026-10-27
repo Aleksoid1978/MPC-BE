@@ -2612,14 +2612,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "عارض فيديو MPC"
     IDS_PPAGE_OUTPUT_EVR    "عارض فيديو معزز (EVR)"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "عارض فيديو معزز (EVR) (عارض مخصص)"
+    IDS_PPAGE_OUTPUT_SYNC   "عارض فيديو متزامن"
+    IDS_PPAGE_OUTPUT_MPCVR  "عارض فيديو MPC"
     IDS_PPAGE_OUTPUT_DXR    "عارض فيديو Haali"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (أي)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (غير مضغوط)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "عارض فيديو متزامن"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "عارض الفيديو المحدد غير مثبت."
     IDS_REND_NOT_AVAILABLE  "**غير متاح**"
 END
@@ -3301,13 +3302,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "الاتصال بأي نوع من وسائط الفيديو وإرسال العينة الواردة إلى لا مكان. استخدمه عندما لا تحتاج إلى عرض الفيديو وتريد الحفاظ على موارد المعالج وتجنب إجهاده دون داع."
-    IDS_DESC_NULLVR_UNCOMP  "مطابق لعرض Null العادي، ولكنه سيتصل فقط بالأنواع غير المضغوطة."
     IDS_DESC_EVR            "محرك عرض الفيديو مع دعم فك التشفير بالأجهزة."
     IDS_DESC_EVR_CP         "مطابق لـ EVR، ولكن مع مُقدّم المخصص للترجمة والمعالجة اللاحقة."
-    IDS_DESC_MADVR          "محرك عرض عالي الجودة، يتطلب وحدة معالجة رسومية تدعم D3D9 أو أحدث."
     IDS_DESC_EVR_SYNC       "مطابق لـ EVR (CP)، ولكنه يوفر خيارات متعددة لمزامنة معدل إطارات الفيديو مع معدل تحديث العرض للتخلص من تخطي أو تكرار إطارات الفيديو."
     IDS_DESC_MPC_VR         "عارض فيديو مع دعم Direct3D 11."
+    IDS_DESC_MADVR          "محرك عرض عالي الجودة، يتطلب وحدة معالجة رسومية تدعم D3D9 أو أحدث."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "الاتصال بأي نوع من وسائط الفيديو وإرسال العينة الواردة إلى لا مكان. استخدمه عندما لا تحتاج إلى عرض الفيديو وتريد الحفاظ على موارد المعالج وتجنب إجهاده دون داع."
+    IDS_DESC_NULLVR_UNCOMP  "مطابق لعرض Null العادي، ولكنه سيتصل فقط بالأنواع غير المضغوطة."
 END
 
 STRINGTABLE

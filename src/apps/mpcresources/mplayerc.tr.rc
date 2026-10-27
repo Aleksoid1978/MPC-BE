@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video İşleyici"
     IDS_PPAGE_OUTPUT_EVR    "Geliştirilmiş Video İşleyici"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Geliştirilmiş Video İşleyici (özel sunucu)"
+    IDS_PPAGE_OUTPUT_SYNC   "Eşzamanlama Video İşleyici"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video İşleyici"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video İşleyici"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Boş (herhangi biri)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Boş (sıkıştırılmamış)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Eşzamanlama Video İşleyici"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Seçilen işleyici yüklenmemiş."
     IDS_REND_NOT_AVAILABLE  "**kullanılamıyor**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Her video benzeri medya biçimine bağlanır ve dahili örnekleri bir yere göndermez. Video gösterimine ihtiyaç duymadığınız ve işlemciyi pek az kullanmak istediğiniz durumlarda bu seçeneği seçiniz."
-    IDS_DESC_NULLVR_UNCOMP  "Boş işleyici ile aynıdır, ancak sadece sıkıştırılmamış biçimleri destekler."
     IDS_DESC_EVR            "Donanım kod çözme desteğine sahip video işleyici."
     IDS_DESC_EVR_CP         "GVİ ile aynıdır, ancak alt yazı ve son işleme için Bölüştürücü-Sunucu ile birlikte çalışır."
-    IDS_DESC_MADVR          "Yüksek kaliteli bir işleyicidir. D3D9 ya da daha sonrasını destekleyen bir ekran kartı gerektirir."
     IDS_DESC_EVR_SYNC       "GVİ (ÖS) ile aynıdır, ancak atlanan ya da çoğaltılan video karelerini ortadan kaldırmak için video kare hızını ekran yenileme hızı ile senkronize etmek için çeşitli seçenekler sunar."
     IDS_DESC_MPC_VR         "Direct3D 11 destekli video işleyici."
+    IDS_DESC_MADVR          "Yüksek kaliteli bir işleyicidir. D3D9 ya da daha sonrasını destekleyen bir ekran kartı gerektirir."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Her video benzeri medya biçimine bağlanır ve dahili örnekleri bir yere göndermez. Video gösterimine ihtiyaç duymadığınız ve işlemciyi pek az kullanmak istediğiniz durumlarda bu seçeneği seçiniz."
+    IDS_DESC_NULLVR_UNCOMP  "Boş işleyici ile aynıdır, ancak sadece sıkıştırılmamış biçimleri destekler."
 END
 
 STRINGTABLE

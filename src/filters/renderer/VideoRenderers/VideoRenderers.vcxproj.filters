@@ -83,6 +83,9 @@
     <ClCompile Include="AllocatorPresenterImpl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrankyAllocatorPresenter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllocatorCommon.h">
@@ -173,6 +176,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AllocatorPresenterImpl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrankyAllocatorPresenter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

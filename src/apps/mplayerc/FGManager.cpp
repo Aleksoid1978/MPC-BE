@@ -2762,10 +2762,11 @@ CFGManagerCustom::CFGManagerCustom(LPCWSTR pName, LPUNKNOWN pUnk, HWND hWnd, boo
 	// Subtitle renderers
 
 	bool VRwithSR =
-		rs.iVideoRenderer == VIDRNDT_MADVR  ||
 		rs.iVideoRenderer == VIDRNDT_EVR_CP ||
 		rs.iVideoRenderer == VIDRNDT_SYNC   ||
-		rs.iVideoRenderer == VIDRNDT_MPCVR;
+		rs.iVideoRenderer == VIDRNDT_MPCVR  ||
+		rs.iVideoRenderer == VIDRNDT_MADVR  ||
+		rs.iVideoRenderer == VIDRNDT_FRANKY;
 
 	switch (s.iSubtitleRenderer) {
 		case SUBRNDT_NONE:

@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (irgendetwas)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (unkomprimiert)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Der ausgewählte Renderer ist nicht installiert."
     IDS_REND_NOT_AVAILABLE  "**nicht verfügbar**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Stellt eine Verbindung zu allen videoartigen Medientypen her und sendet die eingehenden Samples ins Nichts. Sinnvoll, wenn keine Videoausgabe benötigt wird, um die CPU zu entlasten."
-    IDS_DESC_NULLVR_UNCOMP  "Wie der normale Null-Renderer, kann aber nur mit unkomprimierten Videotypen verbunden werden."
     IDS_DESC_EVR            "Videorenderer mit GPU Hardwarebeschleunigung"
     IDS_DESC_EVR_CP         "Wie der EVR, aber mit Allocator-Presenter für Untertitelung und Nachbearbeitung"
-    IDS_DESC_MADVR          "Qualitativ sehr hochwertiger Renderer, der eine Grafikkarte mit D3D9-Unterstützung (oder höher) benötigt."
     IDS_DESC_EVR_SYNC       "Wie der EVR (custom presenter), bietet jedoch verschiedene Optionen zum Synchronisieren der Videobildrate mit der Bildwiederholrate des Anzeigegeräts, um übersprungene oder doppelte Videobilder zu vermeiden."
     IDS_DESC_MPC_VR         "Videorenderer mit Unterstützung für Direct3D 11."
+    IDS_DESC_MADVR          "Qualitativ sehr hochwertiger Renderer, der eine Grafikkarte mit D3D9-Unterstützung (oder höher) benötigt."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Stellt eine Verbindung zu allen videoartigen Medientypen her und sendet die eingehenden Samples ins Nichts. Sinnvoll, wenn keine Videoausgabe benötigt wird, um die CPU zu entlasten."
+    IDS_DESC_NULLVR_UNCOMP  "Wie der normale Null-Renderer, kann aber nur mit unkomprimierten Videotypen verbunden werden."
 END
 
 STRINGTABLE

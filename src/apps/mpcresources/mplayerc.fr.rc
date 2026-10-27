@@ -2614,14 +2614,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_EVR    "Enhanced Video Renderer"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Enhanced Video Renderer (custom presenter)"
+    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
+    IDS_PPAGE_OUTPUT_MPCVR  "MPC Video Renderer"
     IDS_PPAGE_OUTPUT_DXR    "Haali Video Renderer"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (any)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (uncompressed)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Sync Video Renderer"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Le moteur de rendu sélectionné n'est pas installé."
     IDS_REND_NOT_AVAILABLE  "**indisponible**"
 END
@@ -3303,13 +3304,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Connection vers n'importe quel type de média vidéo et enverra l'exemple entrant vers nul part. Utilisez le quand vous n'avez pas besoin de l'affichage vidéo and que vous voulez garder des ressources processeur et éviter de le faire travailler inutilement."
-    IDS_DESC_NULLVR_UNCOMP  "Identique au rendu normal Null, mais ne se connectera qu'à des types non compressés."
     IDS_DESC_EVR            "Moteur de rendu vidéo avec prise en charge du décodage matériel."
     IDS_DESC_EVR_CP         "Identique à l'EVR, mais avec l'Allocator-Presenter pour le sous-titrage et le post-traitement."
-    IDS_DESC_MADVR          "Moteur de rendu de haute qualité, nécessite un GPU prenant en charge D3D9 ou version ultérieure."
     IDS_DESC_EVR_SYNC       "Identique à l'EVR (CP), mais offre plusieurs options pour synchroniser la fréquence d'images vidéo avec la fréquence de rafraîchissement de l'affichage afin d'éliminer les images vidéo sautées ou dupliquées."
     IDS_DESC_MPC_VR         "Video renderer with support for Direct3D 11."
+    IDS_DESC_MADVR          "Moteur de rendu de haute qualité, nécessite un GPU prenant en charge D3D9 ou version ultérieure."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Connection vers n'importe quel type de média vidéo et enverra l'exemple entrant vers nul part. Utilisez le quand vous n'avez pas besoin de l'affichage vidéo and que vous voulez garder des ressources processeur et éviter de le faire travailler inutilement."
+    IDS_DESC_NULLVR_UNCOMP  "Identique au rendu normal Null, mais ne se connectera qu'à des types non compressés."
 END
 
 STRINGTABLE

@@ -1,5 +1,5 @@
 /*
- * (C) 2022-2024 see Authors.txt
+ * (C) 2022-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -97,6 +97,7 @@ void CRenderersSettings::Load()
 								  VIDRNDT_MPCVR,
 								  VIDRNDT_DXR,
 								  VIDRNDT_MADVR,
+								  VIDRNDT_FRANKY,
 								  VIDRNDT_NULL_ANY,
 								  VIDRNDT_NULL_UNCOMP,
 								  });

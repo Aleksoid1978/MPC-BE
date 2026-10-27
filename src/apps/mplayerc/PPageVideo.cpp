@@ -183,9 +183,11 @@ BOOL CPPageVideo::OnInitDialog()
 			ASSERT(FALSE);
 			return;
 		}
-		CStringW sName = (iVR == VIDRNDT_FRANKY)
-			? CStringW(L"FrankyRenderer (experimental)")
-			: ResStr(nID);
+		CStringW sName = ResStr(nID);
+
+		if (iVR == VIDRNDT_FRANKY) {
+			sName.Append(L" (experimental)");
+		}
 
 		HRESULT hr = IsRendererAvailable(iVR);
 		if (S_FALSE == hr) {
@@ -206,7 +208,7 @@ BOOL CPPageVideo::OnInitDialog()
 	addRenderer(VIDRNDT_MPCVR,       IDS_PPAGE_OUTPUT_MPCVR);
 	addRenderer(VIDRNDT_DXR,         IDS_PPAGE_OUTPUT_DXR);
 	addRenderer(VIDRNDT_MADVR,       IDS_PPAGE_OUTPUT_MADVR);
-	addRenderer(VIDRNDT_FRANKY,      0); // TODO
+	addRenderer(VIDRNDT_FRANKY,      IDS_PPAGE_OUTPUT_FRANKY);
 	addRenderer(VIDRNDT_NULL_ANY,    IDS_PPAGE_OUTPUT_NULL_ANY);
 	addRenderer(VIDRNDT_NULL_UNCOMP, IDS_PPAGE_OUTPUT_NULL_UNCOMP);
 
@@ -471,6 +473,7 @@ void CPPageVideo::OnVideoRendererChange()
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_FRANKY:
+			m_wndToolTip.UpdateTipText(ResStr(IDS_DESC_FRANKY_VR), &m_cbVideoRenderer);
 			GetDlgItem(IDC_BUTTON1)->EnableWindow(IsRendererAvailable(CurrentVR) == S_OK ? TRUE : FALSE);
 			break;
 		case VIDRNDT_NULL_ANY:

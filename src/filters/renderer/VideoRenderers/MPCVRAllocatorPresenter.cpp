@@ -386,7 +386,7 @@ STDMETHODIMP CMPCVRAllocatorPresenter::ClearPixelShaders(int target)
 	return hr;
 }
 
-BYTE* WriteChunk(BYTE* dst, const uint32_t code, const int32_t size, BYTE* data)
+static BYTE* WriteChunk(BYTE* dst, const uint32_t code, const int32_t size, BYTE* data)
 {
 	memcpy(dst, &code, 4);
 	dst += 4;

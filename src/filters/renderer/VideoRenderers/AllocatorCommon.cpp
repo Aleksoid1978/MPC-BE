@@ -27,6 +27,7 @@
 #include "MPCVRAllocatorPresenter.h"
 #include "EVRAllocatorPresenter.h"
 #include "SyncRenderer.h"
+#include "FrankyAllocatorPresenter.h"
 
 static bool bIsErrorShowing   = false;
 static bool bIsWarningShowing = false;
@@ -64,8 +65,8 @@ HRESULT CreateAllocatorPresenter(const CLSID& clsid, HWND hWnd, bool bFullscreen
 		ap_name = L"MPC VR allocator presenter";
 	}
 	else if (clsid == CLSID_FrankyAllocatorPresenter) {
-		// TODO
-		return E_NOTIMPL;
+		*ppAP = DNew CFrankyAllocatorPresenter(hWnd, hr, Error);
+		ap_name = L"Franky allocator presenter";
 	}
 	else {
 		return E_NOTIMPL;

@@ -2611,14 +2611,15 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_PPAGE_OUTPUT_MPCVR  "Trình kết xuất video MPC"
     IDS_PPAGE_OUTPUT_EVR    "Trình kết xuất video nâng cao (EVR)"
     IDS_PPAGE_OUTPUT_EVR_CUSTOM "Trình kết xuất video nâng cao (trình bày tùy chỉnh)"
+    IDS_PPAGE_OUTPUT_SYNC   "Trình kết xuất video đồng bộ"
+    IDS_PPAGE_OUTPUT_MPCVR  "Trình kết xuất video MPC"
     IDS_PPAGE_OUTPUT_DXR    "Trình kết xuất video Haali"
+    IDS_PPAGE_OUTPUT_MADVR  "madVR"
+    IDS_PPAGE_OUTPUT_FRANKY "FrankyRenderer"
     IDS_PPAGE_OUTPUT_NULL_ANY "Null (bất kỳ)"
     IDS_PPAGE_OUTPUT_NULL_UNCOMP "Null (không nén)"
-    IDS_PPAGE_OUTPUT_MADVR  "madVR"
-    IDS_PPAGE_OUTPUT_SYNC   "Trình kết xuất video đồng bộ"
     IDS_PPAGE_OUTPUT_UNAVAILABLEMSG "Trình kết xuất đã chọn chưa được cài đặt."
     IDS_REND_NOT_AVAILABLE  "**không khả dụng**"
 END
@@ -3300,13 +3301,14 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_DESC_NULLVR_ANY     "Kết nối với bất kỳ loại phương tiện giống video nào và không gửi mẫu đến đâu cả. Sử dụng khi bạn không cần hiển thị video và muốn tiết kiệm CPU."
-    IDS_DESC_NULLVR_UNCOMP  "Giống như trình kết xuất Null bình thường, nhưng chỉ kết nối với các loại không nén."
     IDS_DESC_EVR            "Trình kết xuất video hỗ trợ giải mã phần cứng."
     IDS_DESC_EVR_CP         "Giống như EVR, nhưng có thêm Allocator-Presenter để phụ đề và xử lý hậu kỳ."
-    IDS_DESC_MADVR          "Trình kết xuất chất lượng cao, yêu cầu GPU hỗ trợ D3D9 trở lên."
     IDS_DESC_EVR_SYNC       "Giống như EVR (CP), nhưng cung cấp nhiều tùy chọn để đồng bộ hóa tốc độ khung hình video với tốc độ làm tươi màn hình nhằm loại bỏ việc bỏ lỡ hoặc lặp lại khung hình video."
     IDS_DESC_MPC_VR         "Trình kết xuất video hỗ trợ Direct3D 11."
+    IDS_DESC_MADVR          "Trình kết xuất chất lượng cao, yêu cầu GPU hỗ trợ D3D9 trở lên."
+    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_NULLVR_ANY     "Kết nối với bất kỳ loại phương tiện giống video nào và không gửi mẫu đến đâu cả. Sử dụng khi bạn không cần hiển thị video và muốn tiết kiệm CPU."
+    IDS_DESC_NULLVR_UNCOMP  "Giống như trình kết xuất Null bình thường, nhưng chỉ kết nối với các loại không nén."
 END
 
 STRINGTABLE

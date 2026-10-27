@@ -60,6 +60,7 @@
     <ClCompile Include="DXRAllocatorPresenter.cpp" />
     <ClCompile Include="EVRAllocatorPresenter.cpp" />
     <ClCompile Include="FocusThread.cpp" />
+    <ClCompile Include="FrankyAllocatorPresenter.cpp" />
     <ClCompile Include="GPUUsage.cpp" />
     <ClCompile Include="IPinHook.cpp" />
     <ClCompile Include="MacrovisionKicker.cpp" />
@@ -88,6 +89,7 @@
     <ClInclude Include="DXRAllocatorPresenter.h" />
     <ClInclude Include="EVRAllocatorPresenter.h" />
     <ClInclude Include="FocusThread.h" />
+    <ClInclude Include="FrankyAllocatorPresenter.h" />
     <ClInclude Include="GPUUsage.h" />
     <ClInclude Include="Include\d3dkmdt.h" />
     <ClInclude Include="Include\d3dkmthk.h" />
