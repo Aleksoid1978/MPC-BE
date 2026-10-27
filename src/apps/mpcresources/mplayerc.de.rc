@@ -3309,7 +3309,7 @@ BEGIN
     IDS_DESC_EVR_SYNC       "Wie der EVR (custom presenter), bietet jedoch verschiedene Optionen zum Synchronisieren der Videobildrate mit der Bildwiederholrate des Anzeigegeräts, um übersprungene oder doppelte Videobilder zu vermeiden."
     IDS_DESC_MPC_VR         "Videorenderer mit Unterstützung für Direct3D 11."
     IDS_DESC_MADVR          "Qualitativ sehr hochwertiger Renderer, der eine Grafikkarte mit D3D9-Unterstützung (oder höher) benötigt."
-    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_FRANKY_VR      "Auf libplacebo basierender Renderer."
     IDS_DESC_NULLVR_ANY     "Stellt eine Verbindung zu allen videoartigen Medientypen her und sendet die eingehenden Samples ins Nichts. Sinnvoll, wenn keine Videoausgabe benötigt wird, um die CPU zu entlasten."
     IDS_DESC_NULLVR_UNCOMP  "Wie der normale Null-Renderer, kann aber nur mit unkomprimierten Videotypen verbunden werden."
 END

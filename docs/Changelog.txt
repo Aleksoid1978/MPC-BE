@@ -17,6 +17,7 @@ Added support for FrankyRenderer.
 
 Player
 Updated Slovak translation.
+Updated German translation (by Klaus1189).
 
 Updated libraries:
 	ffmpeg n9.1-dev-2704-g9d2d5b1aa3;
