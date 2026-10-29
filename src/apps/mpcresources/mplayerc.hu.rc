@@ -3309,7 +3309,7 @@ BEGIN
     IDS_DESC_EVR_SYNC       "Ugyanaz, mint az EVR (CP), de számos lehetőséget kínál a képkocka sebességének szinkronizálására a képernyő frissítési gyakoriságával, hogy kiküszöbölje a kihagyott vagy duplikált képkockákat."
     IDS_DESC_MPC_VR         "Videó megjelenítő Direct3D 11 támogatással."
     IDS_DESC_MADVR          "Kiváló minőségű megjelenítőhöz olyan GPU szükséges, amely támogatja a D3D9 vagy újabb verziókat."
-    IDS_DESC_FRANKY_VR      "libplacebo based renderer."
+    IDS_DESC_FRANKY_VR      "libplacebo alapú renderer."
     IDS_DESC_NULLVR_ANY     "Minden videószerű médiatípushoz csatlakozni fog és a bejövő mintákat nem küldi ki sehová. Ezt akkor válassza, ha a videómegjelenítésre nincs szüksége és meg szeretné kímélni a processzorát a felesleges munkától."
     IDS_DESC_NULLVR_UNCOMP  "Ugyan az, mint a sima Null átalakító, de ez csak tömörítetlen típusokhoz fog csatlakozni."
 END
