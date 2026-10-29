@@ -1670,35 +1670,11 @@ namespace
 			dst += pitch;
 		}
 	}
-
-	template <class... Args>
-	__forceinline void DrawInternal(bool bUseAVX2, Args&& ... args)
-	{
-#ifndef __AVX2__
-		if (bUseAVX2) {
-#endif
-			DrawInternal<AVX2>(std::forward<Args>(args)...);
-#ifndef __AVX2__
-		} else {
-			DrawInternal<SSE2>(std::forward<Args>(args)...);
-		}
-#endif
-		// C version is not used, provided only for reference
-		// DrawInternal<C>(std::forward<Args>(args)...);
-	}
 }
 
-// Render a subpicture onto a surface.
-// spd is the surface to render on.
-// clipRect is a rectangular clip region to render inside.
-// pAlphaMask is an alpha clipping mask.
-// xsub and ysub ???
-// switchpts seems to be an array of fill colours interlaced with coordinates.
-//	switchpts[i*2] contains a colour and switchpts[i*2+1] contains the coordinate to use that colour from
-// fBody tells whether to render the body of the subs.
-// fBorder tells whether to render the border of the subs.
-CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub,
-					   const DWORD* switchpts, bool fBody, bool fBorder) const
+template <typename VER>
+CRect Rasterizer::DrawImpl(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub,
+						   const DWORD* switchpts, bool fBody, bool fBorder) const
 {
 	CRect bbox(0, 0, 0, 0);
 
@@ -1713,28 +1689,28 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	// Remember that all subtitle coordinates are specified in 1/8 pixels
 	// (x+4)>>3 rounds to nearest whole pixel.
 	// ??? What is xsub, ysub, mOffsetX and mOffsetY ?
-	int x = (xsub + m_pOverlayData->mOffsetX + 4)>>3;
-	int y = (ysub + m_pOverlayData->mOffsetY + 4)>>3;
+	int x = (xsub + m_pOverlayData->mOffsetX + 4) >> 3;
+	int y = (ysub + m_pOverlayData->mOffsetY + 4) >> 3;
 	int w = m_pOverlayData->mOverlayWidth;
 	int h = m_pOverlayData->mOverlayHeight;
 	int xo = 0, yo = 0;
 
 	// Again, limiting?
 	if (x < r.left) {
-		xo = r.left-x;
-		w -= r.left-x;
+		xo = r.left - x;
+		w -= r.left - x;
 		x = r.left;
 	}
 	if (y < r.top) {
-		yo = r.top-y;
-		h -= r.top-y;
+		yo = r.top - y;
+		h -= r.top - y;
 		y = r.top;
 	}
-	if (x+w > r.right) {
-		w = r.right-x;
+	if (x + w > r.right) {
+		w = r.right - x;
 	}
-	if (y+h > r.bottom) {
-		h = r.bottom-y;
+	if (y + h > r.bottom) {
+		h = r.bottom - y;
 	}
 
 	// Check if there's actually anything to render
@@ -1742,7 +1718,7 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 		return bbox;
 	}
 
-	bbox.SetRect(x, y, x+w, y+h);
+	bbox.SetRect(x, y, x + w, y + h);
 	bbox &= CRect(0, 0, spd.w, spd.h);
 
 	BYTE* srcBody = m_pOverlayData->mpOverlayBufferBody + m_pOverlayData->mOverlayPitch * yo + xo;
@@ -1766,55 +1742,80 @@ CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int x
 	switch (draw_op) {
 		case BODY:
 			// Draw single color fill or shadow
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts);
 			break;
 		case NONE:
 			// Draw single color border
 			ASSERT(s == srcBorder);
 			__assume(s == srcBorder);
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
-						 srcBody);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
+							  srcBody);
 			break;
 		case BODY | SWITCHPOINT:
 			// Draw multi color fill or shadow
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, xo);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, xo);
 			break;
 		case SWITCHPOINT:
 			// Draw multi color border
 			ASSERT(s == srcBorder);
 			__assume(s == srcBorder);
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
-						 srcBody, xo);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
+							  srcBody, xo);
 			break;
 		case ALPHA:
 			// Draw single color border with alpha mask
 			ASSERT(s == srcBorder);
 			__assume(s == srcBorder);
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
-						 srcBody, alphaMask, spd.w);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
+							  srcBody, alphaMask, spd.w);
 			break;
 		case ALPHA | BODY:
 			// Draw single color fill or shadow with alpha mask
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, alphaMask,
-						 spd.w);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, alphaMask,
+							  spd.w);
 			break;
 		case ALPHA | SWITCHPOINT:
 			// Draw multi color border with alpha mask
 			ASSERT(s == srcBorder);
 			__assume(s == srcBorder);
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
-						 srcBody, alphaMask, spd.w, xo);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, srcBorder,
+							  srcBody, alphaMask, spd.w, xo);
 			break;
 		case ALPHA | BODY | SWITCHPOINT:
 			// Draw multi color fill or shadow with alpha mask
-			DrawInternal(m_bUseAVX2, dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, alphaMask,
-						 spd.w, xo);
+			DrawInternal<VER>(dst, spd.pitch, s, m_pOverlayData->mOverlayPitch, w, h, switchpts, alphaMask,
+							  spd.w, xo);
 			break;
 		default:
 			ASSERT(FALSE);
 	}
 
 	return bbox;
+}
+
+// Render a subpicture onto a surface.
+// spd is the surface to render on.
+// clipRect is a rectangular clip region to render inside.
+// pAlphaMask is an alpha clipping mask.
+// xsub and ysub ???
+// switchpts seems to be an array of fill colours interlaced with coordinates.
+//	switchpts[i*2] contains a colour and switchpts[i*2+1] contains the coordinate to use that colour from
+// fBody tells whether to render the body of the subs.
+// fBorder tells whether to render the border of the subs.
+CRect Rasterizer::Draw(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub,
+					   const DWORD* switchpts, bool fBody, bool fBorder) const
+{
+	if (m_bUseAVX2) {
+		return DrawImpl<AVX2>(spd, clipRect, pAlphaMask, xsub, ysub, switchpts, fBody, fBorder);
+	}
+	return DrawImpl<SSE2>(spd, clipRect, pAlphaMask, xsub, ysub, switchpts, fBody, fBorder);
+}
+
+template <typename VER>
+void Rasterizer::FillSolidRectImpl(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor) const
+{
+	BYTE* dst = (BYTE*)((DWORD*)(spd.bits + spd.pitch * y) + x);
+	DrawInternal<VER>(dst, spd.pitch, BYTE(0x40), nWidth, nHeight, lColor);
 }
 
 void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor) const
@@ -1825,6 +1826,9 @@ void Rasterizer::FillSolidRect(SubPicDesc& spd, int x, int y, int nWidth, int nH
 		return;
 	}
 
-	BYTE* dst = (BYTE*)((DWORD*)(spd.bits + spd.pitch * y) + x);
-	DrawInternal(m_bUseAVX2, dst, spd.pitch, BYTE(0x40), nWidth, nHeight, lColor);
+	if (m_bUseAVX2) {
+		FillSolidRectImpl<AVX2>(spd, x, y, nWidth, nHeight, lColor);
+	} else {
+		FillSolidRectImpl<SSE2>(spd, x, y, nWidth, nHeight, lColor);
+	}
 }

@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2021 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -169,6 +169,11 @@ private:
 	template<int flag> __forceinline void _EvaluateLine(int x0, int y0, int x1, int y1);
 	static void _OverlapRegion(tSpanBuffer& dst, const tSpanBuffer& src, int dx, int dy);
 	void CreateWidenedRegionFast(const int borderY);
+
+	template <typename VER>
+	CRect DrawImpl(SubPicDesc& spd, CRect& clipRect, byte* pAlphaMask, int xsub, int ysub, const DWORD* switchpts, bool fBody, bool fBorder) const;
+	template <typename VER>
+	void FillSolidRectImpl(SubPicDesc& spd, int x, int y, int nWidth, int nHeight, DWORD lColor) const;
 
 public:
 	Rasterizer();
