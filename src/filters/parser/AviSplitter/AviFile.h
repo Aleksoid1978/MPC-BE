@@ -37,7 +37,7 @@ public:
 	template<typename T>
 	HRESULT ReadAvi(T& var, int offset = 0) {
 		memset(&var, 0, sizeof(var));
-		HRESULT hr = ByteRead(&var + offset, sizeof(var) - offset);
+		HRESULT hr = ByteRead((BYTE*)&var + offset, sizeof(var) - offset);
 		return hr;
 	}
 

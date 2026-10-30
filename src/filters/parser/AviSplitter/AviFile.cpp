@@ -291,7 +291,7 @@ HRESULT CAviFile::Parse(DWORD parentid, __int64 end)
 							strm->indx.reset(std::move(pSuperIndex));
 							strm->indx->fcc = FCC('indx');
 							strm->indx->cb = size;
-							if (S_OK != ByteRead(strm->indx.get() + 8, size)) {
+							if (S_OK != ByteRead((BYTE*)strm->indx.get() + 8, size)) {
 								return E_FAIL;
 							}
 							ASSERT(strm->indx->wLongsPerEntry == 4 && strm->indx->bIndexType == AVI_INDEX_OF_INDEXES);
