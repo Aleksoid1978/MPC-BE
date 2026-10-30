@@ -15,7 +15,9 @@ Fixed DolbyVision support for D3D11cb, D3D12cb and NVDEC decoders.
 VideoRenderers
 Added support for FrankyRenderer.
 
-Player
+Installer
+Updated MPC Video Renderer 0.11.1.
+
 Updated Slovak translation.
 Updated German translation (by Klaus1189).
 Updated Romanian translation (by Andrei Miloiu).

@@ -15,7 +15,9 @@ MPCVideoDec
 VideoRenderers
 Добавлена поддержка FrankyRenderer.
 
-Плеер
+Инсталлятор
+Обновлен MPC Video Renderer 0.11.1.
+
 Обновлен словацкий перевод.
 Обновлен немецкий перевод (автор Klaus1189).
 Обновлен румынский перевод (автор Andrei Miloiu).
