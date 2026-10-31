@@ -1,0 +1,154 @@
+/**
+ * Copyright (C) 2025 Niklas Haas
+ *
+ * This file is part of FFmpeg.
+ *
+ * FFmpeg is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * FFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with FFmpeg; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ */
+
+#include "libavutil/avassert.h"
+#include "libavutil/mem.h"
+
+#include "ops_internal.h"
+
+typedef struct MemcpyPriv {
+    int num_planes;
+    int index[4]; /* or -1 to clear plane */
+    uint8_t clear_value[4];
+} MemcpyPriv;
+
+/**
+ * Switch to loop if total padding exceeds this number of bytes. Chosen to
+ * align with the typical L1 cache size of modern CPUs, as this avoids the
+ * risk of the implementation loading one extra unnecessary cache line.
+ */
+#define SWS_MAX_PADDING 64
+
+/* Memcpy backend for trivial cases */
+
+static void process_memcpy(const SwsOpExec *exec, const void *priv,
+                           int x_start, int y_start, int x_end, int y_end)
+{
+    const MemcpyPriv *p = priv;
+    const int lines = y_end - y_start;
+    av_assert1(x_start == 0 && x_end == exec->width);
+
+    for (int i = 0; i < p->num_planes; i++) {
+        uint8_t *out = exec->out[i];
+        const int idx = p->index[i];
+        const int bytes = x_end * exec->block_size_out[i];
+        const int use_loop = exec->out_stride[i] < 0 ||
+                             exec->out_stride[i] > bytes + SWS_MAX_PADDING;
+        const size_t span = (size_t) (lines - 1) * exec->out_stride[i] + bytes;
+        if (idx < 0 && !use_loop) {
+            memset(out, p->clear_value[i], span);
+        } else if (idx < 0) {
+            for (int y = y_start; y < y_end; y++) {
+                memset(out, p->clear_value[i], bytes);
+                out += exec->out_stride[i];
+            }
+        } else if (out == exec->in[idx]) {
+            av_assert1(exec->out_stride[i] == exec->in_stride[idx]);
+            continue; /* plane was already ref'd */
+        } else if (exec->out_stride[i] == exec->in_stride[idx] && !use_loop) {
+            memcpy(out, exec->in[idx], span);
+        } else {
+            const uint8_t *in = exec->in[idx];
+            for (int y = y_start; y < y_end; y++) {
+                memcpy(out, in, bytes);
+                out += exec->out_stride[i];
+                in  += exec->in_stride[idx];
+            }
+        }
+    }
+}
+
+static int compile_ops_memcpy(SwsContext *ctx, const SwsOpList *ops, SwsCompiledOp *out)
+{
+    MemcpyPriv p = {0};
+
+    for (int n = 0; n < ops->num_ops; n++) {
+        const SwsOp *op = &ops->ops[n];
+        switch (op->op) {
+        case SWS_OP_READ:
+            if (ff_sws_rw_op_planes(op) != op->rw.elems || op->rw.frac || op->rw.filter.op)
+                return AVERROR(ENOTSUP);
+            for (int i = 0; i < op->rw.elems; i++)
+                p.index[i] = i;
+            break;
+
+        case SWS_OP_SWIZZLE: {
+            const MemcpyPriv orig = p;
+            for (int i = 0; i < 4; i++) {
+                /* Explicitly exclude swizzle masks that contain duplicates,
+                 * because these are wasteful to implement as a memcpy */
+                for (int j = 0; j < i; j++) {
+                    if (op->swizzle.in[i] == op->swizzle.in[j])
+                        return AVERROR(ENOTSUP);
+                }
+                p.index[i] = orig.index[op->swizzle.in[i]];
+            }
+            break;
+        }
+
+        case SWS_OP_CLEAR:
+            for (int i = 0; i < 4; i++) {
+                if (!SWS_COMP_TEST(op->clear.mask, i))
+                    continue;
+                if (op->clear.value[i].den != 1)
+                    return AVERROR(ENOTSUP);
+
+                /* Ensure all bytes to be cleared are the same, because we
+                 * can't memset on multi-byte sequences */
+                uint8_t val = op->clear.value[i].num & 0xFF;
+                uint32_t ref = val;
+                switch (ff_sws_pixel_type_size(op->clear.type[i])) {
+                case 2: ref *= 0x101; break;
+                case 4: ref *= 0x1010101; break;
+                }
+                if (ref != op->clear.value[i].num)
+                    return AVERROR(ENOTSUP);
+                p.clear_value[i] = val;
+                p.index[i] = -1;
+            }
+            break;
+
+        case SWS_OP_WRITE:
+            if (ff_sws_rw_op_planes(op) != op->rw.elems || op->rw.frac || op->rw.filter.op)
+                return AVERROR(ENOTSUP);
+            p.num_planes = op->rw.elems;
+            break;
+
+        default:
+            return AVERROR(ENOTSUP);
+        }
+    }
+
+    *out = (SwsCompiledOp) {
+        .slice_align = 1,
+        .block_size  = 1,
+        .func = process_memcpy,
+        .priv = av_memdup(&p, sizeof(p)),
+        .free = av_free,
+    };
+    return out->priv ? 0 : AVERROR(ENOMEM);
+}
+
+const SwsOpBackend backend_murder = {
+    .name       = "memcpy",
+    .flags      = SWS_BACKEND_MEMCPY,
+    .compile    = compile_ops_memcpy,
+    .hw_format  = AV_PIX_FMT_NONE,
+};

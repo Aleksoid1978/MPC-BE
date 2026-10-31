@@ -19,14 +19,14 @@
  */
 
 #include "framepool.h"
-#include "libavutil/avassert.h"
-#include "libavutil/avutil.h"
-#include "libavutil/buffer.h"
-#include "libavutil/frame.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/imgutils_internal.h"
-#include "libavutil/mem.h"
-#include "libavutil/pixfmt.h"
+#include "avassert.h"
+#include "avutil.h"
+#include "buffer.h"
+#include "frame.h"
+#include "imgutils.h"
+#include "imgutils_internal.h"
+#include "mem.h"
+#include "pixfmt.h"
 
 static av_cold int frame_pool_video_init(int width, int height,
                                          enum AVPixelFormat format,

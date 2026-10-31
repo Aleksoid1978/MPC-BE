@@ -254,6 +254,23 @@ static void lumRangeFromJpeg16_c(int16_t *_dst, int width,
         dst[i] = ((int64_t) dst[i] * coeff + offset) >> 18;
 }
 
+static void round_xyz12(uint8_t *plane, int stride, int width, int height, int y,
+                        int big_endian)
+{
+    uint8_t *ptr = plane + stride * y;
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < 3 * width; j++) {
+            unsigned v = big_endian ? AV_RB16(ptr + 2 * j) : AV_RL16(ptr + 2 * j);
+            v = FFMIN(v + 8, UINT16_MAX) & 0xFFF0;
+            if (big_endian)
+                AV_WB16(ptr + 2 * j, v);
+            else
+                AV_WL16(ptr + 2 * j, v);
+        }
+        ptr += stride;
+    }
+}
+
 
 #define DEBUG_SWSCALE_BUFFERS 0
 #define DEBUG_BUFFERS(...)                      \
@@ -552,6 +569,11 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
             fillPlane(dst[3], dstStride[3], length, height, offset, 255);
     }
 
+    /* XYZ is scaled on its codes like 16-bit RGB */
+    if (c->srcXYZ && c->dstXYZ)
+        round_xyz12(dst[0], dstStride[0], dstW, dstY - lastDstY, lastDstY - dstSliceY,
+                    isBE(dstFormat));
+
 #if HAVE_MMXEXT_INLINE
     if (av_get_cpu_flags() & AV_CPU_FLAG_MMXEXT)
         __asm__ volatile ("sfence" ::: "memory");
@@ -576,6 +598,7 @@ int ff_swscale(SwsInternal *c, const uint8_t *const src[], const int srcStride[]
  */
 static void solve_range_convert(uint16_t src_min, uint16_t src_max,
                                 uint16_t dst_min, uint16_t dst_max,
+                                uint16_t src_ref, uint16_t dst_ref,
                                 int src_bits, int src_shift, int mult_shift,
                                 uint32_t *coeff, int64_t *offset)
 {
@@ -583,8 +606,8 @@ static void solve_range_convert(uint16_t src_min, uint16_t src_max,
     uint16_t dst_range = dst_max - dst_min;
     int total_shift = mult_shift + src_shift;
     *coeff = AV_CEIL_RSHIFT(((uint64_t) dst_range << total_shift) / src_range, src_shift);
-    *offset = ((int64_t) dst_max << total_shift) -
-              ((int64_t) src_max << src_shift) * *coeff +
+    *offset = ((int64_t) dst_ref << total_shift) -
+              ((int64_t) src_ref << src_shift) * *coeff +
               (1U << (mult_shift - 1));
 }
 
@@ -597,6 +620,7 @@ static void init_range_convert_constants(SwsInternal *c)
     const uint16_t mpeg_min = 16U << (bit_depth - 8);
     const uint16_t mpeg_max_lum = 235U << (bit_depth - 8);
     const uint16_t mpeg_max_chr = 240U << (bit_depth - 8);
+    const uint16_t chr_center = 128U << (bit_depth - 8);
     const uint16_t jpeg_max = (1U << bit_depth) - 1;
     uint16_t src_min, src_max_lum, src_max_chr;
     uint16_t dst_min, dst_max_lum, dst_max_chr;
@@ -616,9 +640,11 @@ static void init_range_convert_constants(SwsInternal *c)
         dst_max_chr = jpeg_max;
     }
     solve_range_convert(src_min, src_max_lum, dst_min, dst_max_lum,
+                        src_max_lum, dst_max_lum,
                         src_bits, src_shift, mult_shift,
                         &c->lumConvertRange_coeff, &c->lumConvertRange_offset);
     solve_range_convert(src_min, src_max_chr, dst_min, dst_max_chr,
+                        chr_center, chr_center,
                         src_bits, src_shift, mult_shift,
                         &c->chrConvertRange_coeff, &c->chrConvertRange_offset);
 }
@@ -1123,7 +1149,7 @@ static int scale_internal(SwsContext *sws,
         src2[0] = base;
     }
 
-    if (c->srcXYZ && !(c->dstXYZ && sws->src_w==sws->dst_w && sws->src_h==sws->dst_h)) {
+    if (c->srcXYZ && !c->dstXYZ) {
         uint8_t *base;
 
         av_fast_malloc(&c->xyz_scratch, &c->xyz_scratch_allocated,
@@ -1191,7 +1217,7 @@ static int scale_internal(SwsContext *sws,
                          dst2, dstStride2, dstSliceY, dstSliceH);
     }
 
-    if (c->dstXYZ && !(c->srcXYZ && sws->src_w==sws->dst_w && sws->src_h==sws->dst_h)) {
+    if (c->dstXYZ && !c->srcXYZ) {
         uint8_t *dst;
 
         if (scale_dst) {
@@ -1554,7 +1580,7 @@ int sws_frame_setup(SwsContext *ctx, const AVFrame *dst, const AVFrame *src)
         if (dev_ctx->type != AV_HWDEVICE_TYPE_VULKAN)
             return AVERROR(ENOTSUP);
 
-#if CONFIG_UNSTABLE && CONFIG_SWSCALE_VULKAN
+#if CONFIG_SWSCALE_VULKAN
         ret = ff_sws_vk_init(ctx, src_hwfc->device_ref);
         if (ret < 0)
             return ret;

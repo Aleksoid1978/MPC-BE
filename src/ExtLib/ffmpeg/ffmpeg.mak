@@ -716,7 +716,6 @@ SRCS_LF = \
 	libavfilter/buffersink.c \
 	libavfilter/buffersrc.c \
 	libavfilter/formats.c \
-	libavfilter/framepool.c \
 	libavfilter/framequeue.c \
 	libavfilter/graphparser.c \
 	libavfilter/pthread.c \
@@ -751,6 +750,7 @@ SRCS_LU = \
 	libavutil/float_scalarproduct.c \
 	libavutil/float2half.c \
 	libavutil/frame.c \
+	libavutil/framepool.c \
 	libavutil/gain_map.c \
 	libavutil/half2float.c \
 	libavutil/hdr_dynamic_metadata.c \
@@ -826,6 +826,7 @@ SRCS_LS = \
 	libswscale/alphablend.c \
 	libswscale/cms.c \
 	libswscale/csputils.c \
+	libswscale/filters.c \
 	libswscale/format.c \
 	libswscale/gamma.c \
 	libswscale/graph.c \
@@ -835,18 +836,27 @@ SRCS_LS = \
 	libswscale/input.c \
 	libswscale/jit.c \
 	libswscale/lut3d.c \
+	libswscale/ops.c \
+	libswscale/ops_chain.c \
+	libswscale/ops_dispatch.c \
+	libswscale/ops_memcpy.c \
+	libswscale/ops_optimizer.c \
 	libswscale/options.c \
 	libswscale/output.c \
+	libswscale/rational64.c \
 	libswscale/rgb2rgb.c \
 	libswscale/slice.c \
 	libswscale/swscale.c \
 	libswscale/swscale_unscaled.c \
+	libswscale/uops.c \
+	libswscale/uops_backend.c \
 	libswscale/utils.c \
 	libswscale/version.c \
 	libswscale/vscale.c \
 	libswscale/yuv2rgb.c \
 	\
 	libswscale/x86/hscale_fast_bilinear_simd.c \
+	libswscale/x86/ops.c \
 	libswscale/x86/rgb2rgb.c \
 	libswscale/x86/swscale.c \
 	libswscale/x86/yuv2rgb.c
@@ -966,11 +976,16 @@ SRCS_ASM_LR = \
 
 SRCS_ASM_LS = \
 	libswscale/x86/input.asm \
+	libswscale/x86/ops_common.asm \
+	libswscale/x86/ops_float.asm \
+	libswscale/x86/ops_include.asm \
+	libswscale/x86/ops_int.asm \
 	libswscale/x86/output.asm \
 	libswscale/x86/range_convert.asm \
 	libswscale/x86/rgb_2_rgb.asm \
 	libswscale/x86/scale.asm \
 	libswscale/x86/scale_avx2.asm \
+	libswscale/x86/uops_macros.asm \
 	libswscale/x86/yuv_2_rgb.asm \
 	libswscale/x86/yuv2yuvX.asm
 

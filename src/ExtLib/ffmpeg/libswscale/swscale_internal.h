@@ -28,10 +28,10 @@
 #include "swscale.h"
 #include "graph.h"
 
-#include "libavfilter/framepool.h"
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
 #include "libavutil/frame.h"
+#include "libavutil/framepool.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/log.h"
 #include "libavutil/mem_internal.h"
@@ -552,9 +552,6 @@ struct SwsInternal {
 
     int use_mmx_vfilter;
 
-/* pre defined color-spaces gamma */
-#define XYZ_GAMMA (2.6)
-#define RGB_GAMMA (2.2)
     SwsColorFunc  xyz12Torgb48;
     SwsColorFunc  rgb48Toxyz12;
     SwsColorXform xyz2rgb;
@@ -736,7 +733,7 @@ av_cold void ff_sws_init_range_convert_x86(SwsInternal *c);
 av_cold void ff_sws_init_xyzdsp(SwsInternal *c);
 av_cold void ff_sws_init_xyzdsp_aarch64(SwsInternal *c);
 
-av_cold int ff_sws_fill_xyztables(SwsInternal *c);
+av_cold int ff_sws_fill_st428_tables(SwsInternal *c);
 
 SwsFunc ff_yuv2rgb_init_x86(SwsInternal *c);
 SwsFunc ff_yuv2rgb_init_ppc(SwsInternal *c);

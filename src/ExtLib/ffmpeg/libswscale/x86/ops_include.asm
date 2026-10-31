@@ -1,0 +1,383 @@
+;******************************************************************************
+;* Copyright (c) 2025 Niklas Haas
+;*
+;* This file is part of FFmpeg.
+;*
+;* FFmpeg is free software; you can redistribute it and/or
+;* modify it under the terms of the GNU Lesser General Public
+;* License as published by the Free Software Foundation; either
+;* version 2.1 of the License, or (at your option) any later version.
+;*
+;* FFmpeg is distributed in the hope that it will be useful,
+;* but WITHOUT ANY WARRANTY; without even the implied warranty of
+;* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;* Lesser General Public License for more details.
+;*
+;* You should have received a copy of the GNU Lesser General Public
+;* License along with FFmpeg; if not, write to the Free Software
+;* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+;******************************************************************************
+
+%include "libavutil/x86/x86util.asm"
+%include "libswscale/x86/uops_macros.asm"
+
+; High-level explanation of how the x86 backend works:
+;
+; sws_processN is the shared entry point for all operation chains. This
+; function is responsible for the block loop, as well as initializing the
+; plane pointers. It will jump directly into the first operation kernel,
+; and each operation kernel will jump directly into the next one, with the
+; final kernel returning back into the entry point.
+;
+; Inside an operation chain, we use a custom calling convention to preserve
+; registers between kernels. The exact register allocation is found further
+; below in this file, but we basically reserve (and share) the following
+; registers:
+;
+; - const execq (read-only, shared execution data, see SwsOpExec); stores the
+;   static metadata for this call and describes the image layouts
+;
+; - implq (read-only, operation chain, see SwsOpChain); stores the private data
+;   for each operation as well as the pointer to the next kernel in the sequence.
+;   This register is automatically incremented by the CONTINUE macro, and will
+;   be reset back to the first operation kernel by sws_process.
+;
+; - bxd, yd: current line and block number, used as loop counters in sws_process.
+;   Also used by e.g. the dithering code to do position-dependent dithering.
+;
+; - tmp0, tmp1, tmp2: temporary registers which are NOT preserved between kernels
+;
+; - inNq, outNq: plane pointers. These are incremented automatically after the
+;   corresponding read/write operation, by the read/write kernels themselves.
+;   sws_process will take care of resetting these to the next line after the
+;   block loop is done.
+;
+; Additionally, we pass data between kernels by directly keeping them inside
+; vector registers. For this, we reserve the following registers:
+;
+; - mx, my, mz, mw:     low half of the X, Y, Z and W components
+; - mx2, my2, mz2, mw2: high half of the X, Y, Z and W components
+; (As well as sized variants for xmx, ymx, etc.)
+;
+; The "high half" registers are only sometimes used; in order to enable
+; processing more pixels at the same time. See `decl_v2` below, which allows
+; assembling the same operation twice, once with only the lower half (V2=0),
+; and once with both halves (V2=1). The remaining vectors (m8-m15) are free for
+; use inside operation kernels.
+;
+; The basic rule is that we always use the full set of both vector registers
+; when processing the largest element size within a pixel chain. For example,
+; if we load 8-bit values and convert them to 32-bit floats internally, then
+; we would have an operation chain which combines an SSE4 V2=0 u8 kernel (128
+; bits = 16 pixels) with an AVX2 V2=1 f32 kernel (512 bits = 16 pixels). This
+; keeps the number of pixels being processed (BLOCK_WIDTH) constant. The V2
+; setting is suffixed to the operation name (_m1 or _m2), along with any other
+; custom NAME_SUFFIX (e.g. for operation variants).
+;
+; This design leaves us with the following set of possibilities:
+;
+; SSE4:
+; - max element is 32-bit: currently unsupported
+; - max element is 16-bit: currently unsupported
+; - max element is 8-bit:  block size 32, u8_m2_sse4
+;
+; AVX2:
+; - max element is 32-bit: block size 16, u32_m2_avx2, u16_m1_avx2, u8_m1_sse4
+; - max element is 16-bit: block size 32, u16_m2_avx2, u8_m1_avx2
+; - max element is 8-bit:  block size 64, u8_m2_avx2
+;
+; Meaning we need to cover the following code paths for each bit depth:
+;
+; -  8-bit kernels: m1_sse4, m2_sse4, m1_avx2, m2_avx2
+; - 16-bit kernels: m1_avx2, m2_avx2
+; - 32-bit kernels: m2_avx2
+;
+; See the bottom of ops_int.asm for an example.
+
+struc SwsOpExec
+    .in0 resq 1
+    .in1 resq 1
+    .in2 resq 1
+    .in3 resq 1
+    .out0 resq 1
+    .out1 resq 1
+    .out2 resq 1
+    .out3 resq 1
+    .in_stride0 resq 1
+    .in_stride1 resq 1
+    .in_stride2 resq 1
+    .in_stride3 resq 1
+    .out_stride0 resq 1
+    .out_stride1 resq 1
+    .out_stride2 resq 1
+    .out_stride3 resq 1
+    .in_bump0 resq 1
+    .in_bump1 resq 1
+    .in_bump2 resq 1
+    .in_bump3 resq 1
+    .out_bump0 resq 1
+    .out_bump1 resq 1
+    .out_bump2 resq 1
+    .out_bump3 resq 1
+    .width resd 1
+    .height resd 1
+    .slice_y resd 1
+    .slice_h resd 1
+    .block_size_in resd 4
+    .block_size_out resd 4
+    .in_sub_y4 resb 4
+    .out_sub_y4 resb 4
+    .in_sub_x4 resb 4
+    .out_sub_x4 resb 4
+    .in_bump_y resq 1
+    .in_offset_x resq 1
+endstruc
+
+struc SwsOpImpl
+    .cont resb 16
+    .priv resb 16
+    .next resb 0
+endstruc
+
+%define SWS_COMP_NONE           0
+%define SWS_COMP_ALL            0xF
+%define SWS_COMP(X)             (1 << (X))
+%define SWS_COMP_TEST(mask, X)  (((mask) >> X) & 1)
+%define SWS_COMP_INV(mask)      ((mask) ^ SWS_COMP_ALL)
+%define SWS_COMP_ELEMS(N)       ((1 << (N)) - 1)
+
+%define LIN_MASK(I, J) (1 << (5 * (I) + (J)))
+%define LIN_COL(J) (LIN_MASK(0, J) | LIN_MASK(1, J) | LIN_MASK(2, J) | LIN_MASK(3, J))
+
+;---------------------------------------------------------
+; Common macros for declaring operations
+
+; Declare an operation kernel, calling a provided macro to generate the body.
+; Note: This is automatically called by the DECL_* macros
+%macro DECL_OP 5-6+ ; macro, name, type, uop, mask
+    ; Declare named variables for common macro parameters
+    %ifdef NAME_SUFFIX
+        %xdefine NAME %2 %+ NAME_SUFFIX
+    %else
+        %xdefine NAME %2
+    %endif
+    %xdefine TYPE %3
+    %xdefine UOP  %4
+    %xdefine MASK %5
+
+    ; Declare X/Y/Z/W based on the provided mask
+    %assign X SWS_COMP_TEST(MASK, 0)
+    %assign Y SWS_COMP_TEST(MASK, 1)
+    %assign Z SWS_COMP_TEST(MASK, 2)
+    %assign W SWS_COMP_TEST(MASK, 3)
+    %assign COMPS (X + Y + Z + W)
+
+    ; Declare BYTES and BITS based on the ops type
+    %ifidn TYPE, SWS_PIXEL_U8
+        %assign BYTES 1
+    %elifidn TYPE, SWS_PIXEL_U16
+        %assign BYTES 2
+    %else
+        %assign BYTES 4
+    %endif
+    %assign BITS (BYTES * 8)
+
+    ; Calculate block size helpers
+    %ifdef V2
+        %assign BLOCK_SIZE (mmsize * (1 + V2))
+    %else
+        %assign BLOCK_SIZE (mmsize)
+    %endif
+    %assign BLOCK_WIDTH (BLOCK_SIZE / BYTES)
+
+    ; Add the correct name mangling / suffix for decl_v2
+    %ifdef V2
+        %if V2
+            %define ADD_MUL(name) name %+ _m2
+        %else
+            %define ADD_MUL(name) name %+ _m1
+        %endif
+    %else
+        %define ADD_MUL(name) name
+    %endif
+
+    cglobal ADD_MUL(NAME), 0, 0, 0 ; already allocated by entry point
+    %1 %6 ; call the provided macro to generate the kernel body
+
+    %undef NAME
+    %undef UOP
+    %undef TYPE
+    %undef MASK
+    %undef X
+    %undef Y
+    %undef Z
+    %undef W
+    %undef COMPS
+    %undef BYTES
+    %undef BITS
+    %undef BLOCK_SIZE
+    %undef BLOCK_WIDTH
+    %undef ADD_MUL
+%endmacro
+
+; Declare a set of operations with a custom name suffix
+%macro decl_suffix 2+ ; suffix, func
+    %xdefine NAME_SUFFIX %1
+    %2
+    %undef NAME_SUFFIX
+%endmacro
+
+; Declare a set of operations with the high half enabled / disabled
+%macro decl_v2 2+ ; v2, func
+    %assign V2 %1
+    %2
+    %undef V2
+%endmacro
+
+;---------------------------------------------------------
+; Common names for the internal calling convention
+%define mx      m0
+%define my      m1
+%define mz      m2
+%define mw      m3
+
+%define xmx     xm0
+%define xmy     xm1
+%define xmz     xm2
+%define xmw     xm3
+
+%define ymx     ym0
+%define ymy     ym1
+%define ymz     ym2
+%define ymw     ym3
+
+%define mx2     m4
+%define my2     m5
+%define mz2     m6
+%define mw2     m7
+
+%define xmx2    xm4
+%define xmy2    xm5
+%define xmz2    xm6
+%define xmw2    xm7
+
+%define ymx2    ym4
+%define ymy2    ym5
+%define ymz2    ym6
+%define ymw2    ym7
+
+; Reserved in this order by the signature of SwsOpFunc
+%define execq   r0q
+%define implq   r1q
+%define bxd     r2d
+%define bxq     r2q
+%define yd      r3d
+%define yq      r3q
+
+; Extra registers for free use by kernels, not saved between ops
+%define tmp0q   r4q
+%define tmp1q   r5q
+%define tmp2q   r6q
+
+%define tmp0d   r4d
+%define tmp1d   r5d
+%define tmp2d   r6d
+
+%define tmp0w   r4w
+%define tmp1w   r5w
+%define tmp2w   r6w
+
+; Registers for plane pointers; put at the end (and in ascending plane order)
+; so that we can avoid reserving them when not necessary
+%define out0q   r7q
+%define  in0q   r8q
+%define out1q   r9q
+%define  in1q   r10q
+%define out2q   r11q
+%define  in2q   r12q
+%define out3q   r13q
+%define  in3q   r14q
+
+;---------------------------------------------------------
+; Common macros for linking together different kernels
+
+; Load the next operation kernel's address to a register
+%macro LOAD_CONT 1 ; reg
+    mov %1, [implq + SwsOpImpl.cont]
+%endmacro
+
+; Tail call into the next operation kernel, given that kernel's address
+%macro CONTINUE 1 ; reg
+    add implq, SwsOpImpl.next
+    jmp %1
+    annotate_function_size
+%endmacro
+
+; Convenience macro to load and continue to the next kernel in one step
+%macro CONTINUE 0
+    LOAD_CONT tmp0q
+    CONTINUE tmp0q
+%endmacro
+
+;---------------------------------------------------------
+; Miscellaneous helpers
+
+; Helper for inline conditionals; used to conditionally include single lines
+%macro IF 2+ ; cond, body
+    %if %1
+        %2
+    %endif
+%endmacro
+
+; Alternate names; for nested usage (to work around NASM limitations)
+%macro IF1 2+
+    %if %1
+        %2
+    %endif
+%endmacro
+
+%macro IF2 2+
+    %if %1
+        %2
+    %endif
+%endmacro
+
+%macro shl_log2 2 ; dst, amount
+    %if %2 == 64
+        shl %1, 6
+    %elif %2 == 32
+        shl %1, 5
+    %elif %2 == 16
+        shl %1, 4
+    %elif %2 == 8
+        shl %1, 3
+    %elif %2 == 4
+        shl %1, 2
+    %elif %2 == 2
+        shl %1, 1
+    %elif %2 == 1
+        ; no-op
+    %else
+        %error "Unsupported value for shl_log2"
+    %endif
+%endmacro
+
+%macro assert 1-2 ; cond, message
+    %if !(%1)
+        %if %0 > 1
+            %error %2
+        %else
+            %error Assertion failed: %1
+        %endif
+    %endif
+%endmacro
+
+%macro assert_idn 2-3 ; expr1, expr2, message
+    %ifnidn %1, %2
+        %if %0 > 2
+            %error %3
+        %else
+            %error Assertion failed: %1 == %2
+        %endif
+    %endif
+%endmacro

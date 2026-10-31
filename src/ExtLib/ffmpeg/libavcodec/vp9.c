@@ -151,6 +151,8 @@ static void vp9_frame_replace(VP9Frame *dst, const VP9Frame *src)
     av_refstruct_replace(&dst->header_ref, src->header_ref);
     dst->frame_header = src->frame_header;
 
+    av_refstruct_replace(&dst->hwaccel_picture_private,
+                          src->hwaccel_picture_private);
     ff_progress_frame_replace(&dst->tf, &src->tf);
 
     av_refstruct_replace(&dst->extradata, src->extradata);
@@ -158,9 +160,6 @@ static void vp9_frame_replace(VP9Frame *dst, const VP9Frame *src)
     dst->segmentation_map = src->segmentation_map;
     dst->mv = src->mv;
     dst->uses_2pass = src->uses_2pass;
-
-    av_refstruct_replace(&dst->hwaccel_picture_private,
-                          src->hwaccel_picture_private);
 }
 
 static int update_size(AVCodecContext *avctx, int w, int h)
@@ -1702,13 +1701,13 @@ static int vp9_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         const FFHWAccel *hwaccel = ffhwaccel(avctx->hwaccel);
         ret = hwaccel->start_frame(avctx, pkt->buf, pkt->data, pkt->size);
         if (ret < 0)
-            return ret;
+            goto fail;
         ret = hwaccel->decode_slice(avctx, pkt->data, pkt->size);
         if (ret < 0)
-            return ret;
+            goto fail;
         ret = hwaccel->end_frame(avctx);
         if (ret < 0)
-            return ret;
+            goto fail;
 
         for (i = 0; i < 8; i++) {
             vp9_frame_replace(&s->s.ref_frames[i],
@@ -1736,7 +1735,7 @@ static int vp9_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if ((ret = update_block_buffers(avctx)) < 0) {
         av_log(avctx, AV_LOG_ERROR,
                "Failed to allocate block buffers\n");
-        return ret;
+        goto fail;
     }
     if (s->s.h.refreshctx && s->s.h.parallelmode) {
         int j, k, l, m;
@@ -1794,13 +1793,17 @@ static int vp9_decode_frame(AVCodecContext *avctx, AVFrame *frame,
                         data += 4;
                         size -= 4;
                     }
-                    if (tile_size > size)
-                        return AVERROR_INVALIDDATA;
+                    if (tile_size > size) {
+                        ret = AVERROR_INVALIDDATA;
+                        goto fail;
+                    }
                     ret = ff_vpx_init_range_decoder(&s->td[tile_col].c_b[tile_row], data, tile_size);
                     if (ret < 0)
-                        return ret;
-                    if (vpx_rac_get_prob_branchy(&s->td[tile_col].c_b[tile_row], 128)) // marker bit
-                        return AVERROR_INVALIDDATA;
+                        goto fail;
+                    if (vpx_rac_get_prob_branchy(&s->td[tile_col].c_b[tile_row], 128)) { // marker bit
+                        ret = AVERROR_INVALIDDATA;
+                        goto fail;
+                    }
                     data += tile_size;
                     size -= tile_size;
                 }

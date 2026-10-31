@@ -45,6 +45,7 @@
 #define F AV_OPT_FLAG_FILTERING_PARAM
 #define V AV_OPT_FLAG_VIDEO_PARAM
 #define A AV_OPT_FLAG_AUDIO_PARAM
+FF_DISABLE_DEPRECATION_WARNINGS
 static const AVOption filtergraph_options[] = {
     { "thread_type", "Allowed thread types", OFFSET(thread_type), AV_OPT_TYPE_FLAGS,
         { .i64 = AVFILTER_THREAD_SLICE }, 0, INT_MAX, F|V|A, .unit = "thread_type" },
@@ -56,10 +57,13 @@ static const AVOption filtergraph_options[] = {
         AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, F|V },
     {"aresample_swr_opts"   , "default aresample filter options"    , OFFSET(aresample_swr_opts)    ,
         AV_OPT_TYPE_STRING, {.str = NULL}, 0, 0, F|A },
+#if FF_API_MAX_BUFFERED_FRAMES
     {"max_buffered_frames"  , "maximum number of buffered frames allowed", OFFSET(max_buffered_frames),
-        AV_OPT_TYPE_UINT,   {.i64 = 0}, 0, UINT_MAX, F|V|A },
+        AV_OPT_TYPE_UINT,   {.i64 = 0}, 0, UINT_MAX, F|V|A|AV_OPT_FLAG_DEPRECATED },
+#endif
     { NULL },
 };
+FF_ENABLE_DEPRECATION_WARNINGS
 
 static const AVClass filtergraph_class = {
     .class_name = "AVFilterGraph",
@@ -93,7 +97,8 @@ AVFilterGraph *avfilter_graph_alloc(void)
     ret = &graph->p;
     ret->av_class = &filtergraph_class;
     av_opt_set_defaults(ret);
-    ff_framequeue_global_init(&graph->frame_queues);
+    for (int i = 0; i < FF_ARRAY_ELEMS(graph->frame_queues); i++)
+        ff_framequeue_global_init(&graph->frame_queues[i]);
 
     return ret;
 }
@@ -162,6 +167,23 @@ fail:
 void avfilter_graph_set_auto_convert(AVFilterGraph *graph, unsigned flags)
 {
     fffiltergraph(graph)->disable_auto_convert = flags;
+}
+
+int avfilter_graph_set_max_buffered_frames(AVFilterGraph *graph,
+                                           enum AVMediaType type,
+                                           unsigned frames)
+{
+    FFFilterGraph *graphi = fffiltergraph(graph);
+    if (type < 0 || type >= FF_ARRAY_ELEMS(graphi->frame_queues))
+        return AVERROR(EINVAL);
+
+    FFFrameQueueGlobal *fqg = &graphi->frame_queues[type];
+    size_t max_queued = frames ? frames : SIZE_MAX;
+    if (fqg->queued > max_queued)
+        return AVERROR(EINVAL);
+    fqg->max_queued = max_queued;
+    graphi->max_queued_set[type] = 1;
+    return 0;
 }
 
 AVFilterContext *avfilter_graph_alloc_filter(AVFilterGraph *graph,
@@ -544,7 +566,7 @@ static int query_formats(AVFilterGraph *graph, void *log_ctx)
             return ret;
         /* note: EAGAIN could indicate a partial success, not counted yet */
         if (ret >= 0) {
-            print_filter_formats(log_ctx, AV_LOG_DEBUG, f);
+            print_filter_formats(log_ctx, AV_LOG_TRACE, f);
             count_queried++;
         }
     }
@@ -1457,10 +1479,23 @@ static int graph_config_pointers(AVFilterGraph *graph, void *log_ctx)
 
 int avfilter_graph_config(AVFilterGraph *graphctx, void *log_ctx)
 {
+    FFFilterGraph *graphi = fffiltergraph(graphctx);
     int ret;
 
+    size_t max_queued = SIZE_MAX;
+#if FF_API_MAX_BUFFERED_FRAMES
+FF_DISABLE_DEPRECATION_WARNINGS
     if (graphctx->max_buffered_frames)
-        fffiltergraph(graphctx)->frame_queues.max_queued = graphctx->max_buffered_frames;
+        max_queued = graphctx->max_buffered_frames;
+FF_ENABLE_DEPRECATION_WARNINGS
+#endif
+
+    for (int i = 0; i < FF_ARRAY_ELEMS(graphi->frame_queues); i++) {
+        /* only infer the value from graphctx->max_buffered_frames if it was
+         * not already set by avfilter_graph_set_max_buffered_frames() */
+        if (!graphi->max_queued_set[i])
+            graphi->frame_queues[i].max_queued = max_queued;
+    }
     if ((ret = graph_check_validity(graphctx, log_ctx)))
         return ret;
     if ((ret = graph_config_formats(graphctx, log_ctx)))

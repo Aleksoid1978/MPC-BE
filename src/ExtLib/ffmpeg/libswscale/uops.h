@@ -152,6 +152,7 @@ typedef enum SwsUOpFlagBits {
     SWS_UOP_FLAG_EXPAND_BIT   = (1 << 2), /* backend implements SWS_UOP_EXPAND_BIT */
     SWS_UOP_FLAG_READ_PALETTE = (1 << 3), /* backend implements SWS_UOP_READ_PALETTE */
     SWS_UOP_FLAG_ADD          = (1 << 4), /* backend implements SWS_UOP_ADD */
+    SWS_UOP_FLAG_PUNNING      = (1 << 5), /* allow type punning float data as int */
 } SwsUOpFlagBits;
 
 typedef enum SwsUOpType {
@@ -346,6 +347,11 @@ int ff_sws_uop_list_append(SwsUOpList *uops, SwsUOp *uop);
  * Called internally by ff_sws_ops_translate().
  */
 int ff_sws_uop_list_optimize(SwsContext *ctx, SwsUOpFlags flags, SwsUOpList *uops);
+
+/**
+ * Print the micro-ops of a compiled list at the given log level.
+ */
+void ff_sws_uop_list_print(void *log_ctx, int log_level, const SwsUOpList *uops);
 
 /**
  * Translate a list of operations down to micro-ops, which can be further

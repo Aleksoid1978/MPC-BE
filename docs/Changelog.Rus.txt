@@ -13,7 +13,7 @@ MPCVideoDec
 Исправлена поддержка DolbyVision для декодеров D3D11cb, D3D12cb и NVDEC.
 
 VideoRenderers
-Добавлена поддержка FrankyRenderer.
+Добавлена поддержка FrankyRenderer (https://github.com/mryx007/FrankyRenderer).
 
 Инсталлятор
 Обновлен MPC Video Renderer 0.11.1.
@@ -26,7 +26,7 @@ VideoRenderers
 Обновлен турецкий перевод (автор cmhrky).
 
 Обновлены библиотеки:
-	ffmpeg n9.1-dev-2704-g9d2d5b1aa3;
+	ffmpeg n9.1-dev-2940-g11ef8d60d6;
 	vvdec v3.2.1.
 
 

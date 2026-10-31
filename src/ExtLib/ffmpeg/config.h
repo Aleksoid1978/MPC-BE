@@ -627,4 +627,6 @@ Note: when adding a new codec, you have to:
 #define CONFIG_CBS_H266 1
 #define CONFIG_CBS_VP9 1
 
+double _j1(double _X); // stupid fix - error G84A3CD4A: implicit declaration of function '_j1'
+
 #endif /* FFMPEG_CONFIG_H */
