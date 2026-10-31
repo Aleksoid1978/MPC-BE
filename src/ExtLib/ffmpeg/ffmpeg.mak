@@ -974,32 +974,23 @@ SRCS_ASM_LR = \
 	libswresample/x86/rematrix.asm \
 	libswresample/x86/resample.asm
 
-ifeq ($(64BIT),yes)
 SRCS_ASM_LS = \
 	libswscale/x86/input.asm \
+	libswscale/x86/output.asm \
+	libswscale/x86/range_convert.asm \
+	libswscale/x86/rgb_2_rgb.asm \
+	libswscale/x86/scale.asm \
+	libswscale/x86/scale_avx2.asm \
+	libswscale/x86/uops_macros.asm \
+	libswscale/x86/yuv_2_rgb.asm \
+	libswscale/x86/yuv2yuvX.asm
+
+ifeq ($(64BIT),yes)
+SRCS_ASM_LS += \
 	libswscale/x86/ops_common.asm \
 	libswscale/x86/ops_float.asm \
 	libswscale/x86/ops_include.asm \
-	libswscale/x86/ops_int.asm \
-	libswscale/x86/output.asm \
-	libswscale/x86/range_convert.asm \
-	libswscale/x86/rgb_2_rgb.asm \
-	libswscale/x86/scale.asm \
-	libswscale/x86/scale_avx2.asm \
-	libswscale/x86/uops_macros.asm \
-	libswscale/x86/yuv_2_rgb.asm \
-	libswscale/x86/yuv2yuvX.asm
-else
-SRCS_ASM_LS = \
-	libswscale/x86/input.asm \
-	libswscale/x86/output.asm \
-	libswscale/x86/range_convert.asm \
-	libswscale/x86/rgb_2_rgb.asm \
-	libswscale/x86/scale.asm \
-	libswscale/x86/scale_avx2.asm \
-	libswscale/x86/uops_macros.asm \
-	libswscale/x86/yuv_2_rgb.asm \
-	libswscale/x86/yuv2yuvX.asm
+	libswscale/x86/ops_int.asm
 endif
 
 OBJS_LC = \
