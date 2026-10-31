@@ -71,7 +71,7 @@ static const struct {
 	{&DXVA2_ModeVP9_VLD_10bit_Profile2,				L"VP9 10-bit"},
 	{&DXVA2_VP9_VLD_Intel,							L"VP9 Intel"},
 	// AV1
-	{&DXVA2_ModeAV1_VLD_Profile0,					L"AV1 profile 0"},
+	{&D3D11_DECODER_PROFILE_AV1_VLD_PROFILE0,		L"AV1 profile 0"},
 	// HEVC Intel
 	{&DXVA2_HEVC_VLD_Main12_Intel,					L"HEVC 12-bit Intel"},
 	{&DXVA2_HEVC_VLD_Main422_10_Intel,				L"HEVC 422 10-bit Intel"},
