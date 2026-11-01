@@ -86,6 +86,22 @@ END_MESSAGE_MAP()
 
 // CPPageBase message handlers
 
+BOOL CPPageBase::OnInitDialog()
+{
+	BOOL bRet = __super::OnInitDialog();
+
+	// Theme the controls here, before the page fills them in and measures them. A list view that has
+	// been given the dark style leaves more room around the text of a cell than the default style
+	// does, so a column measured with LVSCW_AUTOSIZE before the style was applied comes out a few
+	// pixels short and cuts the text - "Wheel Do...", "100.5..." at 200% (#1299). Doing this on the
+	// first activation, as it used to, is too late: the page measured in its own OnInitDialog.
+	DarkTheme::ClipDialogChildren(GetSafeHwnd());
+	DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
+	m_bDarkThemeApplied = true;
+
+	return bRet;
+}
+
 BOOL CPPageBase::OnSetActive()
 {
 	AfxGetAppSettings().nLastUsedPage = (UINT)(ULONG_PTR)m_pPSP->pszTemplate;
