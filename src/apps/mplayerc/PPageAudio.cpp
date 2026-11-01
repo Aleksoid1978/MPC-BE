@@ -392,7 +392,7 @@ void CPPageAudio::OnBnClickedResetAudioPaths()
 	CAppSettings& s = AfxGetAppSettings();
 
 	m_sAudioPaths = DEFAULT_AUDIO_PATHS;
-	m_sAudioPaths.Append(ResStr(IDS_ADDITIONAL_AUDIO_PATHS)); // experimental
+	m_sAudioPaths.Append(ResStr(IDS_ADDITIONAL_AUDIO_PATHS));
 
 	UpdateData(FALSE);
 

@@ -185,10 +185,6 @@ BOOL CPPageVideo::OnInitDialog()
 		}
 		CStringW sName = ResStr(nID);
 
-		if (iVR == VIDRNDT_FRANKY) {
-			sName.Append(L" (experimental)");
-		}
-
 		HRESULT hr = IsRendererAvailable(iVR);
 		if (S_FALSE == hr) {
 			sName.AppendFormat(L" %s", ResStr(IDS_REND_NOT_AVAILABLE));

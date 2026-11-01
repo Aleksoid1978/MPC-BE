@@ -107,7 +107,7 @@ int ParseMPAHeader         (const BYTE* buf, audioframe_t* audioframe = nullptr)
 // need >= 4 bytes
 int ParseMPEG1Header       (const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf);
 
-// need >= 4 bytes (experimental)
+// need >= 4 bytes
 int ParseMP3Header         (const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf);
 
 // need >= 7 bytes, param1 = bitrate

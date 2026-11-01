@@ -293,7 +293,7 @@ int ParseMPEG1Header(const BYTE* buf, MPEG1WAVEFORMAT* mpeg1wf)
 	return (mpeg1wf->wfx.nBlockAlign + pading_bit);
 }
 
-int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf) // experimental
+int ParseMP3Header(const BYTE* buf, MPEGLAYER3WAVEFORMAT* mp3wf)
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/dd390710%28v=vs.85%29.aspx
 
