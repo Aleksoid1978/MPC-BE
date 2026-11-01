@@ -1180,7 +1180,15 @@ namespace DarkTheme
 			COMBOBOXINFO cbi = { sizeof(cbi) };
 			if (::GetComboBoxInfo(hCombo, &cbi) && cbi.hwndList) {
 				if (pAllowDarkModeForWindow) { pAllowDarkModeForWindow(cbi.hwndList, true); }
-				::SetWindowTheme(cbi.hwndList, L"DarkMode_CFD", nullptr);
+				// No visual style for the drop-down list. It used to get "DarkMode_CFD", which painted the
+				// selected item dark - but on current Windows 11 builds that class no longer provides it and
+				// the selected row comes out a solid white bar with the text lost in it. Without a visual
+				// style the list is drawn the classic way: its background and text still come from the
+				// parent's WM_CTLCOLORLISTBOX (dark), and the selected row becomes the system highlight with
+				// white text, which is readable and renders the same on every build. What the style also
+				// provided was a dark scrollbar, but these drop-downs size themselves to their contents and
+				// do not scroll in practice (the shader list, the longest at 26 entries, opens in full).
+				::SetWindowTheme(cbi.hwndList, L"", L"");
 			}
 		}
 
