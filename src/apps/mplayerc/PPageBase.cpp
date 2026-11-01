@@ -97,7 +97,10 @@ BOOL CPPageBase::OnInitDialog()
 	// first activation, as it used to, is too late: the page measured in its own OnInitDialog.
 	DarkTheme::ClipDialogChildren(GetSafeHwnd());
 	DarkTheme::ApplyThemeToChildren(GetSafeHwnd());
-	m_bDarkThemeApplied = true;
+	// Deliberately NOT marking the page as themed here: pages build on top of this. The Keys page
+	// creates its list from scratch over a placeholder, and others re-add LVS_EX_GRIDLINES, both
+	// after this runs - so OnSetActive themes once more when the page is finished, which is what
+	// used to be the only pass.
 
 	return bRet;
 }
