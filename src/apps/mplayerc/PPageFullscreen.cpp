@@ -669,6 +669,13 @@ void CPPageFullscreen::ModesUpdate()
 		}
 	}
 
+	// The autosize measures the text but not the room a right-aligned column needs beside it, which is
+	// a couple of pixels at 96 dpi and shows at 200%: the last digits of the fps columns came out as
+	// "100.5..." (#1299). Give those two a little slack and take it back from the display mode column,
+	// which has room to spare, so the list itself does not grow.
+	CClientDC dcList(&m_list);
+	const int slack = ::MulDiv(6, dcList.GetDeviceCaps(LOGPIXELSX), 96);
+
 	for (int nCol = 0; nCol <= COL_SRR; nCol++) {
 		m_list.SetColumnWidth(nCol, LVSCW_AUTOSIZE);
 		int columnWidth = m_list.GetColumnWidth(nCol);
@@ -679,6 +686,14 @@ void CPPageFullscreen::ModesUpdate()
 			m_list.SetColumnWidth(nCol, columnWidth);
 		} else {
 			columnWidth = headerWidth;
+		}
+
+		if (nCol == COL_VFR_F || nCol == COL_VFR_T) {
+			columnWidth += slack;
+			m_list.SetColumnWidth(nCol, columnWidth);
+		} else if (nCol == COL_SRR && columnWidth > 4 * slack) {
+			columnWidth -= 2 * slack;
+			m_list.SetColumnWidth(nCol, columnWidth);
 		}
 
 		LVCOLUMNW col;
