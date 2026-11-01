@@ -1450,6 +1450,108 @@ namespace DarkTheme
 			return DefSubclassProc(hWnd, msg, wParam, lParam);
 		}
 
+		// ---- Plain list boxes --------------------------------------------------------------------
+		// A list box that is not owner-drawn lets the visual style draw its selected row, and on current
+		// Windows 11 builds the dark style no longer provides it: the row comes out a solid white bar
+		// with the text lost in it, the same way combo drop-downs did (#1296). Dropping the style fixes
+		// the row but takes the dark scrollbar with it, and unlike a drop-down these lists do scroll, so
+		// that trade is not worth it. Instead the style stays (it still gives the scrollbar) and we draw
+		// the items ourselves, double-buffered so nothing flashes.
+		const UINT_PTR kListBoxSubclassId = 16;
+
+		LRESULT CALLBACK ListBoxSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR /*ref*/) {
+			switch (msg) {
+				case WM_ERASEBKGND:
+					return 1; // the WM_PAINT below covers every pixel of the client
+				case WM_PAINT: {
+					PAINTSTRUCT ps;
+					HDC hdc = ::BeginPaint(h, &ps);
+					if (!hdc) {
+						return 0;
+					}
+					RECT rcClient;
+					::GetClientRect(h, &rcClient);
+					const int cw = rcClient.right - rcClient.left;
+					const int ch = rcClient.bottom - rcClient.top;
+
+					HDC mem = ::CreateCompatibleDC(hdc);
+					HBITMAP bmp = ::CreateCompatibleBitmap(hdc, cw, ch);
+					HGDIOBJ oldBmp = ::SelectObject(mem, bmp);
+
+					HBRUSH back = ::CreateSolidBrush(CtrlBackColor());
+					::FillRect(mem, &rcClient, back);
+					::DeleteObject(back);
+
+					const LONG style = ::GetWindowLongW(h, GWL_STYLE);
+					const bool disabled = (style & WS_DISABLED) != 0;
+					const bool multiSel = (style & (LBS_MULTIPLESEL | LBS_EXTENDEDSEL)) != 0;
+					const int  count    = static_cast<int>(::SendMessageW(h, LB_GETCOUNT, 0, 0));
+					const int  top      = static_cast<int>(::SendMessageW(h, LB_GETTOPINDEX, 0, 0));
+					const int  caret    = static_cast<int>(::SendMessageW(h, LB_GETCARETINDEX, 0, 0));
+					const int  curSel   = static_cast<int>(::SendMessageW(h, LB_GETCURSEL, 0, 0));
+					const bool focused  = (::GetFocus() == h);
+					const bool hideFocus = (::SendMessageW(h, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS) != 0;
+
+					HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(h, WM_GETFONT, 0, 0));
+					HGDIOBJ oldFont = hFont ? ::SelectObject(mem, hFont) : nullptr;
+					::SetBkMode(mem, TRANSPARENT);
+
+					const int pad = ::MulDiv(2, static_cast<int>(DpiForWindow(h)), 96);
+					const int hExtent = static_cast<int>(::SendMessageW(h, LB_GETHORIZONTALEXTENT, 0, 0));
+					const int scrollX = (hExtent > cw) ? ::GetScrollPos(h, SB_HORZ) : 0;
+
+					wchar_t text[1024];
+					for (int i = (top > 0 ? top : 0); i < count; ++i) {
+						RECT rcItem;
+						if (::SendMessageW(h, LB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&rcItem)) == LB_ERR) {
+							break;
+						}
+						if (rcItem.top >= ch) {
+							break;
+						}
+						const bool sel = multiSel
+							? (::SendMessageW(h, LB_GETSEL, i, 0) > 0)
+							: (i == curSel);
+						if (sel) {
+							HBRUSH hi = ::CreateSolidBrush(::GetSysColor(COLOR_HIGHLIGHT));
+							::FillRect(mem, &rcItem, hi);
+							::DeleteObject(hi);
+						}
+						const int len = static_cast<int>(::SendMessageW(h, LB_GETTEXTLEN, i, 0));
+						if (len > 0 && len < _countof(text)) {
+							text[0] = L'\0';
+							if (::SendMessageW(h, LB_GETTEXT, i, reinterpret_cast<LPARAM>(text)) != LB_ERR) {
+								::SetTextColor(mem, disabled ? RGB(110, 115, 120)
+									: sel ? ::GetSysColor(COLOR_HIGHLIGHTTEXT) : TextColor());
+								RECT rcText = rcItem;
+								rcText.left += pad - scrollX;
+								rcText.right -= pad;
+								::DrawTextW(mem, text, -1, &rcText,
+									DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_NOCLIP);
+							}
+						}
+						if (focused && !hideFocus && i == caret && count > 0) {
+							DrawDarkFocusRect(mem, rcItem);
+						}
+					}
+
+					if (oldFont) {
+						::SelectObject(mem, oldFont);
+					}
+					::BitBlt(hdc, 0, 0, cw, ch, mem, 0, 0, SRCCOPY);
+					::SelectObject(mem, oldBmp);
+					::DeleteObject(bmp);
+					::DeleteDC(mem);
+					::EndPaint(h, &ps);
+					return 0;
+				}
+				case WM_NCDESTROY:
+					RemoveWindowSubclass(h, ListBoxSubclassProc, kListBoxSubclassId);
+					break;
+			}
+			return DefSubclassProc(h, msg, w, l);
+		}
+
 		const UINT_PTR kStaticSubclassId = 10;
 
 		LRESULT CALLBACK StaticSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR /*uId*/, DWORD_PTR /*dw*/) {
@@ -1659,6 +1761,12 @@ namespace DarkTheme
 				// on scroll, so keep the custom border even when it scrolls (the theme's own border
 				// rendered white on some machines).
 				SetWindowTheme(hCtrl, L"DarkMode_Explorer", nullptr);
+				// An owner-drawn list box is painted by the page that owns it; a plain one is painted by
+				// the style, which no longer darkens the selected row - draw those ourselves.
+				if (!(GetWindowLongW(hCtrl, GWL_STYLE) & (LBS_OWNERDRAWFIXED | LBS_OWNERDRAWVARIABLE))) {
+					SetWindowSubclass(hCtrl, ListBoxSubclassProc, kListBoxSubclassId, 0);
+					InvalidateRect(hCtrl, nullptr, TRUE);
+				}
 				ApplyOwnerBorder(hCtrl); // owned dark border (scrollbar stays DarkMode_Explorer)
 			} else if (_wcsicmp(cls, L"Static") == 0) {
 				// Sunken value boxes (e.g. Brightness/Contrast/Hue/Saturation on the
@@ -1746,6 +1854,7 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
 			RemoveWindowSubclass(hChild, GripSubclassProc,     kGripSubclassId);
+			RemoveWindowSubclass(hChild, ListBoxSubclassProc,  kListBoxSubclassId);
 			// Un-hide a separator we hid while dark (see the SS_ETCHED* branch in ThemeControl) so it draws
 			// its own native etched line again, which is the correct look in the light theme.
 			if (::GetPropW(hChild, L"MPC_ETCHED_ORIG")) {
