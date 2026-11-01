@@ -108,6 +108,11 @@ void CPPageMouse::SyncList()
 		}
 
 		m_list.SetColumnWidth(j, LVSCW_AUTOSIZE);
+		// The autosize measures the text but not the room the cell leaves beside it, which is a
+		// couple of pixels at 96 dpi and enough to cut the last word at 200% ("Volume Do..." in
+		// #1299). Add that back.
+		CClientDC dcList(&m_list);
+		m_list.SetColumnWidth(j, m_list.GetColumnWidth(j) + ::MulDiv(6, dcList.GetDeviceCaps(LOGPIXELSX), 96));
 	}
 }
 
