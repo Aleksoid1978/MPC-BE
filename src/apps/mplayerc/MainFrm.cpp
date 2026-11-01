@@ -958,6 +958,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		m_CMediaControls.Init(this);
 	}
 
+	// keep DWM rendering the frame, or uxtheme paints a basic frame while the style changes for fullscreen
+	auto policy = DWMNCRP_ENABLED;
+	DwmSetWindowAttribute(m_hWnd, DWMWA_NCRENDERING_POLICY, &policy, sizeof(policy));
+
 	RegisterApplicationRestart(L"", RESTART_NO_CRASH | RESTART_NO_HANG);
 
 	cmdLineThread = std::thread([this] { cmdLineThreadFunction(); });
@@ -11147,17 +11151,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreen = !m_bFullScreen;
 
-	// Keep the main HWND logically visible so the normal MFC/child layout runs
-	// during the fullscreen resize, but temporarily remove it from DWM
-	// presentation while its frame and geometry are being rewritten.  Cloaking
-	// is Windows 8+, so Windows 7 and earlier retain the original code path.
-	bool bCloakedForFullscreenTransition = false;
-	if (SysVersion::IsWin8orLater() && IsWindowVisible()) {
-		const BOOL bCloak = TRUE;
-		bCloakedForFullscreenTransition = SUCCEEDED(DwmSetWindowAttribute(
-			m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak)));
-	}
-
 	ModifyStyle(dwRemove, dwAdd, SWP_NOZORDER);
 
 	static bool bChangeMonitor = false;
@@ -11270,17 +11263,6 @@ void CMainFrame::ToggleFullscreen(bool fToNearest, bool fSwitchScreenResWhenHasT
 
 	m_bFullScreenChangingMode = false;
 	MoveVideoWindow();
-
-	// Reveal only after the final top-level and video-child geometry has been
-	// processed. Wait for the compositor to reach the transition's final
-	// presentation point first; unlike a forced RedrawWindow this does not
-	// synchronously repaint a stale pre-WM_SIZE child surface.
-	if (bCloakedForFullscreenTransition) {
-		DwmFlush();
-
-		const BOOL bCloak = FALSE;
-		DwmSetWindowAttribute(m_hWnd, DWMWA_CLOAK, &bCloak, sizeof(bCloak));
-	}
 
 	if (bChangeMonitor && (!m_bToggleShader || !m_bToggleShaderScreenSpace)) { // Enabled shader ...
 		SetShaders();
