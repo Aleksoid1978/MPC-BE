@@ -15,6 +15,9 @@ MPCVideoDec
 VideoRenderers
 Добавлена поддержка FrankyRenderer (https://github.com/mryx007/FrankyRenderer).
 
+Плеер
+Различные исправления интерфейса.
+
 Инсталлятор
 Обновлен MPC Video Renderer 0.11.1.
 
