@@ -2680,15 +2680,24 @@ namespace DarkTheme
 		// each group is ordered Normal, Hot, Pressed, Disabled
 		const int stateId = stateBase + (disabled ? 3 : pressed ? 2 : hot ? 1 : 0);
 
-		SIZE glyph = { 13, 13 };
+		const int dpi = static_cast<int>(DpiForWindow(hCtrl));
+		SIZE glyph = { ::MulDiv(13, dpi, 96), ::MulDiv(13, dpi, 96) };
 		HTHEME hTheme = OpenThemeData(hCtrl, L"Button");
 		if (hTheme) {
 			GetThemePartSize(hTheme, pDC->GetSafeHdc(), partId, stateId, nullptr, TS_DRAW, &glyph);
 		}
+		// Never ask for more room than the control has. The dialog templates give these buttons 8
+		// dialog units, which at 200% is the same 26px the theme wants for the glyph, so the two tie -
+		// and a machine that rounds either of them the other way clips the circle or the box (#1299).
+		// Windows fits its own glyph into the control; do the same instead of overflowing it.
+		const int avail = std::min<int>(rc.Height(), rc.Width());
+		if (avail > 0 && glyph.cy > avail) {
+			glyph.cx = glyph.cy = avail;
+		}
 
 		CRect rcGlyph;
 		rcGlyph.left   = rc.left;
-		rcGlyph.top    = (style & BS_MULTILINE) ? rc.top + 1 : rc.top + (rc.Height() - glyph.cy) / 2;
+		rcGlyph.top    = (style & BS_MULTILINE) ? rc.top + ::MulDiv(1, dpi, 96) : rc.top + (rc.Height() - glyph.cy) / 2;
 		rcGlyph.right  = rcGlyph.left + glyph.cx;
 		rcGlyph.bottom = rcGlyph.top + glyph.cy;
 
@@ -2710,7 +2719,9 @@ namespace DarkTheme
 		}
 
 		CRect rcText = rc;
-		rcText.left = rcGlyph.right + 4;
+		// The gap between the glyph and the caption is 4px at 96 dpi and has to grow with the DPI, or
+		// the caption ends up against the box (measured at 200%: Windows leaves 7px, this one left 5).
+		rcText.left = rcGlyph.right + ::MulDiv(4, dpi, 96);
 
 		HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(hCtrl, WM_GETFONT, 0, 0));
 		CFont* pOldFont = hFont ? pDC->SelectObject(CFont::FromHandle(hFont)) : nullptr;
