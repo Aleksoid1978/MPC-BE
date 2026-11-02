@@ -1,4 +1,4 @@
-/*
+﻿/*
  * (C) 2026 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -445,18 +445,11 @@ namespace DarkTheme
 			::GetClientRect(hWnd, &rcClient);
 
 			HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hWnd, LVM_GETHEADER, 0, 0));
-			int headerH = 0;
-			if (hHeader) {
-				RECT rh;
-				::GetWindowRect(hHeader, &rh);
-				headerH = rh.bottom - rh.top;
-			}
 
-			RECT rcLast{}; rcLast.left = LVIR_BOUNDS;
-			::SendMessageW(hWnd, LVM_GETITEMRECT, count - 1, reinterpret_cast<LPARAM>(&rcLast));
-			const int gridBottom = (rcLast.bottom < rcClient.bottom) ? rcLast.bottom : rcClient.bottom;
 
-			HPEN pen = ::CreatePen(PS_SOLID, 1, GridlineColor());
+			// The same colour the visual style uses for the separator between columns (a thin white
+			// wash over the face), so every line of the grid looks alike.
+			HPEN pen = ::CreatePen(PS_SOLID, 1, Shade(FaceColor(), 33));
 			HGDIOBJ oldPen = ::SelectObject(hdc, pen);
 
 			// Column geometry first: the grid must stop at the right edge of the LAST column. Header_GetItemRect
@@ -497,18 +490,9 @@ namespace DarkTheme
 				::LineTo(hdc, gridRight, r.bottom - 1);
 			}
 
-			// vertical line at each column's right edge, through the item rows only
-			for (int c = 0; c < cols; ++c) {
-				RECT hr{};
-				if (Header_GetItemRect(hHeader, c, &hr)) {
-					// Where Windows puts it: measured against the light theme on the same list, the
-					// native line sits one pixel to the RIGHT of the header separator, and ours sat
-					// one to the left - the only difference anyone could see between the two.
-					const int x = hdrOrg.x + hr.right + 1;
-					::MoveToEx(hdc, x, headerH, nullptr);
-					::LineTo(hdc, x, gridBottom);
-				}
-			}
+			// No vertical lines: the dark visual style already draws a separator between the columns
+			// of a report list, so adding ours next to it is what made every column edge a double line
+			// (one brighter than the other).
 
 			::SelectObject(hdc, oldPen);
 			::DeleteObject(pen);
@@ -566,6 +550,20 @@ namespace DarkTheme
 				if (HBRUSH hbr = OnCtlColor(pDC, CTLCOLOR_EDIT)) {
 					return reinterpret_cast<LRESULT>(hbr);
 				}
+			}
+			if (msg == LVM_SETEXTENDEDLISTVIEWSTYLE) {
+				// Whoever turns the native grid lines on, turns them on again: the pages set them while
+				// they build themselves and some of them do it more than once. Take the bit out of every
+				// request and remember that this list wants a grid, so ours is the only one drawn - the
+				// native one is a lighter line one pixel off ours, so both showed as a double line.
+				const DWORD mask = wParam ? static_cast<DWORD>(wParam) : 0xFFFFFFFFu;
+				DWORD values = static_cast<DWORD>(lParam);
+				if ((mask & LVS_EX_GRIDLINES) && (values & LVS_EX_GRIDLINES)) {
+					values &= ~LVS_EX_GRIDLINES;
+					SetWindowSubclass(hWnd, ListViewSubclassProc, kListViewSubclassId, 1);
+					::InvalidateRect(hWnd, nullptr, FALSE);
+				}
+				return DefSubclassProc(hWnd, msg, wParam, static_cast<LPARAM>(values));
 			}
 			if (msg == WM_PAINT) {
 				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
