@@ -938,6 +938,9 @@ namespace DarkTheme
 		// left for it to draw light, so nothing can flash. (Mirrors Notepad++/darkmodelib.)
 		const UINT_PTR kOwnerBorderSubclassId = 13;
 		const UINT_PTR kComboBorderSubclassId = 12;
+		const UINT_PTR kListBoxSubclassId = 16;
+		// Painting of plain list rows; defined further down, used by the combo drop-down too.
+		LRESULT CALLBACK ListBoxSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR id, DWORD_PTR ref);
 
 		enum { OB_CLIENTEDGE = 1, OB_STATICEDGE = 2, OB_WSBORDER = 4, OB_SSSUNKEN = 8 };
 
@@ -1180,15 +1183,16 @@ namespace DarkTheme
 			COMBOBOXINFO cbi = { sizeof(cbi) };
 			if (::GetComboBoxInfo(hCombo, &cbi) && cbi.hwndList) {
 				if (pAllowDarkModeForWindow) { pAllowDarkModeForWindow(cbi.hwndList, true); }
-				// No visual style for the drop-down list. It used to get "DarkMode_CFD", which painted the
-				// selected item dark - but on current Windows 11 builds that class no longer provides it and
-				// the selected row comes out a solid white bar with the text lost in it. Without a visual
-				// style the list is drawn the classic way: its background and text still come from the
-				// parent's WM_CTLCOLORLISTBOX (dark), and the selected row becomes the system highlight with
-				// white text, which is readable and renders the same on every build. What the style also
-				// provided was a dark scrollbar, but these drop-downs size themselves to their contents and
-				// do not scroll in practice (the shader list, the longest at 26 entries, opens in full).
-				::SetWindowTheme(cbi.hwndList, L"", L"");
+				// The style gives the drop-down its dark scrollbar, which a long list needs - the font
+				// list on the OSD page is hundreds of entries - but it no longer draws the selected row
+				// on current Windows 11 builds (#1296). Dropping the style fixed the row and left a
+				// light scrollbar instead; keep the style and draw the rows ourselves, the way the plain
+				// list boxes are handled. A combo that owner-draws its items paints its own rows.
+				::SetWindowTheme(cbi.hwndList, L"DarkMode_Explorer", nullptr);
+				const LONG cbStyle = GetWindowLongW(hCombo, GWL_STYLE);
+				if (!(cbStyle & (CBS_OWNERDRAWFIXED | CBS_OWNERDRAWVARIABLE))) {
+					SetWindowSubclass(cbi.hwndList, ListBoxSubclassProc, kListBoxSubclassId, 0);
+				}
 			}
 		}
 
@@ -1457,7 +1461,6 @@ namespace DarkTheme
 		// the row but takes the dark scrollbar with it, and unlike a drop-down these lists do scroll, so
 		// that trade is not worth it. Instead the style stays (it still gives the scrollbar) and we draw
 		// the items ourselves, double-buffered so nothing flashes.
-		const UINT_PTR kListBoxSubclassId = 16;
 
 		LRESULT CALLBACK ListBoxSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR /*ref*/) {
 			switch (msg) {
@@ -1851,6 +1854,16 @@ namespace DarkTheme
 			RemoveWindowSubclass(hChild, SpinSubclassProc,     kSpinSubclassId);
 			FreeOwnerBorder(hChild); // owning border: restores the stripped WS_EX_CLIENTEDGE/WS_BORDER + frees the heap data
 			RemoveWindowSubclass(hChild, ComboBorderSubclassProc, kComboBorderSubclassId);
+			{   // the drop-down list of a combo is not a child of the dialog, so undo it from here
+				COMBOBOXINFO cbi = { sizeof(cbi) };
+				if (::GetComboBoxInfo(hChild, &cbi) && cbi.hwndList) {
+					RemoveWindowSubclass(cbi.hwndList, ListBoxSubclassProc, kListBoxSubclassId);
+					SetWindowTheme(cbi.hwndList, nullptr, nullptr);
+					if (pAllowDarkModeForWindow) {
+						pAllowDarkModeForWindow(cbi.hwndList, false);
+					}
+				}
+			}
 			RemoveWindowSubclass(hChild, TrackbarSubclassProc, kTrackbarSubclassId);
 			RemoveWindowSubclass(hChild, StaticSubclassProc,   kStaticSubclassId);
 			RemoveWindowSubclass(hChild, GripSubclassProc,     kGripSubclassId);
