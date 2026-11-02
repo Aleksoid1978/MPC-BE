@@ -501,7 +501,10 @@ namespace DarkTheme
 			for (int c = 0; c < cols; ++c) {
 				RECT hr{};
 				if (Header_GetItemRect(hHeader, c, &hr)) {
-					const int x = hdrOrg.x + hr.right - 1;
+					// Where Windows puts it: measured against the light theme on the same list, the
+					// native line sits one pixel to the RIGHT of the header separator, and ours sat
+					// one to the left - the only difference anyone could see between the two.
+					const int x = hdrOrg.x + hr.right + 1;
 					::MoveToEx(hdc, x, headerH, nullptr);
 					::LineTo(hdc, x, gridBottom);
 				}
@@ -1037,10 +1040,11 @@ namespace DarkTheme
 						// our dark fill covers the light edge DarkMode_Explorer draws between the list and the
 						// scrollbar. Use the scrollbar's REAL rect from GetScrollBarInfo — the earlier
 						// band.right - sw guess was wrong after our custom WM_NCCALCSIZE, so it never covered it.
-						// One logical pixel: enough to cover the light seam the style draws between the
-						// control and its scrollbar. Two of them meant four physical pixels at 200%, eating
-						// into the bar and leaving the arrow box short until the bar repainted itself.
-						const int inner = SystemMetricsForDpi(SM_CXBORDER, dpi);
+						// Do not paint into the scrollbar at all. This used to overlap it by a pixel or two to
+						// cover a light seam the style drew between the control and the bar, but the bar does
+						// not always repaint over it - the arrow box at the end came out a pixel narrow until
+						// it did (#1299).
+						const int inner = 0;
 						if (st & WS_VSCROLL) {
 							SCROLLBARINFO sbi = { sizeof(sbi) };
 							if (::GetScrollBarInfo(h, OBJID_VSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
