@@ -1037,7 +1037,10 @@ namespace DarkTheme
 						// our dark fill covers the light edge DarkMode_Explorer draws between the list and the
 						// scrollbar. Use the scrollbar's REAL rect from GetScrollBarInfo — the earlier
 						// band.right - sw guess was wrong after our custom WM_NCCALCSIZE, so it never covered it.
-						const int inner = 2 * SystemMetricsForDpi(SM_CXBORDER, dpi);
+						// One logical pixel: enough to cover the light seam the style draws between the
+						// control and its scrollbar. Two of them meant four physical pixels at 200%, eating
+						// into the bar and leaving the arrow box short until the bar repainted itself.
+						const int inner = SystemMetricsForDpi(SM_CXBORDER, dpi);
 						if (st & WS_VSCROLL) {
 							SCROLLBARINFO sbi = { sizeof(sbi) };
 							if (::GetScrollBarInfo(h, OBJID_VSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
@@ -1791,16 +1794,17 @@ namespace DarkTheme
 				// Double-buffer so the full repaint we force on horizontal scroll (to clear the
 				// hand-drawn grid-line ghosts) doesn't flicker.
 				::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_DOUBLEBUFFER, LVS_EX_DOUBLEBUFFER);
-				// Replace the light native grid lines with our own dark ones: strip the
-				// style and remember (via the subclass ref-data) that this list wants a grid.
-				// Only do this the first time — on re-application the style is already gone,
-				// so preserve the remembered flag instead of clearing it.
+				// Replace the light native grid lines with our own dark ones: strip the style and
+				// remember (via the subclass ref-data) that this list wants a grid. The style is checked
+				// on every pass, not only the first: a page is themed before it builds itself and again
+				// when it is done, and the Mouse and Fullscreen pages ask for the grid in between - which
+				// is how the native, light grid came back on those two. A flag that was remembered is
+				// never cleared, since by then the style is gone because we took it away.
 				DWORD_PTR gridFlag = 0;
-				if (!GetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, &gridFlag)) {
-					gridFlag = (::SendMessageW(hCtrl, LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0) & LVS_EX_GRIDLINES) ? 1 : 0;
-					if (gridFlag) {
-						::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, 0);
-					}
+				GetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, &gridFlag);
+				if (::SendMessageW(hCtrl, LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0) & LVS_EX_GRIDLINES) {
+					::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, 0);
+					gridFlag = 1;
 				}
 				// Dark-paint the column header (and grid) via a subclass (see ListViewSubclassProc).
 				SetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, gridFlag);
