@@ -1462,89 +1462,151 @@ namespace DarkTheme
 		// that trade is not worth it. Instead the style stays (it still gives the scrollbar) and we draw
 		// the items ourselves, double-buffered so nothing flashes.
 
+		// Draws the whole client: background, every visible row, the selected one in the system
+		// highlight, and the focus rectangle. Used from WM_PAINT and from WM_PRINTCLIENT, which is
+		// how a combo drop-down gets its first paint.
+		void PaintListBoxClient(HWND h, HDC hdc) {
+			if (!hdc) {
+				return;
+			}
+			RECT rcClient;
+			::GetClientRect(h, &rcClient);
+			const int cw = rcClient.right - rcClient.left;
+			const int ch = rcClient.bottom - rcClient.top;
+
+			HDC mem = ::CreateCompatibleDC(hdc);
+			HBITMAP bmp = ::CreateCompatibleBitmap(hdc, cw, ch);
+			HGDIOBJ oldBmp = ::SelectObject(mem, bmp);
+
+			HBRUSH back = ::CreateSolidBrush(CtrlBackColor());
+			::FillRect(mem, &rcClient, back);
+			::DeleteObject(back);
+
+			const LONG style = ::GetWindowLongW(h, GWL_STYLE);
+			const bool disabled = (style & WS_DISABLED) != 0;
+			const bool multiSel = (style & (LBS_MULTIPLESEL | LBS_EXTENDEDSEL)) != 0;
+			const int  count    = static_cast<int>(::SendMessageW(h, LB_GETCOUNT, 0, 0));
+			const int  top      = static_cast<int>(::SendMessageW(h, LB_GETTOPINDEX, 0, 0));
+			const int  caret    = static_cast<int>(::SendMessageW(h, LB_GETCARETINDEX, 0, 0));
+			const int  curSel   = static_cast<int>(::SendMessageW(h, LB_GETCURSEL, 0, 0));
+			const bool focused  = (::GetFocus() == h);
+			const bool hideFocus = (::SendMessageW(h, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS) != 0;
+
+			HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(h, WM_GETFONT, 0, 0));
+			HGDIOBJ oldFont = hFont ? ::SelectObject(mem, hFont) : nullptr;
+			::SetBkMode(mem, TRANSPARENT);
+
+			const int pad = ::MulDiv(2, static_cast<int>(DpiForWindow(h)), 96);
+			const int hExtent = static_cast<int>(::SendMessageW(h, LB_GETHORIZONTALEXTENT, 0, 0));
+			const int scrollX = (hExtent > cw) ? ::GetScrollPos(h, SB_HORZ) : 0;
+
+			wchar_t text[1024];
+			for (int i = (top > 0 ? top : 0); i < count; ++i) {
+				RECT rcItem;
+				if (::SendMessageW(h, LB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&rcItem)) == LB_ERR) {
+					break;
+				}
+				if (rcItem.top >= ch) {
+					break;
+				}
+				const bool sel = multiSel
+					? (::SendMessageW(h, LB_GETSEL, i, 0) > 0)
+					: (i == curSel);
+				if (sel) {
+					HBRUSH hi = ::CreateSolidBrush(::GetSysColor(COLOR_HIGHLIGHT));
+					::FillRect(mem, &rcItem, hi);
+					::DeleteObject(hi);
+				}
+				const int len = static_cast<int>(::SendMessageW(h, LB_GETTEXTLEN, i, 0));
+				if (len > 0 && len < _countof(text)) {
+					text[0] = L'\0';
+					if (::SendMessageW(h, LB_GETTEXT, i, reinterpret_cast<LPARAM>(text)) != LB_ERR) {
+						::SetTextColor(mem, disabled ? RGB(110, 115, 120)
+							: sel ? ::GetSysColor(COLOR_HIGHLIGHTTEXT) : TextColor());
+						RECT rcText = rcItem;
+						rcText.left += pad - scrollX;
+						rcText.right -= pad;
+						::DrawTextW(mem, text, -1, &rcText,
+							DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_NOCLIP);
+					}
+				}
+				if (focused && !hideFocus && i == caret && count > 0) {
+					DrawDarkFocusRect(mem, rcItem);
+				}
+			}
+
+			if (oldFont) {
+				::SelectObject(mem, oldFont);
+			}
+			::BitBlt(hdc, 0, 0, cw, ch, mem, 0, 0, SRCCOPY);
+			::SelectObject(mem, oldBmp);
+			::DeleteObject(bmp);
+			::DeleteDC(mem);
+		}
+
 		LRESULT CALLBACK ListBoxSubclassProc(HWND h, UINT msg, WPARAM w, LPARAM l, UINT_PTR /*id*/, DWORD_PTR /*ref*/) {
 			switch (msg) {
 				case WM_ERASEBKGND:
 					return 1; // the WM_PAINT below covers every pixel of the client
+				// A list box repaints the row that gains or loses the selection by itself, without going
+				// through WM_PAINT, so picking another entry brought the white row back (reported on the
+				// DVD language list). Let the control do its work, then ask for a full repaint whenever
+				// the selection, the contents or the scroll position can have changed - it is one blit.
+				case WM_LBUTTONDOWN:
+				case WM_LBUTTONUP:
+				case WM_LBUTTONDBLCLK:
+				case WM_MOUSEMOVE:
+				case WM_KEYDOWN:
+				case WM_CHAR:
+				case WM_SETFOCUS:
+				case WM_KILLFOCUS:
+				case WM_VSCROLL:
+				case WM_HSCROLL:
+				case WM_MOUSEWHEEL:
+				case LB_SETCURSEL:
+				case LB_SETSEL:
+				case LB_SELECTSTRING:
+				case LB_SETCARETINDEX:
+				case LB_SETTOPINDEX:
+				case LB_ADDSTRING:
+				case LB_INSERTSTRING:
+				case LB_DELETESTRING:
+				case LB_RESETCONTENT: {
+					// Repainting after the fact is not enough: the control draws the row straight to the
+					// screen, so the white one was visible while scrolling and only corrected once the
+					// scroll stopped. Hold the drawing off while the control does its work, then paint
+					// the whole thing ourselves in one blit - the same trick the combo field uses.
+					const int selBefore = static_cast<int>(::SendMessageW(h, LB_GETCURSEL, 0, 0));
+					const int topBefore = static_cast<int>(::SendMessageW(h, LB_GETTOPINDEX, 0, 0));
+					::SendMessageW(h, WM_SETREDRAW, FALSE, 0);
+					const LRESULT r = DefSubclassProc(h, msg, w, l);
+					::SendMessageW(h, WM_SETREDRAW, TRUE, 0);
+					const bool always = (msg == WM_SETFOCUS || msg == WM_KILLFOCUS
+						|| msg == LB_ADDSTRING || msg == LB_INSERTSTRING
+						|| msg == LB_DELETESTRING || msg == LB_RESETCONTENT);
+					if (always
+						|| static_cast<int>(::SendMessageW(h, LB_GETCURSEL, 0, 0)) != selBefore
+						|| static_cast<int>(::SendMessageW(h, LB_GETTOPINDEX, 0, 0)) != topBefore) {
+						::InvalidateRect(h, nullptr, FALSE);
+						::UpdateWindow(h);
+					}
+					return r;
+				}
+				case WM_PRINTCLIENT:
+					// A drop-down gets its first paint through this, not WM_PAINT, which is why it opened
+					// on the white row until the selection moved.
+					PaintListBoxClient(h, reinterpret_cast<HDC>(w));
+					return 0;
+				case WM_SHOWWINDOW:
+				case WM_WINDOWPOSCHANGED:
+					if (::IsWindowVisible(h)) { // a drop-down is shown over and over: start from scratch
+						::InvalidateRect(h, nullptr, FALSE);
+					}
+					break;
 				case WM_PAINT: {
 					PAINTSTRUCT ps;
 					HDC hdc = ::BeginPaint(h, &ps);
-					if (!hdc) {
-						return 0;
-					}
-					RECT rcClient;
-					::GetClientRect(h, &rcClient);
-					const int cw = rcClient.right - rcClient.left;
-					const int ch = rcClient.bottom - rcClient.top;
-
-					HDC mem = ::CreateCompatibleDC(hdc);
-					HBITMAP bmp = ::CreateCompatibleBitmap(hdc, cw, ch);
-					HGDIOBJ oldBmp = ::SelectObject(mem, bmp);
-
-					HBRUSH back = ::CreateSolidBrush(CtrlBackColor());
-					::FillRect(mem, &rcClient, back);
-					::DeleteObject(back);
-
-					const LONG style = ::GetWindowLongW(h, GWL_STYLE);
-					const bool disabled = (style & WS_DISABLED) != 0;
-					const bool multiSel = (style & (LBS_MULTIPLESEL | LBS_EXTENDEDSEL)) != 0;
-					const int  count    = static_cast<int>(::SendMessageW(h, LB_GETCOUNT, 0, 0));
-					const int  top      = static_cast<int>(::SendMessageW(h, LB_GETTOPINDEX, 0, 0));
-					const int  caret    = static_cast<int>(::SendMessageW(h, LB_GETCARETINDEX, 0, 0));
-					const int  curSel   = static_cast<int>(::SendMessageW(h, LB_GETCURSEL, 0, 0));
-					const bool focused  = (::GetFocus() == h);
-					const bool hideFocus = (::SendMessageW(h, WM_QUERYUISTATE, 0, 0) & UISF_HIDEFOCUS) != 0;
-
-					HFONT hFont = reinterpret_cast<HFONT>(::SendMessageW(h, WM_GETFONT, 0, 0));
-					HGDIOBJ oldFont = hFont ? ::SelectObject(mem, hFont) : nullptr;
-					::SetBkMode(mem, TRANSPARENT);
-
-					const int pad = ::MulDiv(2, static_cast<int>(DpiForWindow(h)), 96);
-					const int hExtent = static_cast<int>(::SendMessageW(h, LB_GETHORIZONTALEXTENT, 0, 0));
-					const int scrollX = (hExtent > cw) ? ::GetScrollPos(h, SB_HORZ) : 0;
-
-					wchar_t text[1024];
-					for (int i = (top > 0 ? top : 0); i < count; ++i) {
-						RECT rcItem;
-						if (::SendMessageW(h, LB_GETITEMRECT, i, reinterpret_cast<LPARAM>(&rcItem)) == LB_ERR) {
-							break;
-						}
-						if (rcItem.top >= ch) {
-							break;
-						}
-						const bool sel = multiSel
-							? (::SendMessageW(h, LB_GETSEL, i, 0) > 0)
-							: (i == curSel);
-						if (sel) {
-							HBRUSH hi = ::CreateSolidBrush(::GetSysColor(COLOR_HIGHLIGHT));
-							::FillRect(mem, &rcItem, hi);
-							::DeleteObject(hi);
-						}
-						const int len = static_cast<int>(::SendMessageW(h, LB_GETTEXTLEN, i, 0));
-						if (len > 0 && len < _countof(text)) {
-							text[0] = L'\0';
-							if (::SendMessageW(h, LB_GETTEXT, i, reinterpret_cast<LPARAM>(text)) != LB_ERR) {
-								::SetTextColor(mem, disabled ? RGB(110, 115, 120)
-									: sel ? ::GetSysColor(COLOR_HIGHLIGHTTEXT) : TextColor());
-								RECT rcText = rcItem;
-								rcText.left += pad - scrollX;
-								rcText.right -= pad;
-								::DrawTextW(mem, text, -1, &rcText,
-									DT_SINGLELINE | DT_VCENTER | DT_NOPREFIX | DT_NOCLIP);
-							}
-						}
-						if (focused && !hideFocus && i == caret && count > 0) {
-							DrawDarkFocusRect(mem, rcItem);
-						}
-					}
-
-					if (oldFont) {
-						::SelectObject(mem, oldFont);
-					}
-					::BitBlt(hdc, 0, 0, cw, ch, mem, 0, 0, SRCCOPY);
-					::SelectObject(mem, oldBmp);
-					::DeleteObject(bmp);
-					::DeleteDC(mem);
+					PaintListBoxClient(h, hdc);
 					::EndPaint(h, &ps);
 					return 0;
 				}
