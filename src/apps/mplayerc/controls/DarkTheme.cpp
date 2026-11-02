@@ -449,7 +449,8 @@ namespace DarkTheme
 
 			// The same colour the visual style uses for the separator between columns (a thin white
 			// wash over the face), so every line of the grid looks alike.
-			HPEN pen = ::CreatePen(PS_SOLID, 1, Shade(FaceColor(), 33));
+			const COLORREF clrGrid = Shade(FaceColor(), 33);
+			HPEN pen = ::CreatePen(PS_SOLID, 1, clrGrid);
 			HGDIOBJ oldPen = ::SelectObject(hdc, pen);
 
 			// Column geometry first: the grid must stop at the right edge of the LAST column. Header_GetItemRect
@@ -481,6 +482,14 @@ namespace DarkTheme
 			// horizontal line under each visible row, stopping at the last column. Running these out to the client
 			// edge ruled the empty trailing space to the right of the last column, which the header itself leaves
 			// blank - so the rows looked lined where the header was not.
+			//
+			// The vertical ones are the style's own: it draws a separator between the columns of a report list,
+			// a couple of pixels left of the column edge - not under the header divider, which is why the grid
+			// looked out of line (and why drawing ours at the edge as well made it a double line). So each row
+			// paints that strip out and puts the line back on the edge. The background it paints with is read
+			// from the row itself, so a selected or hot-tracked row keeps its own colour.
+			const int band = ::MulDiv(2, static_cast<int>(DpiForWindow(hWnd)), 96);
+			HBRUSH brGrid = ::CreateSolidBrush(clrGrid);
 			const int top = static_cast<int>(::SendMessageW(hWnd, LVM_GETTOPINDEX, 0, 0));
 			const int per = static_cast<int>(::SendMessageW(hWnd, LVM_GETCOUNTPERPAGE, 0, 0));
 			for (int i = top; i <= top + per && i < count; ++i) {
@@ -488,11 +497,34 @@ namespace DarkTheme
 				::SendMessageW(hWnd, LVM_GETITEMRECT, i, reinterpret_cast<LPARAM>(&r));
 				::MoveToEx(hdc, rcClient.left, r.bottom - 1, nullptr);
 				::LineTo(hdc, gridRight, r.bottom - 1);
-			}
 
-			// No vertical lines: the dark visual style already draws a separator between the columns
-			// of a report list, so adding ours next to it is what made every column edge a double line
-			// (one brighter than the other).
+				if (r.bottom - 1 <= r.top) {
+					continue;
+				}
+				for (int c = 0; c < cols; ++c) {
+					RECT hr{};
+					if (!Header_GetItemRect(hHeader, c, &hr)) {
+						continue;
+					}
+					const int x = hdrOrg.x + hr.right - 1; // the pixel the header divider is drawn on
+					if (x <= rcClient.left || x >= rcClient.right) {
+						continue;
+					}
+					const int xSample = x - band - 1;
+					if (xSample > hdrOrg.x + hr.left) {
+						const COLORREF clrRow = ::GetPixel(hdc, xSample, r.top + 1);
+						if (clrRow != CLR_INVALID) {
+							RECT rcStrip = { x - band, r.top, x, r.bottom - 1 };
+							HBRUSH brRow = ::CreateSolidBrush(clrRow);
+							::FillRect(hdc, &rcStrip, brRow);
+							::DeleteObject(brRow);
+						}
+					}
+					RECT rcLine = { x, r.top, x + 1, r.bottom - 1 };
+					::FillRect(hdc, &rcLine, brGrid);
+				}
+			}
+			::DeleteObject(brGrid);
 
 			::SelectObject(hdc, oldPen);
 			::DeleteObject(pen);
