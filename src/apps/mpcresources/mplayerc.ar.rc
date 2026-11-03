@@ -271,8 +271,8 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "موقع الإعدادات",IDC_STATIC,5,135,115,55
     CONTROL         "سجل Windows",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
-    CONTROL         "ملف تعريف المستخدم",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
-    CONTROL         "مجلد المشغل",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
+    CONTROL         "ملف تعريف المستخدم",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,162,106,10
+    CONTROL         "مجلد المشغل",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,176,106,10
     GROUPBOX        "السجل",IDC_STATIC,124,5,167,128,WS_GROUP
     CONTROL         "الاحتفاظ بسجل الملفات المفتوحة",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,9
@@ -290,9 +290,9 @@ BEGIN
     CONTROL         "إظهار عنوان URL في الملفات الحديثة",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,129,112,156,17
     GROUPBOX        "متنوع",IDC_STATIC,124,135,167,55,WS_GROUP
-    CONTROL         "أيقونة في منطقة الإشعارات",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,9
-    CONTROL         "تعطيل قائمة 'فتح القرص'",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,159,156,9
-    CONTROL         "أولوية أعلى من المعتاد",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,156,9
+    CONTROL         "أيقونة في منطقة الإشعارات",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,148,156,9
+    CONTROL         "تعطيل قائمة 'فتح القرص'",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,160,156,9
+    CONTROL         "أولوية أعلى من المعتاد",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,172,156,9
     GROUPBOX        "مهلات الشبكة",IDC_STATIC,124,191,167,41,WS_GROUP
     LTEXT           "الاتصال:",IDC_STATIC,129,202,96,8
     EDITTEXT        IDC_EDIT2,230,200,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -331,8 +331,8 @@ BEGIN
     GROUPBOX        "التشغيل",IDC_STATIC,5,5,129,60
     CONTROL         "تشغيل",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
     CONTROL         "تكرار تلقائي",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
-    EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "مرات",IDC_STATIC1,90,17,40,8
+    EDITTEXT        IDC_EDIT1,65,17,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    LTEXT           "مرات",IDC_STATIC1,90,18,40,8
     CONTROL         "إعادة اللف في النهاية",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
     GROUPBOX        "التحكم",IDC_STATIC,5,67,286,54
     LTEXT           "خطوة مستوى الصوت:",IDC_STATIC,10,79,108,8

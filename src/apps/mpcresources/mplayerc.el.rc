@@ -271,8 +271,8 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Location of settings",IDC_STATIC,5,135,115,55
     CONTROL         "Windows registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
-    CONTROL         "User profile",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
-    CONTROL         "Player folder",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
+    CONTROL         "User profile",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,162,106,10
+    CONTROL         "Player folder",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,176,106,10
     GROUPBOX        "Ιστορικό",IDC_STATIC,124,5,167,128,WS_GROUP
     CONTROL         "Διατήρηση ιστορικού πρόσφατων αρχείων",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,9
@@ -290,9 +290,9 @@ BEGIN
     CONTROL         "Display title for URL in recent files",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,129,112,156,17
     GROUPBOX        "Άλλα",IDC_STATIC,124,135,167,55,WS_GROUP
-    CONTROL         "Εικονίδιο στη γραμμή ειδοποιήσεων",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,9
-    CONTROL         "Απενεργοποίηση του μενού "" Άνοιγμα δίσκου""",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,159,156,9
-    CONTROL         "Προτεραιότητα διεργασίας πάνω από κανονική",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,156,9
+    CONTROL         "Εικονίδιο στη γραμμή ειδοποιήσεων",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,148,156,9
+    CONTROL         "Απενεργοποίηση του μενού "" Άνοιγμα δίσκου""",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,160,156,9
+    CONTROL         "Προτεραιότητα διεργασίας πάνω από κανονική",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,172,156,9
     GROUPBOX        "Network timeouts",IDC_STATIC,124,191,167,41,WS_GROUP
     LTEXT           "Connection:",IDC_STATIC,129,202,96,8
     EDITTEXT        IDC_EDIT2,230,200,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -331,8 +331,8 @@ BEGIN
     GROUPBOX        "Αναπαραγωγή",IDC_STATIC,5,5,129,60
     CONTROL         "Εκτέλεση",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
     CONTROL         "Συνεχής επανάληψη",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
-    EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "φορά (ές)",IDC_STATIC1,90,17,40,8
+    EDITTEXT        IDC_EDIT1,65,17,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    LTEXT           "φορά (ές)",IDC_STATIC1,90,18,40,8
     CONTROL         "Επαναφορά όταν ολοκληρωθεί  η αναπαραγωγή",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
     GROUPBOX        "Έλεγχος",IDC_STATIC,5,67,286,54
     LTEXT           "Βήμα έντασης:",IDC_STATIC,10,79,108,8

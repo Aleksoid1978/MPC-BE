@@ -270,8 +270,8 @@ BEGIN
     COMBOBOX        IDC_COMBO2,10,118,109,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Vị trí cài đặt",IDC_STATIC,5,135,115,55
     CONTROL         "Windows registry",IDC_RADIO4,"Button",BS_AUTORADIOBUTTON | BS_TOP | WS_GROUP,10,148,106,10
-    CONTROL         "Hồ sơ người dùng",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,161,106,10
-    CONTROL         "Thư mục trình phát",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,175,106,10
+    CONTROL         "Hồ sơ người dùng",IDC_RADIO5,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,162,106,10
+    CONTROL         "Thư mục trình phát",IDC_RADIO6,"Button",BS_AUTORADIOBUTTON | BS_TOP,10,176,106,10
     GROUPBOX        "Lịch sử",IDC_STATIC,124,5,167,128,WS_GROUP
     CONTROL         "Giữ lịch sử các tệp đã mở gần đây",IDC_CHECK1,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,17,156,9
@@ -289,9 +289,9 @@ BEGIN
     CONTROL         "Hiển thị tiêu đề cho URL trong tệp gần đây",IDC_CHECK4,
                     "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,129,112,156,17
     GROUPBOX        "Khác",IDC_STATIC,124,135,167,55,WS_GROUP
-    CONTROL         "Biểu tượng khay hệ thống",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,147,156,9
-    CONTROL         "Vô hiệu hóa menu 'Mở đĩa'",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,159,156,9
-    CONTROL         "Ưu tiên tiến trình trên mức bình thường",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,171,156,9
+    CONTROL         "Biểu tượng khay hệ thống",IDC_CHECK3,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,148,156,9
+    CONTROL         "Vô hiệu hóa menu 'Mở đĩa'",IDC_CHECK10,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,160,156,9
+    CONTROL         "Ưu tiên tiến trình trên mức bình thường",IDC_CHECK9,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,129,172,156,9
     GROUPBOX        "Thời gian chờ mạng",IDC_STATIC,124,191,167,41,WS_GROUP
     LTEXT           "Kết nối:",IDC_STATIC,129,202,96,8
     EDITTEXT        IDC_EDIT2,230,200,29,13,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
@@ -330,8 +330,8 @@ BEGIN
     GROUPBOX        "Phát lại",IDC_STATIC,5,5,129,60
     CONTROL         "Phát",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,17,55,10
     CONTROL         "Lặp lại mãi mãi",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,32,116,8
-    EDITTEXT        IDC_EDIT1,65,15,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
-    LTEXT           "lần",IDC_STATIC1,90,17,40,8
+    EDITTEXT        IDC_EDIT1,65,17,20,13,ES_AUTOHSCROLL | ES_NUMBER | WS_GROUP
+    LTEXT           "lần",IDC_STATIC1,90,18,40,8
     CONTROL         "Tua lại khi phát xong",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,10,45,116,18
     GROUPBOX        "Điều khiển",IDC_STATIC,5,67,286,54
     LTEXT           "Bước âm lượng:",IDC_STATIC,10,79,108,8
