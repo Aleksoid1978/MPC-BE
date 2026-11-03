@@ -1,4 +1,4 @@
-/*
+﻿/*
  * (C) 2026 see Authors.txt
  *
  * This file is part of MPC-BE.
@@ -445,18 +445,12 @@ namespace DarkTheme
 			::GetClientRect(hWnd, &rcClient);
 
 			HWND hHeader = reinterpret_cast<HWND>(::SendMessageW(hWnd, LVM_GETHEADER, 0, 0));
-			int headerH = 0;
-			if (hHeader) {
-				RECT rh;
-				::GetWindowRect(hHeader, &rh);
-				headerH = rh.bottom - rh.top;
-			}
 
-			RECT rcLast{}; rcLast.left = LVIR_BOUNDS;
-			::SendMessageW(hWnd, LVM_GETITEMRECT, count - 1, reinterpret_cast<LPARAM>(&rcLast));
-			const int gridBottom = (rcLast.bottom < rcClient.bottom) ? rcLast.bottom : rcClient.bottom;
 
-			HPEN pen = ::CreatePen(PS_SOLID, 1, GridlineColor());
+			// The same colour the visual style uses for the separator between columns (a thin white
+			// wash over the face), so every line of the grid looks alike.
+			const COLORREF clrGrid = Shade(FaceColor(), 33);
+			HPEN pen = ::CreatePen(PS_SOLID, 1, clrGrid);
 			HGDIOBJ oldPen = ::SelectObject(hdc, pen);
 
 			// Column geometry first: the grid must stop at the right edge of the LAST column. Header_GetItemRect
@@ -488,6 +482,14 @@ namespace DarkTheme
 			// horizontal line under each visible row, stopping at the last column. Running these out to the client
 			// edge ruled the empty trailing space to the right of the last column, which the header itself leaves
 			// blank - so the rows looked lined where the header was not.
+			//
+			// The vertical ones are the style's own: it draws a separator between the columns of a report list,
+			// a couple of pixels left of the column edge - not under the header divider, which is why the grid
+			// looked out of line (and why drawing ours at the edge as well made it a double line). So each row
+			// paints that strip out and puts the line back on the edge. The background it paints with is read
+			// from the row itself, so a selected or hot-tracked row keeps its own colour.
+			const int band = ::MulDiv(2, static_cast<int>(DpiForWindow(hWnd)), 96);
+			HBRUSH brGrid = ::CreateSolidBrush(clrGrid);
 			const int top = static_cast<int>(::SendMessageW(hWnd, LVM_GETTOPINDEX, 0, 0));
 			const int per = static_cast<int>(::SendMessageW(hWnd, LVM_GETCOUNTPERPAGE, 0, 0));
 			for (int i = top; i <= top + per && i < count; ++i) {
@@ -495,17 +497,34 @@ namespace DarkTheme
 				::SendMessageW(hWnd, LVM_GETITEMRECT, i, reinterpret_cast<LPARAM>(&r));
 				::MoveToEx(hdc, rcClient.left, r.bottom - 1, nullptr);
 				::LineTo(hdc, gridRight, r.bottom - 1);
-			}
 
-			// vertical line at each column's right edge, through the item rows only
-			for (int c = 0; c < cols; ++c) {
-				RECT hr{};
-				if (Header_GetItemRect(hHeader, c, &hr)) {
-					const int x = hdrOrg.x + hr.right - 1;
-					::MoveToEx(hdc, x, headerH, nullptr);
-					::LineTo(hdc, x, gridBottom);
+				if (r.bottom - 1 <= r.top) {
+					continue;
+				}
+				for (int c = 0; c < cols; ++c) {
+					RECT hr{};
+					if (!Header_GetItemRect(hHeader, c, &hr)) {
+						continue;
+					}
+					const int x = hdrOrg.x + hr.right - 1; // the pixel the header divider is drawn on
+					if (x <= rcClient.left || x >= rcClient.right) {
+						continue;
+					}
+					const int xSample = x - band - 1;
+					if (xSample > hdrOrg.x + hr.left) {
+						const COLORREF clrRow = ::GetPixel(hdc, xSample, r.top + 1);
+						if (clrRow != CLR_INVALID) {
+							RECT rcStrip = { x - band, r.top, x, r.bottom - 1 };
+							HBRUSH brRow = ::CreateSolidBrush(clrRow);
+							::FillRect(hdc, &rcStrip, brRow);
+							::DeleteObject(brRow);
+						}
+					}
+					RECT rcLine = { x, r.top, x + 1, r.bottom - 1 };
+					::FillRect(hdc, &rcLine, brGrid);
 				}
 			}
+			::DeleteObject(brGrid);
 
 			::SelectObject(hdc, oldPen);
 			::DeleteObject(pen);
@@ -563,6 +582,20 @@ namespace DarkTheme
 				if (HBRUSH hbr = OnCtlColor(pDC, CTLCOLOR_EDIT)) {
 					return reinterpret_cast<LRESULT>(hbr);
 				}
+			}
+			if (msg == LVM_SETEXTENDEDLISTVIEWSTYLE) {
+				// Whoever turns the native grid lines on, turns them on again: the pages set them while
+				// they build themselves and some of them do it more than once. Take the bit out of every
+				// request and remember that this list wants a grid, so ours is the only one drawn - the
+				// native one is a lighter line one pixel off ours, so both showed as a double line.
+				const DWORD mask = wParam ? static_cast<DWORD>(wParam) : 0xFFFFFFFFu;
+				DWORD values = static_cast<DWORD>(lParam);
+				if ((mask & LVS_EX_GRIDLINES) && (values & LVS_EX_GRIDLINES)) {
+					values &= ~LVS_EX_GRIDLINES;
+					SetWindowSubclass(hWnd, ListViewSubclassProc, kListViewSubclassId, 1);
+					::InvalidateRect(hWnd, nullptr, FALSE);
+				}
+				return DefSubclassProc(hWnd, msg, wParam, static_cast<LPARAM>(values));
 			}
 			if (msg == WM_PAINT) {
 				const LRESULT res = DefSubclassProc(hWnd, msg, wParam, lParam);
@@ -1037,7 +1070,11 @@ namespace DarkTheme
 						// our dark fill covers the light edge DarkMode_Explorer draws between the list and the
 						// scrollbar. Use the scrollbar's REAL rect from GetScrollBarInfo — the earlier
 						// band.right - sw guess was wrong after our custom WM_NCCALCSIZE, so it never covered it.
-						const int inner = 2 * SystemMetricsForDpi(SM_CXBORDER, dpi);
+						// Do not paint into the scrollbar at all. This used to overlap it by a pixel or two to
+						// cover a light seam the style drew between the control and the bar, but the bar does
+						// not always repaint over it - the arrow box at the end came out a pixel narrow until
+						// it did (#1299).
+						const int inner = 0;
 						if (st & WS_VSCROLL) {
 							SCROLLBARINFO sbi = { sizeof(sbi) };
 							if (::GetScrollBarInfo(h, OBJID_VSCROLL, &sbi) && !(sbi.rgstate[0] & STATE_SYSTEM_INVISIBLE)) {
@@ -1791,16 +1828,17 @@ namespace DarkTheme
 				// Double-buffer so the full repaint we force on horizontal scroll (to clear the
 				// hand-drawn grid-line ghosts) doesn't flicker.
 				::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_DOUBLEBUFFER, LVS_EX_DOUBLEBUFFER);
-				// Replace the light native grid lines with our own dark ones: strip the
-				// style and remember (via the subclass ref-data) that this list wants a grid.
-				// Only do this the first time — on re-application the style is already gone,
-				// so preserve the remembered flag instead of clearing it.
+				// Replace the light native grid lines with our own dark ones: strip the style and
+				// remember (via the subclass ref-data) that this list wants a grid. The style is checked
+				// on every pass, not only the first: a page is themed before it builds itself and again
+				// when it is done, and the Mouse and Fullscreen pages ask for the grid in between - which
+				// is how the native, light grid came back on those two. A flag that was remembered is
+				// never cleared, since by then the style is gone because we took it away.
 				DWORD_PTR gridFlag = 0;
-				if (!GetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, &gridFlag)) {
-					gridFlag = (::SendMessageW(hCtrl, LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0) & LVS_EX_GRIDLINES) ? 1 : 0;
-					if (gridFlag) {
-						::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, 0);
-					}
+				GetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, &gridFlag);
+				if (::SendMessageW(hCtrl, LVM_GETEXTENDEDLISTVIEWSTYLE, 0, 0) & LVS_EX_GRIDLINES) {
+					::SendMessageW(hCtrl, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_GRIDLINES, 0);
+					gridFlag = 1;
 				}
 				// Dark-paint the column header (and grid) via a subclass (see ListViewSubclassProc).
 				SetWindowSubclass(hCtrl, ListViewSubclassProc, kListViewSubclassId, gridFlag);
