@@ -33,6 +33,13 @@ class File_DcpCpl : public File__Analyze, File__HasReferences
 public :
     //Constructor/Destructor
     File_DcpCpl();
+    #if MEDIAINFO_ADVANCED
+    ~File_DcpCpl()
+    {
+        for (std::map<string, descriptor*>::iterator Descriptor=EssenceDescriptorList.begin(); Descriptor!=EssenceDescriptorList.end(); ++Descriptor)
+            delete Descriptor->second; //Descriptor->second=NULL;
+    }
+    #endif //MEDIAINFO_ADVANCED
 
 private :
     //Streams management

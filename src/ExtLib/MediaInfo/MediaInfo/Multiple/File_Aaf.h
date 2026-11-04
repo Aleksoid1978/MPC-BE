@@ -105,6 +105,7 @@ private :
         int32u ChildSID;
         int64u Size;
         int8u* Buffer;
+        size_t Buffer_MaxSize;
         vector<int32u> StreamOffsets;
 
         stream(const Ztring& Name_, size_t Directory_Pos_, int64u Size_)
@@ -113,7 +114,8 @@ private :
             Directory_Pos(Directory_Pos_),
             ChildSID((int32u)-1),
             Size(Size_),
-            Buffer(NULL)
+            Buffer(NULL),
+            Buffer_MaxSize(0)
         {
         }
 
@@ -127,6 +129,7 @@ private :
     size_t Streams_Pos;
     size_t Streams_Pos2;
     size_t Directory_Pos;
+    size_t Chain_Count=0; //Count of sectors in the current chain
 
     //Descriptor
     /*

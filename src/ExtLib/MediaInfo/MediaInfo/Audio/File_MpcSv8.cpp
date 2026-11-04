@@ -213,7 +213,14 @@ void File_MpcSv8::SH()
     Get_VS (SampleCount,                                        "Sample count");
     Skip_VS(                                                    "Beginning silence");
     BS_Begin();
-    Get_S1 (3, SampleFrequency,                                 "Sample frequency"); Param_Info1(Mpc_SampleFreq[SampleFrequency]);
+    Get_S1 (3, SampleFrequency,                                 "Sample frequency");
+    if (SampleFrequency>=4)
+    {
+        Trusted_IsNot("Invalid sample frequency");
+        BS_End();
+        return;
+    }
+    Param_Info1(Mpc_SampleFreq[SampleFrequency]);
     Skip_S1(5,                                                  "Max used bands");
     Get_S1 (4, ChannelCount,                                    "Channel count");
     Get_SB (   MidSideStereo,                                   "Mid side stereo used");

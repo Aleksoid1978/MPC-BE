@@ -43,6 +43,14 @@ public :
     //Out
     bool NeedToJumpToEnd = false;
 
+    //Out, for checks done by the container (e.g. SMPTE ST 2131) after parsing
+    bool ID_IsPresent(const string& Element, const string& ID); //Element is the name of the ADM element, e.g. "audioProgramme"
+    vector<string> ID_List(const string& Element); //IDs of all elements with this name, e.g. "audioTrackUID"
+    bool audioTrackUID_Get(const string& UID, string& TrackFormatIDRef, string& ChannelFormatIDRef, string& PackFormatIDRef); //Returns false if the UID is not present
+    bool audioProgramme_Get(const string& ID, string& Name, string& FirstLabel); //Returns false if the ID is not present
+    size_t audioFormatExtended_Count();
+    bool audioMXFLookUp_IsPresent();
+
     //Constructor/Destructor
     File_Adm();
     ~File_Adm();

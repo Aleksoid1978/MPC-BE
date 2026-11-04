@@ -1414,6 +1414,10 @@ TopFrontToSide;
 Total;Total
 TotalNumberOfParts;
 TotalProgrammeDuration;
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Track name
 Track_Count;Track count
 TrackFormat;

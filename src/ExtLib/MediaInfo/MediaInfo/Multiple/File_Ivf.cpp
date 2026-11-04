@@ -164,7 +164,7 @@ void File_Ivf::FileHeader_Parse()
     }
     else {
         //No more need data
-        Finish("IVF");
+        ForceFinish("IVF"); //No parser for the frames, even if the whole file is requested
     }
 }
 

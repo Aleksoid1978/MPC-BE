@@ -2342,6 +2342,32 @@ Ztring::size_type Ztring::FindAndReplace (const ZenLib::tstring &ToFind, const Z
 
     size_type Count=0;
     size_type Middle=Pos;
+    if ((Options&Ztring_Recursive) && ToFind.length()!=ReplaceBy.length())
+    {
+        //Building a new string in one pass, replacing in place would move the end of the string for each occurrence
+        size_type Begin=Pos;
+        tstring Result;
+        while ((Middle=find(ToFind, Middle))!=npos)
+        {
+            if (!Count)
+            {
+                Result.reserve(size());
+                Result.append(*this, 0, Begin);
+            }
+            Result.append(*this, Begin, Middle-Begin);
+            Result.append(ReplaceBy);
+            Middle+=ToFind.length();
+            Begin=Middle;
+            Count++;
+        }
+        if (Count)
+        {
+            Result.append(*this, Begin, npos);
+            assign(Result);
+        }
+        return Count;
+    }
+
     while (!(Count==1 && !(Options&Ztring_Recursive)) && (Middle=find(ToFind, Middle))!=npos)
     {
         replace(Middle, ToFind.length(), ReplaceBy);
@@ -2374,7 +2400,11 @@ bool Ztring::IsNumber() const
 //Mise en minuscules
 Ztring &Ztring::MakeLowerCase()
 {
-    transform(begin(), end(), begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+#if defined(__UNICODE__)
+    transform(begin(), end(), begin(), [](wchar_t c) { return towlower(c); });
+#else // defined(__UNICODE__)
+    transform(begin(), end(), begin(), [](unsigned char c) { return tolower(c); });
+#endif // defined(__UNICODE__)
     return *this;
 }
 
@@ -2382,7 +2412,11 @@ Ztring &Ztring::MakeLowerCase()
 // Mise en majuscules
 Ztring &Ztring::MakeUpperCase()
 {
-    transform(begin(), end(), begin(), (int(*)(int))toupper); //(int(*)(int)) is a patch for unix
+#if defined(__UNICODE__)
+    transform(begin(), end(), begin(), [](wchar_t c) { return towupper(c); });
+#else // defined(__UNICODE__)
+    transform(begin(), end(), begin(), [](unsigned char c) { return toupper(c); });
+#endif // defined(__UNICODE__)
     return *this;
 }
 

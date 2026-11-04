@@ -22,6 +22,7 @@
 
 //---------------------------------------------------------------------------
 #include "MediaInfo/Audio/File_Iab.h"
+#include <algorithm>
 using namespace std;
 //---------------------------------------------------------------------------
 
@@ -72,6 +73,27 @@ const float32 Iab_FrameRate[16]=
 };
 
 //---------------------------------------------------------------------------
+const int8u Iab_NumPanSubBlocks[16]=
+{
+    8,
+    8,
+    8,
+    4,
+    4,
+    4,
+    2,
+    2,
+    2,
+    8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+};
+
+//---------------------------------------------------------------------------
 const char* Iab_Channel(int32u Code)
 {
     static const char* Iab_Channel_Values[]=
@@ -90,15 +112,15 @@ const char* Iab_Channel(int32u Code)
         "Tsl",
         "Tsr",
         "LFE",
-        "Left Height",
-        "Right Height",
-        "Center Height",
-        "Left Surround Height",
-        "Right Surround Height",
-        "Left Side Surround Height",
-        "Right Side Surround Height",
-        "Left Rear Surround Height",
-        "Right Rear Surround Height",
+        "Lh",
+        "Rh",
+        "Ch",
+        "Lsh",
+        "Rsh",
+        "Lssh",
+        "Rssh",
+        "Lrsh",
+        "Rrsh",
         "Tc",
         //0x18-0x7F reserved
         "Tfl",
@@ -168,6 +190,48 @@ void File_Iab::Streams_Fill_ForAdm()
     Fill(Stream_Audio, 0, "NumberOfTrackUIDs", numberOfChannelFormats);
     Fill(Stream_Audio, 0, "NumberOfTrackFormats", numberOfChannelFormats);
     Fill(Stream_Audio, 0, "NumberOfStreamFormats", numberOfChannelFormats);
+
+    //Beds and dynamic objects, as named by Dolby (a bed is a Bed Definition element)
+    size_t DynamicObjects_Count=0;
+    vector<pair<size_t, Ztring> > Beds; //Channel count and channel layout
+    for (const auto& Object : Frame.Objects)
+    {
+        if (Object.ChannelLayout.empty())
+        {
+            DynamicObjects_Count++;
+            continue;
+        }
+        ZtringList ChannelLayout;
+        ChannelLayout.Separator_Set(0, __T(" "));
+        for (const auto& ChannelID : Object.ChannelLayout)
+            ChannelLayout.push_back(Iab_Channel(ChannelID));
+        Beds.emplace_back(Object.ChannelLayout.size(), ChannelLayout.Read());
+    }
+    Fill(Stream_Audio, 0, "NumberOfDynamicObjects", DynamicObjects_Count);
+    if (!Beds.empty())
+    {
+        Fill(Stream_Audio, 0, "NumberOfBeds", Beds.size());
+        if (find_if(Beds.begin(), Beds.end(), [&](const pair<size_t, Ztring>& Bed) { return Bed!=Beds.front(); })==Beds.end())
+            Beds.resize(1); //All beds have the same configuration
+        ZtringList BedChannelCounts, BedChannelCount_Strings, BedChannelConfigurations;
+        BedChannelCounts.Separator_Set(0, __T(" / "));
+        BedChannelCount_Strings.Separator_Set(0, __T(" / "));
+        BedChannelConfigurations.Separator_Set(0, __T(" / "));
+        BedChannelConfigurations.Quote_Set(Ztring()); //Channel names with spaces are already quoted in each channel layout
+        for (const auto& Bed : Beds)
+        {
+            BedChannelCounts.push_back(Ztring::ToZtring(Bed.first));
+            BedChannelCount_Strings.push_back(MediaInfoLib::Config.Language_Get(Ztring::ToZtring(Bed.first), __T(" channel")));
+            if (!Bed.second.empty())
+                BedChannelConfigurations.push_back(Bed.second);
+        }
+        Fill(Stream_Audio, 0, "BedChannelCount", BedChannelCounts.Read());
+        Fill_SetOptions(Stream_Audio, 0, "BedChannelCount", "N NIY");
+        Fill(Stream_Audio, 0, "BedChannelCount/String", BedChannelCount_Strings.Read());
+        Fill_SetOptions(Stream_Audio, 0, "BedChannelCount/String", "Y NIN");
+        if (BedChannelConfigurations.size()==Beds.size())
+            Fill(Stream_Audio, 0, "BedChannelConfiguration", BedChannelConfigurations.Read());
+    }
 
     {
         auto O="Programme0";
@@ -317,9 +381,9 @@ void File_Iab::Streams_Fill_ForAdm()
             Fill(Stream_Audio, 0, O.c_str(), "Yes");
             Fill(Stream_Audio, 0, (O + " Pos").c_str(), numberOfChannelFormats);
             Fill_SetOptions(Stream_Audio, 0, (O + " Pos").c_str(), "N NIY");
-            if (Iab_SampleRate[SampleRate])
+            if (SampleRate<4 && Iab_SampleRate[SampleRate])
                 Fill(Stream_Audio, 0, (O+" SamplingRate").c_str(), Iab_SampleRate[SampleRate]);
-            if (Iab_BitDepth[BitDepth])
+            if (BitDepth<4 && Iab_BitDepth[BitDepth])
                 Fill(Stream_Audio, 0, (O+" BitDepth").c_str(), Iab_BitDepth[BitDepth]);
             auto PackFormat=O+" LinkedTo_PackFormat_Pos";
             Fill(Stream_Audio, 0, PackFormat.c_str(), i);
@@ -341,9 +405,9 @@ void File_Iab::Streams_Fill_ForAdm()
                 Fill(Stream_Audio, 0, O.c_str(), "Yes");
                 Fill(Stream_Audio, 0, (O + " Pos").c_str(), numberOfChannelFormats);
                 Fill_SetOptions(Stream_Audio, 0, (O + " Pos").c_str(), "N NIY");
-                if (Iab_SampleRate[SampleRate])
+                if (SampleRate<4 && Iab_SampleRate[SampleRate])
                     Fill(Stream_Audio, 0, (O+" SamplingRate").c_str(), Iab_SampleRate[SampleRate]);
-                if (Iab_BitDepth[BitDepth])
+                if (BitDepth<4 && Iab_BitDepth[BitDepth])
                     Fill(Stream_Audio, 0, (O+" BitDepth").c_str(), Iab_BitDepth[BitDepth]);
                 auto PackFormat=O+" LinkedTo_PackFormat_Pos";
                 Fill(Stream_Audio, 0, PackFormat.c_str(), i);
@@ -468,11 +532,11 @@ void File_Iab::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_Format, "IAB");
     Fill(Stream_Audio, 0, Audio_Format_Info, "Immersive Audio Bitstream");
     Fill(Stream_Audio, 0, Audio_Format_Version, __T("Version ")+Ztring::ToZtring(Version));
-    if (Iab_SampleRate[SampleRate])
+    if (SampleRate<4 && Iab_SampleRate[SampleRate])
         Fill(Stream_Audio, 0, Audio_SamplingRate, Iab_SampleRate[SampleRate]);
-    if (Iab_BitDepth[BitDepth])
+    if (BitDepth<4 && Iab_BitDepth[BitDepth])
         Fill(Stream_Audio, 0, Audio_BitDepth, Iab_BitDepth[BitDepth]);
-    if (Iab_FrameRate[FrameRate])
+    if (FrameRate<16 && Iab_FrameRate[FrameRate])
         Fill(Stream_Audio, 0, Audio_FrameRate, Iab_FrameRate[FrameRate]);
 }
 
@@ -605,15 +669,15 @@ void File_Iab::BedDefinition()
         Skip_Plex(8,                                            "AudioDataID");
         Get_S1 (2, ChannelGainPrefix,                           "ChannelGainPrefix");
         if (ChannelGainPrefix>1)
-            Skip_S1(10,                                         "ChannelGain");
+            Skip_S2(10,                                         "ChannelGain");
         Get_SB (ChannelDecorInfoExists,                         "ChannelDecorInfoExists");
         if (ChannelDecorInfoExists)
         {
             int8u ChannelDecorCoefPrefix;
-            Skip_S2(2,                                          "Reserved");
+            Skip_S1(4,                                          "Reserved");
             Get_S1 (2, ChannelDecorCoefPrefix,                  "ChannelDecorCoefPrefix");
             if (ChannelDecorCoefPrefix>1)
-                Skip_S1(10,                                     "ChannelDecorCoef");
+                Skip_S1(8,                                      "ChannelDecorCoef");
         }
         Element_End0();
         F.Objects.back().ChannelLayout.push_back(ChannelID);
@@ -625,12 +689,14 @@ void File_Iab::BedDefinition()
     Get_B1 (AudioDescription,                                   "AudioDescription");
     if (AudioDescription&0x80)
     {
-        size_t Pos=(size_t)Element_Offset+1;
-        while (Pos<Element_Size-1 && Buffer[Buffer_Offset+Pos])
+        size_t Pos=(size_t)Element_Offset;
+        while (Pos<Element_Size && Buffer[Buffer_Offset+Pos])
             Pos++;
-        Skip_XX(Pos-Element_Offset,                             "AudioDescriptionText");
+        Skip_String(Pos-Element_Offset,                         "AudioDescriptionText");
+        if (Element_Offset<Element_Size)
+            Element_Offset++; //NULL terminator
     }
-    Skip_B1(                                                    "SubElementCount");
+    Skip_Plex8(                                                 "SubElementCount");
     Element_ThisIsAList();
 }
 
@@ -641,18 +707,18 @@ void File_Iab::ObjectDefinition()
 
     //Parsing
     int8u AudioDescription;
-    bool ConditionalBed;
+    bool ConditionalObject;
     Skip_Plex8(                                                 "MetaID");
     Skip_Plex8(                                                 "AudioDataID");
     BS_Begin();
-    Get_SB (ConditionalBed,                                     "ConditionalBed");
-    if (ConditionalBed)
+    Get_SB (ConditionalObject,                                  "ConditionalObject");
+    if (ConditionalObject)
     {
         Skip_SB(                                                "1");
         Skip_S1(8,                                              "ObjectUseCase");
     }
     Skip_SB(                                                    "0");
-    int32u NumPanSubBlocks=8;
+    int32u NumPanSubBlocks=(FrameRate<16 && Iab_NumPanSubBlocks[FrameRate])?Iab_NumPanSubBlocks[FrameRate]:8;
     for (int32u sb=0; sb<NumPanSubBlocks; sb++)
     {
         Element_Begin1("PanSubBlock");
@@ -667,7 +733,7 @@ void File_Iab::ObjectDefinition()
             bool ObjectSnap, ObjectZoneControl;
             Get_S1 (2, ObjectGainPrefix,                        "ObjectGainPrefix");
             if (ObjectGainPrefix>1)
-                Skip_S1(10,                                     "ObjectGainPrefix");
+                Skip_S2(10,                                     "ObjectGain");
             Skip_S1( 3,                                         "b001");
             Skip_S2(16,                                         "ObjectPosX");
             Skip_S2(16,                                         "ObjectPosY");
@@ -691,20 +757,24 @@ void File_Iab::ObjectDefinition()
                     int8u ZoneGainPrefix;
                     Get_S1 (2, ZoneGainPrefix,                  "ZoneGainPrefix");
                     if (ZoneGainPrefix>1)
-                        Skip_S1(10,                             "ZoneGain");
+                        Skip_S2(10,                             "ZoneGain");
                 }
             }
             int8u ObjectSpreadMode;
             Get_S1 (2, ObjectSpreadMode,                        "ObjectSpreadMode");
             switch (ObjectSpreadMode)
             {
-                case 0:
-                case 2:
+                case 0: //OBJECT_SPREAD_LOWREZ
                 {
                     Skip_S1( 8,                                 "ObjectSpread");
                 }
                 break;
-                case 3:
+                case 2: //OBJECT_SPREAD_1D
+                {
+                    Skip_S2(12,                                 "ObjectSpread");
+                }
+                break;
+                case 3: //OBJECT_SPREAD_3D
                 {
                     Skip_S2(12,                                 "ObjectSpreadX");
                     Skip_S2(12,                                 "ObjectSpreadY");
@@ -717,7 +787,7 @@ void File_Iab::ObjectDefinition()
             int8u ObjectDecorCoefPrefix;
             Get_S1 (2, ObjectDecorCoefPrefix,                   "ObjectDecorCoefPrefix");
             if (ObjectDecorCoefPrefix>1)
-                Skip_S1(8,                                      "ObjectDecorCoefPrefix");
+                Skip_S1(8,                                      "ObjectDecorCoef");
         }
         Element_End0();
     }
@@ -725,12 +795,14 @@ void File_Iab::ObjectDefinition()
     Get_B1 (AudioDescription,                                   "AudioDescription");
     if (AudioDescription&0x80)
     {
-        size_t Pos=(size_t)Element_Offset+1;
-        while (Pos<Element_Size-1 && Buffer[Buffer_Offset+Pos])
+        size_t Pos=(size_t)Element_Offset;
+        while (Pos<Element_Size && Buffer[Buffer_Offset+Pos])
             Pos++;
-        Skip_XX(Pos-Element_Offset,                             "AudioDescriptionText");
+        Skip_String(Pos-Element_Offset,                         "AudioDescriptionText");
+        if (Element_Offset<Element_Size)
+            Element_Offset++; //NULL terminator
     }
-    Skip_B1(                                                    "SubElementCount");
+    Skip_Plex8(                                                 "SubElementCount");
     //Element_ThisIsAList(); // TODO: handle SubElements here
 }
 
@@ -743,7 +815,7 @@ void File_Iab::BedRemap()
     BS_Begin();
     Get_Plex (4, SourceChannels,                                "SourceChannels");
     Get_Plex (4, DestinationChannels,                           "DestinationChannels");
-    int32u NumPanSubBlocks=8;
+    int32u NumPanSubBlocks=(FrameRate<16 && Iab_NumPanSubBlocks[FrameRate])?Iab_NumPanSubBlocks[FrameRate]:8;
     for (int32u sb=0; sb<NumPanSubBlocks; sb++)
     {
         Element_Begin1("PanSubBlock");
@@ -762,7 +834,7 @@ void File_Iab::BedRemap()
                     int8u RemapGainPrefix;
                     Get_S1 (2, RemapGainPrefix,                 "RemapGainPrefix");
                     if (RemapGainPrefix>1)
-                        Skip_S1(10,                             "RemapGain");
+                        Skip_S2(10,                             "RemapGain");
                 }
             }
         }
@@ -789,7 +861,7 @@ void File_Iab::Get_Plex(int8u Bits, int32u& Info, const char* Name)
     for (;;)
     {
         Peek_BS(Bits, Info);
-        if (Info!=(1<<Bits)-1 || Bits>=32)
+        if (Bits>=32 || Info!=(1u<<Bits)-1)
         {
             Get_BS(Bits, Info, Name);
             return;

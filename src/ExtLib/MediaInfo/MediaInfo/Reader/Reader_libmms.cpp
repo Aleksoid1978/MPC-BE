@@ -97,13 +97,19 @@ size_t Reader_libmms::Format_Test(MediaInfo_Internal* MI, String File_Name)
 
         //MediaInfo init
         mms_off_t Offset=mmsx_seek(0, Handle, 0, SEEK_SET);
-        uint32_t Length=mmsx_get_length(Handle);
+        Length=mmsx_get_length(Handle);
         MI->Open_Buffer_Init(Length, File_Name);
     }
     else
     {
         //Buffer
-        Buffer_Size_Max=mmsx_get_asf_header_len(Handle);
+        int Header_Size=mmsx_get_asf_header_len(Handle);
+        if (Header_Size<=0)
+        {
+            mmsx_close(Handle);
+            return 0;
+        }
+        Buffer_Size_Max=(size_t)Header_Size;
 
         //MediaInfo init
         Length=(uint32_t)-1;
@@ -128,14 +134,17 @@ size_t Reader_libmms::Format_Test(MediaInfo_Internal* MI, String File_Name)
         }
 
         //Buffering
-        size_t Buffer_Size;
+        int Buffer_Size;
         if (!MI->Config.File_Mmsh_Describe_Only_Get())
             Buffer_Size=mmsx_read(0, Handle, (char*)Buffer, (int)Buffer_Size_Max);
         else
             Buffer_Size=mmsx_peek_header(Handle, (char*)Buffer, (int)Buffer_Size_Max);
 
+        if (Buffer_Size<=0 || (size_t)Buffer_Size>Buffer_Size_Max)
+            break;
+
         //Parser
-        Status=MI->Open_Buffer_Continue(Buffer, Buffer_Size);
+        Status=MI->Open_Buffer_Continue(Buffer, (size_t)Buffer_Size);
         if (Buffer_Size==0 || MI->Config.File_Mmsh_Describe_Only_Get())
             break;
     }

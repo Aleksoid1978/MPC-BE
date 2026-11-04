@@ -192,6 +192,7 @@ bool File_Hls::FileHeader_Begin()
     }
     else
     {
+        delete Sequence;
         Fill(Stream_General, 0, General_Format_Profile, "Master");
     }
     #endif //MEDIAINFO_REFERENCES_YES

@@ -32,7 +32,9 @@ VideoRenderers
 	ffmpeg n9.1-dev-2940-g11ef8d60d6;
 	libpng git-v1.6.59-9-gac0c35324;
 	Little-CMS git-lcms2.20-2-g689a84b;
-	vvdec v3.2.1.
+	MediaInfo git-v26.10-253-g3ae7b32d4;
+	vvdec v3.2.1;
+	ZenLib git-v0.4.41-121-g2785fe6;
 
 
 1.9.2 - 2026-10-13

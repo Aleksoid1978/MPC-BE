@@ -23,6 +23,7 @@
 #endif //defined(MEDIAINFO_ANCILLARY_YES)
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/TimeCode.h"
+#include <deque>
 #include <vector>
 #include <set>
 #include <bitset>
@@ -85,9 +86,20 @@ protected :
     void Streams_Finish_ContentStorage (const int128u ContentStorageUID);
     void Streams_Finish_ContentStorage_ForTimeCode (const int128u ContentStorageUID);
     void Streams_Finish_ContentStorage_ForAS11 (const int128u ContentStorageUID);
+    void Streams_Finish_Arri ();
     void Streams_Finish_Package (const int128u PackageUID);
     void Streams_Finish_Package_ForTimeCode (const int128u PackageUID);
     void Streams_Finish_Package_ForAS11 (const int128u PackageUID);
+    #if MEDIAINFO_CONFORMANCE
+    void Streams_Finish_ContentStorage_Conformance (const int128u ContentStorageUID);
+    void Streams_Finish_Conformance_FileFormat (); //SMPTE ST 377-1, edition depending on the version in the file
+    void Streams_Finish_Conformance_HeaderMetadata (); //SMPTE ST 377-1, KLV coding, Primer Pack and Header Metadata, version 1.3 only
+    void Streams_Finish_Conformance_IndexTables (); //SMPTE ST 377-1, Index Table Segments of an Index Stream, version 1.3 only
+    void Streams_Finish_Conformance_OperationalPattern (); //SMPTE ST 378 (OP1a), and for version 1.3 SMPTE ST 377-1 (generalized patterns) and SMPTE ST 390 (OP-Atom)
+    void Streams_Finish_Conformance_MCA (); //SMPTE ST 377-4 and SMPTE ST 377-41, MCA Label Sub-Descriptors
+    void Streams_Finish_Conformance_RiffChunks (); //SMPTE ST 2131
+    void Streams_Finish_Conformance_References ();
+    #endif //MEDIAINFO_CONFORMANCE
     void Streams_Finish_Track (const int128u TrackUID);
     void Streams_Finish_Track_ForTimeCode (const int128u TrackUID, bool IsSourcePackage);
     void Streams_Finish_Track_ForAS11 (const int128u TrackUID);
@@ -100,6 +112,18 @@ protected :
     void Streams_Finish_Component_ForAS11 (const int128u ComponentUID, float64 EditRate, int32u TrackID, int64s Origin);
     void Streams_Finish_Identification (const int128u IdentificationUID);
     void Streams_Finish_CommercialNames ();
+    void Streams_Finish_CompliantWith ();
+    conformance_errors CompliantWith_ArdZdf (size_t Profile_Pos, bool IsCandidateTest=false); //Profile_Pos is the position in the list of ARD/ZDF profiles, candidate test is done before parsing all partitions, without tests needing all partitions or the essence
+    bool CompliantWith_ArdZdf_IsCandidate (); //Candidate for an ARD/ZDF profile with Body Partitions
+    size_t CompliantWith_ArdZdf_FromContent (std::string& Content); //Position of the ARD/ZDF profile matching the kind of content, (size_t)-1 if none, Content is filled with a description of the content
+    #if MEDIAINFO_CONFORMANCE
+    conformance_errors CompliantWith_St2067204 (conformance_errors& Warnings); //ADM Audio Track File, to be done before filling the ADM content, Warnings are filled with the recommendations not followed
+    conformance_errors CompliantWith_St20675 (conformance_errors& Warnings, bool IsTrackFile); //IMF Essence Component, with the overall constraints of IMF Track Files if IsTrackFile, Warnings are filled with the recommendations not followed
+    conformance_errors CompliantWith_St20672 (conformance_errors& Warnings); //IMF Track File, Warnings are filled with the recommendations not followed
+    bool CompliantWith_St20672_IsDeclared (); //SMPTE ST 2067-2 declared by the file (Channel Assignment label)
+    bool CompliantWith_St20672_IsCandidate (); //Candidate for an IMF Track File (Audio or Timed Text)
+    #endif //MEDIAINFO_CONFORMANCE
+    bool CompliantWith_St20672_IsTested (bool WithSt2067204=false); //IMF Track File or IMF Essence Component requested (or ADM Audio Track File if WithSt2067204), or candidate for an IMF Track File
 
     //Buffer - Global
     void Read_Buffer_Init ();
@@ -148,6 +172,8 @@ protected :
     void MCAEpisode();
     void MCAAudioContentKind();
     void MCAAudioElementKind();
+    void MCAContent();
+    void MCAUseClass();
     void TextDataDescription();
     void ResourceID();
     void NamespaceURI();
@@ -195,6 +221,7 @@ protected :
     void ApplicationPlugInObject();
     void ApplicationReferencedObject();
     void MCALabelSubDescriptor();
+    void MCALabelSubDescriptor_Items();
     void DCTimedTextDescriptor();
     void DCTimedTextResourceSubDescriptor();
     void ContainerConstraintsSubDescriptor();
@@ -236,6 +263,17 @@ protected :
     void DM_AS_11_Core_Framework();
     void DM_AS_11_Segmentation_Framework();
     void DM_AS_11_UKDPP_Framework();
+    void Arri_DmFramework();
+    void Arri_DmFramework_Sets();
+    void Arri_DmSet();
+    void Arri_DmSet_Name();
+    void Arri_DmSet_Mime();
+    void Arri_DmSet_Json();
+    void Arri_DmSet_Schema();
+    void Arri_ClipSet();
+    void Arri_BinaryPack();
+    void Arri_BinaryPack_Header();
+    void Arri_BinaryPack_VideoParameters();
     void Dolby_050201000101() { MXFGenericStreamDataElementKey_09_01(); }
     void PHDRImageMetadataItem();
     void ISXDDataEssenceDescriptor();
@@ -265,6 +303,7 @@ protected :
     void InterchangeObject();
     void PictureDescriptor();
     void PartitionMetadata();
+    void BodyPartition();
     void GenericTrack();
     void GenericPackage();
     void FileDescriptor();
@@ -691,7 +730,7 @@ protected :
         int64u ByteOffset;
         int32u BodySID;
     };
-    std::vector<randomindexpack>     RandomIndexPacks;
+    std::deque<randomindexpack>      RandomIndexPacks; //Front is removed when the partition is parsed
     bool                             RandomIndexPacks_AlreadyParsed;
     std::set<int64u>                 PartitionPack_AlreadyParsed;
     size_t Streams_Count;
@@ -706,6 +745,7 @@ protected :
     int16u Length2;
     int64u File_Size_Total; //Used only in Finish()
     int64u IsParsingMiddle_MaxOffset;
+    bool   ProbeCaption_IsChecked;
     bool   Track_Number_IsAvailable;
     bool   IsParsingEnd;
     bool   IsCheckingRandomAccessTable;
@@ -803,6 +843,7 @@ protected :
     };
     typedef std::map<int128u, track> tracks; //Key is InstanceUID of the track
     tracks Tracks;
+    int32u TrackID_FromTrackNumber(int32u TrackNumber);
 
     //Essence
     typedef std::vector<File__Analyze*> parsers;
@@ -814,6 +855,7 @@ protected :
         parsers Parsers;
         std::map<std::string, Ztring> Infos;
         int64u Stream_Size;
+        int64u Element_Size_Constant; //Size of parsed elements if it is always the same, 0 if no element is parsed, (int64u)-1 if not constant
         int32u TrackID;
         bool   TrackID_WasLookedFor;
         bool   Stream_Finish_Done;
@@ -835,6 +877,7 @@ protected :
             StreamPos=(size_t)-1;
             StreamPos_Initial=(size_t)-1;
             Stream_Size=(int64u)-1;
+            Element_Size_Constant=0;
             TrackID=(int32u)-1;
             TrackID_WasLookedFor=false;
             Stream_Finish_Done=false;
@@ -861,12 +904,23 @@ protected :
     };
     typedef std::map<int32u, essence> essences; //Key is TrackNumber
     essences Essences;
+    struct streamsize_fromelements
+    {
+        size_t  StreamPos;
+        Ztring  ID;
+        int64u  StreamSize;
+        float64 BitRate;
+    };
+    std::vector<streamsize_fromelements> StreamSizes_FromElements; //Video stream sizes and bit rates from the size of frame wrapped elements, used only if the file is complete
+    size_t IndexTable_SegmentCount; //Count of parsed index table segments
+    size_t IndexTable_SegmentCount_Cbe; //Count of parsed index table segments with a non-zero Edit Unit Byte Count
     std::bitset<Stream_Max+1> StreamPos_StartAtZero; //information about the base of StreamPos (0 or 1, 1 is found in 1 file) TODO: per Essence code (last 4 bytes of the Essence header 0xTTXXTTXX)
 
     //Descriptor
     struct descriptor
     {
-        std::vector<int128u> SubDescriptors;
+        std::vector<int128u> SubDescriptors; //File Descriptors for a Multiple Descriptor
+        std::vector<int128u> SubDescriptors_Multiple; //Sub-descriptors of a Multiple Descriptor
         std::vector<int128u> Locators;
 
         Ztring  ScanType;
@@ -879,6 +933,12 @@ protected :
         int128u EssenceContainer;
         int128u EssenceCompression;
         int32u LinkedTrackID;
+        #if MEDIAINFO_CONFORMANCE
+            int64u LinkedTrackID_Offset; //Only if from FileDescriptor
+            int32u SourceTrackID; //PHDR or HDR Vivid metadata track
+            int64u SourceTrackID_Offset;
+            const char* SourceTrackID_Name;
+        #endif //MEDIAINFO_CONFORMANCE
         int32u Width;
         int32u Width_Display;
         int32u Width_Display_Offset;
@@ -915,6 +975,12 @@ protected :
             Type_AudioChannelLabelSubDescriptor,
             Type_SoundfieldGroupLabelSubDescriptor,
             Type_GroupOfSoundfieldGroupsLabelSubDescriptor,
+            Type_ADMSoundfieldGroupLabelSubDescriptor,
+            Type_RIFFChunkDefinitionSubDescriptor,
+            Type_RIFFChunkReferencesSubDescriptor,
+            Type_ADMAudioMetadataSubDescriptor,
+            Type_ADM_CHNASubDescriptor,
+            Type_ADMChannelMapping,
         };
         type Type;
         bool HasBFrames;
@@ -942,7 +1008,13 @@ protected :
         //AudioChannelLabelSubDescriptor specific
         int128u     SoundfieldGroupLinkID;
 
-        //DescriptiveMarker
+        //RIFFChunkDefinitionSubDescriptor specific
+        int32u      RIFFChunkID;
+
+        //ADM_CHNASubDescriptor specific
+        std::vector<int128u> ADMChannelMappings; //Entries of ADMChannelMappingsArray
+
+        //DescriptiveMarker, GenericStreamTextBasedSet, RIFFChunkDefinitionSubDescriptor
         int32u      SID;
 
         descriptor()
@@ -959,6 +1031,12 @@ protected :
             EssenceCompression.hi=(int64u)-1;
             EssenceCompression.lo=(int64u)-1;
             LinkedTrackID=(int32u)-1;
+            #if MEDIAINFO_CONFORMANCE
+                LinkedTrackID_Offset=(int64u)-1;
+                SourceTrackID=(int32u)-1;
+                SourceTrackID_Offset=(int64u)-1;
+                SourceTrackID_Name=nullptr;
+            #endif //MEDIAINFO_CONFORMANCE
             Width=(int32u)-1;
             Width_Display=(int32u)-1;
             Width_Display_Offset=(int32u)-1;
@@ -999,7 +1077,10 @@ protected :
             SoundfieldGroupLinkID.hi=(int64u)-1;
             SoundfieldGroupLinkID.lo=(int64u)-1;
 
-            //DescriptiveMarker
+            //RIFFChunkDefinitionSubDescriptor specific
+            RIFFChunkID=0;
+
+            //DescriptiveMarker, GenericStreamTextBasedSet, RIFFChunkDefinitionSubDescriptor
             SID=0;
         }
         descriptor(const descriptor&) = delete;
@@ -1021,6 +1102,14 @@ protected :
     typedef std::map<int128u, descriptor> descriptors; //Key is InstanceUID of Descriptor
     descriptors Descriptors;
     void Descriptor_Fill(const char* Name, const Ztring& Value);
+    void Descriptor_Type_Set(descriptor::type Type); //After the parsing of each item, the type is not set for a File Descriptor or a set of another type with the same Instance UID
+    descriptor::type Descriptor_Type_Pending; //Type set by Descriptor_Type_Set() before the Instance UID item of the set
+    bool SubDescriptor_IsDangling(const descriptors::iterator& Descriptor);
+    descriptors::iterator Descriptor_Single(bool IncludeLinkedToTrack=false);
+    descriptors::iterator Descriptor_FromTrackID(int32u TrackID);
+    #if MEDIAINFO_DEMUX || MEDIAINFO_SEEK
+    bool Descriptors_ConfigureForDemux();
+    #endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
 
     //Locator
     struct locator
@@ -1055,6 +1144,9 @@ protected :
         int64u Duration;
         int256u SourcePackageID; //Sequence from SourcePackage only
         int32u  SourceTrackID;
+        #if MEDIAINFO_CONFORMANCE
+            int64u SourceTrackID_Offset;
+        #endif //MEDIAINFO_CONFORMANCE
         std::vector<int128u> StructuralComponents; //Sequence from MaterialPackage only
         mxftimecode MxfTimeCode;
 
@@ -1062,6 +1154,9 @@ protected :
         {
             Duration=(int64u)-1;
             SourceTrackID=(int32u)-1;
+            #if MEDIAINFO_CONFORMANCE
+                SourceTrackID_Offset=(int64u)-1;
+            #endif //MEDIAINFO_CONFORMANCE
         }
 
         void Update (struct component &New)
@@ -1071,7 +1166,12 @@ protected :
             if (New.SourcePackageID.hi || New.SourcePackageID.lo)
                 SourcePackageID=New.SourcePackageID;
             if (New.SourceTrackID!=(int32u)-1)
+            {
                 SourceTrackID=New.SourceTrackID;
+                #if MEDIAINFO_CONFORMANCE
+                    SourceTrackID_Offset=New.SourceTrackID_Offset;
+                #endif //MEDIAINFO_CONFORMANCE
+            }
             if (!New.StructuralComponents.empty())
                 StructuralComponents=New.StructuralComponents;
             if (New.MxfTimeCode.StartTimecode!=(int64u)-1)
@@ -1085,6 +1185,37 @@ protected :
     };
     typedef std::map<int128u, component> components; //Key is InstanceUID of the component
     components Components;
+
+    //Timecode comparison
+    struct timecodecache
+    {
+        struct value
+        {
+            int64u Offset;
+            int64u Value;
+
+            value(int64u Offset = 0, int64u Value = 0)
+                : Offset(Offset)
+                , Value(Value)
+            {}
+        };
+        std::vector<value> Values;
+        size_t StreamPos = (size_t)-1;
+    };
+    typedef std::map<int128u, timecodecache> timecodecaches; //Key is InstanceUID of the timecode
+    timecodecaches TimecodeCaches;
+
+    //Track ID references conformance, filled once streams are known
+    #if MEDIAINFO_CONFORMANCE
+    struct conformance_reference
+    {
+        int64u      Offset;
+        const char* Field;
+        string      Value;
+        int32u      TrackID;
+    };
+    std::vector<conformance_reference> Conformance_References;
+    #endif //MEDIAINFO_CONFORMANCE
 
     //Descriptive Metadata - DescriptiveMarkers
     struct dmsegment
@@ -1228,6 +1359,27 @@ protected :
     typedef std::map<int128u, as11> as11s; //Key is InstanceUID of the ProductionFramework
     as11s AS11s;
 
+    //Descriptive Metadata - ARRI
+    struct arri_dmset
+    {
+        Ztring      Name;
+        Ztring      Mime;
+        std::string Json;
+    };
+    typedef std::map<int128u, arri_dmset> arri_dmsets; //Key is InstanceUID of the set
+    arri_dmsets ArriDmSets;
+    std::vector<int128u> ArriDmSets_Order; //InstanceUIDs in file order
+    std::set<int128u> ArriDmFrameworks; //InstanceUIDs
+    std::vector<std::pair<std::string, Ztring> > ArriBinaryFields;
+    std::map<std::string, Ztring> ArriClipFields;
+    std::map<int128u, std::pair<Ztring, Ztring> > ArriClipParams; //Key: InstanceUID of set, value: name and version
+    std::vector<int128u> ArriClipParams_Order; //InstanceUIDs in file order
+    std::vector<int128u> ArriClipParams_Refs; //InstanceUIDs in referenced order
+    std::map<int128u, std::map<std::string, Ztring> > ArriClipObjects; //Key: InstanceUID of LUT or color space set
+    std::map<int128u, std::map<std::string, int128u> > ArriClipObjectRefs; //Key: InstanceUID of LUT set
+    std::vector<int128u> ArriClipLuts_Refs; //InstanceUIDs in referenced order
+    std::map<int8u, std::vector<std::pair<std::string, Ztring> > > ArriClipLooks; //Key: look index (Mini)
+
     //Descriptive Metadata - Omneon
     struct dmomneonlink
     {
@@ -1350,21 +1502,39 @@ protected :
     {
         int64u StreamOffset; //From file, not MXF one
         int64u PartitionPackByteCount; //Fill included
+        int64u ThisPartition;
+        int64u PreviousPartition;
         int64u FooterPartition;
         int64u HeaderByteCount;
         int64u IndexByteCount;
         int64u BodyOffset;
         int32u BodySID;
+        int32u IndexSID;
+        int32u KAGSize;
+        int128u OperationalPattern;
+        int16u MajorVersion;
+        int16u MinorVersion;
+        int8u  Kind; //Byte 14 of the key: 0x02=Header, 0x03=Body or Generic Stream, 0x04=Footer
+        int8u  Status; //Byte 15 of the key: 0x01=Open Incomplete, 0x02=Closed Incomplete, 0x03=Open Complete, 0x04=Closed Complete, 0x11=Generic Stream
 
         partition()
         {
             StreamOffset=0;
             PartitionPackByteCount=(int64u)-1;
+            ThisPartition=0;
+            PreviousPartition=0;
             FooterPartition=0;
             HeaderByteCount=0;
             IndexByteCount=0;
             BodyOffset=0;
             BodySID=0;
+            IndexSID=0;
+            KAGSize=0;
+            OperationalPattern=0;
+            MajorVersion=0;
+            MinorVersion=0;
+            Kind=0;
+            Status=0;
         }
 
         bool operator < (const partition& lhs) const
@@ -1374,10 +1544,157 @@ protected :
     };
     typedef std::vector<partition>  partitions;
     partitions                      Partitions;
+
+    //Raw values of local set properties, for checking compliance with specifications
+    typedef std::map<int64u, std::string> properties; //Key is static local tag or low part of the dynamic property UL, value is the raw content (truncated if long)
+    std::map<int128u, properties>   SetProperties; //Key is InstanceUID of the set
+    std::set<std::pair<int64u, int64u> > SetProperties_FooterDifferences; //Low part of the set key and property key, for properties having another value in the Footer Partition
+    std::set<std::pair<int64u, int64u> > SetProperties_FooterPresenceDifferences; //Low part of the set key and property key, for properties present in only one of the Header Metadata repetitions
+    #if MEDIAINFO_CONFORMANCE
+        struct instanceuid_set
+        {
+            int64u                  Partition; //Offset of the partition of the Header Metadata
+            int64u                  StreamOffset; //Offset of the set
+            int64u                  Key; //Low part of the set key
+            int64u                  StreamOffset_Kept; //Offset of the first parsed set with this Instance UID, the one in SetKeys and SetProperties, (int64u)-1 if only dark sets
+            int64u                  Key_Kept; //Low part of its set key
+            int64u                  Key_FileDescriptor; //Low part of the set key of the first parsed File Descriptor with this Instance UID, 0 if none
+        };
+        std::map<int128u, instanceuid_set> InstanceUID_Sets; //Key is InstanceUID, value is the first set with this Instance UID in the last Header Metadata parsed containing it
+        struct instanceuid_duplicate
+        {
+            int128u                 InstanceUID;
+            int64u                  Key; //Low part of the key of the first set with this Instance UID
+            int64u                  Key_Duplicate; //Low part of the key of the set reusing it
+        };
+        std::map<int64u, instanceuid_duplicate> InstanceUID_Duplicates; //Key is the offset of a set reusing the Instance UID of another set of the same Header Metadata
+        std::map<std::pair<int128u, int64u>, properties> SetProperties_Duplicates; //Key is InstanceUID and low part of the set key, for the first parsed set of each kind with an Instance UID reused in its Header Metadata (SetProperties and SetKeys have the first parsed set)
+    #endif //MEDIAINFO_CONFORMANCE
+
+    //Helpers for checking compliance with specifications, on raw values of local set properties
+    struct property_expected
+    {
+        int64u          Key; //Static local tag or low part of the dynamic property UL
+        const char*     Name;
+        std::vector<std::string> Values; //Empty if any value is accepted
+        bool            AbsentIsAccepted; //Default value is the expected one
+    };
+    struct track_info
+    {
+        tracks::iterator    Track;
+        char                Kind; //T=Timecode, V=Picture, A=Sound, D=Data, M=Descriptive Metadata
+        int32u              TrackNumber;
+        const properties*   Properties;
+    };
+    static std::string          Raw_UInt(int64u Value, size_t Size); //Big endian
+    static std::string          Raw_Rational(int32u Numerator, int32u Denominator);
+    static std::string          Raw_UL(int64u Hi, int64u Lo);
+    static std::string          Raw_Batch(const std::vector<int32u>& Values); //Batch of 4-byte values
+    static bool                 Raw_IsSame(const std::string& Value, const std::string& Expected); //Version byte of UL is ignored
+    static std::string          Raw_Hex(const std::string& Value); //Bytes in hexadecimal with a dot every 4 bytes, e.g. "060E2B34.0401010D.04010202.01316001"
+    static std::string          Raw_Text(const std::string& Value, bool IsRational=false); //Value for messages, e.g. "10", "50/1", "060E2B34.0401010D.04010202.01316001" or "{21, 584}"
+    static bool                 Raw_UInt_Get(const std::string* Value, size_t Size, int64u& Result); //Big endian, returns false if absent or with another size
+    static std::string          Raw_UTF16_Get(const std::string* Value); //UTF-16 big endian, characters out of ISO 7 replaced by '?', null characters at the end ignored, empty if absent
+    const properties&           SetProperties_Get(const int128u& InstanceUID) const; //Empty if the set is not parsed
+    const properties&           SetProperties_Get(const int128u& InstanceUID, int64u Key) const; //Set of this kind (low part of the set key), also if another set of the same Header Metadata reuses its Instance UID
+    static const std::string*   Property_Get(const properties& Properties, int64u Key);
+    static const std::string*   Property_Get(const properties& Properties, int16u Tag, int64u UL_Lo); //Static tag or dynamic tag
+    static bool                 Properties_Test(const properties& Properties, const std::vector<property_expected>& List, conformance_errors& Errors); //Returns true if the test must stop
+    static bool                 Properties_TestRange(const properties& Properties, int64u Key, const char* Name, int32u Min, int32u Max, conformance_errors& Errors); //4-byte value, returns true if the test must stop
+    static bool                 IsOP1a(int64u Hi, int64u Lo); //OP1a with internal essence
+    bool                        Package_Tracks(const package& Package, std::vector<track_info>& List, std::string& Kinds, conformance_errors& Errors); //Kinds has a character per track except Descriptive Metadata, returns true if the test must stop
+    static std::string          Tracks_Kinds_Description(const std::string& Kinds); //e.g. "1 Timecode, 1 Video, 16 Audio"
+    const randomindexpack*      RandomIndexPack_Find(int64u ByteOffset) const; //Entry of the Random Index Pack with this byte offset, nullptr if not listed
+    std::vector<std::string>    HeaderMetadata_FooterDifferences(bool WithPresence=false) const; //Properties of the Header Metadata having another value in the Footer Partition (or present in only one of them if WithPresence), e.g. "Duration of Sequence"
+    struct indextablesegment
+    {
+        int64u      StreamOffset;
+        properties  Properties;
+        std::string Flags; //Flags of each index entry
+    };
+    std::vector<indextablesegment>  IndexTableSegments;
+    std::string                     IndexTableSegment_Flags; //Flags of each index entry of the index table segment being parsed
+    std::vector<int32u>             ContentPackage_Elements; //Track Number of essence elements, in order of first appearance
+    bool                            ContentPackage_SystemItemIsFirst;
+    bool                            SDTI_PackageMetadataSet_IsPresent;
+    bool                            PrivateMetadata_IsPresent;
+    std::vector<randomindexpack>    RandomIndexPack_Entries; //All partitions listed in the Random Index Pack
+    int64u                          RandomIndexPack_Offset; //Offset of the Random Index Pack, (int64u)-1 if not parsed
+    int64u                          RandomIndexPack_Size; //Size of the Random Index Pack
+    int32u                          RandomIndexPack_Length; //Value of the Length item of the Random Index Pack
+    struct systemitem_checks
+    {
+        int16u  ContentPackageRate=(int16u)-1;  //Package Rate and 1.001 Flag, (int16u)-1 if not yet parsed, (int16u)-2 if not constant
+        bool    TimeCode_IsMissing=false;       //A System Item has no timecode
+        bool    TimeCode_IsNotContinuous=false;
+        int64u  TimeCode_Count=0;               //Count of timecodes since the last jump
+        int32u  TimeCode_First_Seconds=0;       //First timecode since the last jump
+        int8u   TimeCode_First_Frames=0;
+        int8u   TimeCode_Modes=0;               //Bit 0: frame count at full rate, bits 1+: frame count at full rate divided by pair count, with first frame being the frame of the pair with this index
+        int64u  ContentPackage_Offset=(int64u)-1; //Offset of the previous System Item since the last jump
+        int64u  ContentPackage_Size=(int64u)-1; //Distance between System Items, (int64u)-1 if not yet parsed, (int64u)-2 if not constant
+        std::vector<int32u> ContentPackage_Elements; //Track Number of essence elements since the previous System Item
+        std::vector<int32u> ContentPackage_Elements_First; //Track Number of essence elements of the first content package between contiguous System Items
+        bool    ContentPackage_Elements_IsNotConstant=false; //Essence elements are not in the same order in all content packages between contiguous System Items
+    };
+    systemitem_checks               SystemItem_Checks;
+    void SystemItem_Checks_TimeCode(int32u Seconds, int8u Frames, int8u FrameRate, int8u PairCount);
+    int32u                          ArdZdf_IsRequested; //Bit per ARD/ZDF profile requested by the user, conformance errors are reported
+    bool                            ArdZdf_FromContent_IsRequested; //ARD/ZDF profile matching the kind of content requested by the user ("ARD_ZDF"), conformance errors are reported
+    #if MEDIAINFO_CONFORMANCE
+        bool                        St2067204_IsRequested; //SMPTE ST 2067-204 requested by the user, conformance errors are reported
+        bool                        St2067204_IsTested; //Candidate (RIFF Chunks or ADM sets) or requested
+        conformance_errors          St2067204_Errors;
+        conformance_errors          St2067204_Warnings;
+        bool                        St20672_IsRequested; //SMPTE ST 2067-2 requested by the user, conformance errors are reported
+        bool                        St20675_IsRequested; //SMPTE ST 2067-5 requested by the user, conformance errors are reported
+        size_t                      RiffChunks_ErrorCount; //Count of SMPTE ST 2131 errors
+        size_t                      McaLabels_ErrorCount; //Count of SMPTE ST 377-4 errors on Audio Channel, Soundfield Group and Group of Soundfield Groups labels
+        void                        CompliantWith_St20672_Audio(const descriptor& Sound, const properties& Sound_Properties, conformance_errors& Errors, conformance_errors& Warnings); //Audio Track File constraints, except the Channel Assignment and the audio labeling
+        void                        CompliantWith_St20672_Labels(const properties& Sound_Properties, const std::vector<int128u>& SubDescriptors, conformance_errors& Errors); //Audio labeling of a Sound Track
+        std::vector<int128u>        SubDescriptors_Get(const int128u& DescriptorUID); //Sub-descriptors of a File Descriptor, also if the SubDescriptors item is not parsed
+        std::set<int128u>           Descriptors_InUse(); //Descriptors and sub-descriptors of the Header Metadata in use, empty if all descriptors are in use
+        void                        ContentStorage_Packages_Get(std::vector<int128u>& MaterialPackages, std::vector<int128u>& TopLevelPackages, std::vector<int128u>& EssenceContainerDatas); //Content Storage of the current Preface, once per Package UID
+    #endif //MEDIAINFO_CONFORMANCE
+    int64u                          Anc_ElementSize; //Size of the ANC Data Elements, (int64u)-1 if not yet parsed, (int64u)-2 if not constant
+    void Property_Store(properties& Properties, int64u Size);
+    void Properties_Store(properties& Properties);
+    void PrivateMetadata_Test(const int128u& UL);
     size_t                          Partitions_Pos;
     bool                            Partitions_IsCalculatingHeaderByteCount;
     bool                            Partitions_IsCalculatingSdtiByteCount;
     bool                            Partitions_IsFooter;
+    #if MEDIAINFO_CONFORMANCE
+        int64u                      GenericStreamPartition_PackEnd; //Offset after the Generic Stream Partition Pack just parsed, (int64u)-1 if the last Partition Pack is not a Generic Stream one
+
+        //KLV coding and Header Metadata (SMPTE ST 377-1), checked while parsing and reported once streams are known
+        struct headermetadata_error
+        {
+            int64u                  Offset;
+            const char*             Field;
+            std::string             Value;
+        };
+        std::vector<headermetadata_error> HeaderMetadata_Errors; //Errors found while parsing
+        std::map<int128u, int64u>   SetKeys; //Key is InstanceUID of a Header Metadata Set (including dark sets), value is the low part of the set key
+        bool                        SetKey_Is(const int128u& InstanceUID, int64u Key) const; //A set with this Instance UID is of this kind (low part of the set key), also if another set of the same Header Metadata reuses its Instance UID
+        int64u                      SetKey_FileDescriptor_Get(const int128u& InstanceUID) const; //Low part of the key of the File Descriptor with this Instance UID, also if another set of the same Header Metadata reuses its Instance UID, else of the set with this Instance UID, 0 if not present
+        bool                        InstanceUID_IsReused(const int128u& InstanceUID) const; //Another set of a Header Metadata (also a dark set) reuses this Instance UID
+        bool                        Set_IsFileDescriptor; //The set being parsed is a File Descriptor
+        std::map<int128u, int64u>   SetPartitions; //Key is InstanceUID of a Header Metadata Set, value is the offset of the partition of its last occurrence
+        std::map<int16u, int64u>    HeaderMetadata_TagsNotInPrimer; //Local Tags used in Header Metadata Sets but not in the Primer Pack of their partition, value is the offset of the first set using it
+        std::map<int64u, std::set<int128u> > HeaderMetadata_Prefaces; //Key is the offset of the partition, value is the Instance UIDs of its Preface sets
+        std::map<int64u, std::set<int128u> > HeaderMetadata_ContentStorages; //Key is the offset of the partition, value is the Instance UIDs of its Content Storage sets
+        std::set<int16u>            PrimerPack_Tags; //Local Tags of the Primer Pack of the current partition
+        bool                        PrimerPack_IsParsed; //The Primer Pack of the current partition is parsed
+        int64u                      HeaderMetadata_Partition; //Offset of the partition of the Header Metadata being parsed
+        int64u                      HeaderMetadata_End; //Offset after the Header Metadata being parsed, (int64u)-1 if none
+        int8u                       HeaderMetadata_Step; //KLV packet sequence: 0 not tested, 1 after the Partition Pack (Primer Pack expected), 2 after the Primer Pack (Preface expected as first set)
+        bool                        HeaderMetadata_FillIsParsed; //A KLV Fill item is between the Partition Pack and the Primer Pack
+        int64u                      Klv_Ber80_Offset; //Offset of the first BER length using the 80h token, (int64u)-1 if none
+        int64u                      Klv_BerTooLong_Offset; //Offset of the first BER length longer than 9 bytes, (int64u)-1 if none
+        int8u                       Klv_BerTooLong_Size;
+        void HeaderMetadata_Sequence_Test();
+    #endif //MEDIAINFO_CONFORMANCE
 
     //Config
     bool                            TimeCodeFromMaterialPackage;
@@ -1440,6 +1757,12 @@ protected :
     {
         File__Analyze* Parser = {};
         int32u SID = {};
+        #if MEDIAINFO_CONFORMANCE
+            int64u Key_Lo = {}; //Low part of the key of the Generic Stream Data Element
+            bool IsAfterPartitionPack = {}; //Directly after a Generic Stream Partition Pack
+            std::string Format; //Format of the content, empty if unknown
+            std::string SHA1; //SHA-1 digest of the content, empty if not computed
+        #endif //MEDIAINFO_CONFORMANCE
 
         generic_stream_data_element_key() = default;
         generic_stream_data_element_key(const generic_stream_data_element_key& Value) = delete;
@@ -1456,11 +1779,9 @@ protected :
     File__Analyze* DolbyAudioMetadata;
     #if defined(MEDIAINFO_ADM_YES)
     File__Analyze* Adm;
-    int32u ADMChannelMapping_LocalChannelID;
-    string ADMChannelMapping_ADMAudioTrackUID;
-    std::bitset<2> ADMChannelMapping_Presence;
     std::map<int128u, set<int128u> > ADMProfileLevelULBatch_List;
     void CompareAdmProfiles();
+    void Streams_Finish_ADM_CHNA();
     #endif
     #if defined(MEDIAINFO_IAB_YES)
     File__Analyze* Adm_ForLaterMerge;
@@ -1529,6 +1850,8 @@ protected :
     #endif //MEDIAINFO_DEMUX || MEDIAINFO_SEEK
 
     void Streams_Finish_Descriptor (descriptors::iterator Descriptor);
+    void Streams_Finish_SoundfieldGroupLabel (const descriptor& Label, size_t StreamPos);
+    std::map<size_t, std::vector<Ztring> > ADMSoundfieldGroupLabel_Languages; //Spoken languages of the ADM soundfield groups, per audio stream
 };
 
 } //NameSpace

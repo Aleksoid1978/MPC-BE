@@ -796,6 +796,7 @@ File_Mk::File_Mk()
     Laces_Pos=0;
     IsParsingSegmentTrack_SeekBackTo=0;
     SegmentTrack_Offset_End=0;
+    Segment_Tracks_SeekBack_Attempted=false;
     #if MEDIAINFO_DEMUX
         Demux_EventWasSent=(int64u)-1;
     #endif //MEDIAINFO_DEMUX
@@ -1541,32 +1542,34 @@ size_t File_Mk::Read_Buffer_Seek(size_t Method, int64u Value, int64u ID)
 //---------------------------------------------------------------------------
 bool File_Mk::Synchronize()
 {
+    static const int8u Sync_Pattern[4] = { 0x1A, 0x45, 0xDF, 0xA3 };
+
     //Synchronizing
-    while (Buffer_Offset+4<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x1A
-                                         || Buffer[Buffer_Offset+1]!=0x45
-                                         || Buffer[Buffer_Offset+2]!=0xDF
-                                         || Buffer[Buffer_Offset+3]!=0xA3))
+    while (Buffer_Size - Buffer_Offset >= 4 )
     {
+        const size_t Candidate_End = Buffer_Size - 3;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Buffer_Offset, Sync_Pattern[0], Candidate_End - Buffer_Offset);
+        if (!Sync)
+        {
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer);
+
+        if (!memcmp(Sync + 1, Sync_Pattern + 1, 3))
+        {
+            //Synched is OK
+            MustSynchronize = false; //We need synchro only once (at the beginning, in case of junk bytes before EBML)
+            return true;
+        }
+
         Buffer_Offset++;
-        while (Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x1A)
-            Buffer_Offset++;
     }
 
     //Parsing last bytes if needed
-    if (Buffer_Offset+4>Buffer_Size)
-    {
-        if (Buffer_Offset+3==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x1A45DF)
-            Buffer_Offset++;
-        if (Buffer_Offset+2==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x1A45)
-            Buffer_Offset++;
-        if (Buffer_Offset+1==Buffer_Size && CC1(Buffer+Buffer_Offset)!=0x1A)
-            Buffer_Offset++;
-        return false;
-    }
-
-    //Synched is OK
-    MustSynchronize=false; //We need synchro only once (at the beginning, in case of junk bytes before EBML)
-    return true;
+    while (Buffer_Offset < Buffer_Size && memcmp(Buffer + Buffer_Offset, Sync_Pattern, Buffer_Size - Buffer_Offset))
+        Buffer_Offset++;
+    return false;
 }
 
 //***************************************************************************
@@ -1748,8 +1751,10 @@ void File_Mk::Header_Parse()
     }
 
     //Should we parse Cluster?
-    if (Element_Level==3 && Name==Elements::Segment_Cluster && !Segment_Tracks_Count)
+    if (Element_Level==3 && Name==Elements::Segment_Cluster && !Segment_Tracks_Count && !Segment_Tracks_SeekBack_Attempted)
     {
+        Segment_Tracks_SeekBack_Attempted=true;
+
         //Jumping
         for (size_t Pos=0; Pos<Segment_Seeks.size(); Pos++)
             if (Segment_Seeks[Pos].SeekID==Elements::Segment_Tracks)
@@ -2441,7 +2446,7 @@ bool File_Mk::Rawcooked_Compressed_Start(rawcookedtrack::mask* Mask, bool UseMas
             }
             if (!UseMask)
             {
-                Mask->Buffer=Dest;
+                Mask->Buffer.reset(Dest);
                 Mask->Size=Dest_Size;
             }
         }
@@ -2627,6 +2632,8 @@ void File_Mk::Segment()
 
     Segment_Offset_Begin=File_Offset+Buffer_Offset;
     Segment_Offset_End=File_Offset+Buffer_Offset+Element_TotalSize_Get();
+    Segment_Tracks_Count=0;
+    Segment_Tracks_SeekBack_Attempted=false;
 
     #if MEDIAINFO_TRACE
         Trace_Segment_Cluster_Count=0;
@@ -2752,6 +2759,22 @@ void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLangu
     Ztring Data=String_Get();
 
     FILLING_BEGIN();
+        if (EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].HasChapLanguageIETF)
+            return;
+        EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].ChapLanguage=Data;
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF()
+{
+    //Parsing
+    Ztring Data=String_Get();
+
+    FILLING_BEGIN();
+        if (Data.empty())
+            return;
+        EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].HasChapLanguageIETF=true;
         EditionEntries[EditionEntries_Pos].ChapterAtoms[ChapterAtoms_Pos].ChapterDisplays[ChapterDisplays_Pos].ChapLanguage=Data;
     FILLING_END();
 }
@@ -3562,6 +3585,7 @@ void File_Mk::Segment_Tracks_TrackEntry()
     TrackType=(int64u)-1;
     TrackNumber=(int64u)-1;
     AudioBitDepth=(int64u)-1;
+    TrackHasLanguageIETF=false;
     TrackVideoDisplayWidth=0;
     TrackVideoDisplayHeight=0;
     AvgBytesPerSec=0;
@@ -4156,7 +4180,7 @@ void File_Mk::Segment_Tracks_TrackEntry_CodecPrivate_vids()
 
     FILLING_END();
 
-    if (Data_Remain())
+    if (Size>=Element_Offset && Data_Remain())
     {
         Element_Begin1("Private data");
         if (Size>Element_Size)
@@ -4282,6 +4306,24 @@ void File_Mk::Segment_Tracks_TrackEntry_Language()
     FILLING_BEGIN();
         if (Segment_Info_Count>1)
             return; //First element has the priority
+        if (TrackHasLanguageIETF)
+            return;
+        Fill(StreamKind_Last, StreamPos_Last, "Language", Data, true);
+    FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Mk::Segment_Tracks_TrackEntry_LanguageIETF()
+{
+    //Parsing
+    Ztring Data=String_Get();
+
+    FILLING_BEGIN();
+        if (Segment_Info_Count>1)
+            return; //First element has the priority
+        if (Data.empty())
+            return;
+        TrackHasLanguageIETF=true;
         Fill(StreamKind_Last, StreamPos_Last, "Language", Data, true);
     FILLING_END();
 }
@@ -5481,15 +5523,24 @@ void File_Mk::CRC32_Check ()
         if (CRC32Compute[i].UpTo && File_Offset + Buffer_Offset - (size_t)Header_Size >= CRC32Compute[i].From)
         {
             //Handling of case when data is not completetely loaded because it is not needed by the parser
-            const size_t Offset = Buffer_Offset + (size_t)((Element_WantNextLevel && Element_Offset <= Element_Size) ? Element_Offset : Element_Size);
-            if (Element_Offset > Element_Size)
+            size_t Offset = Buffer_Offset + (size_t)((Element_WantNextLevel && Element_Offset <= Element_Size) ? Element_Offset : Element_Size);
+            if (Element_Offset > Element_Size || Offset > Buffer_Size) // Offset > Buffer_Size e.g. when the rest of the upper element is in the header after a parsing problem
             {
                 if (Config->ParseSpeed<1)
                 {
                     CRC32Compute.clear();
                     break;
                 }
-                CRC32Compute_SkipUpTo = File_Offset + Buffer_Offset + Element_Offset;
+                if (Offset > Buffer_Size)
+                {
+                    // Computing the end of the header with next buffers
+                    CRC32Compute_SkipUpTo = File_Offset + Offset;
+                    Header_Size -= Buffer_Offset - Buffer_Size;
+                    Buffer_Offset = Buffer_Size;
+                    Offset = Buffer_Size;
+                }
+                else
+                    CRC32Compute_SkipUpTo = File_Offset + Buffer_Offset + Element_Offset;
                 Element_Offset = Element_Size;
                 Element_ThisIsAList(); // Fake for forcing the parser to be called for the whole stream
             }

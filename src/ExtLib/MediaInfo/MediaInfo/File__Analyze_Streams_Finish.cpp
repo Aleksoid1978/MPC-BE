@@ -2121,6 +2121,7 @@ static const char* VersionPrefixes =
 //---------------------------------------------------------------------------
 extern MediaInfo_Config Config;
 extern size_t DolbyVision_Compatibility_Pos(const Ztring& Value);
+extern const char* DolbyVision_Compatibility[];
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -2516,6 +2517,7 @@ void File__Analyze::Streams_Finish_Global()
     Streams_Finish_StreamOnly_General_Curate(0);
 
     Config->File_ExpandSubs_Update((void**)(&Stream_More));
+    Stream_More_Index.List=nullptr; // Names may be modified
 
     if (!IsSub && !Config->File_IsReferenced_Get() && MediaInfoLib::Config.ReadByHuman_Get())
         Streams_Finish_HumanReadable();
@@ -4034,20 +4036,175 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
         }
     }
 
+    //Dolby Vision without configuration, deduced from the RPU: level and compatibility
+    //Dolby Vision profile 8 without compatibility info (e.g. MPEG-TS descriptor version 1): compatibility, as profile 8 has always a compatible base layer
+    {
+        ZtringList Formats;
+        Formats.Separator_Set(0, __T(" / "));
+        Formats.Write(Retrieve_Const(Stream_Video, Pos, Video_HDR_Format));
+        auto DolbyVision_Pos=Formats.Find(__T("Dolby Vision"));
+        if (DolbyVision_Pos!=Error)
+        {
+            ZtringList Values[Video_HDR_Format_Compatibility-Video_HDR_Format_Version+1];
+            for (size_t i=Video_HDR_Format_Version; i<=Video_HDR_Format_Compatibility; i++)
+            {
+                auto& Value=Values[i-Video_HDR_Format_Version];
+                Value.Separator_Set(0, __T(" / "));
+                Value.Write(Retrieve_Const(Stream_Video, Pos, i));
+                Value.resize(Formats.size());
+            }
+            const auto& Profile=Values[Video_HDR_Format_Profile-Video_HDR_Format_Version][DolbyVision_Pos];
+            auto Profile_Dot=Profile.find(__T('.'));
+            if (Profile_Dot!=string::npos)
+            {
+                auto Configuration_IsMissing=Values[0][DolbyVision_Pos].empty();
+                auto Profile_Number=Ztring(Profile.substr(Profile_Dot+1)).To_int8u();
+                auto& Level=Values[Video_HDR_Format_Level-Video_HDR_Format_Version][DolbyVision_Pos];
+                auto& Compatibility=Values[Video_HDR_Format_Compatibility-Video_HDR_Format_Version][DolbyVision_Pos];
+                auto Level_WasEmpty=Level.empty();
+                auto Compatibility_WasEmpty=Compatibility.empty();
+                if (Configuration_IsMissing && Level_WasEmpty)
+                {
+                    // Dolby Vision levels: maximum pixel rate and maximum width
+                    static const int64u DolbyVision_Levels[][2]=
+                    {
+                        { 1280* 720* 24, 1280},
+                        { 1280* 720* 30, 1280},
+                        { 1920*1080* 24, 1920},
+                        { 1920*1080* 30, 2560},
+                        { 1920*1080* 60, 3840},
+                        { 3840*2160* 24, 3840},
+                        { 3840*2160* 30, 3840},
+                        { 3840*2160* 48, 3840},
+                        { 3840*2160* 60, 3840},
+                        { 3840*2160*120, 3840},
+                        { 3840*2160*120, 7680},
+                        {(int64u)7680*4320* 60, 7680},
+                        {(int64u)7680*4320*120, 7680},
+                    };
+                    auto Width=Retrieve_Const(Stream_Video, Pos, Video_Width).To_int64u();
+                    auto Height=Retrieve_Const(Stream_Video, Pos, Video_Height).To_int64u();
+                    auto FrameRate=Retrieve_Const(Stream_Video, Pos, Video_FrameRate).To_float64();
+                    if (Values[Video_HDR_Format_Settings-Video_HDR_Format_Version][DolbyVision_Pos].rfind(__T("BL"), 0)!=0 && Retrieve_Const(Stream_Video, Pos, "DolbyVision EL_SpatialResamplingFilter")==__T("Yes"))
+                    {
+                        // The stream is the enhancement layer with a resolution of half the one of the base layer, the level is about the base layer
+                        Width*=2;
+                        Height*=2;
+                    }
+                    if (Width && Height && FrameRate)
+                    {
+                        auto PixelRate=Width*Height*FrameRate;
+                        for (size_t i=0; i<sizeof(DolbyVision_Levels)/sizeof(*DolbyVision_Levels); i++)
+                            if (PixelRate<=DolbyVision_Levels[i][0] && Width<=DolbyVision_Levels[i][1])
+                            {
+                                if (i<9)
+                                    Level+=__T('0');
+                                Level+=Ztring::ToZtring(i+1);
+                                break;
+                            }
+                    }
+                }
+                if (Compatibility_WasEmpty && (Configuration_IsMissing || Profile_Number==8))
+                {
+                    // Compatibility of the base layer signal
+                    const auto& colour_primaries=Retrieve_Const(Stream_Video, Pos, Video_colour_primaries);
+                    const auto& transfer_characteristics=Retrieve_Const(Stream_Video, Pos, Video_transfer_characteristics);
+                    size_t Compatibility_Pos=0;
+                    switch (Profile_Number)
+                    {
+                        case 4:
+                        case 9:
+                            Compatibility_Pos=2; // SDR
+                            break;
+                        case 7:
+                            if (transfer_characteristics==__T("PQ"))
+                                Compatibility_Pos=6; // Blu-ray
+                            break;
+                        case 8:
+                            if (transfer_characteristics==__T("PQ"))
+                                Compatibility_Pos=1; // HDR10
+                            else if (transfer_characteristics==__T("HLG"))
+                                Compatibility_Pos=4; // HLG
+                            else if (transfer_characteristics==__T("BT.709") || transfer_characteristics==__T("BT.601") || transfer_characteristics.rfind(__T("BT.2020"), 0)==0)
+                                Compatibility_Pos=2; // SDR
+                            break;
+                        case 10:
+                            if (colour_primaries==__T("BT.2020") && transfer_characteristics==__T("PQ"))
+                                Compatibility_Pos=1; // HDR10
+                            else if (colour_primaries==__T("BT.2020") && transfer_characteristics==__T("HLG"))
+                                Compatibility_Pos=4; // HLG
+                            else if (colour_primaries==__T("BT.709") && transfer_characteristics==__T("BT.709"))
+                                Compatibility_Pos=2; // SDR
+                            break;
+                    }
+                    if (Compatibility_Pos)
+                        Compatibility.From_UTF8(DolbyVision_Compatibility[Compatibility_Pos]);
+                }
+                if (Level_WasEmpty && !Level.empty())
+                    Fill(Stream_Video, Pos, Video_HDR_Format_Level, Values[Video_HDR_Format_Level-Video_HDR_Format_Version].Read(), true);
+                if (Compatibility_WasEmpty && !Compatibility.empty())
+                    Fill(Stream_Video, Pos, Video_HDR_Format_Compatibility, Values[Video_HDR_Format_Compatibility-Video_HDR_Format_Version].Read(), true);
+            }
+        }
+    }
+
+    //Dolby Vision group, values only if there are several values or if the value differs from the one of the video stream (known only once all sources are merged)
+    {
+        static const pair<const char*, video> DolbyVision_InVideo[]=
+        {
+            {"DolbyVision MasteringDisplay_ColorPrimaries", Video_MasteringDisplay_ColorPrimaries},
+            {"DolbyVision MasteringDisplay_Luminance", Video_MasteringDisplay_Luminance},
+            {"DolbyVision MasteringDisplay_Luminance_HDR10", Video_MasteringDisplay_Luminance},
+        };
+        for (const auto& Item : DolbyVision_InVideo)
+        {
+            const auto& Value=Retrieve_Const(Stream_Video, Pos, Item.first);
+            if (!Value.empty() && Value==Retrieve_Const(Stream_Video, Pos, Item.second))
+                Clear(Stream_Video, Pos, Item.first);
+        }
+        const auto& Active_DisplayAspectRatio=Retrieve_Const(Stream_Video, Pos, "DolbyVision Active_DisplayAspectRatio");
+        if (!Active_DisplayAspectRatio.empty() && Active_DisplayAspectRatio.find(__T(" / "))==string::npos)
+        {
+            // Display aspect ratio if there is no active aspect ratio (full frame)
+            const auto& Active_DisplayAspectRatio_Video=Retrieve_Const(Stream_Video, Pos, Video_Active_DisplayAspectRatio);
+            const auto& DisplayAspectRatio_Video=Active_DisplayAspectRatio_Video.empty()?Retrieve_Const(Stream_Video, Pos, Video_DisplayAspectRatio):Active_DisplayAspectRatio_Video;
+            if (!DisplayAspectRatio_Video.empty() && Ztring::ToZtring(DisplayAspectRatio_Video.To_float64(), 3)==Active_DisplayAspectRatio)
+            {
+                Clear(Stream_Video, Pos, "DolbyVision Active_DisplayAspectRatio");
+                Clear(Stream_Video, Pos, "DolbyVision Active_DisplayAspectRatio/String");
+            }
+        }
+    }
+
     //Commercial name
-    if (Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility).rfind(__T("HDR10"), 0)==0
-     && ((!Retrieve(Stream_Video, Pos, Video_BitDepth).empty() && Retrieve(Stream_Video, Pos, Video_BitDepth).To_int64u()<10) //e.g. ProRes has not bitdepth info
+    if ((!Retrieve(Stream_Video, Pos, Video_BitDepth).empty() && Retrieve(Stream_Video, Pos, Video_BitDepth).To_int64u()<10) //e.g. ProRes has not bitdepth info
      || Retrieve(Stream_Video, Pos, Video_colour_primaries)!=__T("BT.2020")
      || Retrieve(Stream_Video, Pos, Video_transfer_characteristics)!=__T("PQ")
-     || Retrieve(Stream_Video, Pos, Video_MasteringDisplay_ColorPrimaries).empty()
-        ))
+     || Retrieve(Stream_Video, Pos, Video_MasteringDisplay_ColorPrimaries).empty())
     {
-        //If HDR10+ Profile A with HLG, it is actually HLG+
-        if (Retrieve(Stream_Video, Pos, Video_transfer_characteristics) == __T("HLG") && Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility).rfind(__T("HDR10+ Profile A"), 0) == 0)
-            Fill(Stream_Video, Pos, Video_HDR_Format_Compatibility, "HLG+", Unlimited, true, true);
-        else
-            //We actually fill HDR10/HDR10+ by default, so it will be removed below if not fitting in the color related rules
-            Clear(Stream_Video, Pos, Video_HDR_Format_Compatibility);
+        //We actually fill HDR10/HDR10+ by default, so it is removed if not fitting in the color related rules, per HDR format (e.g. after Dolby Vision)
+        ZtringList Compatibilities;
+        Compatibilities.Separator_Set(0, __T(" / "));
+        Compatibilities.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
+        bool IsModified=false;
+        for (auto& Compatibility : Compatibilities)
+            if (Compatibility.rfind(__T("HDR10"), 0)==0)
+            {
+                //If HDR10+ Profile A with HLG, it is actually HLG+
+                if (Retrieve(Stream_Video, Pos, Video_transfer_characteristics)==__T("HLG") && Compatibility.rfind(__T("HDR10+ Profile A"), 0)==0)
+                    Compatibility=__T("HLG+");
+                else
+                    Compatibility.clear();
+                IsModified=true;
+            }
+        if (IsModified)
+        {
+            auto Value=Compatibilities.Read();
+            if (Value.size()>(Compatibilities.size()-1)*3)
+                Fill(Stream_Video, Pos, Video_HDR_Format_Compatibility, Value, true);
+            else
+                Clear(Stream_Video, Pos, Video_HDR_Format_Compatibility);
+        }
     }
     if (Retrieve(Stream_Video, Pos, Video_HDR_Format_String).empty())
     {
@@ -4079,39 +4236,33 @@ void File__Analyze::Streams_Finish_StreamOnly_Video(size_t Pos)
                         {
                             case Video_HDR_Format_Version: Summary[j]+=__T(", Version "); break;
                             case Video_HDR_Format_Level: Summary[j]+=__T('.'); break;
-                            case Video_HDR_Format_Compression: ToAdd[j][0]+=0x20; if (ToAdd[j].size()==4) ToAdd[j].resize(2); ToAdd[j]+=__T(" metadata compression"); [[fallthrough]];
-                            default: Summary[j] += __T(", ");
-                        }
-                        Summary[j]+=ToAdd[j];
-                        if (i==Video_HDR_Format_Version && j==DolbyVision_Pos)
-                        {
-                            ToAdd.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Profile));
-                            if (j<ToAdd.size())
-                            {
-                                const Ztring& Profile=ToAdd[j];
-                                size_t Profile_Dot=Profile.find(__T('.'));
-                                if (Profile_Dot!=string::npos)
+                            case Video_HDR_Format_Profile:
+                                if (j==DolbyVision_Pos)
                                 {
-                                    Profile_Dot++;
-                                    if (Profile_Dot<Profile.size() && Profile[Profile_Dot]==__T('0'))
-                                        Profile_Dot++;
-                                    Summary[j]+=__T(", Profile ");
-                                    Summary[j]+=Profile.substr(Profile_Dot);
-                                    ToAdd.Write(Retrieve(Stream_Video, Pos, Video_HDR_Format_Compatibility));
-                                    if (j<ToAdd.size())
+                                    const Ztring& Profile=ToAdd[j];
+                                    size_t Profile_Dot=Profile.find(__T('.'));
+                                    if (Profile_Dot!=string::npos)
                                     {
-                                        const Ztring& Compatibility=ToAdd[j];
-                                        size_t Compatibility_Pos=DolbyVision_Compatibility_Pos(Compatibility);
-                                        if (Compatibility_Pos!=size_t()-1)
+                                        Profile_Dot++;
+                                        if (Profile_Dot<Profile.size() && Profile[Profile_Dot]==__T('0'))
+                                            Profile_Dot++;
+                                        Summary[j]+=__T(", Profile ");
+                                        Summary[j]+=Profile.substr(Profile_Dot);
+                                        const Ztring& Compatibility=HDR_Format_Compatibility[j];
+                                        size_t Compatibility_Pos=Compatibility.empty()?(size_t)-1:DolbyVision_Compatibility_Pos(Compatibility);
+                                        if (Compatibility_Pos!=(size_t)-1)
                                         {
                                             Summary[j]+=__T('.');
                                             Summary[j]+=Ztring::ToZtring(Compatibility_Pos, 16);
                                         }
                                     }
                                 }
-                            }
-                            ToAdd.resize(Summary.size());
+                                Summary[j]+=__T(", ");
+                                break;
+                            case Video_HDR_Format_Compression: ToAdd[j][0]+=0x20; if (ToAdd[j].size()==4) ToAdd[j].resize(2); ToAdd[j]+=__T(" metadata compression"); [[fallthrough]];
+                            default: Summary[j] += __T(", ");
                         }
+                        Summary[j]+=ToAdd[j];
                     }
                 }
             }

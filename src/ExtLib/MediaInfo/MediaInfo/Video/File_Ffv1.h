@@ -59,10 +59,16 @@ public:
         sample_buffer(NULL)
     {
         for (size_t i = 0; i < MAX_QUANT_TABLES; ++i)
+        {
             plane_states[i] = NULL;
+            plane_states_size[i] = 0;
+        }
 
         for (size_t i = 0; i < MAX_PLANES; ++i)
+        {
             contexts[i] = NULL;
+            contexts_size[i] = 0;
+        }
     }
 
     ~Slice()
@@ -166,8 +172,10 @@ public:
     typedef Context* ContextPtr;
 
     ContextPtr contexts[MAX_PLANES];
+    size_t     contexts_size[MAX_PLANES]; // Count of initialized contexts
     states_context_plane plane_states[MAX_QUANT_TABLES];
     size_t               plane_states_maxsizes[MAX_QUANT_TABLES];
+    size_t               plane_states_size[MAX_QUANT_TABLES]; // Count of initialized states
 
     // HELPER
     void contexts_init(int32u plane_count, int32u quant_table_index[MAX_PLANES], int32u context_count[MAX_QUANT_TABLES]);

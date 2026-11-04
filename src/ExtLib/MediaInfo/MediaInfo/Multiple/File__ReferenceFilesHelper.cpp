@@ -485,6 +485,7 @@ void File__ReferenceFilesHelper::DetectSameReels(vector<size_t> &ReelCount)
                 if (Sequence_Pos!=Sequence_Pos_First)
                 {
                     Sequences[Sequence_Pos_First]->Resources.insert(Sequences[Sequence_Pos_First]->Resources.end(), Sequences[Sequence_Pos]->Resources.begin(), Sequences[Sequence_Pos]->Resources.end());
+                    Sequences[Sequence_Pos]->Resources.clear(); //Ownership transfered
                     Sequence_Pos_toDelete.push_back(Sequence_Pos);
                 }
             }
@@ -664,7 +665,7 @@ void File__ReferenceFilesHelper::ParseReferences()
                     IsUrlEncoded=true;
                 }
                 Ztring AbsoluteName;
-                if (Names[Pos].find(__T(':'))!=1 && Names[Pos].find(__T("/"))!=0 && Names[Pos].find(__T("\\\\"))!=0) //If absolute patch
+                if (Names[Pos].find(__T(':'))!=1 && Names[Pos].find(__T("/"))!=0 && Names[Pos].find(__T("\\\\"))!=0 && Names[Pos].find(__T("://"))==string::npos) //If absolute patch
                 {
                     if (MI->File_Name.find(__T("://"))==string::npos)
                         AbsoluteName=ZenLib::FileName::Path_Get(MI->File_Name);
@@ -696,7 +697,7 @@ void File__ReferenceFilesHelper::ParseReferences()
                     Names[Pos].From_Unicode(URL_Encoded_Decode(Names[Pos].To_Unicode()));
                     IsUrlEncoded=true;
                     Ztring AbsoluteName;
-                    if (Names[Pos].find(__T(':'))!=1 && Names[Pos].find(__T("/"))!=0 && Names[Pos].find(__T("\\\\"))!=0) //If absolute patch
+                    if (Names[Pos].find(__T(':'))!=1 && Names[Pos].find(__T("/"))!=0 && Names[Pos].find(__T("\\\\"))!=0 && Names[Pos].find(__T("://"))==string::npos) //If absolute patch
                     {
                         if (MI->File_Name.find(__T("://"))==string::npos)
                             AbsoluteName=ZenLib::FileName::Path_Get(MI->File_Name);

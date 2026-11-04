@@ -164,6 +164,11 @@ private :
     //extension_stream specific
     const ZenLib::Char*  extension_stream_ChooseExtension();
 
+    //SL_packetized_stream specific
+    #ifdef MEDIAINFO_MPEG4_YES
+    bool           SL_accessUnitEndFlag_Last;
+    #endif //MEDIAINFO_MPEG4_YES
+
     //Count
     int8u video_stream_Count;
     int8u audio_stream_Count;

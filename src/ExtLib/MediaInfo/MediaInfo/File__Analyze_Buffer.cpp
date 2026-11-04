@@ -1595,6 +1595,16 @@ void File__Analyze::Get_C8(int64u &Info, const char* Name)
 }
 
 //---------------------------------------------------------------------------
+void File__Analyze::Get_C12(int128u& Info, const char* Name)
+{
+    INTEGRITY_SIZE_ATLEAST_INT(12);
+    Info.hi=CC4(Buffer+Buffer_Offset+(size_t)Element_Offset);
+    Info.lo=CC8(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
+    if (Trace_Activated) Param_CC(Name, Buffer+Buffer_Offset+(size_t)Element_Offset, 12);
+    Element_Offset+=12;
+}
+
+//---------------------------------------------------------------------------
 void File__Analyze::Skip_C1(const char* Name)
 {
     INTEGRITY_SIZE_ATLEAST(1);
@@ -2321,9 +2331,9 @@ void File__Analyze::Skip_BS(size_t Bits, const char* Name)
     INTEGRITY(Bits<=BS->Remain(), "Size is wrong", BS->Offset_Get())
     if (Trace_Activated)
     {
-        if (Bits<=32) //TODO: in BitStream.h, handle >32 bit gets
+        if (Bits<=64) //TODO: in BitStream.h, handle >64 bit gets
         {
-            Param(Name, BS->Get4((int8u)Bits), Bits);
+            Param(Name, BS->Get8((int8u)Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else
@@ -2353,7 +2363,7 @@ void File__Analyze::Skip_S1(int8u Bits, const char* Name)
     #if MEDIAINFO_TRACE
         if (Trace_Activated)
         {
-            Param(Name, BS->Get1(Bits), 1);
+            Param(Name, BS->Get1(Bits), Bits);
             Param_Info(__T("(")+Ztring::ToZtring(Bits)+__T(" bits)"));
         }
         else

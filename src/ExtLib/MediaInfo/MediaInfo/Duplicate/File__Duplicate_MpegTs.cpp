@@ -147,6 +147,8 @@ bool File__Duplicate_MpegTs::Configure (const Ztring &Value, bool ToRemove)
 
 bool File__Duplicate_MpegTs::Write (int16u PID, const int8u* ToAdd, size_t ToAdd_Size)
 {
+    if (PID>=elementary_PIDs.size())
+        return false;
     if (elementary_PIDs[PID])
     {
         Writer.Write(ToAdd, ToAdd_Size);
@@ -217,14 +219,19 @@ bool File__Duplicate_MpegTs::Manage_PMT (const int8u* ToAdd, size_t ToAdd_Size)
         return false;
 
     //Testing program_number
-    if (!Is_Wanted(StreamID, elementary_PIDs_program_map_PIDs[StreamID]))
+    const int16u program_map_PID=((ToAdd[1]&0x1F)<<8)|ToAdd[2];
+    if (!Is_Wanted(StreamID, program_map_PID))
     {
         delete[] PMT[StreamID].Buffer; PMT[StreamID].Buffer=NULL;
         return false;
     }
 
     //program_info_length
+    if (FromTS.Offset+4>FromTS.End)
+        return false;
     const int16u program_info_length=CC2(FromTS.Buffer+FromTS.Offset+2)&0x0FFF;
+    if (program_info_length>FromTS.End-FromTS.Offset-4 || PMT[StreamID].Offset>PMT[StreamID].Size || (size_t)4+program_info_length>PMT[StreamID].Size-PMT[StreamID].Offset)
+        return false;
     std::memcpy(PMT[StreamID].Buffer+PMT[StreamID].Offset, FromTS.Buffer+FromTS.Offset, 4+program_info_length);
     FromTS.Offset+=4+program_info_length;
     PMT[StreamID].Offset+=4+program_info_length;
@@ -235,8 +242,12 @@ bool File__Duplicate_MpegTs::Manage_PMT (const int8u* ToAdd, size_t ToAdd_Size)
         //For each elementary_PID
         const int16u elementary_PID=CC2(FromTS.Buffer+FromTS.Offset+1)&0x1FFF;
         const int16u ES_info_length=CC2(FromTS.Buffer+FromTS.Offset+3)&0x0FFF;
+        if (ES_info_length>FromTS.End-FromTS.Offset-5)
+            return false;
         if (Wanted_elementary_PIDs.empty() || Wanted_elementary_PIDs.find(elementary_PID)!=Wanted_elementary_PIDs.end())
         {
+            if (PMT[StreamID].Offset>PMT[StreamID].Size || (size_t)5+ES_info_length>PMT[StreamID].Size-PMT[StreamID].Offset)
+                return false;
             //Integrating it
             elementary_PIDs[elementary_PID]=1;
             elementary_PIDs_program_map_PIDs[elementary_PID]=StreamID;
@@ -258,6 +269,9 @@ bool File__Duplicate_MpegTs::Manage_PMT (const int8u* ToAdd, size_t ToAdd_Size)
 
 bool File__Duplicate_MpegTs::Parsing_Begin (const int8u* ToAdd, size_t ToAdd_Size, std::map<int16u, buffer> &ToModify_)
 {
+    if (!ToAdd || ToAdd_Size<4)
+        return false;
+
     //Managing big chunks
     int16u PID=((ToAdd[1]&0x1F)<<8)|ToAdd[2]; //BigEndian2int16u(ToAdd+1)&0x1FFF;
     if (ToAdd[1]&0x40) //payload_unit_start_indicator
@@ -283,11 +297,21 @@ bool File__Duplicate_MpegTs::Parsing_Begin (const int8u* ToAdd, size_t ToAdd_Siz
     //adaptation_field_length
     int8u adaptation_field_length=0;
     if (CC1(FromTS.Buffer+3)&0x20) //adaptation_field_control (adaptation) == true
+    {
+        if (FromTS.Size<5)
+            return false;
         adaptation_field_length=1+CC1(FromTS.Buffer+4);
+        if (adaptation_field_length>FromTS.Size-4)
+            return false;
+    }
 
     //pointer_field
     FromTS.Offset+=4+adaptation_field_length;
+    if (FromTS.Offset>=FromTS.Size)
+        return false;
     int8u pointer_field=CC1(FromTS.Buffer+FromTS.Offset);
+    if (pointer_field>=FromTS.Size-FromTS.Offset)
+        return false;
 
     //table_id
     FromTS.Offset+=1+pointer_field;
@@ -301,10 +325,12 @@ bool File__Duplicate_MpegTs::Parsing_Begin (const int8u* ToAdd, size_t ToAdd_Siz
         return false;
     FromTS.Begin=FromTS.Offset-1;
     int16u section_length=CC2(FromTS.Buffer+FromTS.Offset)&0x0FFF;
-    FromTS.End=4+adaptation_field_length+section_length;
+    FromTS.End=4+adaptation_field_length+pointer_field+section_length;
 
     //Positionning just after section_length
     FromTS.Offset+=2;
+    if (FromTS.Offset+5>FromTS.Size || FromTS.Offset+5>FromTS.End)
+        return false;
 
     //Retrieving StreamID
     StreamID=CC2(FromTS.Buffer+FromTS.Offset);

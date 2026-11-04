@@ -73,7 +73,7 @@ bool File_La::FileHeader_Begin()
         return false;
 
     //Synchro
-    if (Buffer_Offset+2>Buffer_Size)
+    if (Buffer_Offset>Buffer_Size || Buffer_Size-Buffer_Offset<3)
         return false;
     if (CC3(Buffer+Buffer_Offset)!=0x4C4130) //"LA0"
     {

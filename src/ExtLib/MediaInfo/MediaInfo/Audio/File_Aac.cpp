@@ -95,6 +95,7 @@ File_Aac::File_Aac()
     //Temp - Main
     muxConfigPresent=true;
     audioMuxVersionA=false;
+    streamCnt=0;
 
     //Temp - General Audio
     num_window_groups=0;

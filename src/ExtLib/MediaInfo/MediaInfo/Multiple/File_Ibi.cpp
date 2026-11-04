@@ -502,7 +502,11 @@ void File_Ibi::Stream_Dts()
     #if MEDIAINFO_IBIUSAGE
     FILLING_BEGIN();
         if (Ibi)
+        {
+            if (Ibi->Streams[ID_Current]==NULL)
+                Ibi->Streams[ID_Current]=new ibi::stream();
             Ibi->Streams[ID_Current]->DtsFrequencyNumerator=Item;
+        }
     FILLING_END();
     #endif //MEDIAINFO_IBIUSAGE
     Get_EB (Item,                                               "DtsFrequencyDenominator");
@@ -510,6 +514,8 @@ void File_Ibi::Stream_Dts()
     FILLING_BEGIN();
         if (Ibi)
         {
+            if (Ibi->Streams[ID_Current]==NULL)
+                Ibi->Streams[ID_Current]=new ibi::stream();
             Ibi->Streams[ID_Current]->DtsFrequencyDenominator=Item;
 
             //Handling of previous inverted Numerator/Denominator
@@ -729,7 +735,7 @@ void File_Ibi::InformData()
             {
                 if (Pos)
                     Pos++;
-                if (Pos>Fields.size() || Fields[Pos].size()<1)
+                if (Pos>=Fields.size() || Fields[Pos].size()<1)
                     break; //End or problem
 
                 if (Fields[Pos][0]==__T("General"))
@@ -749,10 +755,13 @@ void File_Ibi::InformData()
                 else
                     break; //Problem
                 Pos++;
+                if (Pos>=Fields.size() || Fields[Pos].size()<2)
+                    break; //End or problem
             }
 
             Fill(StreamKind_Last, StreamPos_Last, Fields[Pos][0].To_UTF8().c_str(), Fields[Pos][1], true);
-            Fill_SetOptions(StreamKind_Last, StreamPos_Last, Fields[Pos][0].To_UTF8().c_str(), Fields[Pos][Info_Options].To_UTF8().c_str());
+            if (Fields[Pos].size()>Info_Options)
+                Fill_SetOptions(StreamKind_Last, StreamPos_Last, Fields[Pos][0].To_UTF8().c_str(), Fields[Pos][Info_Options].To_UTF8().c_str());
         }
     }
     #endif //MEDIAINFO_IBIUSAGE

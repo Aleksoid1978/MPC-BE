@@ -406,8 +406,9 @@ void ZtringListList::Write(const Ztring &ToWrite)
 
         if (y>=size())
         {
+            size_t Size_Old=size();
             resize(y+1);
-            for (size_t j=0; j<=y; j++)
+            for (size_t j=Size_Old; j<=y; j++) //Only new lines, older ones are already configured
             {
                 operator[](j).Separator_Set(0, Separator[1]);
                 operator[](j).Quote_Set(Quote);

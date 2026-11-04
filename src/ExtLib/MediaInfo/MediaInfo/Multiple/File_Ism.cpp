@@ -131,9 +131,11 @@ bool File_Ism::FileHeader_Begin()
 
                                     if (!Sequence->FileNames.empty() && !Sequence->FileNames[0].empty() && FileNames.find(Sequence->FileNames[0])==FileNames.end())
                                     {
-                                        ReferenceFiles->AddSequence(Sequence);
                                         FileNames.insert(Sequence->FileNames[0]);
+                                        ReferenceFiles->AddSequence(Sequence);
                                     }
+                                    else
+                                        delete Sequence;
                                 }
 
                                 Stream=Stream->NextSiblingElement();

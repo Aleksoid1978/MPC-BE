@@ -77,6 +77,20 @@ string XML_Encode (const string& Data)
 }
 
 //---------------------------------------------------------------------------
+static string XML_Comment_Encode (const string& Data)
+{
+    //"--" is not permitted inside a comment and a comment can not end with "-"
+    string Result;
+    for (size_t Pos=0; Pos<Data.size(); Pos++)
+    {
+        Result+=Data[Pos];
+        if (Data[Pos]=='-' && (Pos+1==Data.size() || Data[Pos+1]=='-'))
+            Result+=' ';
+    }
+    return Result;
+}
+
+//---------------------------------------------------------------------------
 string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
 {
     string Result;
@@ -117,7 +131,7 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     bool CommentedNow;
     if (!Cur_Node.XmlCommentOut.empty())
     {
-        Result+=(Indent?string(Level, '\t'):string())+(Cur_Node.AlreadyCommented?"<!- ":"<!-- ")+Cur_Node.XmlCommentOut;
+        Result+=(Indent?string(Level, '\t'):string())+(Cur_Node.AlreadyCommented?"<!- ":"<!-- ")+XML_Comment_Encode(Cur_Node.XmlCommentOut);
 
         // If the node name is empty, just print the comment
         if (Cur_Node.Name.empty())
@@ -147,7 +161,7 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     {
         Result+=" />";
         if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
-            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
+            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+XML_Comment_Encode(Cur_Node.XmlComment)+(Cur_Node.AlreadyCommented?" ->":" -->");
         if (Cur_Node.XmlCommentOut.size())
             Result+="\n"+(Indent?string(Level, '\t'):string())+((Cur_Node.AlreadyCommented && !CommentedNow)?"->":"-->");
         return Result;
@@ -167,7 +181,7 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     {
         CanDisplayXmlComment=false;
         if (!Cur_Node.XmlComment.empty() && Cur_Node.XmlCommentOut.empty())
-            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
+            Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+XML_Comment_Encode(Cur_Node.XmlComment)+(Cur_Node.AlreadyCommented?" ->":" -->");
 
         for (size_t Pos=0; Pos<Cur_Node.Childs.size(); Pos++)
         {
@@ -189,7 +203,7 @@ string To_XML (Node& Cur_Node, const int& Level, bool Print_Header, bool Indent)
     if (Cur_Node.XmlCommentOut.size())
         Result+="\n"+(Indent?string(Level, '\t'):string())+((Cur_Node.AlreadyCommented && !CommentedNow)?"->":"-->");
     else if (!Cur_Node.XmlComment.empty() && CanDisplayXmlComment)
-        Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+Cur_Node.XmlComment+(Cur_Node.AlreadyCommented?" ->":" -->");
+        Result+=(Cur_Node.AlreadyCommented?" <!- ":" <!-- ")+XML_Comment_Encode(Cur_Node.XmlComment)+(Cur_Node.AlreadyCommented?" ->":" -->");
     if (!Level)
         Result+="\n";
 
@@ -410,7 +424,10 @@ bool Parse_XML(const ZtringList& Parents, const Ztring& PlaceHolder, const XMLNo
                 {
                     Value=Values.FindValue(FileName, Values(0).Find(Value.substr(1, Value.length()-2)), 0, 1);
                     if (Value.empty())
+                    {
+                        delete Current;
                         return false;
+                    }
                 }
 
                 Current->Add_Attribute(Attribute->Name(), Value);

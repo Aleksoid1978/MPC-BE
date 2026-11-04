@@ -123,6 +123,39 @@ Ztring External_Command_Exists(const ZtringList& PossibleNames)
 }
 
 //---------------------------------------------------------------------------
+#if defined(WINDOWS) && !defined(WINDOWS_UWP)
+static Ztring External_Command_Quote(const Ztring& Argument)
+{
+    //Windows command line rules (CommandLineToArgvW)
+    if (!Argument.empty() && Argument.find_first_of(__T(" \t\n\v\""))==string::npos)
+        return Argument;
+
+    Ztring Result(__T("\""));
+    for (size_t i=0; ; i++)
+    {
+        size_t Backslashes=0;
+        while (i<Argument.size() && Argument[i]==__T('\\'))
+        {
+            i++;
+            Backslashes++;
+        }
+        if (i>=Argument.size())
+        {
+            Result.append(Backslashes*2, __T('\\')); //Escape all backslashes, the closing quote follows
+            break;
+        }
+        if (Argument[i]==__T('"'))
+            Result.append(Backslashes*2+1, __T('\\')); //Escape all backslashes and the quote
+        else
+            Result.append(Backslashes, __T('\\'));
+        Result+=Argument[i];
+    }
+    Result+=__T('"');
+    return Result;
+}
+#endif //defined(WINDOWS) && !defined(WINDOWS_UWP)
+
+//---------------------------------------------------------------------------
 int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztring* StdOut, Ztring* StdErr)
 {
     #ifdef WINDOWS
@@ -133,9 +166,13 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
 
     #ifndef WINDOWS_UWP
     #ifdef WINDOWS
-    ZtringList CommandLine(Command);
-    CommandLine+=Arguments;
-    CommandLine.Separator_Set(0, __T(" "));
+    Ztring CommandLine=External_Command_Quote(Command);
+    for (size_t Pos=0; Pos<Arguments.size(); Pos++)
+    {
+        CommandLine+=__T(' ');
+        CommandLine+=External_Command_Quote(Arguments[Pos]);
+    }
+    std::wstring CommandLine_Unicode=CommandLine.To_Unicode();
 
     SECURITY_ATTRIBUTES Attrs;
     ZeroMemory(&Attrs, sizeof(SECURITY_ATTRIBUTES));
@@ -180,7 +217,7 @@ int External_Command_Run(const Ztring& Command, const ZtringList& Arguments, Ztr
     PROCESS_INFORMATION ProcessInfo;
     ZeroMemory(&ProcessInfo, sizeof(PROCESS_INFORMATION));
 
-    if (!CreateProcessW(nullptr, (LPWSTR)CommandLine.Read().To_Unicode().c_str(), nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &StartupInfo, &ProcessInfo))
+    if (!CreateProcessW(nullptr, &CommandLine_Unicode[0], nullptr, nullptr, TRUE, CREATE_NO_WINDOW, nullptr, nullptr, &StartupInfo, &ProcessInfo))
     {
         if (StdOutWrite) CloseHandle(StdOutWrite);
         if (StdOutRead)  CloseHandle(StdOutRead);

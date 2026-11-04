@@ -204,7 +204,7 @@ void Reader_Directory::Xdcam_Directory_Cleanup(ZtringList &List)
         {
             //This is a XDCAM CLIP
             Ztring Path_Begin=List[File_Pos];
-            Path_Begin.resize(Path_Begin.size()-(1+4+1+12));
+            Path_Begin.resize(Xdcam_Pos);
             Path_Begin+=Ztring(1, PathSeparator);
             if (Dir::Exists(Path_Begin+__T("Edit")) && Dir::Exists(Path_Begin+__T("General")) && Dir::Exists(Path_Begin+__T("Sub")))
             {

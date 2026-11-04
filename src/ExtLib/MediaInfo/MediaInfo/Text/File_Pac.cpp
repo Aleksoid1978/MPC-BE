@@ -159,18 +159,14 @@ void File_Pac::Streams_Finish()
         Fill(Stream_Text, 0, Text_Duration_Start2End, Start2End);
     }
     Fill(Stream_Text, 0, Text_Delay, (int64s)(Delay_TC.IsValid()?Delay_TC:Offset).ToMilliseconds());
-
-    if (Frame_Count) {
-        Fill(Stream_Text, 0, Text_Events_Total, Frame_Count - EmptyCount);
-    }
-    if (LineCount) {
+    const auto Events_Total = Frame_Count - EmptyCount;
+    Fill(Stream_Text, 0, Text_Events_Total, Events_Total);
+    if (Events_Total) {
         Fill(Stream_Text, 0, Text_Lines_Count, LineCount);
-    }
-    if (LineCount) {
-        Fill(Stream_Text, 0, Text_Lines_MaxCountPerEvent, MaxCountOfLinesPerFrame);
-    }
-    if (MaxCountOfCharsPerLine) {
-        Fill(Stream_Text, 0, Text_Lines_MaxCharacterCount, MaxCountOfCharsPerLine);
+        if (LineCount) {
+            Fill(Stream_Text, 0, Text_Lines_MaxCountPerEvent, MaxCountOfLinesPerFrame);
+            Fill(Stream_Text, 0, Text_Lines_MaxCharacterCount, MaxCountOfCharsPerLine);
+        }
     }
     if (Count_UTF8) {
         Fill(Stream_Text, 0, "CharacterSet", "UTF-8");
@@ -542,7 +538,7 @@ void File_Pac::Data_Parse()
                 if (Line.rfind(__T("FRAME "), 0) == 0 && Line.find_first_not_of(__T("0123456789"), 6) == string::npos) {
                     IsFrameNumber = true;
                     if (!Delay) {
-                        Delay = stoul(Line.substr(6));
+                        Delay = Ztring(Line.substr(6)).To_int64u(); //No exception in case of empty or too big value
                         Time_Delay = Time_Start_Command_Temp;
                     }
                 }

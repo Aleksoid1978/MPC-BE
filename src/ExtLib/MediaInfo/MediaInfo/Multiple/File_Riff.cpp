@@ -592,7 +592,7 @@ void File_Riff::Streams_Finish ()
             if (Temp->second.PacketCount && Temp->second.Length!=Temp->second.PacketCount)
             {
                 if (StreamKind_Last==Stream_Video && Temp->second.Rate)
-                    Fill(Stream_Video, StreamPos_Last, "Source_Duration", ((float64)Temp->second.PacketCount)*1000*Temp->second.Scale/Temp->second.Rate, 0);
+                    Fill(Stream_Video, StreamPos_Last, Video_Source_Duration, ((float64)Temp->second.PacketCount)*1000*Temp->second.Scale/Temp->second.Rate, 0);
                 if (StreamKind_Last==Stream_Audio && Temp->second.Rate)
                 {
                     float64 Duration_Source=((float64)Temp->second.StreamSize)*1000/Temp->second.AvgBytesPerSec;
@@ -601,7 +601,7 @@ void File_Riff::Streams_Finish ()
                     if (Temp->second.Scale!=1 && float64_int64s(Duration_Header/Duration_Source)==Temp->second.Scale)
                         Fill(Stream_Audio, StreamPos_Last, Audio_Duration, Duration_Source, 0, true); //Found 1 stream with Scale not being right
                     else if (Difference<-2 || Difference>2) //+/- 2 ms
-                        Fill(Stream_Audio, StreamPos_Last, "Source_Duration", Duration_Source, 0);
+                        Fill(Stream_Audio, StreamPos_Last, Audio_Source_Duration, Duration_Source, 0, true);
                 }
             }
         }
@@ -1030,7 +1030,7 @@ void File_Riff::Header_Parse()
             Element_WaitForMoreData();
             return;
         }
-        if (Name==Elements::RF64 && CC4(Buffer+Buffer_Offset+0x0C)==Elements::WAVE_ds64)
+        if ((Name==Elements::RF64 || Name==Elements::BW64) && CC4(Buffer+Buffer_Offset+0x0C)==Elements::WAVE_ds64)
         {
             Size_Complete=LittleEndian2int64u(Buffer+Buffer_Offset+0x14);
             Param_Info1(Size_Complete);
@@ -1117,11 +1117,11 @@ void File_Riff::Header_Parse()
     }
 
     //Integrity
-    if (Name==0x00000000)
+    if (Size==0 && Name==0x00000000)
     {
         //Filling
         Header_Fill_Code(0, "Junk");
-        Header_Fill_Size(File_Size-(File_Offset+Buffer_Offset));
+        Header_Fill_Size(Element_TotalSize_Get());
         Alignement_ExtraByte=0;
         return;
     }

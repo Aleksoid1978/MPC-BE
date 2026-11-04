@@ -311,13 +311,6 @@ void File_SmpteSt0302::Read_Buffer_Continue()
 
     //Filling
     TS_Add(audio_packet_size/((1+number_channels)*(5+bits_per_sample)));
-    if (Parsers.size()>1 && Frame_Count>=2)
-    {
-        for (size_t Pos=0; Pos<Parsers.size()-1; Pos++)
-            delete Parsers[Pos]; //Parsers[Pos]=NULL;
-        Parsers.erase(Parsers.begin(), Parsers.begin()+Parsers.size()-1);
-    }
-
     if (!Status[IsFilled] && Parsers.size()==1 && Parsers[0]->Status[IsFinished])
     {
         //Filling

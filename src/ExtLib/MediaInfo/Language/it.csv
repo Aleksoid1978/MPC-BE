@@ -1414,6 +1414,10 @@ TopFrontToSide;Alto avanti a lato
 Total;Totale
 TotalNumberOfParts;Numero totale parti
 TotalProgrammeDuration;Durata totale programma
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Traccia
 Track_Count;N. traccia
 TrackFormat;Formato traccia

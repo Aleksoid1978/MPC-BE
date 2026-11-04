@@ -721,6 +721,14 @@ void File_AribStdB24B37::caption_statement() //caption_data()
             int8u  data_unit_parameter;
             Get_B1 (data_unit_parameter,                        "data_unit_parameter"); Param_Info1(AribStdB24B37_data_unit_parameter(data_unit_parameter));
             Get_B3 (data_unit_size,                             "data_unit_size");
+            if (!Element_IsOK() || Element_Offset>Element_Size || data_unit_size>Element_Size-Element_Offset
+             || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+             || data_unit_size>Buffer_Size-Buffer_Offset-(size_t)Element_Offset)
+            {
+                Trusted_IsNot("Invalid caption unit size");
+                Element_End0();
+                return;
+            }
             switch (data_unit_parameter)
             {
                 case 0x20 : data_unit_data(Element_Offset+data_unit_size); break;
@@ -762,8 +770,11 @@ void File_AribStdB24B37::data_unit_data(int64u End)
 {
     Element_Begin1("data_unit_data");
 
+    int64u Element_Size_Save=Element_Size;
+    Element_Size=End;
+
     //data_unit_data_byte
-    while (Element_Offset<End)
+    while (Element_Offset<End && Element_IsOK())
     {
         int8u header;
         Peek_B1(header);
@@ -779,13 +790,13 @@ void File_AribStdB24B37::data_unit_data(int64u End)
                 Character(Caption_conversion_type==4?GS_Kanji:Streams[(size_t)(Element_Code-1)].G[Streams[(size_t)(Element_Code-1)].GR],
                           Streams[(size_t)(Element_Code-1)].GR,
                           Buffer[Buffer_Offset+Element_Offset]&0x7F,
-                          Buffer[Buffer_Offset+Element_Offset+1]&0x7F);
+                          End-Element_Offset>=2?Buffer[Buffer_Offset+Element_Offset+1]&0x7F:0);
             else // GL
             {
                 Character(Caption_conversion_type==4?GS_DRCS:Streams[(size_t)(Element_Code-1)].G[Streams[(size_t)(Element_Code-1)].GL_SS?Streams[(size_t)(Element_Code-1)].GL_SS:Streams[(size_t)(Element_Code-1)].GL],
                           Streams[(size_t)(Element_Code-1)].GL_SS?Streams[(size_t)(Element_Code-1)].GL_SS:Streams[(size_t)(Element_Code-1)].GL,
                           Buffer[Buffer_Offset+Element_Offset],
-                          Buffer[Buffer_Offset+Element_Offset+1]);
+                          End-Element_Offset>=2?Buffer[Buffer_Offset+Element_Offset+1]:0);
                 Streams[(size_t)(Element_Code-1)].GL_SS=0;
             }
         }
@@ -793,6 +804,7 @@ void File_AribStdB24B37::data_unit_data(int64u End)
             control_code(); // C0 or C1
     }
 
+    Element_Size=Element_Size_Save;
     Element_End0();
 }
 
@@ -880,6 +892,24 @@ void File_AribStdB24B37::DefaultMacro()
 //---------------------------------------------------------------------------
 void File_AribStdB24B37::Character (int16u CharacterSet, int8u G_Value, int8u FirstByte, int8u SecondByte)
 {
+    size_t Width=Streams[(size_t)(Element_Code-1)].G_Width[G_Value];
+    switch (CharacterSet)
+    {
+        case GS_Kanji: Width=2; break;
+        case GS_Hiragana:
+        case GS_PropHiragana:
+        case GS_Katakana:
+        case GS_PropKatakana:
+        case GS_Alphanumeric:
+        case GS_PropAscii:
+        case GS_DRCS|GS_Macro: Width=1; break;
+    }
+    if (Element_Offset>Element_Size || Width>Element_Size-Element_Offset)
+    {
+        Trusted_IsNot("Truncated caption character");
+        return;
+    }
+
     int16u Value=(FirstByte<<8) | SecondByte;
 
     //ARIB STD B24/B37 provide numbers with 2 number (Row and Colupmn) a shift of 32 (b00100000)
@@ -1394,7 +1424,7 @@ void File_AribStdB24B37::CSI()
     Params.push_back(0);
     size_t Pos=0;
 
-    while (Element_Offset+Pos<=Element_Size)
+    while (Element_Offset<Element_Size && Pos<Element_Size-Element_Offset)
     {
         int8u Value=Buffer[Buffer_Offset+Element_Offset+Pos];
         Pos++;

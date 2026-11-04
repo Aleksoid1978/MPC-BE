@@ -226,8 +226,10 @@ bool File_Wvpk::Synchronize()
         if (Buffer_Offset+4<=Buffer_Size)//Testing if size is coherant
         {
             //Testing next start, to be sure
-            size_t Size=LittleEndian2int32u(Buffer+Buffer_Offset+4)+8;
-            if (Buffer_Offset+Size+4>Buffer_Size)
+            if (Buffer_Size-Buffer_Offset<8)
+                return false; //Need more data
+            int64u Size=(int64u)LittleEndian2int32u(Buffer+Buffer_Offset+4)+8;
+            if (Size>Buffer_Size-Buffer_Offset-4)
                 return false; //Need more data
 
             //Testing
@@ -269,7 +271,7 @@ bool File_Wvpk::Synched_Test()
         return false;
 
     //Must have enough buffer for having header
-    if (Buffer_Offset+3>Buffer_Size)
+    if (Buffer_Offset>Buffer_Size || Buffer_Size-Buffer_Offset<4)
         return false;
 
     //Quick test of synchro

@@ -1414,6 +1414,10 @@ TopFrontToSide;Obere vordere Kanäle zu seitlichen Kanälen
 Total;Gesamt
 TotalNumberOfParts;Gesamtzahl der Teile
 TotalProgrammeDuration;Gesamtprogrammdauer
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Track-Name
 Track_Count;Anzahl der Tracks
 TrackFormat;Track-Format

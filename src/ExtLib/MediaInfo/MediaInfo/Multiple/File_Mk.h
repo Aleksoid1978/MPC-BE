@@ -18,6 +18,7 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/File__Analyze.h"
 #include <bitset>
+#include <memory>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -179,7 +180,7 @@ private :
     void Segment_Tracks_TrackEntry_MaxBlockAdditionID(){UInteger_Info();};
     void Segment_Tracks_TrackEntry_Name();
     void Segment_Tracks_TrackEntry_Language();
-    void Segment_Tracks_TrackEntry_LanguageIETF(){Segment_Tracks_TrackEntry_Language();};
+    void Segment_Tracks_TrackEntry_LanguageIETF();
     void Segment_Tracks_TrackEntry_CodecID();
     void Segment_Tracks_TrackEntry_CodecPrivate();
     void Segment_Tracks_TrackEntry_CodecName(){UTF8_Info();};
@@ -330,7 +331,7 @@ private :
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay();
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapString();
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage();
-    void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF(){Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguage();};
+    void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapLanguageIETF();
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapterDisplay_ChapCountry(){String_Info();};
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess(){};
     void Segment_Chapters_EditionEntry_ChapterAtom_ChapProcess_ChapProcessCodecID(){UInteger_Info();};
@@ -477,6 +478,7 @@ private :
     void     CodecID_Manage();
     int64u   TrackType{};
     int64u   AudioBitDepth{};
+    bool     TrackHasLanguageIETF{};
 
     //Temp - BlockAddition
     int64u  BlockAddIDType;
@@ -544,6 +546,7 @@ private :
     {
         Ztring ChapLanguage;
         Ztring ChapString;
+        bool HasChapLanguageIETF{};
     };
     struct chapteratom
     {
@@ -567,6 +570,7 @@ private :
     int64u              Segment_Offset_End{};
     int64u              IsParsingSegmentTrack_SeekBackTo;
     int64u              SegmentTrack_Offset_End;
+    bool                Segment_Tracks_SeekBack_Attempted;
     struct seek
     {
         int64u SeekID;
@@ -598,23 +602,12 @@ private :
     {
         struct mask
         {
-            int8u*      Buffer;
-            size_t      Size;
-
-            //mask(); //Init done in rawcookedtrack() in 1 shot
-            ~mask()
-            {
-                delete[] Buffer;
-            }
+            std::unique_ptr<int8u[]> Buffer;
+            size_t      Size = 0;
         };
-        int64u          FramePos;
+        int64u          FramePos = 0;
         mask            MaskBaseFileName;
         mask            MaskBaseBeforeData;
-
-        rawcookedtrack()
-        {
-            memset(this, 0x00, sizeof(rawcookedtrack));
-        }
     };
     rawcookedtrack RawcookedTrack_Data;
     const int8u* Rawcooked_Compressed_Save_Buffer{};

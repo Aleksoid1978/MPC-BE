@@ -129,6 +129,715 @@ uint16_t Dts_CRC_CCIT_Compute(const uint8_t* Buffer, size_t Size)
 }
 
 //---------------------------------------------------------------------------
+// A DTS:X extension sync word only announces DTS:X metadata. It does not
+// prove that the presentation contains dynamic objects. Probe the CRC-valid
+// primary type-241 presentation metadata, matching the decoder path.
+class dtsx_bit_reader
+{
+public:
+    dtsx_bit_reader(const int8u* Data, size_t Size)
+        : Data(Data), BitLimit(Size*8), BitOffset(0), IsValid(true) {}
+
+    int32u Get(size_t Bits)
+    {
+        if (Bits>32 || BitOffset>BitLimit || Bits>BitLimit-BitOffset)
+        {
+            IsValid=false;
+            return 0;
+        }
+        int32u Value=0;
+        for (size_t i=0; i<Bits; ++i)
+        {
+            Value<<=1;
+            Value|=(Data[BitOffset>>3]>>(7-(BitOffset&7)))&1;
+            ++BitOffset;
+        }
+        return Value;
+    }
+
+    void Skip(size_t Bits)
+    {
+        if (BitOffset>BitLimit || Bits>BitLimit-BitOffset)
+            IsValid=false;
+        else
+            BitOffset+=Bits;
+    }
+
+    bool Limit(size_t Bits)
+    {
+        if (Bits>BitLimit || BitOffset>Bits)
+        {
+            IsValid=false;
+            return false;
+        }
+        BitLimit=Bits;
+        return true;
+    }
+
+    size_t Offset() const { return BitOffset; }
+    bool Valid() const { return IsValid; }
+
+private:
+    const int8u* Data;
+    size_t BitLimit;
+    size_t BitOffset;
+    bool IsValid;
+};
+
+struct dtsx_exss_probe
+{
+    bool StaticFieldsPresent=false;
+    int8u SizeFieldBits=0;
+    int32u HeaderSize=0;
+    int32u FrameSize=0;
+    int32u FrameDuration=0;
+    int8u AssetCount=0;
+    int8u SpeakerMetadataPresent=0;
+    int8u SpeakerMaskCount=0;
+    int8u SpeakerCounts[8]{};
+    int32u AssetSizes[8]{};
+    size_t AssetHeaderBitOffsets[8]{};
+};
+
+struct dtsx_asset_probe
+{
+    int32u HeaderSize=0;
+    int32u ChannelCount=0;
+    bool OneToOneMapping=false;
+    bool EmbeddedStereo=false;
+    bool EmbeddedSixChannel=false;
+    bool SpeakerMaskPresent=false;
+    int32u SpeakerActivityMask=0;
+    int8u CodingMode=0;
+    int16u CodingComponents=0;
+    int32u ComponentSize[12]{};
+    int32u ComponentOffset[12]{};
+    bool XllMetadataPresent=false;
+    bool XllObjectMetadataPresent=false;
+    int32u XllMetadataOffset=0;
+    vector<int8u> MetadataElementSizes;
+    vector<int8u> AssociatedChunkTypes;
+    vector<int16u> AssociatedChunkExtents;
+};
+
+static int8u DtsX_SpeakerCount(int32u Mask)
+{
+    static const int8u Counts[20]={
+        1, 2, 2, 1, 1, 2, 2, 1, 1, 2,
+        2, 2, 1, 2, 1, 2, 1, 2, 2, 2,
+    };
+    int8u Count=0;
+    for (size_t i=0; i<20; ++i)
+        if (Mask&(1<<i))
+            Count+=Counts[i];
+    return Count;
+}
+
+static int8u DtsX_AddedSpeakerCount(const int8u* Buffer, size_t Size, size_t Offset, int32u FallbackReferenceMask)
+{
+    if (Offset>=Size)
+        return 0;
+    dtsx_bit_reader Source(Buffer+Offset, Size-Offset);
+    int8u ChunkId=(int8u)Source.Get(8);
+    Source.Skip(8); // Association flags
+    if (ChunkId<2 || ChunkId>4)
+        return 0;
+    Source.Skip(1+4+4);
+    if (Source.Get(1))
+        Source.Skip(1);
+    int32u ReferenceMask;
+    if (Source.Get(1))
+    {
+        Source.Skip(2+3);
+        int8u MaskWords=(int8u)(Source.Get(3)+1);
+        ReferenceMask=Source.Get(4*MaskWords);
+    }
+    else
+    {
+        Source.Skip(4);
+        ReferenceMask=FallbackReferenceMask;
+    }
+    if (Source.Get(1))
+    {
+        Source.Skip(6);
+        if (Source.Get(1))
+            Source.Skip(6);
+    }
+    int8u MaskWords=(int8u)(Source.Get(3)+1);
+    int32u OutputMask=Source.Get(4*MaskWords);
+    // A type-69 chunk is supplemental only when the combined-mix matrix
+    // identifies actual speakers added to the coded bed.
+    int8u ReferenceCount=DtsX_SpeakerCount(ReferenceMask);
+    int8u AddedCount=DtsX_SpeakerCount(OutputMask&~ReferenceMask);
+    bool FirstGainPresent=false;
+    if (ChunkId<=3)
+    {
+        Source.Skip(5+6);
+        FirstGainPresent=Source.Get(1)!=0;
+        if (Source.Get(1))
+        {
+            Source.Skip(6);
+            if (FirstGainPresent && Source.Get(1))
+                Source.Skip(6);
+        }
+    }
+    else
+        Source.Skip(4);
+    bool DownmixPresent=Source.Get(1)!=0;
+    bool CoefficientsPresent=DownmixPresent || Source.Get(1)!=0;
+    if (!CoefficientsPresent || !ReferenceCount || !AddedCount || ReferenceCount>32 || AddedCount>32)
+        return 0;
+    Source.Skip(6);
+    int8u CommonGainSelector=(int8u)Source.Get(FirstGainPresent?1:3);
+    if (CommonGainSelector)
+        Source.Skip(6*(1<<(CommonGainSelector-1)));
+    for (size_t Added=0; Added<AddedCount; ++Added)
+    {
+        int32u UpdateMask=Source.Get(ReferenceCount);
+        if (!UpdateMask)
+            return 0;
+        for (size_t Reference=0; Reference<ReferenceCount; ++Reference)
+            if ((UpdateMask&((int32u)1<<Reference)) && Source.Get(6)>61)
+                return 0;
+    }
+    return Source.Valid()?AddedCount:0;
+}
+
+static bool DtsX_ExssHeader(const int8u* Buffer, size_t Size, dtsx_exss_probe& Header)
+{
+    dtsx_bit_reader Source(Buffer, Size);
+    if (Source.Get(32)!=0x64582025)
+        return false;
+    Source.Skip(8);
+    int8u StreamIndex=(int8u)Source.Get(2);
+    bool LongSizeFields=Source.Get(1)!=0;
+    Header.SizeFieldBits=LongSizeFields?20:16;
+    Header.HeaderSize=Source.Get(LongSizeFields?12:8)+1;
+    Header.FrameSize=Source.Get(Header.SizeFieldBits)+1;
+    if (!Source.Valid() || Header.HeaderSize>Header.FrameSize || Header.FrameSize>Size || !Source.Limit(Header.HeaderSize*8))
+        return false;
+
+    Header.StaticFieldsPresent=Source.Get(1)!=0;
+    int8u PresentationCount=1;
+    if (Header.StaticFieldsPresent)
+    {
+        Source.Skip(2);
+        Header.FrameDuration=(Source.Get(3)+1)<<9;
+        if (Source.Get(1))
+            Source.Skip(36);
+        PresentationCount=(int8u)(Source.Get(3)+1);
+        Header.AssetCount=(int8u)(Source.Get(3)+1);
+        int8u ActiveExSSMasks[8]{};
+        for (size_t i=0; i<PresentationCount; ++i)
+            ActiveExSSMasks[i]=(int8u)Source.Get(StreamIndex+1);
+        for (size_t i=0; i<PresentationCount; ++i)
+            for (size_t j=0; j<=StreamIndex; ++j)
+                if (ActiveExSSMasks[i]&(1<<j))
+                    Source.Skip(8);
+        Header.SpeakerMetadataPresent=(int8u)Source.Get(1);
+        if (Header.SpeakerMetadataPresent)
+        {
+            Source.Skip(2);
+            int8u SpeakerMaskBits=(int8u)Source.Get(2);
+            Header.SpeakerMaskCount=(int8u)(Source.Get(2)+1);
+            for (size_t i=0; i<Header.SpeakerMaskCount; ++i)
+                Header.SpeakerCounts[i]=DtsX_SpeakerCount(Source.Get(4*(SpeakerMaskBits+1)));
+        }
+    }
+    else
+        Header.AssetCount=1;
+
+    if (PresentationCount>8 || Header.AssetCount>8)
+        return false;
+    for (size_t i=0; i<Header.AssetCount; ++i)
+        Header.AssetSizes[i]=Source.Get(Header.SizeFieldBits)+1;
+    for (size_t i=0; i<Header.AssetCount; ++i)
+    {
+        Header.AssetHeaderBitOffsets[i]=Source.Offset();
+        int32u AssetHeaderSize=Source.Get(9)+1;
+        if (AssetHeaderSize<2)
+            return false;
+        Source.Skip(AssetHeaderSize*8-9);
+    }
+    return Source.Valid();
+}
+
+static bool DtsX_AssetHeader(const int8u* Buffer, size_t Size, const dtsx_exss_probe& Exss, size_t AssetOrdinal, dtsx_asset_probe& Asset)
+{
+    if (AssetOrdinal>=Exss.AssetCount || Exss.AssetHeaderBitOffsets[AssetOrdinal]>=Size*8)
+        return false;
+    dtsx_bit_reader Source(Buffer, Size);
+    Source.Skip(Exss.AssetHeaderBitOffsets[AssetOrdinal]);
+    size_t AssetStart=Source.Offset();
+    Asset.HeaderSize=Source.Get(9)+1;
+    if (!Source.Valid() || Asset.HeaderSize<2 || AssetStart+Asset.HeaderSize*8>Size*8)
+        return false;
+    Source.Get(3); // AssetIndex
+
+    bool MixMetadataPresent=false;
+    if (Exss.StaticFieldsPresent)
+    {
+        if (Source.Get(1))
+            Source.Skip(4);
+        if (Source.Get(1))
+            Source.Skip(24);
+        if (Source.Get(1))
+            Source.Skip((Source.Get(10)+1)*8);
+        Source.Skip(5+4);
+        Asset.ChannelCount=Source.Get(8)+1;
+        Asset.OneToOneMapping=Source.Get(1)!=0;
+        if (Asset.OneToOneMapping)
+        {
+            if (Asset.ChannelCount>2)
+                Asset.EmbeddedStereo=Source.Get(1)!=0;
+            if (Asset.ChannelCount>6)
+                Asset.EmbeddedSixChannel=Source.Get(1)!=0;
+            Asset.SpeakerMaskPresent=Source.Get(1)!=0;
+            int8u MaskBits=0;
+            if (Asset.SpeakerMaskPresent)
+            {
+                MaskBits=(int8u)(4*(Source.Get(2)+1));
+                Asset.SpeakerActivityMask=Source.Get(MaskBits);
+            }
+            int8u RemapSets=(int8u)Source.Get(3);
+            for (size_t Set=0; Set<RemapSets; ++Set)
+            {
+                int8u Destinations=DtsX_SpeakerCount(Source.Get(MaskBits));
+                int8u CoefficientBits=(int8u)(Source.Get(5)+1);
+                for (size_t Destination=0; Destination<Destinations; ++Destination)
+                {
+                    int32u CoefficientMask=Source.Get(CoefficientBits);
+                    int8u CoefficientCount=0;
+                    for (size_t Bit=0; Bit<CoefficientBits; ++Bit)
+                        CoefficientCount+=(CoefficientMask>>Bit)&1;
+                    Source.Skip(5*CoefficientCount);
+                }
+            }
+        }
+        else
+            Source.Skip(3);
+    }
+
+    bool LanguagePresent=Source.Get(1)!=0;
+    if (LanguagePresent)
+        Source.Skip(8);
+    if (Source.Get(1))
+        Source.Skip(5);
+    if (LanguagePresent && Asset.EmbeddedStereo)
+        Source.Skip(8);
+    if (Exss.SpeakerMetadataPresent)
+    {
+        MixMetadataPresent=Source.Get(1)!=0;
+        if (MixMetadataPresent)
+        {
+            Source.Skip(7);
+            int8u AdjustmentMode=(int8u)Source.Get(2);
+            Source.Skip(AdjustmentMode<=2?3:8);
+            bool PerSpeakerAdjustment=Source.Get(1)!=0;
+            for (size_t i=0; i<Exss.SpeakerMaskCount; ++i)
+                Source.Skip(6*(PerSpeakerAdjustment?Exss.SpeakerCounts[i]:1));
+
+            int32u ChannelSets[3]={Asset.ChannelCount, 0, 0};
+            size_t ChannelSetCount=1;
+            if (Asset.EmbeddedSixChannel)
+                ChannelSets[ChannelSetCount++]=6;
+            if (Asset.EmbeddedStereo)
+                ChannelSets[ChannelSetCount++]=2;
+            for (size_t Config=0; Config<Exss.SpeakerMaskCount; ++Config)
+                for (size_t Set=0; Set<ChannelSetCount; ++Set)
+                    for (size_t Channel=0; Channel<ChannelSets[Set]; ++Channel)
+                    {
+                        int32u Mask=Source.Get(Exss.SpeakerCounts[Config]);
+                        int8u Active=0;
+                        for (size_t Bit=0; Bit<Exss.SpeakerCounts[Config]; ++Bit)
+                            Active+=(Mask>>Bit)&1;
+                        Source.Skip(6*Active);
+                    }
+        }
+    }
+
+    Asset.CodingMode=(int8u)Source.Get(2);
+    if (!Asset.CodingMode)
+    {
+        Asset.CodingComponents=(int16u)Source.Get(12);
+        int32u ComponentOffset=0;
+        for (size_t Component=4; Component<=8; ++Component)
+        {
+            if (!(Asset.CodingComponents&(1<<Component)))
+                continue;
+            int32u ComponentSize=(Source.Get(Component==7?12:14)+3)&~3;
+            Asset.ComponentSize[Component]=ComponentSize;
+            Asset.ComponentOffset[Component]=ComponentOffset;
+            ComponentOffset+=ComponentSize;
+            if (Component==4 && Source.Get(1))
+                Source.Skip(2);
+            if (Component==8 && Source.Get(1))
+                Source.Skip(2);
+        }
+        if (Asset.CodingComponents&(1<<9))
+        {
+            Asset.ComponentOffset[9]=ComponentOffset;
+            Asset.ComponentSize[9]=Source.Get(Exss.SizeFieldBits)+1;
+            if (Source.Get(1))
+            {
+                Source.Skip(4);
+                int8u DelayBits=(int8u)(Source.Get(5)+1);
+                Source.Skip(DelayBits+Exss.SizeFieldBits);
+            }
+        }
+        if (Asset.CodingComponents&(1<<10))
+            Source.Skip(16);
+        if (Asset.CodingComponents&(1<<11))
+            Source.Skip(16);
+    }
+    else if (Asset.CodingMode==1)
+        Source.Skip(Exss.SizeFieldBits);
+    else
+        Source.Skip(14);
+
+    const bool HasXll=Asset.CodingMode==1 || (Asset.CodingMode==0 && (Asset.CodingComponents&(1<<9)));
+    // Private XLL navigation may continue beyond the nominal asset header.
+    // The decoder reads this tail from the containing ExSS frame.
+    const size_t XllPrivateEnd=Size*8;
+    if (HasXll && Source.Offset()+3<=XllPrivateEnd)
+        Source.Skip(3);
+    if (Asset.OneToOneMapping && Exss.StaticFieldsPresent && Exss.SpeakerMetadataPresent && !MixMetadataPresent && Source.Offset()<XllPrivateEnd)
+    {
+        if (Source.Get(1) && Source.Offset()<XllPrivateEnd)
+        {
+            bool PerSpeaker=Source.Get(1)!=0;
+            Source.Skip(6*(PerSpeaker?Asset.ChannelCount:1));
+        }
+    }
+    if (Source.Offset()<XllPrivateEnd)
+        Source.Skip(1);
+    if (Source.Offset()<XllPrivateEnd && Source.Get(1) && Source.Offset()+4<=XllPrivateEnd)
+    {
+        Source.Skip(4);
+        if (Source.Offset()+8*(Exss.FrameDuration>>8)<=XllPrivateEnd)
+            Source.Skip(8*(Exss.FrameDuration>>8));
+    }
+    if (HasXll && Source.Offset()<XllPrivateEnd)
+        Source.Skip(1);
+    if (Asset.SpeakerMaskPresent && Source.Offset()+2<=XllPrivateEnd)
+        Source.Skip(2);
+    if (HasXll && Source.Offset()+2<=XllPrivateEnd)
+    {
+        Asset.XllMetadataPresent=Source.Get(1)!=0;
+        Asset.XllObjectMetadataPresent=Source.Get(1)!=0;
+        if ((Asset.XllMetadataPresent || Asset.XllObjectMetadataPresent) && Source.Offset()+Exss.SizeFieldBits<=XllPrivateEnd)
+        {
+            Asset.XllMetadataOffset=Source.Get(Exss.SizeFieldBits);
+            if (Asset.XllMetadataPresent && Source.Offset()+4<=XllPrivateEnd)
+            {
+                int8u Count=(int8u)(Source.Get(4)+1);
+                if (Source.Offset()+Count*8<=XllPrivateEnd)
+                    for (size_t i=0; i<Count; ++i)
+                        Asset.MetadataElementSizes.push_back((int8u)Source.Get(8));
+            }
+            if (Asset.XllObjectMetadataPresent && Source.Offset()+4<=XllPrivateEnd)
+            {
+                int8u Count=(int8u)(Source.Get(4)+1);
+                if (Source.Offset()+Count*8+Count*15<=XllPrivateEnd)
+                {
+                    for (size_t i=0; i<Count; ++i)
+                        Asset.AssociatedChunkTypes.push_back((int8u)Source.Get(8));
+                    for (size_t i=0; i<Count; ++i)
+                        Asset.AssociatedChunkExtents.push_back((int16u)(Source.Get(15)+1));
+                }
+            }
+        }
+    }
+    return Source.Valid() && Source.Offset()<=XllPrivateEnd;
+}
+
+static bool DtsX_PresentationObjectCount(const int8u* Data, size_t Size, int8u AssociationMode, int8u& ObjectCount)
+{
+    if (Size<2 || Data[0]!=241)
+        return false;
+    int8u Flags=Data[1];
+    int8u SelectorBits=3;
+    bool AlternateAssociation=false;
+    bool ShortForm=false;
+    switch (AssociationMode)
+    {
+        case 1: SelectorBits=1; ShortForm=(Flags&0x80)!=0; break;
+        case 2: SelectorBits=2; AlternateAssociation=(Flags&0x80)!=0; ShortForm=(Flags&0x40)!=0; break;
+        case 3:
+        case 4: AlternateAssociation=(Flags&0x40)!=0; ShortForm=(Flags&0x20)!=0; break;
+        default: AlternateAssociation=(Flags&0x20)!=0;
+    }
+    bool Primary=true;
+    if (!AlternateAssociation)
+        Primary=(Flags&(1<<(7-SelectorBits)))!=0;
+    if (!Primary || ShortForm)
+        return false;
+
+    dtsx_bit_reader Source(Data+2, Size-2);
+    Source.Skip(4+1+4+1);
+    if (Source.Get(1))
+        Source.Skip(1);
+    if (!Source.Get(1))
+        return false;
+    ObjectCount=(int8u)(Source.Get(4)+1);
+    return Source.Valid();
+}
+
+static bool DtsX_ReadBitsAt(const int8u* Buffer, size_t Size, size_t BitOffset, size_t BitCount, int32u& Value)
+{
+    Value=0;
+    if (BitCount>32 || BitOffset>((size_t)-1)-BitCount)
+        return false;
+    size_t End=BitOffset+BitCount;
+    if (End/8>Size || (End/8==Size && End%8))
+        return false;
+    for (size_t Bit=0; Bit<BitCount; ++Bit)
+    {
+        size_t Absolute=BitOffset+Bit;
+        Value=(Value<<1)|((Buffer[Absolute>>3]>>(7-(Absolute&7)))&1);
+    }
+    return true;
+}
+
+static bool DtsX_FourChannelSetHeader(const int8u* Buffer, size_t Size, size_t ByteOffset)
+{
+    if (ByteOffset>Size)
+        return false;
+    const int8u* Header=Buffer+ByteOffset;
+    size_t HeaderAvailable=Size-ByteOffset;
+    int32u HeaderSizeMinusOne, ChannelsMinusOne;
+    if (!DtsX_ReadBitsAt(Header, HeaderAvailable, 0, 10, HeaderSizeMinusOne)
+     || !DtsX_ReadBitsAt(Header, HeaderAvailable, 10, 4, ChannelsMinusOne)
+     || ChannelsMinusOne+1!=4)
+        return false;
+    size_t BitOffset=14+ChannelsMinusOne+1;
+    int32u PcmMinusOne, StorageMinusOne, FrequencyIndex, FrequencyModifier, ReplacementSet;
+    if (!DtsX_ReadBitsAt(Header, HeaderAvailable, BitOffset, 5, PcmMinusOne)
+     || !DtsX_ReadBitsAt(Header, HeaderAvailable, BitOffset+5, 5, StorageMinusOne)
+     || !DtsX_ReadBitsAt(Header, HeaderAvailable, BitOffset+10, 4, FrequencyIndex)
+     || !DtsX_ReadBitsAt(Header, HeaderAvailable, BitOffset+14, 2, FrequencyModifier)
+     || !DtsX_ReadBitsAt(Header, HeaderAvailable, BitOffset+16, 2, ReplacementSet))
+        return false;
+    size_t HeaderSize=HeaderSizeMinusOne+1;
+    int32u Pcm=PcmMinusOne+1;
+    int32u Storage=StorageMinusOne+1;
+    return HeaderSize<=HeaderAvailable
+        && Pcm<=Storage
+        && (Storage==16 || Storage==20 || Storage==24)
+        && FrequencyIndex==12
+        && !FrequencyModifier
+        && !ReplacementSet
+        && !Dts_CRC_CCIT_Compute(Header, HeaderSize);
+}
+
+static bool DtsX_AlternateGeometryAt(const int8u* Control, size_t Size, size_t BitOffset)
+{
+    int32u SegmentLog2, SegmentSampleLog2, NavigationSizeMinusOne;
+    if (!DtsX_ReadBitsAt(Control, Size, BitOffset, 4, SegmentLog2)
+     || !DtsX_ReadBitsAt(Control, Size, BitOffset+4, 4, SegmentSampleLog2)
+     || !DtsX_ReadBitsAt(Control, Size, BitOffset+8, 5, NavigationSizeMinusOne)
+     || SegmentLog2>3 || SegmentSampleLog2>9)
+        return false;
+    int32u Segments=1U<<SegmentLog2;
+    int32u SegmentSamples=1U<<SegmentSampleLog2;
+    int32u NavigationSize=NavigationSizeMinusOne+1;
+    return Segments<=8 && Segments*SegmentSamples==512 && NavigationSize>=4 && NavigationSize<=20;
+}
+
+static bool DtsX_AlternateCrcPrefixEnd(const int8u* Buffer, size_t Size, size_t Offset, size_t& PrefixEnd)
+{
+    static const int8u OuterSuffix[6]={0x03, 0x34, 0x38, 0x8C, 0x4F, 0x00};
+    PrefixEnd=(size_t)-1;
+    if (Offset>Size || Size-Offset<4)
+        return false;
+    const int8u* Payload=Buffer+Offset;
+    size_t PayloadSize=Size-Offset;
+    for (size_t Candidate=4; Candidate+sizeof(OuterSuffix)<=PayloadSize; ++Candidate)
+    {
+        bool Matches=true;
+        for (size_t i=0; i<sizeof(OuterSuffix); ++i)
+            if (Payload[Candidate+i]!=OuterSuffix[i])
+                Matches=false;
+        if (!Matches || Dts_CRC_CCIT_Compute(Payload, Candidate))
+            continue;
+        if (PrefixEnd!=(size_t)-1)
+            return false;
+        PrefixEnd=Candidate;
+    }
+    return PrefixEnd!=(size_t)-1;
+}
+
+static bool DtsX_AlternateFourChannelSet(const int8u* Buffer, size_t Size, size_t Offset, int32u Sync)
+{
+    static const size_t OuterSuffixSize=6;
+    size_t PrefixEnd;
+    if (!DtsX_AlternateCrcPrefixEnd(Buffer, Size, Offset, PrefixEnd))
+        return false;
+    const int8u* Payload=Buffer+Offset;
+    size_t PayloadSize=Size-Offset;
+    size_t ControlStart=PrefixEnd+OuterSuffixSize;
+    if (ControlStart>=PayloadSize)
+        return false;
+    int8u Tag=Payload[ControlStart];
+    size_t ControlSize=Tag==0xB2?7:(Tag>=0xC2 && Tag<=0xC6?8:0);
+    if (!ControlSize || ControlSize>PayloadSize-ControlStart)
+        return false;
+    size_t LastGeometryBit=Sync==0xF14000D3?31:(Sync==0xF14000D4?26:25);
+    size_t CommonBit=(size_t)-1;
+    for (size_t Bit=18; Bit<=LastGeometryBit; ++Bit)
+    {
+        if (!DtsX_AlternateGeometryAt(Payload+ControlStart, ControlSize, Bit))
+            continue;
+        if (CommonBit!=(size_t)-1)
+            return false;
+        CommonBit=Bit;
+    }
+    if (CommonBit==(size_t)-1 || CommonBit<14)
+        return false;
+    int32u EncodedSpan;
+    if (!DtsX_ReadBitsAt(Payload+ControlStart, ControlSize, 9, CommonBit-14, EncodedSpan))
+        return false;
+    size_t Nominal=(size_t)EncodedSpan*2+ControlStart+12;
+    bool Found=false;
+    for (size_t Adjustment=0; Adjustment<2; ++Adjustment)
+    {
+        if (Adjustment && !Nominal)
+            continue;
+        size_t Candidate=Nominal-Adjustment;
+        if (!DtsX_FourChannelSetHeader(Payload, PayloadSize, Candidate))
+            continue;
+        if (Found)
+            return false;
+        Found=true;
+    }
+    return Found;
+}
+
+static int8u DtsX_ConfirmedSupplementalChannelCount(const int8u* Buffer, size_t Size, size_t Offset, int32u Sync)
+{
+    if (Sync>=0xF14000D0 && Sync<=0xF14000D4)
+        return DtsX_AlternateFourChannelSet(Buffer, Size, Offset, Sync)?4:0;
+    return 0;
+}
+
+static bool DtsX_ExtensionProbe(const int8u* Buffer, size_t Size, int8u& ObjectCount, int8u& SupplementalChannelCount)
+{
+    bool HasValidatedEvidence=false;
+    ObjectCount=0;
+    SupplementalChannelCount=0;
+    for (size_t Offset=0; Offset+4<=Size; Offset+=4)
+    {
+        int32u Sync=BigEndian2int32u(Buffer+Offset);
+        if (Sync!=0x02000850 && Sync!=0xF14000D0 && Sync!=0xF14000D1
+         && Sync!=0xF14000D2 && Sync!=0xF14000D3 && Sync!=0xF14000D4)
+            continue;
+        int8u ConfirmedSupplementalChannelCount=DtsX_ConfirmedSupplementalChannelCount(Buffer, Size, Offset, Sync);
+        if (ConfirmedSupplementalChannelCount)
+        {
+            SupplementalChannelCount=max(SupplementalChannelCount, ConfirmedSupplementalChannelCount);
+            HasValidatedEvidence=true;
+        }
+        int8u Count=0;
+        // D3 is both the DTS:X extension sync and a primary type-241
+        // presentation header, so its payload carries the real object count.
+        size_t PrefixEnd;
+        if (Sync==0xF14000D3
+         && DtsX_AlternateCrcPrefixEnd(Buffer, Size, Offset, PrefixEnd)
+         && DtsX_PresentationObjectCount(Buffer+Offset, PrefixEnd, 1, Count))
+        {
+            ObjectCount=max(ObjectCount, Count);
+            HasValidatedEvidence=true;
+        }
+    }
+    return HasValidatedEvidence;
+}
+
+static int8u DtsX_ObjectCount(const int8u* Buffer, size_t Size, int8u& SupplementalChannelCount)
+{
+    dtsx_exss_probe Exss;
+    if (!DtsX_ExssHeader(Buffer, Size, Exss))
+        return 0;
+
+    int8u MaximumObjectCount=0;
+    int32u AssetPayloadOffset=Exss.HeaderSize;
+    for (size_t AssetOrdinal=0; AssetOrdinal<Exss.AssetCount; ++AssetOrdinal)
+    {
+        dtsx_asset_probe Asset;
+        if (!DtsX_AssetHeader(Buffer, Size, Exss, AssetOrdinal, Asset)
+         || !Asset.XllMetadataPresent
+         || Asset.MetadataElementSizes.empty()
+         || !(Asset.CodingMode==1 || (Asset.CodingComponents&(1<<9))))
+        {
+            AssetPayloadOffset+=Exss.AssetSizes[AssetOrdinal];
+            continue;
+        }
+        size_t MetadataOffset=AssetPayloadOffset+Asset.ComponentOffset[9]+Asset.XllMetadataOffset;
+        size_t MetadataSize=2;
+        for (auto ElementSize : Asset.MetadataElementSizes)
+            MetadataSize+=2+ElementSize;
+        if (MetadataOffset>Size)
+        {
+            AssetPayloadOffset+=Exss.AssetSizes[AssetOrdinal];
+            continue;
+        }
+        size_t MetadataAvailable=Size-MetadataOffset;
+        if (MetadataSize>MetadataAvailable || Dts_CRC_CCIT_Compute(Buffer+MetadataOffset, MetadataSize))
+        {
+            // Private XLL navigation may overread the nominal final element
+            // size. The in-band CRC is authoritative, as in the decoder.
+            size_t MetadataSizeWithoutLastPayload=MetadataSize-Asset.MetadataElementSizes.back();
+            bool Recovered=false;
+            for (size_t LastSize=0; LastSize<=0xFF; ++LastSize)
+            {
+                size_t RecoveredSize=MetadataSizeWithoutLastPayload+LastSize;
+                if (RecoveredSize<=MetadataAvailable && !Dts_CRC_CCIT_Compute(Buffer+MetadataOffset, RecoveredSize))
+                {
+                    Asset.MetadataElementSizes.back()=(int8u)LastSize;
+                    MetadataSize=RecoveredSize;
+                    Recovered=true;
+                    break;
+                }
+            }
+            if (!Recovered)
+            {
+                AssetPayloadOffset+=Exss.AssetSizes[AssetOrdinal];
+                continue;
+            }
+        }
+        size_t ElementOffset=MetadataOffset;
+        for (auto ElementSize : Asset.MetadataElementSizes)
+        {
+            if (ElementOffset+2+ElementSize>MetadataOffset+MetadataSize)
+                break;
+            int8u ObjectCount=0;
+            if (DtsX_PresentationObjectCount(Buffer+ElementOffset, Size-ElementOffset, Exss.AssetCount, ObjectCount))
+                MaximumObjectCount=max(MaximumObjectCount, ObjectCount);
+            ElementOffset+=2+ElementSize;
+        }
+        size_t AssociatedOffset=MetadataOffset+MetadataSize;
+        int8u AddedSpeakerCount=DtsX_AddedSpeakerCount(Buffer, Size, MetadataOffset, Asset.SpeakerActivityMask);
+        for (size_t i=0; i<Asset.AssociatedChunkTypes.size() && i<Asset.AssociatedChunkExtents.size(); ++i)
+        {
+            size_t Extent=Asset.AssociatedChunkExtents[i];
+            if (AssociatedOffset>=Size)
+                break;
+            size_t ChunkEnd=AssociatedOffset+min(Extent, Size-AssociatedOffset);
+            if (Asset.AssociatedChunkTypes[i]==69 && AddedSpeakerCount==4)
+                for (size_t Candidate=AssociatedOffset; Candidate<ChunkEnd; ++Candidate)
+                    if (DtsX_FourChannelSetHeader(Buffer, ChunkEnd, Candidate))
+                    {
+                        SupplementalChannelCount=max(SupplementalChannelCount, (int8u)4);
+                        break;
+                    }
+            AssociatedOffset=ChunkEnd;
+        }
+        AssetPayloadOffset+=Exss.AssetSizes[AssetOrdinal];
+    }
+
+    return MaximumObjectCount;
+}
+
+//---------------------------------------------------------------------------
 static const char*  DTS_FrameType[]=
 {
     "Termination",
@@ -568,6 +1277,9 @@ File_Dts::File_Dts()
     HD_MaximumSampleRate_Real=(int8u)-1;
     HD_TotalNumberChannels=(int8u)-1;
     HD_ExSSFrameDurationCode=(int8u)-1;
+    DtsXObjectCount=0;
+    DtsXSupplementalChannelCount=0;
+    DtsXObjectCountProbeDone=false;
     AuxiliaryData=false;
     ExtendedCoding=false;
     ES=false;
@@ -588,7 +1300,7 @@ void File_Dts::Streams_Fill_Extension()
     if (HD_TotalNumberChannels!=(int8u)-1)
     {
         int8u i=HD_TotalNumberChannels;
-        int8u Core_Core_Channels=DTS_Channels[Core_Core_AMODE];
+        int8u Core_Core_Channels=Presence[presence_Core_Core] && Core_Core_AMODE<sizeof(DTS_Channels)?DTS_Channels[Core_Core_AMODE]:0;
         if (Presence[presence_Core_Core] && Core_Core_LFF)
             Core_Core_Channels++;
 
@@ -646,12 +1358,12 @@ void File_Dts::Streams_Fill_Extension()
     {
         Data[BitDepth].push_back(Ztring());
     }
-    if (HD_MaximumSampleRate_Real!=(int8u)-1)
+    if (HD_MaximumSampleRate_Real<sizeof(DTS_HD_MaximumSampleRate)/sizeof(*DTS_HD_MaximumSampleRate))
     {
         Data[SamplingRate].push_back(Ztring::ToZtring(DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]));
         Data[SamplesPerFrame].push_back(Ztring::ToZtring(HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate_Real])));
     }
-    else if (HD_MaximumSampleRate!=(int8u)-1)
+    else if (HD_MaximumSampleRate<sizeof(DTS_HD_MaximumSampleRate)/sizeof(*DTS_HD_MaximumSampleRate))
     {
         Data[SamplingRate].push_back(Ztring::ToZtring(DTS_HD_MaximumSampleRate[HD_MaximumSampleRate]));
         Data[SamplesPerFrame].push_back(Ztring::ToZtring(HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate])));
@@ -730,8 +1442,8 @@ void File_Dts::Streams_Fill_Core(bool With96k)
         Data[ChannelPositions2].push_back(Ztring(__T("User Defined"))+(Core_Core_LFF?__T(".1"):__T(".0")));
         Data[ChannelLayout].push_back(Ztring(__T("User Defined"))+(Core_Core_LFF?__T(" LFE"):__T("")));
     }
-    Data[BitDepth].push_back(Ztring::ToZtring(DTS_Resolution[bits_per_sample]));
-    Data[SamplingRate].push_back(Ztring::ToZtring(DTS_SamplingRate[sample_frequency]*(1+With96k)));
+    Data[BitDepth].push_back(bits_per_sample<sizeof(DTS_Resolution)?Ztring::ToZtring(DTS_Resolution[bits_per_sample]):Ztring());
+    Data[SamplingRate].push_back(sample_frequency<sizeof(DTS_SamplingRate)/sizeof(*DTS_SamplingRate)?Ztring::ToZtring(DTS_SamplingRate[sample_frequency]*(1+With96k)):Ztring());
     Data[SamplesPerFrame].push_back(Ztring::ToZtring(Number_Of_PCM_Sample_Blocks*32*(1+With96k)));
     Data[BitRate].push_back(Core_BitRate);
     Data[BitRate_Mode].push_back(__T("CBR"));
@@ -745,15 +1457,20 @@ void File_Dts::Streams_Fill()
 
     Stream_Prepare(Stream_Audio);
     Fill(Stream_Audio, 0, Audio_Format, "DTS");
+    Ztring DtsXBedChannelConfiguration;
+    Ztring DtsXBedChannelPositions;
+    Ztring DtsXBedChannelPositions2;
+    size_t DtsXBedChannelCount=0;
 
     // IMAX DTS:X
     if (Presence[presence_Extended_IMAX])
     {
         Data[Profiles].push_back(__T("IMAX"));
         Streams_Fill_Extension();
-        Data[ChannelPositions].back()+=__T(", Objects");
-        Data[ChannelPositions2].back()+=__T(".?");
-        Data[ChannelLayout].back()+=__T(" Objects");
+        if (DtsXObjectCount)
+        {
+            Data[NumberOfDynamicObjects]=Ztring::ToZtring(DtsXObjectCount);
+        }
         Data[BitRate].pop_back();
         Data[BitRate_Mode].pop_back();
         Data[BitRate].push_back(__T("Unknown"));
@@ -770,9 +1487,36 @@ void File_Dts::Streams_Fill()
     {
         Data[Profiles].push_back(__T("X"));
         Streams_Fill_Extension();
-        Data[ChannelPositions].back()+=__T(", Objects");
-        Data[ChannelPositions2].back()+=__T(".?");
-        Data[ChannelLayout].back()+=__T(" Objects");
+        if (DtsXSupplementalChannelCount && !Data[ChannelLayout].back().empty() && !Data[Channels].back().empty())
+        {
+            DtsXBedChannelConfiguration=Data[ChannelLayout].back()+__T(" Tfl Tfr Tbl Tbr");
+            if (!Data[ChannelPositions].back().empty())
+            {
+                DtsXBedChannelPositions=Data[ChannelPositions].back();
+                Ztring Heights=__T(", TopFront: L R, TopRear: L R");
+                size_t LfePos=DtsXBedChannelPositions.find(__T(", LFE"));
+                if (LfePos==string::npos)
+                    DtsXBedChannelPositions+=Heights;
+                else
+                    DtsXBedChannelPositions.insert(LfePos, Heights);
+            }
+            if (!Data[ChannelPositions2].back().empty())
+                DtsXBedChannelPositions2=Data[ChannelPositions2].back()+__T(".4");
+            DtsXBedChannelCount=Data[Channels].back().To_int64u()+DtsXSupplementalChannelCount;
+
+            for (int8u pos = 0; pos < (Presence[presence_Extended_IMAX] ? 2 : 1); ++pos) {
+                Data[Channels].Write(Ztring::ToZtring(DtsXBedChannelCount, 10), pos);
+                Data[ChannelLayout].Write(DtsXBedChannelConfiguration, pos);
+                if (!DtsXBedChannelPositions.empty())
+                    Data[ChannelPositions].Write(DtsXBedChannelPositions, pos);
+                if (!DtsXBedChannelPositions2.empty())
+                    Data[ChannelPositions2].Write(DtsXBedChannelPositions2, pos);
+            }
+        }
+        if (DtsXObjectCount)
+        {
+            Data[NumberOfDynamicObjects]=Ztring::ToZtring(DtsXObjectCount);
+        }
         Data[BitRate].pop_back();
         Data[BitRate_Mode].pop_back();
         Data[BitRate].push_back(__T("Unknown"));
@@ -900,6 +1644,7 @@ void File_Dts::Streams_Fill()
     Fill(Stream_Audio, 0, Audio_BitRate_Mode, LegacyStreamDisplay?Data[BitRate_Mode].Read():Data[BitRate_Mode].Read(0), true);
     Fill(Stream_General, 0, General_OverallBitRate_Mode, Retrieve(Stream_Audio, 0, Audio_BitRate_Mode));
     Fill(Stream_Audio, 0, Audio_Compression_Mode, LegacyStreamDisplay?Data[Compression_Mode].Read():Data[Compression_Mode].Read(0), true);
+    Fill(Stream_Audio, 0, "NumberOfDynamicObjects", LegacyStreamDisplay?Data[NumberOfDynamicObjects].Read():Data[NumberOfDynamicObjects].Read(0), true);
 
     // Cleanup up
     for (size_t Pos=0; Pos<10; ++Pos)
@@ -930,7 +1675,7 @@ void File_Dts::Streams_Finish()
 bool File_Dts_Common::FileHeader_Begin()
 {
     //Must have enough buffer for having header
-    if (Buffer_Size<4)
+    if (Buffer_Size<12)
         return false; //Must wait for more data
 
     //False positives detection: Detect WAV files, the parser can't detect it easily, there is only 70 bytes of beginning for saying WAV
@@ -1143,7 +1888,18 @@ bool File_Dts_Common::Header_Begin()
         for (int i=0; i<8; i++)
             ToShow.append(1, (ZenLib::Char)((Name>>(56-i*8)))&0xFF);
         Element_Name(ToShow);
+        if (Element_Offset>Element_Size || Size>Element_Size-Element_Offset
+         || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+         || Size>Buffer_Size-Buffer_Offset-Element_Offset)
+        {
+            Trusted_IsNot("Invalid footer size");
+            Element_End0();
+            Element_End0();
+            return false;
+        }
         auto End=Element_Offset+Size;
+        auto Element_Size_Save=Element_Size;
+        Element_Size=End;
         switch (Name)
         {
             case CHUNK_BUILDVER:
@@ -1185,7 +1941,9 @@ bool File_Dts_Common::Header_Begin()
                 break;
             }
         }
-        Skip_XX(End-Element_Offset,                             End-Element_Offset<=3?"Dword_Align":"(Unknown)");
+        if (Element_Offset<End)
+            Skip_XX(End-Element_Offset,                         End-Element_Offset<=3?"Dword_Align":"(Unknown)");
+        Element_Size=Element_Size_Save;
         Element_Offset=End;
         Element_End0();
     }
@@ -1355,10 +2113,41 @@ void File_Dts::Data_Parse()
     }
 
     //Parsing
+    if (!Presence[presence_Extended_X] || !DtsXSupplementalChannelCount)
+    {
+        int8u BufferedDtsXObjectCount=0;
+        int8u BufferedDtsXSupplementalChannelCount=0;
+        size_t DtsXProbeSize=Buffer_Size-Buffer_Offset;
+        if (DtsXProbeSize>Element_Size)
+            DtsXProbeSize=(size_t)Element_Size;
+        if (DtsXProbeSize>0x10000)
+            DtsXProbeSize=0x10000;
+        if (DtsX_ExtensionProbe(Buffer+Buffer_Offset, DtsXProbeSize, BufferedDtsXObjectCount, BufferedDtsXSupplementalChannelCount))
+        {
+            Presence.set(presence_Extended_X);
+            DtsXObjectCount=max(DtsXObjectCount, BufferedDtsXObjectCount);
+            DtsXSupplementalChannelCount=max(DtsXSupplementalChannelCount, BufferedDtsXSupplementalChannelCount);
+        }
+    }
+
     int32u Sync;
     Peek_B4 (Sync);
     if (Sync==0x64582025)
     {
+        if (Presence[presence_Extended_X] || !DtsXObjectCountProbeDone)
+        {
+            int8u FrameDtsXSupplementalChannelCount=0;
+            int8u FrameDtsXObjectCount=DtsX_ObjectCount(Buffer+Buffer_Offset, Element_Size, FrameDtsXSupplementalChannelCount);
+            if (FrameDtsXObjectCount || FrameDtsXSupplementalChannelCount)
+            {
+                DtsXObjectCount=max(DtsXObjectCount, FrameDtsXObjectCount);
+                DtsXSupplementalChannelCount=max(DtsXSupplementalChannelCount, FrameDtsXSupplementalChannelCount);
+                Presence.set(presence_Extended_X);
+            }
+            if (!Presence[presence_Extended_X])
+                DtsXObjectCountProbeDone=true;
+        }
+
         //HD
         Element_Name("HD");
         Element_Info1(Ztring::ToZtring(Frame_Count-(Core_Exists?1:0)));
@@ -1379,13 +2168,15 @@ void File_Dts::Data_Parse()
         if (ExtSSHeaderSize<4)
         {
             Element_End0();
+            BS_End();
             return;
         }
-        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ExtSSHeaderSize-4);
+        auto CRC=CRC_Compute(ExtSSHeaderSize-4);
         if (CRC)
         {
             Element_Info1("CRC NOK");
             Element_End0();
+            BS_End();
             return;
         }
         Param_Info2(ExtSSHeaderSize+1, " bytes");
@@ -1415,7 +2206,7 @@ void File_Dts::Data_Parse()
                 Get_S1 (2, Bits4MixOutMask,                     "Bits4MixOutMask"); Bits4MixOutMask=4+Bits4MixOutMask*4; Param_Info2(Bits4MixOutMask, " bits");
                 Get_S1 (2, NumMixOutConfigs,                    "NumMixOutConfigs"); NumMixOutConfigs++; Param_Info2(NumMixOutConfigs, " configs");
                 for (int8u Pos=0; Pos<NumMixOutConfigs; Pos++)
-                    Skip_S1(Bits4MixOutMask,                    "NumMixOutCh");
+                    Skip_S2(Bits4MixOutMask,                    "NumMixOutCh");
             TEST_SB_END();
         TESTELSE_SB_ELSE("Static fields present");
             NumAudioPresent=1;
@@ -1692,6 +2483,8 @@ void File_Dts::Extensions()
                 default:
                     Extensions_Resynch(false);
             }
+            if (Element_Offset>Element_Size)
+                Element_Offset=Element_Size; //Prevent unsigned underflow in loop condition if handler left offset past asset boundary
             Element_End0();
         }
         Element_Size=Element_Size_Save;
@@ -1798,8 +2591,25 @@ void File_Dts::Extensions_Resynch(bool Known)
 }
 
 //---------------------------------------------------------------------------
+int16u File_Dts::CRC_Compute(size_t Size)
+{
+    if (Element_Offset>Element_Size || Size>Element_Size-Element_Offset
+     || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+     || Size>Buffer_Size-Buffer_Offset-Element_Offset)
+        return 1; //Invalid range
+
+    return Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+(size_t)Element_Offset, Size);
+}
+
+//---------------------------------------------------------------------------
 void File_Dts::Extensions_Padding()
 {
+    if (Element_Offset>Element_Size || Buffer_Offset>Buffer_Size
+     || Element_Size>Buffer_Size-Buffer_Offset)
+    {
+        Trusted_IsNot("Invalid padding range");
+        return;
+    }
     auto Begin=Buffer+Buffer_Offset+(size_t)Element_Offset;
     auto Current=Begin;
     auto Size=Element_Size-Element_Offset;
@@ -1821,8 +2631,7 @@ void File_Dts::Extensions_Padding()
         Current+=PaddingBytes;
     }
     
-    auto End=decltype(Begin)((((size_t)Current+Size)>>2)<<2);
-    while (Current<End)
+    while (Size-(Current-Begin)>=4)
     {
         if (BigEndian2int32u(Current))
             break;
@@ -1855,7 +2664,7 @@ void File_Dts::X96()
         int8u HeaderSize=Begin>>2;
         if (HeaderSize<=3)
             return;
-        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+        auto CRC=CRC_Compute(HeaderSize-3);
         if (CRC)
         {
             Element_Info1("CRC NOK");
@@ -1914,7 +2723,7 @@ void File_Dts::XLL()
     int8u HeaderSize=Begin>>4;
     if (HeaderSize<8)
         return;
-    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    auto CRC=CRC_Compute(HeaderSize-3);
     if (CRC)
     {
         Element_Info1("CRC NOK");
@@ -1946,6 +2755,13 @@ void File_Dts::XLL()
         return;
     }
     auto Element_Size_Save=Element_Size;
+    if (Element_Offset_Start-3+LLFrameSize>Element_Size_Save)
+    {
+        BS_End();
+        Element_End0();
+        Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
+        return;
+    }
     Element_Size=Element_Offset_Start-3+LLFrameSize;
     Get_S1 (4, NumChSetsInFrame,                                "NumChSetsInFrame");
     NumChSetsInFrame++; Param_Info1(NumChSetsInFrame);
@@ -1975,7 +2791,7 @@ void File_Dts::XLL()
         int16u Begin;
         Peek_B2(Begin);
         int8u ChSetHeaderSize=Begin>>6;
-        auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, ChSetHeaderSize+1);
+        auto CRC=CRC_Compute(ChSetHeaderSize+1);
         if (CRC)
         {
             Skip_XX(Element_Size-Element_Offset,                "(Unknown)");
@@ -2030,14 +2846,25 @@ void File_Dts::XLL()
         Element_End0();
     }
     size_t Count=(1<<SegmentsInFrame)*NumChSetsInFrame;
-    if (DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]>DTS_SamplingRate[sample_frequency])
+    if (Presence[presence_Core_Core]
+     && sample_frequency<sizeof(DTS_SamplingRate)/sizeof(*DTS_SamplingRate)
+     && HD_MaximumSampleRate_Real<sizeof(DTS_HD_MaximumSampleRate)/sizeof(*DTS_HD_MaximumSampleRate)
+     && DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]>DTS_SamplingRate[sample_frequency])
     {
         Count*=2;
         if (DTS_HD_MaximumSampleRate[HD_MaximumSampleRate_Real]>DTS_SamplingRate[sample_frequency]*2)
             Count*=2;
     }
     size_t NaviByteCount=(Count*Bits4SSize+7)/8+2;
-    CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, NaviByteCount);
+    if (Element_Offset>Element_Size || NaviByteCount>Element_Size-Element_Offset
+     || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+     || NaviByteCount>Buffer_Size-Buffer_Offset-(size_t)Element_Offset)
+    {
+        Trusted_IsNot("Invalid navigation size");
+        Element_Size=Element_Size_Save;
+        return;
+    }
+    CRC=CRC_Compute(NaviByteCount);
     if (CRC)
     {
         auto Buffer_Temp=Buffer+Buffer_Offset+Element_Offset+NaviByteCount;
@@ -2059,7 +2886,7 @@ void File_Dts::XLL()
         Element_Size=Element_Size_Save;
         return;
     }
-    CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, SegmentSize_Size);
+    CRC=CRC_Compute(SegmentSize_Size);
     if (CRC)
     {
         Skip_XX(Element_Size-Element_Offset,                    "(Unknown)");
@@ -2107,7 +2934,7 @@ void File_Dts::XXCH()
     int8u HeaderSize=Begin>>2;
     if (HeaderSize<8)
         return;
-    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    auto CRC=CRC_Compute(HeaderSize-3);
     if (CRC)
     {
         Element_Info1("CRC NOK");
@@ -2122,7 +2949,7 @@ void File_Dts::XXCH()
     // Parsing
     Element_Begin1("Header");
     vector<int16u> ChSetFsizeXXCHs;
-    int16u CoreSpkrActivityMask;
+    int32u CoreSpkrActivityMask;
     int8u Bits4SpkrMaskXXCH, NumChSetsInXXCH;
     bool bCRCPresent4ChSetHeaderXXCH;
     auto Element_Offset_Start=Element_Offset;
@@ -2146,7 +2973,7 @@ void File_Dts::XXCH()
         }
         ChSetFsizeXXCHs.push_back(ChSetFsizeXXCH);
     }
-    Get_S2 (Bits4SpkrMaskXXCH, CoreSpkrActivityMask,            "CoreSpkrActivityMask");
+    Get_S4 (Bits4SpkrMaskXXCH, CoreSpkrActivityMask,            "CoreSpkrActivityMask");
     auto RemainingBits=(HeaderSize-5)*8-(EndBS-Data_BS_Remain());
     if (RemainingBits)
     {
@@ -2173,7 +3000,7 @@ void File_Dts::XXCH()
         int8u XXCHChSetHeaderSize=Begin>>1;
         if (bCRCPresent4ChSetHeaderXXCH)
         {
-            auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, XXCHChSetHeaderSize+1);
+            auto CRC=CRC_Compute(XXCHChSetHeaderSize+1);
             if (CRC)
             {
                 Skip_XX(Element_Size-Element_Offset,            "(Unknown)");
@@ -2246,7 +3073,7 @@ void File_Dts::XBR()
     int8u HeaderSize=Begin>>2;
     if (HeaderSize<8)
         return;
-    auto CRC=Dts_CRC_CCIT_Compute(Buffer+Buffer_Offset+Element_Offset, HeaderSize-3);
+    auto CRC=CRC_Compute(HeaderSize-3);
     if (CRC)
     {
         Element_Info1("CRC NOK");
@@ -2317,6 +3144,8 @@ void File_Dts::Extensions2()
     {
         case 0x02000850:
         case 0xF14000D1:
+        case 0xF14000D2:
+        case 0xF14000D3:
         case 0xF14000D4:
             Element_Name("X?");
             Presence.set(presence_Extended_X);
@@ -2345,11 +3174,11 @@ float64 File_Dts::BitRate_Get(bool WithHD)
         float64 BitRate;
         if (Presence[presence_Extended_LBR])
             BitRate=0; //No core bitrate
-        else if (DTS_SamplingRate[sample_frequency])
+        else if (sample_frequency<sizeof(DTS_SamplingRate)/sizeof(*DTS_SamplingRate) && DTS_SamplingRate[sample_frequency] && Number_Of_PCM_Sample_Blocks)
             BitRate=((float64)Primary_Frame_Byte_Size)*8/(Number_Of_PCM_Sample_Blocks*32)*DTS_SamplingRate[sample_frequency]; //(float64)DTS_BitRate[bit_rate];
         else
             BitRate=0; //Problem
-        if (WithHD && HD_ExSSFrameDurationCode!=(int8u)-1)
+        if (WithHD && HD_ExSSFrameDurationCode && HD_ExSSFrameDurationCode!=(int8u)-1 && HD_MaximumSampleRate<sizeof(DTS_HD_MaximumSampleRate)/sizeof(*DTS_HD_MaximumSampleRate))
         {
             int32u SamplesPerFrame_Temp=HD_ExSSFrameDurationCode<<(7+DTS_HD_SamplePerFrames_Factor[HD_MaximumSampleRate]);
             BitRate+=((float64)HD_size)*8*DTS_HD_MaximumSampleRate[HD_MaximumSampleRate]/SamplesPerFrame_Temp;
@@ -2450,7 +3279,7 @@ bool File_Dts::FrameSynchPoint_Test()
             //Preparing new buffer
             if (Word)
             {
-                int8u* Buffer_Little=new int8u[Size];
+                int8u* Buffer_Little=new int8u[Size](); //Initialized in case of incomplete words
                 for (size_t Pos=0; Pos+1<Size; Pos+=2)
                 {
                     Buffer_Little[Pos+1]=Save_Buffer[Buffer_Offset+Pos  ];
@@ -2462,7 +3291,7 @@ bool File_Dts::FrameSynchPoint_Test()
             }
             else
             {
-                int8u* Dest=new int8u[Size];
+                int8u* Dest=new int8u[Size](); //Initialized in case of incomplete words
                 for (size_t Pos=0; Pos+8<=Original_Size; Pos+=8)
                 {
                     int64u Value;

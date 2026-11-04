@@ -727,6 +727,13 @@ void File_Mpegh3da::mpegh3daConfig()
             usacSamplingFrequency=0;
     }
     Get_S1 (3, coreSbrFrameLengthIndex,                         "coreSbrFrameLengthIndex");
+    if (coreSbrFrameLengthIndex>=coreSbrFrameLengthIndex_Mapping_Size)
+    {
+        Trusted_IsNot("Invalid frame length index");
+        BS_End();
+        Element_End0();
+        return;
+    }
     Skip_SB(                                                    "cfg_reserved");
     Skip_SB(                                                    "receiverDelayCompensation");
     SpeakerConfig3d(referenceLayout);
@@ -760,6 +767,7 @@ void File_Mpegh3da::SpeakerConfig3d(speaker_layout& Layout)
         int32u numSpeakers;
         escapedValue(numSpeakers, 5, 8, 16,                     "numSpeakers");
         numSpeakers++;
+        Loop_CheckValue_BS(numSpeakers, speakerLayoutType==1?7:1, "numSpeakers");
         Layout.numSpeakers=numSpeakers;
 
         if (speakerLayoutType==1)
@@ -975,6 +983,7 @@ void File_Mpegh3da::mpegh3daDecoderConfig()
     bool elementLengthPresent;
     Get_SB (elementLengthPresent,                               "elementLengthPresent");
 
+    Loop_CheckValue_BS(numElements, 2, "numElements");
     for (size_t Pos=0; Pos<numElements; Pos++)
     {
         Element_Begin1("Element");

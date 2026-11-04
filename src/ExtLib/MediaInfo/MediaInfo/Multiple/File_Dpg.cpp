@@ -67,7 +67,7 @@ File_Dpg::~File_Dpg()
 bool File_Dpg::FileHeader_Begin()
 {
     //Element_Size
-    if (Buffer_Size<0x14)
+    if (Buffer_Size<0x24)
         return false; //Must wait for more data
 
     if (                CC4(Buffer     )!=0x44504730    //"DPG0"
@@ -95,6 +95,15 @@ void File_Dpg::FileHeader_Parse()
     Get_L4 (Audio_Size,                                         "Audio Size");
     Get_L4 (Video_Offset,                                       "Video Offset");
     Get_L4 (Video_Size,                                         "Video Size");
+    if (!Trusted_Get() || Element_IsWaitingForMoreData()
+     || (Audio_Size && Audio_Offset<Element_Offset)
+     || (Video_Size && Video_Offset<Element_Offset)
+     || (File_Size!=(int64u)-1 && ((int64u)Audio_Offset+Audio_Size>File_Size
+                              || (int64u)Video_Offset+Video_Size>File_Size)))
+    {
+        Reject("DPG");
+        return;
+    }
 
     FILLING_BEGIN();
         Accept("DPG");
@@ -147,7 +156,14 @@ void File_Dpg::Read_Buffer_Continue()
         if (Audio_Size)
         {
             #if defined(MEDIAINFO_MPEGA_YES)
-                Open_Buffer_Continue(Parser, (size_t)((File_Offset+Buffer_Size<Audio_Offset+Audio_Size)?Buffer_Size:(Audio_Offset+Audio_Size-File_Offset)));
+                int64u End=(int64u)Audio_Offset+Audio_Size;
+                int64u Current=File_Offset+Buffer_Offset;
+                if (Current<Audio_Offset || Current>End || Buffer_Offset>Buffer_Size)
+                {
+                    Trusted_IsNot("Invalid audio range");
+                    return;
+                }
+                Open_Buffer_Continue(Parser, (size_t)std::min((int64u)(Buffer_Size-Buffer_Offset), End-Current));
                 if (Parser->Status[IsAccepted])
                 {
                     Parser->Open_Buffer_Unsynch();
@@ -167,7 +183,14 @@ void File_Dpg::Read_Buffer_Continue()
         else
         {
             #if defined(MEDIAINFO_MPEGV_YES)
-                Open_Buffer_Continue(Parser, (size_t)((File_Offset+Buffer_Size<Video_Offset+Video_Size)?Buffer_Size:(Video_Offset+Video_Size-File_Offset)));
+                int64u End=(int64u)Video_Offset+Video_Size;
+                int64u Current=File_Offset+Buffer_Offset;
+                if (Current<Video_Offset || Current>End || Buffer_Offset>Buffer_Size)
+                {
+                    Trusted_IsNot("Invalid video range");
+                    return;
+                }
+                Open_Buffer_Continue(Parser, (size_t)std::min((int64u)(Buffer_Size-Buffer_Offset), End-Current));
                 if (Parser->Status[IsAccepted])
                 {
                     //Merging

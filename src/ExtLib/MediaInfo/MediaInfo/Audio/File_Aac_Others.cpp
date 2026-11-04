@@ -384,7 +384,8 @@ void File_Aac::ALSSpecificConfig()
     if (chan_sort)
     {
         int16u ChBits=(int16u)ceil(log((double)(channels+1))/log((double)2));
-        for (int8u c=0; c<=channels; c++)
+        Loop_CheckValue_BS(channels, ChBits, "channels");
+        for (int32u c=0; c<=channels; c++)
             Skip_BS(ChBits,                                     "chan_pos[c]");
     }
     if(Data_BS_Remain()%8)
@@ -393,6 +394,16 @@ void File_Aac::ALSSpecificConfig()
     int32u header_size,trailer_size;
     Get_B4(header_size,                                         "header_size");
     Get_B4(trailer_size,                                        "trailer_size");
+    if (!Trusted_Get() || Element_IsWaitingForMoreData()
+     || Element_Offset>Element_Size || header_size>Element_Size-Element_Offset
+     || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+     || header_size>Buffer_Size-Buffer_Offset-Element_Offset)
+    {
+        Trusted_IsNot("Invalid original header size");
+        Element_End0();
+        BS_Begin();
+        return;
+    }
     #ifdef MEDIAINFO_RIFF_YES
     if (file_type==1) //WAVE file
     {
@@ -412,8 +423,12 @@ void File_Aac::ALSSpecificConfig()
     if (crc_enabled)
         Skip_B4(                                                "crc");
     if ((ra_flag == 2) && (random_access > 0))
-        for (int32u f=0; f<((samples-1)/(frame_length+1))+1; f++)
+    {
+        int32u ra_unit_size_Count=((samples-1)/(frame_length+1))+1;
+        Loop_CheckValue(ra_unit_size_Count, 4, "ra_unit_size");
+        for (int32u f=0; f<ra_unit_size_Count; f++)
             Skip_B4(                                            "ra_unit_size[f]");
+    }
     if (aux_data_enabled)
     {
         int32u aux_size;

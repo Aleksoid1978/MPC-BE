@@ -130,66 +130,51 @@ void File_Teletext::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_Teletext::Synchronize()
 {
+    static const int8u Sync_Pattern[3] = { 0x55, 0x55, 0x27 };
+
     //Synchronizing
-    while (Buffer_Offset+3<=Buffer_Size)
+    while (Buffer_Size - Buffer_Offset >= 3)
     {
-        while (Buffer_Offset+3<=Buffer_Size)
+        const size_t Candidate_End = Buffer_Size - 2;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Buffer_Offset, Sync_Pattern[0], Candidate_End - Buffer_Offset);
+        if (!Sync)
         {
-            if (Buffer[Buffer_Offset  ]==0x55
-             && Buffer[Buffer_Offset+1]==0x55
-             && Buffer[Buffer_Offset+2]==0x27)
-                break; //while()
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer);
 
-            Buffer_Offset++;
+        if (!memcmp(Sync + 1, Sync_Pattern + 1, 2))
+        {
+            //For the moment, we accept only if the file is in sync, the test is not strict enough
+            if (Buffer_Offset)
+            {
+                Reject();
+                return false;
+            }
+
+            //Synched is OK
+            return true;
         }
 
-        if (Buffer_Offset+3<=Buffer_Size) //Testing if size is coherant
-        {
-            if (Buffer_Offset+45==Buffer_Size)
-                break;
-
-            if (Buffer_Offset+45+3>Buffer_Size)
-                return false; //Wait for more data
-
-            if (Buffer[Buffer_Offset  ]==0x55
-             && Buffer[Buffer_Offset+1]==0x55
-             && Buffer[Buffer_Offset+2]==0x27)
-                break; //while()
-
-            Buffer_Offset++;
-        }
+        Buffer_Offset++;
     }
 
-    //Must have enough buffer for having header
-    if (Buffer_Offset+3>=Buffer_Size)
-        return false;
-
-    //Synched is OK
-    if (!Status[IsAccepted])
-    {
-        //For the moment, we accept only if the file is in sync, the test is not strict enough
-        if (Buffer_Offset)
-        {
-            Reject();
-            return false;
-        }
-
-        Accept();
-    }
-    return true;
+    //Parsing last bytes if needed
+    while (Buffer_Offset < Buffer_Size && memcmp(Buffer + Buffer_Offset, Sync_Pattern, Buffer_Size - Buffer_Offset))
+        Buffer_Offset++;
+    return false;
 }
 
 //---------------------------------------------------------------------------
 bool File_Teletext::Synched_Test()
 {
     //Must have enough buffer for having header
-    if (Buffer_Offset+3>Buffer_Size)
+    if (Buffer_Size-Buffer_Offset<3)
         return false;
 
     //Quick test of synchro
-    if (Buffer[Buffer_Offset  ]!=0x55
-     || Buffer[Buffer_Offset+1]!=0x55
-     || Buffer[Buffer_Offset+2]!=0x27)
+    if (BigEndian2int24u(Buffer+Buffer_Offset)!=0x555527)
     {
         Synched=false;
         return true;
@@ -202,6 +187,7 @@ bool File_Teletext::Synched_Test()
 //---------------------------------------------------------------------------
 void File_Teletext::Synched_Init()
 {
+    Accept();
 }
 
 //***************************************************************************
@@ -252,6 +238,13 @@ void File_Teletext::Read_Buffer_Continue()
                 int8u data_unit_id, data_unit_length;
                 Get_B1 (data_unit_id,                           "data_unit_id");
                 Get_B1 (data_unit_length,                       "data_unit_length");
+                if (!Element_IsOK() || Element_Offset>Element_Size || data_unit_length>Element_Size-Element_Offset
+                 || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+                 || data_unit_length>Buffer_Size-Buffer_Offset-(size_t)Element_Offset)
+                {
+                    Trusted_IsNot("Truncated teletext unit");
+                    return;
+                }
                 if (data_unit_length)
                 {
                 Skip_B1(                                        "field/line");

@@ -454,22 +454,14 @@ void File_Pcm::Data_Parse()
     {
         size_t Mask=0;
         const int8u* Current=Buffer+Buffer_Offset;
-        const size_t* Current8=(const size_t*)(((size_t)Current)&(~(sizeof(size_t)-1)));
-        if ((int8u*)Current8!=Current)
-            Current8++;
         auto End=Buffer+Buffer_Offset+(size_t)Element_Size;
-        const size_t* End8=(const size_t*)(((size_t)End)&(~(sizeof(size_t)-1)));
-        while (Current<(int8u*)Current8)
+        while ((size_t)(End-Current)>=sizeof(size_t))
         {
-            Mask|=*Current;
-            Current++;
+            size_t Value;
+            memcpy(&Value, Current, sizeof(Value));
+            Mask|=Value;
+            Current+=sizeof(Value);
         }
-        while (Current8<End8)
-        {
-            Mask|=*Current8;
-            Current8++;
-        }
-        Current=(int8u*)Current8;
         while (Current<End)
         {
             Mask|=*Current;

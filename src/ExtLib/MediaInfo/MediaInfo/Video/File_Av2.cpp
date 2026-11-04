@@ -72,6 +72,9 @@ extern const char* Avc_video_full_range[];
 #define MAX_TILE_ROWS  64
 #define MAX_TILE_COLS  64
 
+#define MAX_REF_BV_STACK_SIZE 4
+#define MAX_REF_MV_STACK_SIZE 6
+
 //---------------------------------------------------------------------------
 static const char* Av2_obu_type(int8u obu_type)
 {
@@ -103,6 +106,53 @@ static const char* Av2_obu_type(int8u obu_type)
     case 24 : return "OBU_CONTENT_INTERPRETATION";
     case 25 : return "OBU_PADDING";
     default : return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Av2_seq_profile_idc(int8u seq_profile_idc)
+{
+    switch (seq_profile_idc)
+    {
+    case 0: return "Main_420_10_IP0";
+    case 1: return "Main_420_10_IP1";
+    case 2: return "Main_420_10_IP2";
+    case 3: return "Main_422_10_IP1";
+    case 4: return "Main_444_10_IP1";
+    case 31: return "Configurable";
+    default: return "";
+    }
+}
+
+//---------------------------------------------------------------------------
+static const char* Av2_seq_level_idx(int8u seq_level_idx)
+{
+    switch (seq_level_idx)
+    {
+    case 0:  return "2.0";
+    case 1:  return "2.1";
+    case 2:  return "3.0";
+    case 3:  return "3.1";
+    case 4:  return "4.0";
+    case 5:  return "4.1";
+    case 6:  return "5.0";
+    case 7:  return "5.1";
+    case 8:  return "5.2";
+    case 9:  return "5.3";
+    case 10: return "6.0";
+    case 11: return "6.1";
+    case 12: return "6.2";
+    case 13: return "6.3";
+    case 14: return "7.0";
+    case 15: return "7.1";
+    case 16: return "7.2";
+    case 17: return "7.3";
+    case 18: return "8.0";
+    case 19: return "8.1";
+    case 20: return "8.2";
+    case 21: return "8.3";
+    case 31: return "Maximum parameters";
+    default: return "";
     }
 }
 
@@ -222,7 +272,62 @@ void File_Av2::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Av2::Streams_Finish()
 {
-    
+    //Merge info about different HDR formats
+    auto HDR_Format = HDR.find(Video_HDR_Format);
+    if (HDR_Format != HDR.end())
+    {
+        std::bitset<HdrFormat_Max> HDR_Present;
+        size_t HDR_FirstFormatPos = (size_t)-1;
+        for (size_t i = 0; i < HdrFormat_Max; ++i)
+            if (!HDR_Format->second[i].empty())
+            {
+                if (HDR_FirstFormatPos == (size_t)-1)
+                    HDR_FirstFormatPos = i;
+                HDR_Present[i] = true;
+            }
+        bool LegacyStreamDisplay = MediaInfoLib::Config.LegacyStreamDisplay_Get();
+        for (const auto& HDR_Item : HDR)
+        {
+            size_t i = HDR_FirstFormatPos;
+            size_t HDR_FirstFieldNonEmpty = (size_t)-1;
+            if (HDR_Item.first > Video_HDR_Format_Compatibility)
+            {
+                for (; i < HdrFormat_Max; ++i)
+                {
+                    if (!HDR_Present[i])
+                        continue;
+                    if (HDR_FirstFieldNonEmpty == (size_t)-1 && !HDR_Item.second[i].empty())
+                        HDR_FirstFieldNonEmpty = i;
+                    if (!HDR_Item.second[i].empty() && HDR_FirstFieldNonEmpty < HdrFormat_Max && HDR_Item.second[i] != HDR_Item.second[HDR_FirstFieldNonEmpty])
+                        break;
+                }
+            }
+            if (i == HdrFormat_Max && HDR_FirstFieldNonEmpty != (size_t)-1)
+                Fill(Stream_Video, 0, HDR_Item.first, HDR_Item.second[HDR_FirstFieldNonEmpty]);
+            else
+            {
+                ZtringList Value;
+                Value.Separator_Set(0, __T(" / "));
+                if (i != HdrFormat_Max)
+                    for (i = HDR_FirstFormatPos; i < HdrFormat_Max; ++i)
+                    {
+                        if (!LegacyStreamDisplay && HDR_FirstFormatPos != HdrFormat_SmpteSt2086 && i >= HdrFormat_SmpteSt2086)
+                            break;
+                        if (!HDR_Present[i])
+                            continue;
+                        Value.push_back(HDR_Item.second[i]);
+                    }
+                auto Value_Flat = Value.Read();
+                if (!Value.empty() && Value_Flat.size() > (Value.size() - 1) * 3)
+                    Fill(Stream_Video, 0, HDR_Item.first, Value.Read());
+            }
+        }
+    }
+
+    if (!maximum_content_light_level.empty())
+        Fill(Stream_Video, 0, Video_MaxCLL, maximum_content_light_level);
+    if (!maximum_frame_average_light_level.empty())
+        Fill(Stream_Video, 0, Video_MaxFALL, maximum_frame_average_light_level);
 }
 
 //***************************************************************************
@@ -308,7 +413,7 @@ void File_Av2::Data_Parse()
 {
     //Probing mode in case of raw stream //TODO: better reject of bad files
     if (!IsSub && !Status[IsAccepted]
-        && !sequence_header_Parsed && Element_Code != 1)
+        && !sequence_header_Parsed && Element_Code != 1 && Element_Code != 2)
     {
         Reject();
         return;
@@ -319,7 +424,7 @@ void File_Av2::Data_Parse()
     {
     case  1: sequence_header_obu(); break;
     case  2: temporal_delimiter_obu(); break;
-    case 20: multi_stream_decoder_operation_obu(); break;
+    case 20: multistream_decoder_operation_obu(); break;
     case  3: multi_frame_header_obu(); break;
     case 11:
     case 12:
@@ -333,7 +438,7 @@ void File_Av2::Data_Parse()
     case  4:
     case  5:
     case 10:
-    case 21: tile_group_obu(Element_Size); break;
+    case 21: tile_group_obu(); break;
     case 16: layer_config_record_obu(); break;
     case 17: atlas_segment_info_obu(); break;
     case 18: operating_point_set_obu(); break;
@@ -402,26 +507,46 @@ void File_Av2::sequence_header_obu()
 
     Element_Begin1("sequence_header_obu");
     Skip_uvlc(                                                  "seq_header_id");
-    Skip_S1(5,                                                  "seq_profile_idc");
-    TESTELSE_SB_GET(single_picture_header_flag,                 "single_picture_header_flag");
-        // seq_lcr_id = 0 	
-        // still_picture = 1
-    TESTELSE_SB_ELSE(                                           "single_picture_header_flag");
-        Skip_S1(3,                                              "seq_lcr_id");
-        Skip_SB(                                                "still_picture");
-    TESTELSE_SB_END();
-    int8u seq_level_idx;
-    Get_S1(5, seq_level_idx,                                    "seq_level_idx");
-    if (seq_level_idx > 7 && !single_picture_header_flag) {
-        Skip_SB(                                                "seq_tier");
+    int8u seq_profile_idc;
+    Get_S1(5, seq_profile_idc,                                  "seq_profile_idc"); Param_Info1(Av2_seq_profile_idc(seq_profile_idc));
+    Get_SB(single_picture_header_flag,                          "single_picture_header_flag");
+    Get_S1(5, seq_level_idx,                                    "seq_level_idx"); Param_Info1(Av2_seq_level_idx(seq_level_idx));
+    if (seq_level_idx > 3 && !single_picture_header_flag) {
+        Get_SB(seq_tier,                                        "seq_tier");
     }
     else {
-        // seq_tier = 0
+        seq_tier = 0;
+    }
+    int32u bit_depth_idc;
+    Get_uvlc(chroma_format_idc,                                 "chroma_format_idc"); Param_Info1(chroma_format_idc == 0 ? "4:2:0" : chroma_format_idc == 2 ? "4:4:4" : chroma_format_idc == 3 ? "4:2:2" : "");
+    Get_uvlc(bit_depth_idc,                                     "bit_depth_idc"); Param_Info2(bit_depth_idc == 0 ? "10" : (bit_depth_idc == 1 ? "8" : ""), " bits");
+    int8u max_tlayer_id, max_mlayer_id;
+    if (single_picture_header_flag) {
+        // seq_lcr_id = 0
+        // still_picture = 1
+        max_tlayer_id = 0;
+        max_mlayer_id = 0;
+        // SeqMaxMlayerCnt = 1
+        // monotonic_output_order_flag = 1
+    }
+    else {
+        Skip_S1(3,                                              "seq_lcr_id");
+        Skip_SB(                                                "still_picture");
+        Get_S1(2, max_tlayer_id,                                "max_tlayer_id");
+        Get_S1(3, max_mlayer_id,                                "max_mlayer_id");
+        if (max_mlayer_id > 0) {
+            auto n = CeilLog2(max_mlayer_id + 1);
+            Skip_S4(n,                                          "seq_max_mlayer_cnt_minus_1");
+            // SeqMaxMlayerCnt = seq_max_mlayer_cnt_minus_1 + 1
+        }
+        else {
+            // SeqMaxMlayerCnt = 1
+        }
+        Skip_SB(                                                "monotonic_output_order_flag");
     }
     int8u frame_width_bits_minus_1, frame_height_bits_minus_1;
     Get_S1(4, frame_width_bits_minus_1,                         "frame_width_bits_minus_1");
     Get_S1(4, frame_height_bits_minus_1,                        "frame_height_bits_minus_1 ");
-    int32u max_frame_width_minus_1, max_frame_height_minus_1;
     Get_S4(frame_width_bits_minus_1 + 1, max_frame_width_minus_1, "max_frame_width_minus_1");
     Get_S4(frame_height_bits_minus_1 + 1, max_frame_height_minus_1, "max_frame_height_minus_1");
     TESTELSE_SB_SKIP(                                           "seq_cropping_window_present_flag");
@@ -435,57 +560,34 @@ void File_Av2::sequence_header_obu()
         // seq_cropping_win_top_offset = 0
         // seq_cropping_win_bottom_offset = 0
     TESTELSE_SB_END();
-    Element_Begin1("color_config");
-        int32u bit_depth_idc;
-        Get_uvlc(chroma_format_idc,                             "chroma_format_idc"); Param_Info1(chroma_format_idc == 0 ? "4:2:0" : chroma_format_idc == 2 ? "4:4:4" : chroma_format_idc == 3 ? "4:2:2" : "");
-        Get_uvlc(bit_depth_idc,                                 "bit_depth_idc"); Param_Info2(bit_depth_idc == 0 ? 10 : (bit_depth_idc == 1 ? 8 : 12), " bits");
-        Monochrome = (chroma_format_idc == 1);
-    Element_End0();
-    int8u max_tlayer_id, max_mlayer_id;
     if (single_picture_header_flag) {
         // decoder_model_info_present_flag = 0
-        max_tlayer_id = 0;
-        max_mlayer_id = 0;
-        // seq_max_mlayer_cnt = 1
     }
     else {
-        TESTELSE_SB_SKIP(                                       "max_display_model_info_present_flag");
-            Skip_S1(4,                                          "max_initial_display_delay_minus_1");
-        TESTELSE_SB_ELSE(                                       "max_display_model_info_present_flag");
-            // max_initial_display_delay_minus_1 = BUFFER_POOL_MAX_SIZE - 1
-        TESTELSE_SB_END();
+        TEST_SB_SKIP(                                           "seq_initial_display_delay_present_flag");
+            Skip_S1(4,                                          "seq_initial_display_delay_minus_1");
+        TEST_SB_END();
         TEST_SB_SKIP(                                           "decoder_model_info_present_flag");
-            Element_Begin1("decoder_model_info");
-                Skip_S4(32,                                     "num_units_in_decoding_tick");
-            Element_End0();
-            TEST_SB_SKIP(                                       "max_display_model_info_present_flag");
-                Element_Begin1("operating_parameters_info");
-                Skip_uvlc(                                      "decoder_buffer_delay");
-                Skip_uvlc(                                      "encoder_buffer_delay");
-                Skip_SB(                                        "low_delay_mode_flag");
-                Element_End0();
+            Skip_S4(32,                                         "num_units_in_decoding_tick");
+            TEST_SB_SKIP(                                       "seq_decoder_model_info_present_flag");
+                seq_decoder_model_info();
             TEST_SB_END();
         TEST_SB_END();
-        Get_S1(2, max_tlayer_id,                                "max_tlayer_id");
-        Get_S1(3, max_mlayer_id,                                "max_mlayer_id");
-        if (max_mlayer_id > 0) {
-            Skip_S4(CeilLog2(max_mlayer_id + 1),                "seq_max_mlayer_cnt");
-        }
+    }
+    if (max_mlayer_id > 0) {
+        TEST_SB_SKIP(                                           "mlayer_dependency_present_flag");
+            for (int currLayer = 1; currLayer <= max_mlayer_id; ++currLayer) {
+                for (int refLayer = currLayer; refLayer >= 0; --refLayer) {
+                    Skip_SB(                                    "mlayer_dependency_map");
+                }
+            }
+        TEST_SB_END();
     }
     if (max_tlayer_id > 0) {
         TEST_SB_SKIP(                                           "tlayer_dependency_present_flag");
             for (int currLayer = 1; currLayer <= max_tlayer_id; ++currLayer) {
                 for (int refLayer = currLayer; refLayer >= 0; --refLayer) {
                     Skip_SB(                                    "tlayer_dependency_map");
-                }
-            }
-        TEST_SB_END();
-    }
-    if (max_mlayer_id > 0) {
-        TEST_SB_SKIP(                                           "mlayer_dependency_present_flag ");
-            for (int currLayer = 1; currLayer <= max_mlayer_id; ++currLayer) {
-                for (int refLayer = currLayer; refLayer >= 0; --refLayer) {
-                    Skip_SB(                                    "mlayer_dependency_map");
                 }
             }
         TEST_SB_END();
@@ -497,11 +599,7 @@ void File_Av2::sequence_header_obu()
     sequence_scc_config();
     sequence_transform_quant_entropy_config();
     sequence_filter_config();
-    TEST_SB_SKIP(                                               "seq_tile_info_present_flag ");
-        Skip_SB(                                                "allow_tile_info_change");
-        auto seqSbSize = get_seq_sb_size();
-        tile_params(max_frame_width_minus_1 + 1, max_frame_height_minus_1 + 1, seqSbSize, seqSbSize, false);
-    TEST_SB_END();
+    sequence_tile_config();
     bool film_grain_params_present;
     Get_SB(film_grain_params_present,                           "film_grain_params_present");
     Element_End0();
@@ -513,9 +611,13 @@ void File_Av2::sequence_header_obu()
     FILLING_BEGIN_PRECISE();
     if (!sequence_header_Parsed)
     {
+        std::string Video_Format_Profile_string = Av2_seq_profile_idc(seq_profile_idc);
+        Video_Format_Profile_string += '@';
+        Video_Format_Profile_string += Av2_seq_level_idx(seq_level_idx);
+        Fill(Stream_Video, 0, Video_Format_Profile, Video_Format_Profile_string);
         Fill(Stream_Video, 0, Video_Width, max_frame_width_minus_1 + 1);
         Fill(Stream_Video, 0, Video_Height, max_frame_height_minus_1 + 1);
-        Fill(Stream_Video, 0, Video_BitDepth, bit_depth_idc == 0 ? 10 : (bit_depth_idc == 1 ? 8 : 12));
+        Fill(Stream_Video, 0, Video_BitDepth, bit_depth_idc == 0 ? "10" : (bit_depth_idc == 1 ? "8" : ""));
         if (film_grain_params_present)
             Fill(Stream_Video, 0, Video_Format_Settings, "Film Grain Synthesis");
         if (max_mlayer_id > 0 || max_tlayer_id > 0)
@@ -524,6 +626,18 @@ void File_Av2::sequence_header_obu()
         sequence_header_Parsed = true;
     }
     FILLING_END();
+}
+
+//---------------------------------------------------------------------------
+void File_Av2::sequence_tile_config()
+{
+    Element_Begin1("sequence_tile_config");
+    TEST_SB_SKIP(                                               "seq_tile_info_present_flag ");
+        Skip_SB(                                                "allow_tile_info_change");
+        auto seqSbSize = get_seq_sb_size();
+        tile_params(max_frame_width_minus_1 + 1, max_frame_height_minus_1 + 1, seqSbSize, seqSbSize, false);
+    TEST_SB_END();
+    Element_End0();
 }
 
 //---------------------------------------------------------------------------
@@ -553,8 +667,8 @@ void File_Av2::sequence_partition_config()
         // enable_uneven_4way_partitions = 0
     TESTELSE_SB_END();
     TESTELSE_SB_SKIP(                                           "reduce_pb_aspect_ratio");
-        Skip_SB(                                                "max_pb_aspect_ratio_log2_minus1");
-        // MaxPbAspectRatio = 1 << (max_pb_aspect_ratio_log2_minus1 + 1)
+        Skip_SB(                                                "max_pb_aspect_ratio_log2_minus_1");
+        // MaxPbAspectRatio = 1 << (max_pb_aspect_ratio_log2_minus_1 + 1)
     TESTELSE_SB_ELSE(                                           "reduce_pb_aspect_ratio");
         // MaxPbAspectRatio = 8
     TESTELSE_SB_END();
@@ -604,7 +718,8 @@ void File_Av2::sequence_inter_config()
         TESTELSE_SB_ELSE(                                       "disable_drl_reorder");
             Skip_SB(                                            "constrain_drl_reorder");
         TESTELSE_SB_END();
-        Skip_ns(4 - 1,                                          "seq_max_bvp_drl_bits_minus1");
+        auto n = MAX_REF_BV_STACK_SIZE - 1;
+        Skip_ns(n,                                              "seq_max_bvp_drl_bits_minus_1");
         Skip_SB(                                                "allow_frame_max_bvp_drl_bits");
         Skip_SB(                                                "enable_bawp");
     }
@@ -623,20 +738,22 @@ void File_Av2::sequence_inter_config()
         TEST_SB_SKIP(                                           "enable_ref_frame_mvs");
         Skip_SB(                                                "reduced_ref_frame_mvs_mode");
         TEST_SB_END();
-        Skip_S1(3,                                              "order_hint_bits_minus_1");
+        Skip_S1(4,                                              "order_hint_bits_minus_1");
         Skip_SB(                                                "enable_refmvbank");
         TESTELSE_SB_SKIP(                                       "disable_drl_reorder");
         TESTELSE_SB_ELSE(                                       "disable_drl_reorder");
             Skip_SB(                                            "constrain_drl_reorder");
         TESTELSE_SB_END();
         Skip_SB(                                                "explicit_ref_frame_map");
-        TEST_SB_SKIP(                                           "use_extra_ref_frames");
+        TEST_SB_SKIP(                                           "explicit_num_ref_frames");
             Skip_S1(4,                                          "num_ref_frames_minus_1");
         TEST_SB_END();
         Skip_S1(3,                                              "long_term_frame_id_bits");
-        Skip_ns(6 - 1,                                          "seq_max_drl_bits_minus1");
+        auto n1 = MAX_REF_MV_STACK_SIZE - 1;
+        Skip_ns(n1,                                             "seq_max_drl_bits_minus1");
         Skip_SB(                                                "allow_frame_max_drl_bits");
-        Skip_ns(4 - 1,                                          "seq_max_bvp_drl_bits_minus1");
+        auto n2 = MAX_REF_BV_STACK_SIZE - 1;
+        Skip_ns(n2,                                             "seq_max_bvp_drl_bits_minus1");
         Skip_SB(                                                "allow_frame_max_bvp_drl_bits");
         Skip_S1(2,                                              "num_same_ref_compound");
         bool enable_tip, EnableTipOutput;
@@ -652,9 +769,9 @@ void File_Av2::sequence_inter_config()
         Skip_SB(                                                "enable_bawp");
         Skip_SB(                                                "enable_cwp");
         Skip_SB(                                                "enable_imp_msk_bld");
-        bool enable_lf_sub_pu;
-        Get_SB(enable_lf_sub_pu,                                "enable_lf_sub_pu");
-        if (EnableTipOutput && enable_lf_sub_pu)
+        bool enable_df_sub_pu;
+        Get_SB(enable_df_sub_pu,                                "enable_df_sub_pu");
+        if (EnableTipOutput && enable_df_sub_pu)
             Skip_SB(                                            "enable_tip_explicit_qp");
         int8u enable_opfl_refine;
         Get_S1(2, enable_opfl_refine,                           "enable_opfl_refine");
@@ -774,8 +891,9 @@ void File_Av2::seg_info(int8u numSegments)
         for (int8u j = 0; j < SEG_LVL_MAX; ++j) {
             TEST_SB_SKIP(                                       "feature_enabled");
                 auto bitsToRead = Segmentation_Feature_Bits[j];
+                auto n = 1 + bitsToRead;
                 if (Segmentation_Feature_Signed[j] == 1)
-                    Skip_S2(1 + bitsToRead,                     "feature_value");
+                    Skip_S2(n,                                  "feature_value");
                 else
                     Skip_S2(bitsToRead,                         "feature_value");
             TEST_SB_END();
@@ -788,17 +906,28 @@ void File_Av2::seg_info(int8u numSegments)
 void File_Av2::sequence_filter_config() 
 {
     Element_Begin1("sequence_filter_config");
+    bool enable_gdf;
     Skip_SB(                                                    "disable_loopfilters_across_tiles");
     Skip_SB(                                                    "enable_cdef");
-    Skip_SB(                                                    "enable_gdf");
+    Get_SB(enable_gdf,                                          "enable_gdf");
+    if (enable_gdf && get_seq_sb_size() == BLOCK_64X64) {
+        Skip_SB(                                                "gdf_unit_matches_sb_size");
+    }
+    else {
+        // gdf_unit_matches_sb_size = 0
+    }
     TEST_SB_SKIP(                                               "enable_restoration");
         Skip_SB(                                                "lr_tools_disable[ 0 ][ RESTORE_PC_WIENER ]");
         Skip_SB(                                                "lr_tools_disable[ 0 ][ RESTORE_WIENER_NONSEP ]");
-        TEST_SB_SKIP(                                           "enable_restoration");
+        TEST_SB_SKIP(                                           "lr_tools_uv_present");
             Skip_SB(                                            "lr_tools_disable[ 1 ][ RESTORE_WIENER_NONSEP ]");
         TEST_SB_END();
     TEST_SB_END();
-    Skip_SB(                                                    "enable_ccso");
+    TESTELSE_SB_SKIP(                                           "enable_ccso");
+        Skip_SB(                                                "ccso_unit_matches_sb_size");
+    TESTELSE_SB_ELSE(                                           "enable_ccso");
+        // ccso_unit_matches_sb_size = 0
+    TESTELSE_SB_END();
     if (single_picture_header_flag) {
     }
     else {
@@ -807,7 +936,17 @@ void File_Av2::sequence_filter_config()
             Skip_SB(                                            "cdef_on_skip_txfm_disabled");
         TESTELSE_SB_END();
     }
-    Skip_S1(2,                                                  "df_par_bits_minus2");
+    Skip_S1(2,                                                  "df_par_bits_minus_2");
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Av2::seq_decoder_model_info()
+{
+    Element_Begin1("seq_decoder_model_info");
+    Skip_uvlc(                                                  "decoder_buffer_delay");
+    Skip_uvlc(                                                  "encoder_buffer_delay");
+    Skip_SB(                                                    "low_delay_mode_flag");
     Element_End0();
 }
 
@@ -823,7 +962,7 @@ void File_Av2::temporal_delimiter_obu()
 }
 
 //---------------------------------------------------------------------------
-void File_Av2::multi_stream_decoder_operation_obu()
+void File_Av2::multistream_decoder_operation_obu()
 {
 #if MEDIAINFO_TRACE
     if (Trace_Activated)
@@ -831,24 +970,23 @@ void File_Av2::multi_stream_decoder_operation_obu()
         //Parsing
         BS_Begin();
 
-        Element_Begin1("multi_stream_decoder_operation_obu");
-        int8u num_streams_minus2;
-        Get_S1 (3, num_streams_minus2,                          "num_streams_minus2");
-        Skip_S1(6,                                              "multi_config_idc");
-        Skip_S1(5,                                              "multi_level_idx");
-        Skip_SB(                                                "multi_tier");
-        Skip_S1(4,                                              "multi_interop");
-        TESTELSE_SB_SKIP(                                       "multi_even_allocation_flag");
-        TESTELSE_SB_ELSE(                                       "multi_even_allocation_flag");
-        Skip_S1(3,                                              "multi_large_picture_idc");
+        Element_Begin1("multistream_decoder_operation_obu");
+        int8u num_streams_minus_2;
+        Get_S1 (3, num_streams_minus_2,                         "num_streams_minus_2");
+        Skip_S1(5,                                              "multistream_profile_idc");
+        Skip_S1(5,                                              "multistream_level_idx");
+        Skip_SB(                                                "multistream_tier");
+        TESTELSE_SB_SKIP(                                       "multistream_even_allocation_flag");
+        TESTELSE_SB_ELSE(                                       "multistream_even_allocation_flag");
+        Skip_S1(3,                                              "multistream_large_picture_idc");
         TESTELSE_SB_END();
-        for (int8u i = 0; i < num_streams_minus2 + 2; i++) {
+        for (int8u i = 0; i < num_streams_minus_2 + 2; i++) {
             Skip_S1(5,                                          "sub_xlayer_id[ i ]");
-            Skip_S1(5,                                          "sub_profile[ i ]");
-            Skip_S1(5,                                          "sub_level[ i ]");
-            Skip_SB(                                            "sub_tier[ i ]");
-            Skip_S1(4,                                          "sub_mlayer_count[ i ]");
+            Skip_S1(5,                                          "sub_stream_max_profile[ i ]");
+            Skip_S1(5,                                          "sub_stream_max_level[ i ]");
+            Skip_SB(                                            "sub_stream_max_tier[ i ]");
         }
+        Skip_SB(                                                "multistream_doh_constraint_flag");
         Element_End0();
 
         obu_end();
@@ -925,58 +1063,59 @@ void File_Av2::content_interpretation_obu()
     BS_Begin();
 
     Element_Begin1("content_interpretation_obu");
-    int8u scan_type_idc;
-    bool color_description_present_flag, chroma_sample_position_present_flag, aspect_ratio_info_present_flag, timing_info_present_flag;
-    Get_S1(2, scan_type_idc,                                    "scan_type_idc");           Param_Info1(Av2_scan_type_idc(scan_type_idc));
-    Get_SB(color_description_present_flag,                      "color_description_present_flag");
-    Get_SB(chroma_sample_position_present_flag,                 "chroma_sample_position_present_flag");
-    Get_SB(aspect_ratio_info_present_flag,                      "aspect_ratio_info_present_flag");
-    Get_SB(timing_info_present_flag,                            "timing_info_present_flag");
-    Skip_S1(2,                                                  "reserved_2bit");
-    int8u color_primaries{ 2 };
-    int8u transfer_characteristics{ 2 };
-    int8u matrix_coefficients{ 2 };
-    bool full_range_flag{};
-    if (color_description_present_flag) {
-        int64u color_description_idc;
-        Get_rg(2, color_description_idc,                        "color_description_idc");    Param_Info1(Av2_color_description_idc(static_cast<int8u>(color_description_idc)));
-        if (color_description_idc == 0) { // Explicitly signaled
-            Get_S1(8, color_primaries,                          "color_primaries");          Param_Info1(Mpegv_colour_primaries(color_primaries));
-            Get_S1(8, transfer_characteristics,                 "transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(transfer_characteristics));
-            Get_S1(8, matrix_coefficients,                      "matrix_coefficients");      Param_Info1(Mpegv_matrix_coefficients(matrix_coefficients));
+    int8u ci_scan_type_idc;
+    bool ci_color_description_present_flag, ci_chroma_sample_position_present_flag, ci_aspect_ratio_info_present_flag, ci_timing_info_present_flag;
+    Get_S1(2, ci_scan_type_idc,                                 "ci_scan_type_idc");            Param_Info1(Av2_scan_type_idc(ci_scan_type_idc));
+    Get_SB(ci_color_description_present_flag,                   "ci_color_description_present_flag");
+    Get_SB(ci_chroma_sample_position_present_flag,              "ci_chroma_sample_position_present_flag");
+    Get_SB(ci_aspect_ratio_info_present_flag,                   "ci_aspect_ratio_info_present_flag");
+    Get_SB(ci_timing_info_present_flag,                         "ci_timing_info_present_flag");
+    Skip_S1(2,                                                  "ci_reserved_2bit");
+    int8u ci_color_primaries{ 2 };
+    int8u ci_transfer_characteristics{ 2 };
+    int8u ci_matrix_coefficients{ 2 };
+    bool ci_full_range_flag{};
+    if (ci_color_description_present_flag) {
+        int64u ci_color_description_idc;
+        Get_rg(2, ci_color_description_idc,                     "ci_color_description_idc");    Param_Info1(Av2_color_description_idc(static_cast<int8u>(ci_color_description_idc)));
+        if (ci_color_description_idc == 0) { // Explicitly signaled
+            Get_S1(8, ci_color_primaries,                       "ci_color_primaries");          Param_Info1(Mpegv_colour_primaries(ci_color_primaries));
+            Get_S1(8, ci_transfer_characteristics,              "ci_transfer_characteristics"); Param_Info1(Mpegv_transfer_characteristics(ci_transfer_characteristics));
+            Get_S1(8, ci_matrix_coefficients,                   "ci_matrix_coefficients");      Param_Info1(Mpegv_matrix_coefficients(ci_matrix_coefficients));
         }
         else {
-            switch (color_description_idc) {
+            switch (ci_color_description_idc) {
             case 1: // BT.709 SDR
-                color_primaries = 1; transfer_characteristics = 1; matrix_coefficients = 1; break;
+                ci_color_primaries = 1; ci_transfer_characteristics = 1; ci_matrix_coefficients = 1; break;
             case 2: // BT.2100 PQ
-                color_primaries = 9; transfer_characteristics = 16; matrix_coefficients = 9; break;
+                ci_color_primaries = 9; ci_transfer_characteristics = 16; ci_matrix_coefficients = 9; break;
             case 3: // BT.2100 HLG
-                color_primaries = 9; transfer_characteristics = 18; matrix_coefficients = 9; break;
+                ci_color_primaries = 9; ci_transfer_characteristics = 18; ci_matrix_coefficients = 9; break;
             case 4: // sRGB
-                color_primaries = 1; transfer_characteristics = 13; matrix_coefficients = 0; break;
+                ci_color_primaries = 1; ci_transfer_characteristics = 13; ci_matrix_coefficients = 0; break;
             case 5: // sYCC
-                color_primaries = 1; transfer_characteristics = 13; matrix_coefficients = 6; break;
+                ci_color_primaries = 1; ci_transfer_characteristics = 13; ci_matrix_coefficients = 6; break;
             }
         }
-        Get_SB(full_range_flag,                                 "full_range_flag");
+        Get_SB(ci_full_range_flag,                              "ci_full_range_flag");
     }
-    if (chroma_sample_position_present_flag) {
-        Skip_uvlc(                                              "chroma_sample_position_top");
-        if (scan_type_idc != 1)
-            Skip_uvlc(                                          "chroma_sample_position_bottom");
+    int32u ci_chroma_sample_position_top{}, ci_chroma_sample_position_bottom{};
+    if (ci_chroma_sample_position_present_flag) {
+        Get_uvlc(ci_chroma_sample_position_top,                 "ci_chroma_sample_position_top");
+        if (ci_scan_type_idc != 1)
+            Get_uvlc(ci_chroma_sample_position_bottom,          "ci_chroma_sample_position_bottom");
     }
-    if (aspect_ratio_info_present_flag) {
-        int8u aspect_ratio_idc;
-        Get_S1(8, aspect_ratio_idc,                             "aspect_ratio_idc");
-        if (aspect_ratio_idc == 255) {
-            Skip_uvlc(                                          "sar_width");
-            Skip_uvlc(                                          "sar_height");
+    if (ci_aspect_ratio_info_present_flag) {
+        int8u ci_aspect_ratio_idc;
+        Get_S1(8, ci_aspect_ratio_idc,                          "ci_aspect_ratio_idc");
+        if (ci_aspect_ratio_idc == 255) {
+            Skip_uvlc(                                          "ci_sar_width");
+            Skip_uvlc(                                          "ci_sar_height");
         }
     }
     float64 framerate{};
     bool equal_picture_interval;
-    if (timing_info_present_flag) {
+    if (ci_timing_info_present_flag) {
         Element_Begin1("timing_info");
         int32u num_units_in_display_tick, time_scale;
         Get_S4(32, num_units_in_display_tick,                   "num_units_in_display_tick");
@@ -996,15 +1135,20 @@ void File_Av2::content_interpretation_obu()
 
     //Filling
     FILLING_BEGIN_PRECISE();
-    if (color_description_present_flag)
+    if (ci_color_description_present_flag)
     {
-        ColorDescriptionPresent = color_description_present_flag;
-        ColorPrimaries = color_primaries;
-        TransferCharacteristics = transfer_characteristics;
-        MatrixCoefficients = matrix_coefficients;
-        FullRange = full_range_flag;
+        ColorDescriptionPresent = ci_color_description_present_flag;
+        ColorPrimaries = ci_color_primaries;
+        TransferCharacteristics = ci_transfer_characteristics;
+        MatrixCoefficients = ci_matrix_coefficients;
+        FullRange = ci_full_range_flag;
     }
-    if (timing_info_present_flag) {
+    if (ci_chroma_sample_position_present_flag) {
+        Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(ci_chroma_sample_position_top));
+        if (ci_scan_type_idc != 1 && ci_chroma_sample_position_bottom != ci_chroma_sample_position_top)
+            Fill(Stream_Video, 0, "ChromaSubsampling_Position", __T("Type ") + Ztring::ToZtring(ci_chroma_sample_position_bottom));
+    }
+    if (ci_timing_info_present_flag) {
         Fill(Stream_Video, 0, Video_FrameRate, framerate, 3);
         if (equal_picture_interval)
             Fill(Stream_Video, 0, Video_FrameRate_Mode, "Constant");
@@ -1021,26 +1165,31 @@ void File_Av2::padding_obu()
 }
 
 //---------------------------------------------------------------------------
-void File_Av2::metadata_unit(int64u metadata_type, int64u payload_size)
+void File_Av2::metadata_unit(int64u metadata_type, int64u metadataPayloadSize)
 {
     auto Element_Size_Save = Element_Size;
-    if (payload_size > Element_Size - Element_Offset) {
+    if (metadataPayloadSize > Element_Size - Element_Offset) {
         Trusted_IsNot("payload_size");
-        payload_size = Element_Size - Element_Offset;
+        metadataPayloadSize = Element_Size - Element_Offset;
     }
-    Element_Size = Element_Offset + payload_size;
+    Element_Size = Element_Offset + metadataPayloadSize;
 
     switch (metadata_type) {
     case 1: metadata_hdr_cll(); break;
     case 2: metadata_hdr_mdcv(); break;
     case 3: metadata_itu_t_t35(); break;
     case 4: metadata_timecode(); break;
+    case 5: metadata_decoded_frame_hash(); break;
     case 6: metadata_banding_hints(); break;
     case 7: metadata_icc_profile(); break;
     case 8: metadata_scan_type(); break;
     case 9: metadata_temporal_point_info(); break;
+    case 10: metadata_user_data_unregistered(); break;
     default: Skip_XX(Element_Size - Element_Offset,             "(Unknown)");
     }
+
+    if (Element_Size - Element_Offset)
+        Skip_XX(Element_Size - Element_Offset,                  "metadata_unit_remaining_bit");
 
     Element_Size = Element_Size_Save;
 }
@@ -1060,8 +1209,8 @@ void File_Av2::metadata_short_obu()
     int64u metadata_type;
     Get_leb128(metadata_type,                                   "metadata_type"); Param_Info1(Av2_metadata_type(static_cast<int8u>(metadata_type)));
     Element_End0();
-    if (!muh_cancel_flag) {
-        metadata_unit(metadata_type, Element_Size - Element_Offset);
+    if (!muh_cancel_flag && (Element_Size - Element_Offset) > 1) {
+        metadata_unit(metadata_type, Element_Size - Element_Offset - 1);
     }
     Element_End0();
     if (Element_Size - Element_Offset) {
@@ -1083,13 +1232,13 @@ void File_Av2::metadata_group_obu()
     Skip_S1(2,                                                  "metadata_necessity_idc");
     Skip_S1(5,                                                  "metadata_application_id");
     BS_End();
-    int64u metadata_unit_cnt_minus1;
-    Get_leb128(metadata_unit_cnt_minus1,                        "metadata_unit_cnt_minus1");
-    if (metadata_unit_cnt_minus1 > Element_Size) {
+    int64u metadata_unit_cnt_minus_1;
+    Get_leb128(metadata_unit_cnt_minus_1,                       "metadata_unit_cnt_minus_1");
+    if (metadata_unit_cnt_minus_1 > Element_Size) {
         Reject();
         return;
     }
-    for (int64u i = 0; i <= metadata_unit_cnt_minus1; ++i) {
+    for (int64u i = 0; i <= metadata_unit_cnt_minus_1; ++i) {
         Element_Begin1("metadata_unit");
         Element_Begin1("muh");
         int64u metadata_type;
@@ -1234,13 +1383,13 @@ void File_Av2::metadata_banding_hints()
         Skip_SB(                                                "source_banding_present_flag");
         if (coding_banding_present_flag) {
             TEST_SB_SKIP(                                       "banding_hints_flag");
-                bool three_color_components;
-                Get_SB(three_color_components,                  "three_color_components");
-                auto numComponents = three_color_components ? 3 : 1;
+                bool three_color_components_flag;
+                Get_SB(three_color_components_flag,             "three_color_components_flag");
+                auto numComponents = three_color_components_flag ? 3 : 1;
                 for (int8u plane = 0; plane < numComponents; ++plane) {
                     TEST_SB_SKIP(                               "banding_in_component_present_flag");
-                        Skip_S1(6,                              "max_band_width_minus4");
-                        Skip_S1(4,                              "max_band_step_minus1");
+                        Skip_S1(6,                              "max_band_width_minus_4");
+                        Skip_S1(4,                              "max_band_step_minus_1");
                     TEST_SB_END();
                 }
                 TEST_SB_SKIP(                                   "band_units_information_present_flag");
@@ -1250,10 +1399,10 @@ void File_Av2::metadata_banding_hints()
                     TEST_SB_SKIP(                               "varying_size_band_units_flag");
                         Skip_S1(3,                              "band_block_in_luma_samples");
                         for (int8u r = 0; r <= num_band_units_rows_minus_1; r++) {
-                            Skip_S1(5,                          "vert_size_in_band_blocks_minus1");
+                            Skip_S1(5,                          "vert_size_in_band_blocks_minus_1");
                         }
                         for (int8u c = 0; c <= num_band_units_cols_minus_1; c++) {
-                            Skip_S1(5,                          "horz_size_in_band_blocks_minus1");
+                            Skip_S1(5,                          "horz_size_in_band_blocks_minus_1");
                         }
                     TEST_SB_END();
                     for (int8u r = 0; r <= num_band_units_rows_minus_1; r++) {
@@ -1305,15 +1454,44 @@ void File_Av2::metadata_scan_type()
 //---------------------------------------------------------------------------
 void File_Av2::metadata_temporal_point_info()
 {
-    BS_Begin();
     Element_Begin1("metadata_temporal_point_info");
-    int8u frame_presentation_time_length_minus_1;
-    Get_S1(5, frame_presentation_time_length_minus_1,           "frame_presentation_time_length_minus_1");
-    auto n = frame_presentation_time_length_minus_1 + 1;
-    Skip_BS(n,                                                  "frame_presentation_time");
+    int64u frame_presentation_time;
+    Get_leb128(frame_presentation_time,                         "frame_presentation_time");
     Element_End0();
-    byte_alignment();
+}
+
+//---------------------------------------------------------------------------
+void File_Av2::metadata_decoded_frame_hash()
+{
+    Element_Begin1("metadata_decoded_frame_hash");
+    bool per_plane, is_monochrome;
+    BS_Begin();
+    Skip_S1(4,                                                  "hash_type");
+    Get_SB (per_plane,                                          "per_plane");
+    Skip_SB(                                                    "has_grain");
+    Get_SB (is_monochrome,                                      "is_monochrome");
+    Skip_SB(                                                    "reserved");
     BS_End();
+    if (per_plane) {
+        int8u numPlanes = is_monochrome ? 1 : 3;
+        for (int8u i = 0; i < numPlanes; ++i) {
+            Skip_L2(                                            "plane_hash[ i ]");
+        }
+    }
+    else {
+        Skip_L2(                                                "frame_hash");
+    }
+    BS_End();
+    Element_End0();
+}
+
+//---------------------------------------------------------------------------
+void File_Av2::metadata_user_data_unregistered()
+{
+    Element_Begin1("metadata_user_data_unregistered");
+    Skip_UUID(                                                  "uuid_iso_iec_11578");
+    Skip_XX(Element_Size - Element_Offset,                      "user_data_payload_byte");
+    Element_End0();
 }
 
 //---------------------------------------------------------------------------
@@ -1360,6 +1538,40 @@ void File_Av2::tile_params(int16u frameWidth, int16u frameHeight, int8u uniformS
         0, 3, 1, 4, 0, 4,
     };
 
+    #define reserved (int8u)-1
+
+    const int8u Tile_Width_Scaling_Factor[2][31] = {
+        {4, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 8, 8, 8, 8,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved},
+        {4, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4,
+        8, 8, 8, 8, 16, 16, 16, 16,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved}
+    };
+
+    const int8u Tile_Area_Scaling_Factor[2][31] = {
+        {4, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4,
+        8, 8, 8, 8, 16, 16, 16, 16,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved},
+        {4, 4, 4, 4, 4, 4,
+        4, 4, 4, 4, 4, 4, 4, 4,
+        16, 16, 16, 16, 32, 32, 32, 32,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved,
+        reserved, reserved, reserved}
+    };
+
+    #undef reserved
+
     Element_Begin1("tile_params");
     auto miCols = 2 * ((frameWidth + 7) >> 3);
     auto miRows = 2 * ((frameHeight + 7) >> 3);
@@ -1367,8 +1579,15 @@ void File_Av2::tile_params(int16u frameWidth, int16u frameHeight, int8u uniformS
     auto sbShift = Mi_Width_Log2[sbSize];
     auto sbCols = (miCols + sb4x4 - 1) >> sbShift;
     auto sbRows = (miRows + sb4x4 - 1) >> sbShift;
-    auto maxTileWidthSb = MAX_TILE_WIDTH >> (sbShift + 2);
-    auto maxTileAreaSb = MAX_TILE_AREA >> (2 * (sbShift + 2));
+    int maxTileWidthSb{}, maxTileAreaSb{};
+    if (seq_level_idx != 31) {
+        maxTileWidthSb = (Tile_Width_Scaling_Factor[seq_tier][seq_level_idx] * MAX_TILE_WIDTH) >> (sbShift + 4);
+        maxTileAreaSb = (Tile_Area_Scaling_Factor[seq_tier][seq_level_idx] * MAX_TILE_AREA) >> (2 * (sbShift + 2) + 2);
+    }
+    else {
+        maxTileWidthSb = sbCols;
+        maxTileAreaSb = sbCols * sbRows;
+    }
     auto minLog2TileCols = tile_log2(maxTileWidthSb, sbCols);
     auto maxLog2TileCols = tile_log2(1, std::min(sbCols, MAX_TILE_COLS));
     auto maxLog2TileRows = tile_log2(1, std::min(sbRows, MAX_TILE_ROWS));
@@ -1428,7 +1647,7 @@ void File_Av2::tile_params(int16u frameWidth, int16u frameHeight, int8u uniformS
 }
 
 //---------------------------------------------------------------------------
-void File_Av2::tile_group_obu(int64u obuPayloadSize)
+void File_Av2::tile_group_obu()
 {
     Element_Begin1("tile_group_obu");
     BS_Begin();

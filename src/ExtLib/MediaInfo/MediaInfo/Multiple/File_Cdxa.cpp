@@ -115,7 +115,7 @@ File_Cdxa::~File_Cdxa()
 bool File_Cdxa::FileHeader_Begin()
 {
     //Element_Size
-    if (Buffer_Size<0x28)
+    if (Buffer_Size<0x2C)
         return false; //Must wait for more data
 
     if (                CC4(Buffer+0x00)!=0x52494646  //"RIFF"

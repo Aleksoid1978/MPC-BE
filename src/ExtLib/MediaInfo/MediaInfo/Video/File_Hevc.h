@@ -128,6 +128,7 @@ private :
         video_full_range_flag,
         colour_description_present_flag,
         pic_struct_present_flag,
+        field_seq_flag,
         frame_field_info_present_flag,
         vui_flags_Max
     };
@@ -260,6 +261,9 @@ private :
         int8u   bit_depth_luma_minus8;
         int8u   bit_depth_chroma_minus8;
         int8u   sps_max_num_reorder_pics;
+        int8u   pic_struct_FirstDetected;       //First pic_struct found in a pic_timing SEI message; (int8u)-1 if none
+        int8u   source_scan_type_FirstDetected; //First source_scan_type found in a pic_timing SEI message; (int8u)-1 if none
+        int8u   pic_struct_FirstIrap;           //pic_struct of the first IRAP picture; an IRAP starts a frame and therefore leads its field pair, so its parity gives the field order when pic_struct is a bare field (1 or 2); (int8u)-1 if none
 
         //Computed value
         bool    NalHrdBpPresentFlag() {return vui_parameters && vui_parameters->NAL;}
@@ -289,7 +293,10 @@ private :
             log2_max_pic_order_cnt_lsb_minus4(log2_max_pic_order_cnt_lsb_minus4_),
             bit_depth_luma_minus8(bit_depth_luma_minus8_),
             bit_depth_chroma_minus8(bit_depth_chroma_minus8_),
-            sps_max_num_reorder_pics(sps_max_num_reorder_pics_)
+            sps_max_num_reorder_pics(sps_max_num_reorder_pics_),
+            pic_struct_FirstDetected((int8u)-1),
+            source_scan_type_FirstDetected((int8u)-1),
+            pic_struct_FirstIrap((int8u)-1)
         {
         }
 
@@ -350,6 +357,17 @@ private :
     };
     typedef vector<pic_parameter_set_struct*> pic_parameter_set_structs;
 
+    //Interlacement, which HEVC conveys only as metadata: pic_struct and source_scan_type in the pic_timing SEI, VUI field_seq_flag and the profile_tier_level constraint flags
+    struct interlacement_info
+    {
+        int8u   pic_struct;         //First pic_struct found in a pic_timing SEI message; (int8u)-1 if none
+        int8u   source_scan_type;   //First source_scan_type found in a pic_timing SEI message; (int8u)-1 if none
+        bool    SeparatedFields;    //Each coded picture carries a single field, so the coded picture size is that of a field
+        bool    IsInterlaced;       //The source is interlaced, whether or not each coded picture is a single field
+        bool    IsProgressive;      //The source is progressive; both flags are false when nothing in the stream tells
+    };
+    static interlacement_info Interlacement_Detect(const seq_parameter_set_struct* seq_parameter_set_Item);
+
     //Streams management
     void Streams_Fill();
     void Streams_Fill_Profile(const profile_tier_level_struct& p);
@@ -358,10 +376,10 @@ private :
     void Streams_Finish();
 
     //Buffer - File header
-    bool FileHeader_Begin();
+    bool FileHeader_Begin() { return FileHeader_Begin_0x000001(); }
 
     //Buffer - Synchro
-    bool Synchronize();
+    bool Synchronize() { return Synchronize_0x000001(true); }
     bool Synched_Test();
     void Synched_Init();
 
@@ -424,6 +442,8 @@ private :
     void sei_alternative_transfer_characteristics();
     void sei_ambient_viewing_environment();
     void three_dimensional_reference_displays_info(int32u payloadSize);
+    void Dolby_Vision_reference_processing_unit();
+    void Dolby_Vision_enhancement_layer();
 
     //Packets - SubElements
     void slice_segment_header();
@@ -527,6 +547,7 @@ private :
     };
     typedef std::map<video, Ztring[HdrFormat_Max]> hdr;
     hdr                                 HDR;
+    DV_RPU                              DV_RPU_data;
     Ztring                              EtsiTS103433;
     int32u  chroma_format_idc{};
     int32u  slice_pic_parameter_set_id{};
@@ -542,6 +563,7 @@ private :
     Ztring  ambient_viewing_environment_chromaticity;
     bool    RapPicFlag{};
     bool    first_slice_segment_in_pic_flag{};
+    int8u   pic_struct_Pending{(int8u)-1}; //pic_struct of the pic_timing SEI of the access unit being parsed, kept until the slice header tells whether the picture is an IRAP; (int8u)-1 if none
 };
 
 } //NameSpace

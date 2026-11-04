@@ -47,6 +47,7 @@
 #include "ZenLib/Format/Http/Http_Utils.h"
 #include <algorithm>    // std::sort
 #include <cfloat>       // DBL_MAX
+#include <set>
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -357,6 +358,7 @@ File_Mpeg4::File_Mpeg4()
     IsFragmented=false;
     StreamOrder=0;
     meta_pitm_item_ID=(int32u)-1;
+    meta_iref_IsParsed=false;
     meta_iprp_ipco_Buffer=NULL;
     moov_trak_mdia_minf_stbl_stsd_Pos=0;
     moov_trak_tkhd_TrackID=(int32u)-1;
@@ -494,12 +496,29 @@ void File_Mpeg4::Streams_Finish()
 
     //For each stream
     vector<size_t> ToDelete_StreamPos;
+    std::map<int32u, size_t> Image_StreamPos; //Image stream position per item ID
+    grids Grids;
+    Streams_Finish_Grid_Prepare(Grids);
+    for (const auto& Item : Streams)
+        if (Item.second.IsImage && Item.second.StreamKind!=Stream_Video && Grids.SkippedTiles.find(Item.first)==Grids.SkippedTiles.end()) //HEIF item without stream yet
+        {
+            moov_trak_tkhd_TrackID=Item.first;
+            meta_CreateStream();
+        }
     streams::iterator Temp=Streams.begin();
     while (Temp!=Streams.end())
     {
         //Preparing
         StreamKind_Last=Temp->second.StreamKind;
         StreamPos_Last=Temp->second.StreamPos;
+
+        if (Grids.SkippedTiles.find(Temp->first)!=Grids.SkippedTiles.end()) //HEIF tile hidden by its grid, its stream (if any) is only removed
+        {
+            if (StreamKind_Last==Stream_Video)
+                ToDelete_StreamPos.push_back(StreamPos_Last);
+            ++Temp;
+            continue;
+        }
 
         if (StreamKind_Last==Stream_Max && !Temp->second.MetaFor.empty())
         {
@@ -554,7 +573,7 @@ void File_Mpeg4::Streams_Finish()
         //    Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize);
 
         //flags and references
-        if (StreamKind_Last != Stream_Menu)
+        if (StreamKind_Last != Stream_Menu && StreamKind_Last != Stream_General) // General is used by metadata items (e.g. Exif in HEIF), merged with the file metadata
         {
             Ztring TempString;
             std::vector<int32u>::iterator TrackID;
@@ -1489,6 +1508,7 @@ void File_Mpeg4::Streams_Finish()
             size_t Source_StreamPos=StreamPos_Last;
             ToDelete_StreamPos.push_back(StreamPos_Last);
             Stream_Prepare(Stream_Image);
+            Image_StreamPos[Temp->first]=StreamPos_Last;
             if (Temp->second.stsz_StreamSize)
                 Fill(StreamKind_Last, StreamPos_Last, Fill_Parameter(StreamKind_Last, Generic_StreamSize), Temp->second.stsz_StreamSize, 10, true);
             size_t Size=Count_Get(Source_StreamKind, Source_StreamPos);
@@ -1546,6 +1566,7 @@ void File_Mpeg4::Streams_Finish()
         for (size_t i=ToDelete_StreamPos.size()-1; i!=(size_t)-1; i--)
             Stream_Erase(Stream_Video, ToDelete_StreamPos[i]);
     }
+    Streams_Finish_Grid(Image_StreamPos, Grids);
     if (Vendor!=0x00000000 && Vendor!=0xFFFFFFFF)
     {
         Ztring VendorS=Mpeg4_Encoded_Library(Vendor);
@@ -1649,6 +1670,122 @@ void File_Mpeg4::Streams_Finish()
 }
 
 //---------------------------------------------------------------------------
+void File_Mpeg4::Streams_Finish_Grid_Prepare(grids& Grids)
+{
+    //HEIF grid: the image to display is the reconstructed one, with the characteristics of its tiles, the tiles are not displayed
+    std::set<int32u> Inputs_NotGrid;
+    for (const auto& Item : Streams)
+    {
+        const auto& Inputs=Item.second.iref_dimg;
+        const auto FirstTile=Inputs.empty()?Streams.end():Streams.find(Inputs[0]);
+        if (Item.second.infe_item_type==0x67726964 //grid
+         && Item.second.IsImage
+         && FirstTile!=Streams.end()
+         && FirstTile->second.IsImage)
+            Grids.Grid_IDs.insert(Item.first);
+        else
+            Inputs_NotGrid.insert(Inputs.begin(), Inputs.end());
+    }
+    for (auto Grid_ID : Grids.Grid_IDs)
+        for (auto Tile_ID : Streams[Grid_ID].iref_dimg)
+        {
+            const auto Tile=Streams.find(Tile_ID);
+            if (Tile!=Streams.end() && Tile->second.IsImage
+             && Tile_ID!=meta_pitm_item_ID && Inputs_NotGrid.find(Tile_ID)==Inputs_NotGrid.end() && Tile->second.Infos_List.size()==1) //Tile not used for something else
+                Grids.HiddenTiles.insert(Tile_ID);
+        }
+
+    //The hidden tiles are not needed, except the first one of each grid for the characteristics of the grid
+    Grids.SkippedTiles=Grids.HiddenTiles;
+    for (auto Grid_ID : Grids.Grid_IDs)
+        Grids.SkippedTiles.erase(Streams[Grid_ID].iref_dimg[0]);
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4::Streams_Finish_Grid(const std::map<int32u, size_t>& Image_StreamPos, const grids& Grids)
+{
+    std::set<size_t> ToDelete_StreamPos;
+    for (auto Grid_ID : Grids.Grid_IDs)
+    {
+        const auto& Grid=Streams[Grid_ID];
+        const auto Grid_StreamPos=Image_StreamPos.find(Grid_ID)->second;
+        const auto& FirstTile=Streams[Grid.iref_dimg[0]];
+        const auto FirstTile_StreamPos=Image_StreamPos.find(Grid.iref_dimg[0])->second;
+
+        //Characteristics of the tiles, except the ones specific to a tile or to the grid item
+        const auto& Format=Retrieve_Const(Stream_Image, FirstTile_StreamPos, Image_Format);
+        if (!Format.empty())
+            Fill(Stream_Image, Grid_StreamPos, Image_Format, Format, true);
+        static const char* const TileSpecific[]=
+        {
+            "Width",
+            "Height",
+            "Format_Settings_SliceCount",
+            "Stored_",
+            "Sampled_",
+            "PixelAspectRatio_CleanAperture",
+            "DisplayAspectRatio",
+            "Active_",
+            "Rotation",
+            "Mirror",
+            "StreamSize",
+            "Default",
+        };
+        const auto Count=Count_Get(Stream_Image, FirstTile_StreamPos);
+        for (size_t i=Image_Format+1; i<Count; i++)
+        {
+            const auto& Value=Retrieve_Const(Stream_Image, FirstTile_StreamPos, i);
+            if (Value.empty())
+                continue;
+            const auto Name=Retrieve_Const(Stream_Image, FirstTile_StreamPos, i, Info_Name).To_UTF8();
+            if (FirstTile.Infos_List.find(Name)!=FirstTile.Infos_List.end()) //References
+                continue;
+            bool IsTileSpecific=false;
+            for (const auto Prefix : TileSpecific)
+                if (!Name.rfind(Prefix, 0))
+                {
+                    IsTileSpecific=true;
+                    break;
+                }
+            if (IsTileSpecific || !Retrieve_Const(Stream_Image, Grid_StreamPos, Name.c_str()).empty())
+                continue;
+            Fill(Stream_Image, Grid_StreamPos, Name.c_str(), Value);
+            Fill_SetOptions(Stream_Image, Grid_StreamPos, Name.c_str(), Retrieve_Const(Stream_Image, FirstTile_StreamPos, i, Info_Options).To_UTF8().c_str());
+        }
+        Fill(Stream_Image, Grid_StreamPos, Image_MuxingMode, "Grid");
+        Fill(Stream_Image, Grid_StreamPos, Image_Format_Settings_SliceCount, Grid.iref_dimg.size()); //Count of cells
+
+        //Tiles
+        int64u StreamSize=Grid.stsz_StreamSize;
+        bool AllTilesHidden=true;
+        const std::set<int32u> Tiles(Grid.iref_dimg.begin(), Grid.iref_dimg.end()); //A tile may be used several times
+        for (auto Tile_ID : Tiles)
+        {
+            const auto Tile=Streams.find(Tile_ID);
+            if (Tile==Streams.end() || !Tile->second.IsImage)
+            {
+                AllTilesHidden=false;
+                continue;
+            }
+            StreamSize+=Tile->second.stsz_StreamSize;
+            if (Grids.HiddenTiles.find(Tile_ID)==Grids.HiddenTiles.end()) //Tile used for something else
+                AllTilesHidden=false;
+            else
+            {
+                const auto Tile_StreamPos=Image_StreamPos.find(Tile_ID);
+                if (Tile_StreamPos!=Image_StreamPos.end()) //No image stream for the skipped tiles
+                    ToDelete_StreamPos.insert(Tile_StreamPos->second);
+            }
+        }
+        Fill(Stream_Image, Grid_StreamPos, Image_StreamSize, StreamSize, 10, true);
+        if (AllTilesHidden)
+            Fill(Stream_Image, Grid_StreamPos, "Derived from", Ztring(), true);
+    }
+    for (auto StreamPos=ToDelete_StreamPos.rbegin(); StreamPos!=ToDelete_StreamPos.rend(); ++StreamPos)
+        Stream_Erase(Stream_Image, *StreamPos);
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4::Streams_Finish_CommercialNames()
 {
     if (Count_Get(Stream_Video)==1)
@@ -1718,7 +1855,7 @@ void File_Mpeg4::Read_Buffer_Unsynched()
     mdat_Pos_Temp=&mdat_Pos[0];
     while (mdat_Pos_Temp!=mdat_Pos_Max && mdat_Pos_Temp->Offset<File_GoTo)
         mdat_Pos_Temp++;
-    if (mdat_Pos_Temp!=mdat_Pos_Max && mdat_Pos_Temp->Offset>File_GoTo)
+    if (mdat_Pos_Temp!=mdat_Pos_Max && mdat_Pos_Temp!=&mdat_Pos[0] && mdat_Pos_Temp->Offset>File_GoTo)
         mdat_Pos_Temp--; //Previous frame
     if (mdat_Pos_Temp==mdat_Pos_Max)
     {
@@ -1874,6 +2011,8 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                                 case Stream_Text  :
                                                     {
                                                         //Searching the corresponding chunk offset
+                                                        if (Stream->second.stco.empty())
+                                                            break;
                                                         std::vector<int64u>::iterator Stco=Stream->second.stco.begin();
                                                         if (Value<*Stco)
                                                             return Read_Buffer_Seek(3, 0, ID);
@@ -1933,7 +2072,7 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                                                         //Searching the corresponding frame
                                                         for (stream::stts_durations::iterator stts_Duration=Stream->second.stts_Durations.begin(); stts_Duration!=Stream->second.stts_Durations.end(); ++stts_Duration)
                                                         {
-                                                            if (Value2>=stts_Duration->DTS_Begin && Value2<stts_Duration->DTS_End)
+                                                            if (Value2>=stts_Duration->DTS_Begin && Value2<stts_Duration->DTS_End && stts_Duration->SampleDuration)
                                                             {
                                                                 int64u FrameNumber=stts_Duration->Pos_Begin+(Value2-stts_Duration->DTS_Begin)/stts_Duration->SampleDuration;
 
@@ -1960,9 +2099,12 @@ size_t File_Mpeg4::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                                                                         SamplePos+=CountOfSamples;
                                                                     else
                                                                     {
+                                                                        if (!Stsc->SamplesPerChunk)
+                                                                            return 2; //Invalid FrameNumber
                                                                         int64u CountOfChunks=(FrameNumber-SamplePos)/Stsc->SamplesPerChunk;
                                                                         size_t stco_Pos=(size_t)(Stsc->FirstChunk-1+CountOfChunks); //-1 because first chunk is number 1
-                                                                        if (stco_Pos>Stream->second.stco.size())
+                                                                        if (stco_Pos>=Stream->second.stco.size())
+
                                                                             return 2; //Invalid FrameNumber
                                                                         if (JumpTo>Stream->second.stco[stco_Pos])
                                                                             JumpTo=Stream->second.stco[stco_Pos];
@@ -2226,26 +2368,24 @@ void File_Mpeg4::Header_Parse()
 
     if (Size<8)
     {
-        //Special case: until the end of the atom
-            if (Size==0)
-        {
-            Size=Config->File_Current_Size-(File_Offset+Buffer_Offset);
-            if (Status[IsAccepted] && Element_Level==2 && Name==0x00000000) //First real level (Level 1 is atom, level 2 is header block)
-            {
-                Element_Offset=0;
-                Name=Elements::mdat;
-            }
-        }
         //Special case: Big files, size is 64-bit
-        else if (Size==1)
+        if (Size==1)
         {
             //Reading Extended size
             Get_B8 (Size,                                       "Size (Extended)");
         }
-        //Not in specs!
+        //Until the end of the atom if 0, else not in specs but currently handled as 0
         else
         {
-            Size=Config->File_Current_Size-(File_Offset+Buffer_Offset);
+            if (Element_Level == 2 && Config->File_Sizes.size() > 1)
+                Size = Config->File_Sizes[0] - (File_Offset + Buffer_Offset); //TODO: Element_TotalSize_Get() should not use complete sequence size
+            else
+                Size = Element_TotalSize_Get();
+            if (Status[IsAccepted] && Element_Level == 2 && Name == 0x00000000) //First real level (Level 1 is atom, level 2 is header block)
+            {
+                Element_Offset = 0;
+                Name = Elements::mdat;
+            }
         }
     }
 
@@ -2641,7 +2781,7 @@ bool File_Mpeg4::BookMark_Needed()
                                     mdat_Pos_Type mdat_Pos_Temp2;
                                     mdat_Pos_Temp2.Offset = *stco_Current + Chunk_Offset;
                                     mdat_Pos_Temp2.StreamID = Temp->first;
-                                    if (stsz_Current2 && stsz_Current2 <= stsz_Max2 && *stsz_Current2)
+                                    if (stsz_Current2 && stsz_Current2 < stsz_Max2 && *stsz_Current2)
                                         mdat_Pos_Temp2.Size = *stsz_Current2;
                                     else
                                         mdat_Pos_Temp2.Size = *stsz_Current;
@@ -2806,7 +2946,7 @@ bool File_Mpeg4::BookMark_Needed()
                 int64u LastStco_Begin=(int64u)-1;
                 for (streams::iterator Stream=Streams.begin(); Stream!=Streams.end(); Stream++)
                 {
-                    if (!Stream->second.stco.empty() && !Stream->second.IsPriorityStream)
+                    if (!Stream->second.stco.empty() && !Stream->second.stsc.empty() && !Stream->second.stts_Durations.empty() && !Stream->second.IsPriorityStream)
                     {
                         if (Stream->second.stco[0]>FirstStco_Last)
                             FirstStco_Last=Stream->second.stco[0];
@@ -2869,7 +3009,11 @@ bool File_Mpeg4::BookMark_Needed()
                                 Time=Temp_Time;
                         }
                         for (std::vector<int32u>::iterator Temp=Audios.begin(); Temp!=Audios.end(); Temp++)
-                            if (StreamsTemp[*Temp].stco_Pos<Streams[*Temp].stco.size() && StreamsTemp[*Temp].DTS_Offset+((float64)StreamsTemp[*Temp].stts_Current)/Streams[*Temp].mdhd_TimeScale<Time+0.001) // 1ms margin in order to be a bit more logcial with 1/1.001 frame rates
+                            if (StreamsTemp[*Temp].stco_Pos<Streams[*Temp].stco.size()
+                             && StreamsTemp[*Temp].stts_Durations_Pos<Streams[*Temp].stts_Durations.size()
+                             && (Streams[*Temp].stsz.empty() || StreamsTemp[*Temp].stsz_Pos<Streams[*Temp].stsz.size())
+                             && StreamsTemp[*Temp].DTS_Offset+
+((float64)StreamsTemp[*Temp].stts_Current)/Streams[*Temp].mdhd_TimeScale<Time+0.001) // 1ms margin in order to be a bit more logcial with 1/1.001 frame rates
                             {
                                 int64u NextPos=Streams[*Temp].stco[StreamsTemp[*Temp].stco_Pos]+StreamsTemp[*Temp].stsc_SampleSizeOffset;
                                 if (CurrentPos!=NextPos)
@@ -2976,9 +3120,11 @@ bool File_Mpeg4::BookMark_Needed()
                     {
                         ((File_Mpeg4_TimeCode*)StreamTemp.Parsers[0])->AllFramesParsed=false;
                         auto StreamID=Temp->StreamID;
-                        for (int j=mdat_Pos.size()-1; j>=0; j--)
-                            if (StreamID==mdat_Pos[j].StreamID && mdat_Pos[j].Offset!=stco_ToFind && mdat_Pos[j].Offset!=StreamTemp.FirstUsedOffset && mdat_Pos[j].Offset!=StreamTemp.LastUsedOffset)
-                                mdat_Pos.erase(mdat_Pos.begin()+j);
+                        const auto FirstUsedOffset=StreamTemp.FirstUsedOffset;
+                        const auto LastUsedOffset=StreamTemp.LastUsedOffset;
+                        mdat_Pos.erase(std::remove_if(mdat_Pos.begin(), mdat_Pos.end(), [&](const mdat_Pos_Type& Item) { //In one pass, erasing items one by one is too slow with a lot of items
+                            return StreamID==Item.StreamID && Item.Offset!=stco_ToFind && Item.Offset!=FirstUsedOffset && Item.Offset!=LastUsedOffset;
+                        }), mdat_Pos.end());
                         if (mdat_Pos.empty())
                         {
                             mdat_Pos_Temp=nullptr;
@@ -3367,39 +3513,6 @@ void File_Mpeg4::AddCodecConfigurationBoxInfo()
     if (moov_trak_mdia_minf_stbl_stsd_Pos>1)
         return;
     Streams[moov_trak_tkhd_TrackID].CodecConfigurationBoxInfo.push_back((int32u)Element_Code);
-}
-
-//---------------------------------------------------------------------------
-void File_Mpeg4::Loop_CheckValue(int32u& Value, int64u RemainingSize, int8u MinBlockSize, const char* Name)
-{
-    if (!MinBlockSize)
-    {
-        Value = 0; // Avoiding loop when there is no data
-        return;
-    }
-    auto MaxSize = RemainingSize / MinBlockSize;
-    if (Value > MaxSize) {
-        Ztring FullName;
-        for (size_t i = 1; i <= Element_Level; i++) {
-            FullName += Ztring().From_CC4(Element[i].Code);
-            FullName += __T(' ');
-        }
-
-        Fill_Conformance((FullName.To_UTF8() + Name).c_str(), "Value " + std::to_string(Value) + " is bigger than what the box can contain " + std::to_string(MaxSize));
-        Value = MaxSize;
-    }
-}
-
-//---------------------------------------------------------------------------
-void File_Mpeg4::Loop_CheckValue(int32u& Value, int8u MinBlockSize, const char* Name)
-{
-    Loop_CheckValue(Value, Element_Size > Element_Offset ? (Element_Size - Element_Offset) : 0, MinBlockSize, Name);
-}
-
-//---------------------------------------------------------------------------
-void File_Mpeg4::Loop_CheckValue_BS(int32u& Value, int8u MinBlockSize, const char* Name)
-{
-    Loop_CheckValue(Value, Data_BS_Remain(), MinBlockSize, Name);
 }
 
 //---------------------------------------------------------------------------

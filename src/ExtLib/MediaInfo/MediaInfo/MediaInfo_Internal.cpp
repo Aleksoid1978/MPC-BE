@@ -49,6 +49,7 @@
     #include "zlib.h"
 #endif //MEDIAINFO_COMPRESS
 #include <cmath>
+#include <memory>
 #ifdef MEDIAINFO_DEBUG_WARNING_GET
     #include <iostream>
 #endif //MEDIAINFO_DEBUG_WARNING_GET
@@ -2460,14 +2461,13 @@ String MediaInfo_Internal::Option (const String &Option, const String &Value)
             #if MEDIAINFO_COMPRESS
                 if (Value.find(__T("zlib"))==0)
                 {
-                    uLongf Compressed_Size=(uLongf)(Inform_Cache.size() + 16);
-                    Bytef* Compressed=new Bytef[Inform_Cache.size()+16];
-                    if (compress(Compressed, &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
+                    uLongf Compressed_Size=compressBound((uLong)Inform_Cache.size());
+                    std::unique_ptr<Bytef[]> Compressed(new Bytef[Compressed_Size]);
+                    if (compress(Compressed.get(), &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
                     {
-                        delete[] Compressed;
                         return __T("Error during zlib compression");
                     }
-                    Inform_Cache.assign((char*)Compressed, (size_t)Compressed_Size);
+                    Inform_Cache.assign((char*)Compressed.get(), (size_t)Compressed_Size);
                     if (Value.find(__T("+base64"))+7==Value.size())
                     {
                         Inform_Cache=Base64::encode(Inform_Cache);
@@ -2782,14 +2782,13 @@ Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
             string Inform_Cache = Result.To_UTF8();
             if (zlib)
             {
-                uLongf Compressed_Size=(uLongf)(Inform_Cache.size() + 16);
-                Bytef* Compressed=new Bytef[Inform_Cache.size()+16];
-                if (compress(Compressed, &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
+                uLongf Compressed_Size=compressBound((uLong)Inform_Cache.size());
+                std::unique_ptr<Bytef[]> Compressed(new Bytef[Compressed_Size]);
+                if (compress(Compressed.get(), &Compressed_Size, (const Bytef*)Inform_Cache.c_str(), (uLong)Inform_Cache.size()) < 0)
                 {
-                    delete[] Compressed;
                     return __T("Error during zlib compression");
                 }
-                Inform_Cache.assign((char*)Compressed, (size_t)Compressed_Size);
+                Inform_Cache.assign((char*)Compressed.get(), (size_t)Compressed_Size);
             }
             if (base64)
             {

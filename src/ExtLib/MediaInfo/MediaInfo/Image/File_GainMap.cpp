@@ -27,6 +27,32 @@
 namespace MediaInfoLib
 {
 //---------------------------------------------------------------------------
+static Ztring GainMap_Value(int64s Numerator, int32u Denominator)
+{
+    if (!Denominator)
+        return Ztring();
+    Ztring Value=Ztring::ToZtring(((float64)Numerator)/Denominator, 6);
+    Value.TrimRight(__T('0'));
+    Value.TrimRight(__T('.'));
+    if (Value==__T("-0"))
+        Value=__T("0");
+    return Value;
+}
+
+//---------------------------------------------------------------------------
+template<typename T>
+static Ztring GainMap_Values(const T* Numerators, const int32u* Denominators, int channel_count)
+{
+    Ztring Values;
+    for (int ch = 0; ch < channel_count; ++ch) {
+        if (ch)
+            Values+=__T(" / ");
+        Values+=GainMap_Value(Numerators[ch], Denominators[ch]);
+    }
+    return Values;
+}
+
+//---------------------------------------------------------------------------
 void File_GainMap::Data_Parse()
 {
     Element_Name("ISO 21496-1 Gain Map Metadata");
@@ -97,6 +123,18 @@ void File_GainMap::Data_Parse()
         alternate_offset_n[ch] = static_cast<int32s>(alternate_offset_numerator_u);
         Element_End0();
     }
+
+    FILLING_BEGIN();
+        Stream_Prepare(StreamKind);
+        Fill(StreamKind, 0, "GainMap_BaseHeadroom", GainMap_Value(base_hdr_headroom_numerator, base_hdr_headroom_denominator));
+        Fill(StreamKind, 0, "GainMap_AlternateHeadroom", GainMap_Value(alternate_hdr_headroom_numerator, alternate_hdr_headroom_denominator));
+        Fill(StreamKind, 0, "GainMap_Min", GainMap_Values(gain_map_min_numerator, gain_map_min_denominator, channel_count));
+        Fill(StreamKind, 0, "GainMap_Max", GainMap_Values(gain_map_max_numerator, gain_map_max_denominator, channel_count));
+        Fill(StreamKind, 0, "GainMap_Gamma", GainMap_Values(gamma_numerator, gamma_denominator, channel_count));
+        Fill(StreamKind, 0, "GainMap_BaseOffset", GainMap_Values(base_offset_n, base_offset_denominator, channel_count));
+        Fill(StreamKind, 0, "GainMap_AlternateOffset", GainMap_Values(alternate_offset_n, alternate_offset_denominator, channel_count));
+        Fill(StreamKind, 0, "GainMap_UseBaseColorSpace", use_base_colour_space ? "Yes" : "No");
+    FILLING_END();
 
     if (output) {
         output->minimum_version = minimum_version;

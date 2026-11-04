@@ -412,11 +412,11 @@ int tfsxml_attr(tfsxml_string* priv, tfsxml_string* n, tfsxml_string* v) {
                 next_char(priv);
 
                 /* Value */
-                const char quote = *priv->buf;
                 if (!priv->len) {
                     *priv = priv_bak;
                     return 1;
                 }
+                const char quote = *priv->buf;
                 next_char(priv);
                 v->buf = priv->buf;
                 while (priv->len && *priv->buf != quote) {
@@ -662,7 +662,6 @@ int tfsxml_leave(tfsxml_string* priv) {
                         set_level(priv, level - 1);
                         return 1;
                     }
-                    next_char(priv);
                     break;
                 }
                 for (;;) {

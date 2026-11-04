@@ -54,7 +54,7 @@ private :
     void MDPR_fileinfo();
     void PROP();
     void RJMD();
-    void RJMD_property(std::string Name);
+    void RJMD_property(std::string Name, int8u Depth=0);
     void RMJE();
     void RMMD();
     void TAG ();

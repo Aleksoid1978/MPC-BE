@@ -22,6 +22,7 @@
 
 //---------------------------------------------------------------------------
 #include <algorithm>
+#include <set>
 #include "MediaInfo/Multiple/File_Vbi.h"
 #if defined(MEDIAINFO_EIA608_YES)
     #include "MediaInfo/Text/File_Eia608.h"
@@ -60,6 +61,7 @@ File_Vbi::File_Vbi()
 //---------------------------------------------------------------------------
 void File_Vbi::Streams_Finish()
 {
+    std::set<int16u> Streams_ToErase;
     for (auto& Stream : Streams) {
         if (!Stream.second.Parser) {
             continue;
@@ -68,7 +70,7 @@ void File_Vbi::Streams_Finish()
     }
 
     for (auto& Stream : Streams) {
-        if (!Stream.second.Parser) {
+        if (!Stream.second.Parser || Streams_ToErase.find(Stream.first) != Streams_ToErase.end()) {
             continue;
         }
         size_t Start[Stream_Max];
@@ -89,7 +91,7 @@ void File_Vbi::Streams_Finish()
                 Fill((stream_t)StreamKind, StreamPos, General_ID, ID_String, true);
                 if (Stream.second.Type) {
                     Fill((stream_t)StreamKind, StreamPos, "MuxingMode", "VBI");
-                    if (Stream.second.Type == VbiType_Vitc) {
+                    if (Stream.first < 263 && Stream.second.Type == VbiType_Vitc) {
                         Fill(Stream_Other, StreamPos, Other_Format, "SMPTE TC"); // TODO: in timecode parser directly
                         Fill(Stream_Other, StreamPos, Other_BitRate_Mode, "CBR"); // TODO: in timecode parser directly
                         auto Field2 = Streams.find(ID + 263); // NTSC
@@ -102,10 +104,10 @@ void File_Vbi::Streams_Finish()
                             if (TimeCode_FirstFrame2 != TimeCode_FirstFrame1) {
                                 Fill(Stream_Other, StreamPos, Other_TimeCode_FirstFrame, TimeCode_FirstFrame2);
                             }
-                            Streams.erase(Field2);
+                            Streams_ToErase.insert(Field2->first);
                         }
                     }
-                    if (Stream.second.Type == VbiType_Teletext) {
+                    if (Stream.first < 263 && Stream.second.Type == VbiType_Teletext) {
                         auto Field2 = Streams.find(ID + 263); // NTSC
                         if (Field2 == Streams.end() || Field2->second.Type != Stream.second.Type) {
                             Field2 = Streams.find(ID + 313); //PAL
@@ -114,13 +116,16 @@ void File_Vbi::Streams_Finish()
                             const auto& ID_FirstFrame1 = Stream.second.Parser->Retrieve_Const(StreamKind_Last, 0, General_ID);
                             const auto& ID_FirstFrame2 = Field2->second.Parser->Retrieve_Const(StreamKind_Last, 0, General_ID);
                             if (ID_FirstFrame1 == ID_FirstFrame2) {
-                                Streams.erase(Field2);
+                                Streams_ToErase.insert(Field2->first);
                             }
                         }
                     }
                 }
             }
         }
+    }
+    for (auto Stream : Streams_ToErase) {
+        Streams.erase(Stream);
     }
 }
 

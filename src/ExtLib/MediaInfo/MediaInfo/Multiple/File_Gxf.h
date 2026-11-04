@@ -44,6 +44,7 @@ private :
 
     //Buffer - Synchro
     bool Synchronize();
+    void Synched_Init();
     bool Synched_Test();
 
     //Buffer - Global

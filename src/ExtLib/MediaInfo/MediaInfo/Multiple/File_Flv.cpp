@@ -1091,7 +1091,10 @@ void File_Flv::video_H263()
     Skip_S3(17,                                                 "PictureStartCode");
     Get_S1 ( 5, Version,                                        "Version");
     if (Version>1)
+    {
+        BS_End();
         return;
+    }
     Skip_S1( 8,                                                 "TemporalReference");
     Get_S1 ( 3, PictureSize,                                    "PictureSize"); Param_Info1(Flv_H263_PictureSize[PictureSize]);
     switch (PictureSize)
@@ -1205,6 +1208,12 @@ void File_Flv::video_VP6(bool WithAlpha)
 //---------------------------------------------------------------------------
 void File_Flv::video_AVC(int8u PacketType_plus1)
 {
+    size_t Header_Size=(!PacketType_plus1?1:0)+((!PacketType_plus1 || PacketType_plus1==CodedFrames-1)?3:0);
+    if (Element_Offset>Element_Size || Header_Size>Element_Size-Element_Offset)
+    {
+        Trusted_IsNot("Truncated video header");
+        return;
+    }
     int8u AVCPacketType;
     if (PacketType_plus1)
     {
@@ -1304,6 +1313,12 @@ void File_Flv::video_AVC(int8u PacketType_plus1)
 //---------------------------------------------------------------------------
 void File_Flv::video_HEVC(int8u PacketType_plus1)
 {
+    size_t Header_Size=(!PacketType_plus1?1:0)+((!PacketType_plus1 || PacketType_plus1==CodedFrames-1)?3:0);
+    if (Element_Offset>Element_Size || Header_Size>Element_Size-Element_Offset)
+    {
+        Trusted_IsNot("Truncated video header");
+        return;
+    }
     int8u AVCPacketType;
     if (PacketType_plus1)
     {
@@ -1438,7 +1453,7 @@ void File_Flv::audio()
 
     if (codec!=10) // AAC has an header
     {
-        Demux(Buffer+Buffer_Offset+(size_t)(Element_Offset+1), (size_t)(Element_Size-Element_Offset-1), ContentType_MainStream);
+        Demux(Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset), ContentType_MainStream);
     }
 
     FILLING_BEGIN();
@@ -1508,6 +1523,11 @@ void File_Flv::audio_MPEG()
 //---------------------------------------------------------------------------
 void File_Flv::audio_AAC()
 {
+    if (Element_Offset>=Element_Size)
+    {
+        Trusted_IsNot("Truncated AAC header");
+        return;
+    }
     int8u AACPacketType;
     Get_B1 (AACPacketType,                                      "AACPacketType"); Param_Info1(Flv_AACPacketType(AACPacketType));
 
@@ -1574,6 +1594,7 @@ void File_Flv::meta()
 
     //Parsing
     meta_Level=0;
+    meta_Depth=0;
     meta_SCRIPTDATAOBJECT();
 
     if (MetaData_NotTrustable)
@@ -1615,6 +1636,20 @@ void File_Flv::meta_SCRIPTDATAVARIABLE()
 
 //---------------------------------------------------------------------------
 void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
+{
+    if (meta_Depth>=64)
+    {
+        Trusted_IsNot("Too many nested elements");
+        Element_Offset=Element_Size; //Forcing the end of parsing
+        return;
+    }
+    meta_Depth++;
+    meta_SCRIPTDATAVALUE_Content(StringData);
+    meta_Depth--;
+}
+
+//---------------------------------------------------------------------------
+void File_Flv::meta_SCRIPTDATAVALUE_Content(const std::string &StringData)
 {
     std::string StringDataModified(StringData);
     if (!StringDataModified.empty() && StringDataModified[0]==__T('_'))
@@ -1792,6 +1827,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
                 int32u ECMAArrayLength;
                 Get_B4 (ECMAArrayLength,                        "ECMAArrayLength");
                 Element_Info1(Ztring::ToZtring(ECMAArrayLength)+__T(" elements"));
+                Loop_CheckValue(ECMAArrayLength, 3, "ECMAArrayLength"); //Name length and type
                 for (int32u Pos=0; Pos<ECMAArrayLength; Pos++)
                 {
                     meta_SCRIPTDATAVARIABLE();
@@ -1809,6 +1845,7 @@ void File_Flv::meta_SCRIPTDATAVALUE(const std::string &StringData)
             {
                 int32u Count;
                 Get_B4 (Count,                                  "Count");
+                Loop_CheckValue(Count, 1, "Count"); //Type
                 for (int32u Pos=0; Pos<Count; Pos++)
                     meta_SCRIPTDATAVALUE(StringData);
             }

@@ -51,6 +51,7 @@ private :
     void byte_alignment();
     void reserved_obu();
     void sequence_header_obu();
+    void sequence_tile_config();
     void sequence_partition_config();
     void sequence_segment_config();
     void sequence_intra_config();
@@ -59,8 +60,9 @@ private :
     void sequence_transform_quant_entropy_config();
     void seg_info(int8u numSegments);
     void sequence_filter_config();
+    void seq_decoder_model_info();
     void temporal_delimiter_obu();
-    void multi_stream_decoder_operation_obu();
+    void multistream_decoder_operation_obu();
     void multi_frame_header_obu();
     void layer_config_record_obu();
     void atlas_segment_info_obu();
@@ -81,10 +83,11 @@ private :
     void metadata_icc_profile();
     void metadata_scan_type();
     void metadata_temporal_point_info();
-
+    void metadata_decoded_frame_hash();
+    void metadata_user_data_unregistered();
     void frame_header(bool isFirst);
     void tile_params(int16u frameWidth, int16u frameHeight, int8u uniformSbSize, int8u sbSize, bool isBridge);
-    void tile_group_obu(int64u obuPayloadSize);
+    void tile_group_obu();
 
     //Functions
     bool  is_extensible_obu(int8u obu_type) const;
@@ -95,6 +98,8 @@ private :
     void  obu_end();
 
     //Temp
+    int8u   seq_level_idx{};
+    bool    seq_tier{};
     int8u   obu_mlayer_id{};
     int8u   obu_xlayer_id{};
     bool    sequence_header_Parsed{};
@@ -109,6 +114,8 @@ private :
     int8u   TransferCharacteristics{ 2 };
     int8u   MatrixCoefficients{ 2 };
     int32u  chroma_format_idc{};
+    int32u  max_frame_width_minus_1{};
+    int32u  max_frame_height_minus_1{};
     Ztring  maximum_content_light_level;
     Ztring  maximum_frame_average_light_level;
     enum hdr_format

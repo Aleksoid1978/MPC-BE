@@ -610,19 +610,25 @@ size_t Amazon_AWS_GetRegion(const string &serviceName, const string &bucketName,
     curl_easy_setopt(Curl, CURLOPT_WRITEDATA, &Curl_Data2);
     curl_easy_setopt(Curl, CURLOPT_HTTPHEADER, HttpHeader);
     curl_easy_setopt(Curl, CURLOPT_URL, FileName_String.c_str());
+    size_t ToReturn=0;
     if (Reader_Curl->SetOptions())
-        return 1;
-    CURLcode Result=curl_easy_perform(Curl);
-    if (Result)
+        ToReturn=1;
+    else
     {
-        Reader_Curl->Curl_Log(Result);
-        return 1;
+        CURLcode Result=curl_easy_perform(Curl);
+        if (Result)
+        {
+            Reader_Curl->Curl_Log(Result);
+            ToReturn=1;
+        }
     }
     curl_easy_setopt(Curl, CURLOPT_WRITEFUNCTION, NULL);
     curl_easy_setopt(Curl, CURLOPT_WRITEDATA, NULL);
     curl_easy_setopt(Curl, CURLOPT_HTTPHEADER, NULL);
     curl_easy_setopt(Curl, CURLOPT_URL, NULL);
     curl_slist_free_all(HttpHeader);
+    if (ToReturn)
+        return ToReturn;
 
     //We get the region name
     RegionName=Curl_Data2.Amazon_AWS_Region;

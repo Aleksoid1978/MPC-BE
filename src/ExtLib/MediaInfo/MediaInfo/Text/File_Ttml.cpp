@@ -29,6 +29,9 @@
 #include "tinyxml2.h"
 #include <cstring>
 #include <limits>
+#include <map>
+#include <set>
+#include <tuple>
 using namespace tinyxml2;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -50,6 +53,322 @@ static const auto Ttml_timeBase_Size=sizeof(Ttml_timeBase)/sizeof(*Ttml_timeBase
 //***************************************************************************
 // Utils
 //***************************************************************************
+
+// Timeline of currently displayed events, indexed in order to avoid scanning all events for each new event
+class Ttml_TimeLine
+{
+public:
+    struct item
+    {
+        TimeCode    Time_Begin;
+        TimeCode    Time_End;
+        int64s      Begin;      // Time_Begin in milliseconds
+        int64s      End;        // Time_End in milliseconds (0 if not set)
+        bool        End_IsSet;
+        int64u      LineCount;
+    };
+
+    // Remove events beginning after this time (not supporting back to the past)
+    void Remove_BeginAfter(int64s Time)
+    {
+        while (!ByBegin.empty() && ByBegin.rbegin()->first>Time)
+            Remove(ByBegin.rbegin()->second);
+    }
+
+    // Remove events ending at or before this time
+    void Remove_EndUpTo(int64s Time)
+    {
+        while (!ByEnd.empty() && ByEnd.begin()->first<=Time)
+            Remove(ByEnd.begin()->second);
+    }
+
+    // Last added event still present
+    const item* Last() const
+    {
+        return Items.empty()?nullptr:&Items.rbegin()->second;
+    }
+
+    // Add lines to events with same begin and end, return true if there is such event
+    bool AddToSameTime(const TimeCode& Time_Begin, const TimeCode& Time_End, int64s Begin, int64s End, int64u LineCount)
+    {
+        bool HasSameTime=false;
+        for (auto It=ByTimes.lower_bound(make_tuple(Begin, End, (int64u)0)); It!=ByTimes.end() && get<0>(*It)==Begin && get<1>(*It)==End; ++It)
+        {
+            auto& Item=Items[get<2>(*It)];
+            if (Item.Time_Begin==Time_Begin && Item.Time_End==Time_End)
+            {
+                Item.LineCount+=LineCount;
+                LineCount_Total+=LineCount;
+                HasSameTime=true;
+            }
+        }
+        return HasSameTime;
+    }
+
+    // Is there an event beginning at this time, or with an end set at this time
+    bool HasBeginOrEndAt(int64s Time) const
+    {
+        return Count(Count_Begin, Time) || Count(Count_EndSet_End, Time);
+    }
+
+    // Is there an event with an end set, beginning and ending not at this time
+    bool HasEndSetNotAt(int64s Time) const
+    {
+        auto Pair=Count_EndSet_BeginEnd.find(make_pair(Time, Time));
+        return Count_EndSet-Count(Count_EndSet_Begin, Time)-Count(Count_EndSet_End, Time)+(Pair==Count_EndSet_BeginEnd.end()?0:Pair->second)!=0;
+    }
+
+    void Add(const TimeCode& Time_Begin, const TimeCode& Time_End, int64u LineCount)
+    {
+        auto Id=Id_Next++;
+        auto& Item=Items[Id];
+        Item.Time_Begin=Time_Begin;
+        Item.Time_End=Time_End;
+        Item.Begin=Time_Begin.ToMilliseconds();
+        Item.End=Time_End.ToMilliseconds();
+        Item.End_IsSet=Time_End.IsSet();
+        Item.LineCount=LineCount;
+        ByBegin.insert(make_pair(Item.Begin, Id));
+        ByEnd.insert(make_pair(Item.End, Id));
+        ByTimes.insert(make_tuple(Item.Begin, Item.End, Id));
+        Count_Begin[Item.Begin]++;
+        if (Item.End_IsSet)
+        {
+            Count_EndSet++;
+            Count_EndSet_Begin[Item.Begin]++;
+            Count_EndSet_End[Item.End]++;
+            Count_EndSet_BeginEnd[make_pair(Item.Begin, Item.End)]++;
+        }
+        LineCount_Total+=LineCount;
+    }
+
+    int64u LineCount() const
+    {
+        return LineCount_Total;
+    }
+
+private:
+    typedef map<int64s, size_t> counts;
+    map<int64u, item> Items; // Key is the insertion order
+    set<pair<int64s, int64u> > ByBegin;
+    set<pair<int64s, int64u> > ByEnd;
+    set<tuple<int64s, int64s, int64u> > ByTimes;
+    counts Count_Begin;
+    counts Count_EndSet_Begin;
+    counts Count_EndSet_End;
+    map<pair<int64s, int64s>, size_t> Count_EndSet_BeginEnd;
+    size_t Count_EndSet=0;
+    int64u LineCount_Total=0;
+    int64u Id_Next=0;
+
+    static size_t Count(const counts& Counts, int64s Time)
+    {
+        auto It=Counts.find(Time);
+        return It==Counts.end()?0:It->second;
+    }
+
+    static void Decrement(counts& Counts, int64s Time)
+    {
+        auto It=Counts.find(Time);
+        if (!--It->second)
+            Counts.erase(It);
+    }
+
+    void Remove(int64u Id)
+    {
+        auto It=Items.find(Id);
+        const auto& Item=It->second;
+        ByBegin.erase(make_pair(Item.Begin, Id));
+        ByEnd.erase(make_pair(Item.End, Id));
+        ByTimes.erase(make_tuple(Item.Begin, Item.End, Id));
+        Decrement(Count_Begin, Item.Begin);
+        if (Item.End_IsSet)
+        {
+            Count_EndSet--;
+            Decrement(Count_EndSet_Begin, Item.Begin);
+            Decrement(Count_EndSet_End, Item.End);
+            auto Pair=Count_EndSet_BeginEnd.find(make_pair(Item.Begin, Item.End));
+            if (!--Pair->second)
+                Count_EndSet_BeginEnd.erase(Pair);
+        }
+        LineCount_Total-=Item.LineCount;
+        Items.erase(It);
+    }
+};
+
+//---------------------------------------------------------------------------
+// Helper structure to track line and character counting
+struct LineCharCounter
+{
+    int64u LineCount = 0;
+    size_t CurrentLineCharCount = 0;
+    size_t MaxCharsPerLine = 0;
+    bool HasVisibleCharOnLine = false;
+    bool LastCharWasSpace = false;
+
+    void ProcessText(const char* text)
+    {
+        if (!text)
+            return;
+
+        while (*text)
+        {
+            unsigned char c = (unsigned char)*text;
+
+            // In TTML/HTML, newlines and carriage returns in source are treated as whitespace,
+            // NOT as line breaks. Only <br/> creates line breaks.
+            bool isWhitespace = (c == ' ' || c == '\t' || c == '\r' || c == '\n');
+
+            if (isWhitespace)
+            {
+                // Only count space if we have visible chars and last wasn't already a space
+                if (HasVisibleCharOnLine && !LastCharWasSpace)
+                {
+                    CurrentLineCharCount++;
+                    LastCharWasSpace = true;
+                }
+                text++;
+            }
+            else
+            {
+                // UTF-8 character handling
+                size_t utf8Len = 1;
+                bool isNbsp = false;
+
+                if ((c & 0x80) == 0x00)
+                {
+                    // ASCII (1 byte)
+                    utf8Len = 1;
+                }
+                else if ((c & 0xE0) == 0xC0)
+                {
+                    // 2-byte UTF-8
+                    utf8Len = 2;
+                    // Check if this is a non-breaking space (U+00A0 = 0xC2 0xA0 in UTF-8)
+                    if (c == 0xC2 && text[1] && (unsigned char)text[1] == 0xA0)
+                    {
+                        isNbsp = true;
+                    }
+                }
+                else if ((c & 0xF0) == 0xE0)
+                {
+                    // 3-byte UTF-8
+                    utf8Len = 3;
+                }
+                else if ((c & 0xF8) == 0xF0)
+                {
+                    // 4-byte UTF-8
+                    utf8Len = 4;
+                }
+
+                // Validate we have enough bytes for the UTF-8 sequence
+                const char* p = text + 1;
+                for (size_t i = 1; i < utf8Len; i++)
+                {
+                    if (!*p++)
+                    {
+                        utf8Len = i;
+                        break;
+                    }
+                }
+
+                // Count as 1 character regardless of byte length
+                CurrentLineCharCount++;
+                HasVisibleCharOnLine = true;
+
+                // Non-breaking spaces are NOT collapsible
+                LastCharWasSpace = false;
+
+                // Advance by the UTF-8 sequence length
+                text += utf8Len;
+                while ((*text & 0x80) == 0x80)
+                    ++text;
+            }
+        }
+    }
+
+    void NewLine()
+    {
+        // Trim trailing collapsible space (space/tab that was counted)
+        // We do NOT trim nbsp because those are not collapsible
+        // LastCharWasSpace is only set for regular spaces, not nbsp
+        if (LastCharWasSpace && CurrentLineCharCount > 0)
+            CurrentLineCharCount--;
+
+        // Only count lines that have content
+        if (HasVisibleCharOnLine && CurrentLineCharCount > 0)
+        {
+            if (MaxCharsPerLine < CurrentLineCharCount)
+                MaxCharsPerLine = CurrentLineCharCount;
+            LineCount++;
+        }
+
+        // Reset for next line
+        CurrentLineCharCount = 0;
+        HasVisibleCharOnLine = false;
+        LastCharWasSpace = false;
+    }
+
+    void Finish()
+    {
+        // Trim trailing collapsible space (space/tab that was counted)
+        if (LastCharWasSpace && CurrentLineCharCount > 0)
+            CurrentLineCharCount--;
+
+        // Only count final line if it has content
+        if (HasVisibleCharOnLine && CurrentLineCharCount > 0)
+        {
+            if (MaxCharsPerLine < CurrentLineCharCount)
+                MaxCharsPerLine = CurrentLineCharCount;
+            LineCount++;
+        }
+    }
+};
+
+// Recursively process XML nodes to extract text and count lines
+void ProcessNodeForLineCount(XMLNode* node, LineCharCounter& counter)
+{
+    if (!node)
+        return;
+
+    // Process all children (text nodes and elements)
+    for (XMLNode* child = node->FirstChild(); child; child = child->NextSibling())
+    {
+        // Check if it's a text node
+        XMLText* textNode = child->ToText();
+        if (textNode)
+        {
+            counter.ProcessText(textNode->Value());
+        }
+        // Check if it's an element
+        else
+        {
+            XMLElement* element = child->ToElement();
+            if (element)
+            {
+                // Handle <br/> elements as line breaks
+                const char* elemName = element->Value();
+
+                // Check for br element (with or without namespace)
+                // Common forms: "br", "tt:br", "ttml:br", etc.
+                bool isBr = (strcmp(elemName, "br") == 0 || 
+                            strcmp(elemName, "tt:br") == 0 ||
+                            strcmp(elemName, "ttml:br") == 0 ||
+                            strstr(elemName, ":br") != nullptr);
+
+                if (isBr)
+                {
+                    counter.NewLine();
+                }
+                else
+                {
+                    // Recursively process other elements (span, b, i, etc.)
+                    ProcessNodeForLineCount(element, counter);
+                }
+            }
+        }
+    }
+}
 
 double to_float64(const char* s)
 {
@@ -84,12 +403,19 @@ double to_float64(const char* s)
             sign=-1;
         }
         while (c>='0' && c<='9') {
-            i*=10;
-            i+=(c-'0');
+            if (i<100000) // Avoid overflow, more than enough for a double
+            {
+                i*=10;
+                i+=(c-'0');
+            }
             c=*s++;
         }
         e+=i*sign;
     }
+    if (e>400) // More than enough for a double
+        e=400;
+    if (e<-400)
+        e=-400;
     while (e>0)
     {
         Value*=Ten;
@@ -194,9 +520,9 @@ void File_Ttml::Streams_Accept()
     Stream_Prepare(Stream_Text);
     Fill(Stream_Text, 0, "Format", "TTML");
 
-    FrameCount=0;
     LineCount=0;
-    LineMaxCountPerEvent=0;
+    MaxCountOfLinesPerFrame=0;
+    MaxCountOfCharsPerLine=0;
     EmptyCount=0;
     FrameRate_Int=0;
     FrameRateMultiplier_Num=1;
@@ -242,10 +568,15 @@ void File_Ttml::Streams_Finish()
             Fill(Stream_Text, 0, Text_TimeCode_LastFrame, (Time_End - 1).ToString());
     }
     Fill(Stream_Text, 0, Text_FrameRate_Mode, "CFR");
-    Fill(Stream_Text, 0, Text_Events_Total, FrameCount-EmptyCount);
-    Fill(Stream_Text, 0, Text_Lines_Count, LineCount);
-    if (LineCount)
-        Fill(Stream_Text, 0, Text_Lines_MaxCountPerEvent, LineMaxCountPerEvent);
+    const auto Events_Total = Frame_Count - EmptyCount;
+    Fill(Stream_Text, 0, Text_Events_Total, Events_Total);
+    if (Events_Total) {
+        Fill(Stream_Text, 0, Text_Lines_Count, LineCount);
+        if (LineCount) {
+            Fill(Stream_Text, 0, Text_Lines_MaxCountPerEvent, MaxCountOfLinesPerFrame);
+            Fill(Stream_Text, 0, Text_Lines_MaxCharacterCount, MaxCountOfCharsPerLine);
+        }
+    }
 }
 
 //***************************************************************************
@@ -454,7 +785,7 @@ void File_Ttml::Read_Buffer_Continue()
     #if MEDIAINFO_EVENTS
     tinyxml2::XMLElement*       p=NULL;
     #endif //MEDIAINFO_EVENTS
-    vector<timeline> TimeLine;
+    Ttml_TimeLine TimeLine;
     for (XMLElement* tt_element=Root->FirstChildElement(); tt_element; tt_element=tt_element->NextSiblingElement())
     {
         //body
@@ -562,84 +893,53 @@ void File_Ttml::Read_Buffer_Continue()
                                 if (!p)
                                     p=div_element;
                             #endif //MEDIAINFO_EVENTS
-                            int64u LineCount_New=1;
-                            for (XMLElement* p_element=div_element->FirstChildElement(); p_element; p_element=p_element->NextSiblingElement())
-                            {
-                                if (!strcmp(p_element->Value(), "br"))
-                                    LineCount_New++;
-                            }
-                            LineCount+=LineCount_New;
+
+                            // Count lines and characters using recursive processing
+                            LineCharCounter counter;
+                            ProcessNodeForLineCount(div_element, counter);
+                            counter.Finish();
+
+                            int64u LineCount_New = counter.LineCount;
+                            int64u LineCount_FromCounter = counter.LineCount;  // Save the actual line count from this <p> element
+                            if (counter.MaxCharsPerLine > MaxCountOfCharsPerLine)
+                                MaxCountOfCharsPerLine = counter.MaxCharsPerLine;
 
                             if (Time_Begin_New.IsSet())
                             {
+                                const auto Begin_New=Time_Begin_New.ToMilliseconds();
+                                const auto End_New=Time_End_New.ToMilliseconds();
+
                                 // Not supporting back to the past
-                                for (size_t i=0; i<TimeLine.size(); i++)
-                                {
-                                    if (Time_Begin_New.ToMilliseconds()<TimeLine[i].Time_Begin.ToMilliseconds())
-                                    {
-                                        TimeLine.erase(TimeLine.begin()+i);
-                                        i--;
-                                        continue;
-                                    }
-                                }
+                                TimeLine.Remove_BeginAfter(Begin_New);
 
                                 // Empty
-                                if (!TimeLine.empty() && TimeLine[TimeLine.size()-1].Time_End.IsSet() && TimeLine[TimeLine.size()-1].Time_End.ToMilliseconds()<Time_Begin_New.ToMilliseconds())
+                                const auto Last=TimeLine.Last();
+                                if (Last && Last->End_IsSet && Last->End<Begin_New)
                                     EmptyCount++;
 
                                 // Checking same times
-                                bool HasSameTime=false;
-                                for (size_t i=0; i<TimeLine.size(); i++)
-                                {
-                                    if (TimeLine[i].Time_Begin==Time_Begin_New && TimeLine[i].Time_End==Time_End_New)
-                                    {
-                                        TimeLine[i].LineCount+=LineCount_New;
-                                        HasSameTime=true;
-                                    }
-                                }
+                                bool HasSameTime=TimeLine.AddToSameTime(Time_Begin_New, Time_End_New, Begin_New, End_New, LineCount_New);
 
                                 // Checking overlappings
                                 if (!HasSameTime)
                                 {
-                                    size_t CreateFrame_Begin=1;
-                                    size_t CreateFrame_End=0;
-                                    for (size_t i=0; i<TimeLine.size(); i++)
-                                    {
-                                        if (Time_Begin_New.ToMilliseconds()==TimeLine[i].Time_Begin.ToMilliseconds()
-                                         || (TimeLine[i].Time_End.IsSet() && Time_Begin_New.ToMilliseconds()==TimeLine[i].Time_End.ToMilliseconds()))
-                                            CreateFrame_Begin=0;
-                                        if (Time_End_New.ToMilliseconds()!=TimeLine[i].Time_Begin.ToMilliseconds()
-                                         && (TimeLine[i].Time_End.IsSet() && Time_End_New.ToMilliseconds()!=TimeLine[i].Time_End.ToMilliseconds()))
-                                            CreateFrame_End=1;
-                                    }
-                                    FrameCount+=CreateFrame_Begin;
-                                    FrameCount+=CreateFrame_End;
+                                    Frame_Count+=TimeLine.HasBeginOrEndAt(Begin_New)?0:1;
+                                    Frame_Count+=TimeLine.HasEndSetNotAt(End_New)?1:0;
                                 }
 
-                                for (size_t i=0; i<TimeLine.size(); i++)
-                                {
-                                    if (TimeLine[i].Time_End.ToMilliseconds()<=Time_Begin_New.ToMilliseconds())
-                                    {
-                                        TimeLine.erase(TimeLine.begin()+i);
-                                        i--;
-                                        continue;
-                                    }
-                                }
+                                TimeLine.Remove_EndUpTo(Begin_New);
 
                                 if (!HasSameTime)
-                                    TimeLine.push_back(timeline(Time_Begin_New, Time_End_New, LineCount_New));
+                                    TimeLine.Add(Time_Begin_New, Time_End_New, LineCount_FromCounter);
 
-                                LineCount_New=0;
-                                for (size_t i=0; i<TimeLine.size(); i++)
-                                {
-                                    LineCount_New+=TimeLine[i].LineCount;
-                                }
+                                LineCount_New=TimeLine.LineCount();
                             }
                             else
-                                FrameCount++;
-                          
-                            if (LineMaxCountPerEvent<LineCount_New)
-                                LineMaxCountPerEvent=LineCount_New;
+                                Frame_Count++;
+
+                            LineCount+=LineCount_FromCounter;  // Add the actual line count from this <p>, not the accumulated overlap count
+                            if (MaxCountOfLinesPerFrame<LineCount_New)  // But MaxCountOfLinesPerFrame uses the overlap sum for simultaneous display
+                                MaxCountOfLinesPerFrame=LineCount_New;
                         }
                     }
                 }

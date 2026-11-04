@@ -99,7 +99,7 @@ bool File_DcpCpl::FileHeader_Begin()
 
     XMLElement* Root=document.FirstChildElement();
     const char *NameSpace;
-    if (!Root || strcmp(LocalName(Root, NameSpace), "CompositionPlaylist"))
+    if (!Root || strcmp(LocalName(Root, NameSpace), "CompositionPlaylist") || !NameSpace)
     {
         Reject("DcpCpl");
         return false;
@@ -262,7 +262,11 @@ bool File_DcpCpl::FileHeader_Begin()
                         }
 
                         if (!Id.empty())
-                            EssenceDescriptorList[Id]=Descriptor;
+                        {
+                            auto& Existing=EssenceDescriptorList[Id];
+                            delete Existing;
+                            Existing=Descriptor;
+                        }
                         else
                             delete Descriptor; // Can not be associated
                     }

@@ -681,7 +681,7 @@ void File_Dpx::GenericSectionHeader_Dpx()
     Get_X4 (Size_Header,                                        "Offset to image data");
     Get_ASCII (8, Version,                                      "Version number of header format");
     Get_X4 (Size_Total,                                         "Total image file size");
-    Skip_B4(                                                    "Ditto Key");
+    Skip_X4(                                                    "Ditto Key");
     Get_X4 (Size_Generic,                                       "Generic section header length");
     Get_X4 (Size_Industry,                                      "Industry specific header length");
     Get_X4 (Size_User,                                          "User-defined header length");

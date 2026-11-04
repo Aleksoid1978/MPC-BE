@@ -1244,7 +1244,7 @@ struct coreSbrFrameLengthIndex_mapping
     int16u   coreCoderFrameLength;
     int8u    outputFrameLengthDivided256;
 };
-const size_t coreSbrFrameLengthIndex_Mapping_Size=5;
+extern const size_t coreSbrFrameLengthIndex_Mapping_Size=5;
 coreSbrFrameLengthIndex_mapping coreSbrFrameLengthIndex_Mapping[coreSbrFrameLengthIndex_Mapping_Size]=
 {
     { 0, 768,   3 },

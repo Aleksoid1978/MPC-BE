@@ -1414,6 +1414,10 @@ TopFrontToSide;
 Total;Ընդամենը
 TotalNumberOfParts;
 TotalProgrammeDuration;
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Շավիղը
 Track_Count;Շավիղների ք-ը
 TrackFormat;

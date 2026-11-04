@@ -23,6 +23,9 @@
 //---------------------------------------------------------------------------
 #include "MediaInfo/Text/File_SubRip.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include <iterator>
+#include <map>
+#include <set>
 #if MEDIAINFO_EVENTS
     #include "MediaInfo/MediaInfo_Events_Internal.h"
 #endif //MEDIAINFO_EVENTS
@@ -92,17 +95,175 @@ int64u SubRip_str2timecode(const char* Value)
 }
 
 //---------------------------------------------------------------------------
-struct timeline
+// Timeline of currently displayed events, indexed in order to avoid scanning all events for each new event
+class SubRip_TimeLine
 {
-    int64u      Time_Begin;
-    int64u      Time_End;
-    size_t      LineCount;
+public:
+    typedef pair<int64u, int64u> times; // Begin, End
 
-    timeline(int64u Time_Begin_, int64u Time_End_, size_t LineCount_)
-        : Time_Begin(Time_Begin_)
-        , Time_End(Time_End_)
-        , LineCount(LineCount_)
-    {}
+    // Remove events beginning after this time (not supporting back to the past)
+    void Remove_BeginAfter(int64u Time)
+    {
+        while (!ByBegin.empty() && ByBegin.rbegin()->first>Time)
+            Remove(*ByBegin.rbegin());
+    }
+
+    // Remove events ending at or before this time
+    void Remove_EndUpTo(int64u Time)
+    {
+        while (!ByEnd.empty() && ByEnd.begin()->first<=Time)
+            Remove(make_pair(ByEnd.begin()->second, ByEnd.begin()->first));
+    }
+
+    // End of the last added event still present
+    bool Last_End(int64u& End) const
+    {
+        if (Ids.empty())
+            return false;
+        End=Ids.rbegin()->second.second;
+        return true;
+    }
+
+    // Add lines to the event with same begin and end, return true if there is such event
+    bool AddToSameTime(int64u Begin, int64u End, size_t LineCount)
+    {
+        auto It=Items.find(make_pair(Begin, End));
+        if (It==Items.end())
+            return false;
+        It->second.LineCount+=LineCount;
+        LineCount_Total+=LineCount;
+        return true;
+    }
+
+    // Is there an event beginning or ending at this time
+    bool HasBeginOrEndAt(int64u Time) const
+    {
+        return Count(Count_Begin, Time) || Count(Count_End, Time);
+    }
+
+    // Is there an event not ending at this time (no event begins at this time, as all events begin before)
+    bool HasEndNotAt(int64u Time) const
+    {
+        return Items.size()-Count(Count_End, Time)!=0;
+    }
+
+    // Latest begin before this time, for events not ending at End
+    bool Begin_Before(int64u Time, int64u End, int64u& Begin) const
+    {
+        auto It=ByBegin.lower_bound(make_pair(Time, (int64u)0));
+        if (It==ByBegin.begin())
+            return false;
+        --It;
+        if (It->second==End)
+        {
+            // Going to the event before all consecutive events ending at End
+            auto Run=RunStarts.upper_bound(*It);
+            --Run;
+            It=ByBegin.find(*Run);
+            if (It==ByBegin.begin())
+                return false;
+            --It;
+        }
+        Begin=It->first;
+        return true;
+    }
+
+    // Earliest end after this time, for events not ending at End
+    bool End_After(int64u Time, int64u End, int64u& End_Found) const
+    {
+        auto It=ByEnd.upper_bound(make_pair(Time, (int64u)-1));
+        if (It!=ByEnd.end() && It->first==End)
+            It=ByEnd.upper_bound(make_pair(End, (int64u)-1));
+        if (It==ByEnd.end())
+            return false;
+        End_Found=It->first;
+        return true;
+    }
+
+    void Add(int64u Begin, int64u End, size_t LineCount)
+    {
+        const auto Times=make_pair(Begin, End);
+        auto& Item=Items[Times];
+        Item.LineCount=LineCount;
+        Item.Id=Id_Next++;
+        Ids[Item.Id]=Times;
+        auto It=ByBegin.insert(Times).first;
+        ByEnd.insert(make_pair(End, Begin));
+        Count_Begin[Begin]++;
+        Count_End[End]++;
+        LineCount_Total+=LineCount;
+
+        // Runs of consecutive events (by begin) with the same end
+        auto Next=It; ++Next;
+        if (It==ByBegin.begin() || prev(It)->second!=End)
+            RunStarts.insert(Times);
+        if (Next!=ByBegin.end())
+        {
+            if (Next->second==End)
+                RunStarts.erase(*Next);
+            else
+                RunStarts.insert(*Next);
+        }
+    }
+
+    size_t LineCount() const
+    {
+        return LineCount_Total;
+    }
+
+private:
+    struct item
+    {
+        size_t      LineCount;
+        int64u      Id;
+    };
+    typedef map<int64u, size_t> counts;
+    map<times, item> Items;
+    map<int64u, times> Ids; // Key is the insertion order
+    set<times> ByBegin;
+    set<times> ByEnd; // End, Begin
+    set<times> RunStarts;
+    counts Count_Begin;
+    counts Count_End;
+    size_t LineCount_Total=0;
+    int64u Id_Next=0;
+
+    static size_t Count(const counts& Counts, int64u Time)
+    {
+        auto It=Counts.find(Time);
+        return It==Counts.end()?0:It->second;
+    }
+
+    static void Decrement(counts& Counts, int64u Time)
+    {
+        auto It=Counts.find(Time);
+        if (!--It->second)
+            Counts.erase(It);
+    }
+
+    void Remove(times Times)
+    {
+        auto Item=Items.find(Times);
+        auto It=ByBegin.find(Times);
+        auto Next=It; ++Next;
+        bool HasPrev=It!=ByBegin.begin();
+        int64u Prev_End=HasPrev?prev(It)->second:0;
+        RunStarts.erase(Times);
+        if (Next!=ByBegin.end())
+        {
+            if (HasPrev && Prev_End==Next->second)
+                RunStarts.erase(*Next);
+            else
+                RunStarts.insert(*Next);
+        }
+        ByBegin.erase(It);
+        ByEnd.erase(make_pair(Times.second, Times.first));
+        Decrement(Count_Begin, Times.first);
+        Decrement(Count_End, Times.second);
+        LineCount_Total-=Item->second.LineCount;
+        Ids.erase(Item->second.Id);
+        Items.erase(Item);
+    }
 };
 
 //***************************************************************************
@@ -240,7 +401,7 @@ bool File_SubRip::FileHeader_Begin()
     size_t Lines_Count=0;
     size_t EmptyCount=0;
     size_t LineMaxCountPerEvent=0;
-    vector<timeline> TimeLine;
+    SubRip_TimeLine TimeLine;
 
     for (size_t Pos=0; Pos<List.size(); Pos++)
     {
@@ -292,89 +453,36 @@ bool File_SubRip::FileHeader_Begin()
                    Lines_Count+=LineCount_New;
 
                     // Not supporting back to the past
-                    for (size_t i=0; i<TimeLine.size(); i++)
-                    {
-                        if (Time_Begin_New<TimeLine[i].Time_Begin)
-                        {
-                            TimeLine.erase(TimeLine.begin()+i);
-                            i--;
-                            continue;
-                        }
-                    }
+                    TimeLine.Remove_BeginAfter(Time_Begin_New);
 
                     // Empty
-                    if (!TimeLine.empty() && TimeLine[TimeLine.size()-1].Time_End<Time_Begin_New)
+                    int64u Last_End;
+                    if (TimeLine.Last_End(Last_End) && Last_End<Time_Begin_New)
                         EmptyCount++;
 
                     // Checking same times
-                    bool HasSameTime=false;
-                    for (size_t i=0; i<TimeLine.size(); i++)
-                    {
-                        if (TimeLine[i].Time_Begin==Time_Begin_New && TimeLine[i].Time_End==Time_End_New)
-                        {
-                            TimeLine[i].LineCount+=LineCount_New;
-                            HasSameTime=true;
-                        }
-                    }
+                    bool HasSameTime=TimeLine.AddToSameTime(Time_Begin_New, Time_End_New, LineCount_New);
 
-                    // Checking overlappings
+                    // Checking overlappings (all present events begin at or before Time_Begin_New, so before Time_End_New)
                     if (!HasSameTime)
                     {
-                        size_t CreateFrame_Begin=1;
-                        size_t CreateFrame_End=0;
-                        for (size_t i=0; i<TimeLine.size(); i++)
-                        {
-                            if (Time_Begin_New==TimeLine[i].Time_Begin
-                             || Time_Begin_New==TimeLine[i].Time_End)
-                                CreateFrame_Begin=0;
-                            if (Time_End_New!=TimeLine[i].Time_Begin
-                             && Time_End_New!=TimeLine[i].Time_End)
-                            {
-                                CreateFrame_End=1;
-                                int64u Duration;
-                                if (Time_Begin_New>TimeLine[i].Time_Begin)
-                                {
-                                    Duration=Time_Begin_New-TimeLine[i].Time_Begin;
-                                    if (Events_MinDuration>Duration)
-                                        Events_MinDuration=Duration;
-                                }
-                                if (Time_Begin_New<TimeLine[i].Time_End)
-                                {
-                                    Duration=TimeLine[i].Time_End-Time_Begin_New;
-                                    if (Events_MinDuration>Duration)
-                                        Events_MinDuration=Duration;
-                                }
-                            }
-                        }
-                        Events_Total+=CreateFrame_Begin;
-                        Events_Total+=CreateFrame_End;
+                        Events_Total+=TimeLine.HasBeginOrEndAt(Time_Begin_New)?0:1;
+                        Events_Total+=TimeLine.HasEndNotAt(Time_End_New)?1:0;
+                        int64u Time;
+                        if (TimeLine.Begin_Before(Time_Begin_New, Time_End_New, Time) && Events_MinDuration>Time_Begin_New-Time)
+                            Events_MinDuration=Time_Begin_New-Time;
+                        if (TimeLine.End_After(Time_Begin_New, Time_End_New, Time) && Events_MinDuration>Time-Time_Begin_New)
+                            Events_MinDuration=Time-Time_Begin_New;
                     }
 
-                    for (size_t i=0; i<TimeLine.size(); i++)
-                    {
-                        if (TimeLine[i].Time_End<=Time_Begin_New)
-                        {
-                            TimeLine.erase(TimeLine.begin()+i);
-                            i--;
-                            continue;
-                        }
-                    }
+                    TimeLine.Remove_EndUpTo(Time_Begin_New);
 
                     if (!HasSameTime)
-                        TimeLine.push_back(timeline(Time_Begin_New, Time_End_New, LineCount_New));
+                        TimeLine.Add(Time_Begin_New, Time_End_New, LineCount_New);
 
-                    LineCount_New=0;
-                    for (size_t i=0; i<TimeLine.size(); i++)
-                    {
-                        LineCount_New+=TimeLine[i].LineCount;
-                        int64u Duration;
-                        if (Time_Begin_New<Time_End_New)
-                            Duration=Time_End_New-Time_Begin_New;
-                        else
-                            Duration=0;
-                        if (Events_MinDuration>Duration)
-                            Events_MinDuration=Duration;
-                    }
+                    LineCount_New=TimeLine.LineCount();
+                    if (Events_MinDuration>Time_End_New-Time_Begin_New) // Timeline is never empty here
+                        Events_MinDuration=Time_End_New-Time_Begin_New;
                 }
 
                 if (LineMaxCountPerEvent<LineCount_New)
@@ -434,7 +542,7 @@ void File_SubRip::Read_Buffer_Continue()
     #endif //MEDIAINFO_DEMUX
 
     // Output
-    #if MEDIAINFO_EVENTS
+    #if MEDIAINFO_EVENTS && MEDIAINFO_DEMUX
         for (; Items_Pos<Items.size(); Items_Pos++)
         {
             Frame_Count_NotParsedIncluded=Frame_Count;
@@ -472,7 +580,7 @@ void File_SubRip::Read_Buffer_Continue()
 
             Frame_Count++;
         }
-    #endif //MEDIAINFO_EVENTS
+    #endif //MEDIAINFO_EVENTS && MEDIAINFO_DEMUX
 
     Buffer_Offset=Buffer_Size;
 }

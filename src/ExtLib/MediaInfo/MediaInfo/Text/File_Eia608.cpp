@@ -213,11 +213,17 @@ void File_Eia608::Streams_Finish()
                     Stream.Count_PaintOn++;
                 if (Stream.Count_PaintOn)
                     Fill(Stream_Text, i, Text_Events_PaintOn, Stream.Count_PaintOn);
-                if (size_t Events_Total=Stream.Count_PopOn+Stream.Count_RollUp+Stream.Count_PaintOn)
-                    Fill(Stream_Text, i, Text_Events_Total, Events_Total);
-                Fill(Stream_Text, i, Text_Lines_Count, Stream.LineCount);
-                if (Stream.LineCount)
-                    Fill(Stream_Text, i, Text_Lines_MaxCountPerEvent, Stream.LineMaxCountPerEvent);
+                const auto Events_Total = Stream.Count_PopOn + Stream.Count_RollUp + Stream.Count_PaintOn;
+                Fill(Stream_Text, i, Text_Events_Total, Events_Total);
+                if (Events_Total)
+                {
+                    Fill(Stream_Text, i, Text_Lines_Count, Stream.LineCount);
+                    if (Stream.LineCount)
+                    {
+                        Fill(Stream_Text, i, Text_Lines_MaxCountPerEvent, Stream.LineMaxCountPerEvent);
+                        Fill(Stream_Text, i, Text_Lines_MaxCharacterCount, Stream.MaxCountOfCharsPerLine);
+                    }
+                }
             }
             i++;
         }
@@ -1093,16 +1099,19 @@ void File_Eia608::Special_14(int8u cc_data_2)
                     {
                         bool HasContent=false;
                         vector<character>& Line=CC_Displayed[Pos_Y];
+                        size_t CharCountPerLine=0;
                         for (int8u Pos_X=0; Pos_X<Eia608_Columns; Pos_X++)
                             if (Line[Pos_X].Value)
                             {
                                 HasContent=true;
-                                break;
+                                CharCountPerLine++;
                             }
                         if (HasContent)
                         {
                             Stream.LineCount++;
                             LineMaxCountPerEvent_Temp++;
+                            if (Stream.MaxCountOfCharsPerLine<CharCountPerLine)
+                                Stream.MaxCountOfCharsPerLine=CharCountPerLine;
                         }
                     }
                     if (Stream.LineMaxCountPerEvent<LineMaxCountPerEvent_Temp)
@@ -1302,11 +1311,21 @@ void File_Eia608::Character_Fill(wchar_t Character)
         {
             bool HasContent=false;
             vector<character>& Line=CC_Displayed[Pos_Y];
+            size_t CharCountPerLine=0;
             for (int8u Pos_X=0; Pos_X<Eia608_Columns; Pos_X++)
+            {
                 if (Line[Pos_X].Value)
+                {
                     HasContent=true;
+                    CharCountPerLine++;
+                }
+            }
             if (HasContent)
+            {
                 LineMaxCountPerEvent_Temp++;
+                if (Stream.MaxCountOfCharsPerLine<CharCountPerLine)
+                    Stream.MaxCountOfCharsPerLine=CharCountPerLine;
+            }
         }
         if (Stream.LineMaxCountPerEvent<LineMaxCountPerEvent_Temp)
             Stream.LineMaxCountPerEvent=LineMaxCountPerEvent_Temp;

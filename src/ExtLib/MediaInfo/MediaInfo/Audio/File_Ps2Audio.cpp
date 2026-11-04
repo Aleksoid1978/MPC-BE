@@ -54,6 +54,7 @@ void File_Ps2Audio::SSbd()
     if (Count_Get(Stream_Audio)!=1)
     {
         Trusted_IsNot("Element should not be here");
+        Element_Offset=Element_Size;
         return;
     }
 

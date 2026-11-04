@@ -15,6 +15,7 @@
 #include "MediaInfo/MediaInfo_Internal.h"
 #include "MediaInfo/Multiple/File_Mpeg4_Descriptors.h"
 #include <memory>
+#include <set>
 class File_MpegPs;
 //---------------------------------------------------------------------------
 
@@ -50,6 +51,14 @@ protected :
     void Streams_Accept();
     void Streams_Accept_jp2(bool IsJp2=false);
     void Streams_Finish();
+    struct grids
+    {
+        std::set<int32u> Grid_IDs;
+        std::set<int32u> HiddenTiles; //Tiles not displayed
+        std::set<int32u> SkippedTiles; //Hidden tiles not needed for the characteristics of the grid
+    };
+    void Streams_Finish_Grid_Prepare(grids& Grids);
+    void Streams_Finish_Grid(const std::map<int32u, size_t>& Image_StreamPos, const grids& Grids);
     void Streams_Finish_CommercialNames ();
 
 public :
@@ -91,12 +100,14 @@ private :
     void mdat_xxxx();
     void mdat_StreamJump();
     void meta();
+    void meta_CreateStream();
     void meta_grpl();
     void meta_grpl_xxxx();
     void meta_hdlr() {moov_meta_hdlr();}
     void meta_idat();
     void meta_iinf();
     void meta_iinf_infe();
+    void meta_iinf_infe_Fill();
     void meta_iloc();
     void meta_iprp();
     void meta_iprp_ipco();
@@ -116,6 +127,7 @@ private :
     void meta_iprp_ipco_pasp();
     void meta_iprp_ipco_pixi();
     void meta_iprp_ipco_rloc();
+    void meta_iprp_ipco_xxxx();
     void meta_iprp_ipma();
     void meta_iref();
     void meta_iref_xxxx();
@@ -123,6 +135,11 @@ private :
     void mfra();
     void mfra_mfro();
     void mfra_tfra();
+    void mini();
+    template<typename F> void mini_Chunk(const char* Name, int64u Size, F Parse);
+    void mini_CodecConfiguration(int32u item_ID, int32u codec_config_type);
+    void mini_HdrProperties(Ztring& MaxCLL, Ztring& MaxFALL, Ztring& MasteringDisplay_ColorPrimaries, Ztring& MasteringDisplay_Luminance);
+    void mini_ItemData(int32u item_ID);
     void moof();
     void moof_mfhd();
     void moof_traf();
@@ -149,6 +166,7 @@ private :
     void moov_meta_ilst();
     void moov_meta_ilst_xxxx();
     void moov_meta_ilst_xxxx_data();
+    void moov_meta_ilst_xxxx_data_arri();
     void moov_meta_ilst_xxxx_mean();
     void moov_meta_ilst_xxxx_name();
     void moov_meta_xml();
@@ -240,6 +258,7 @@ private :
     void moov_trak_mdia_minf_stbl_stsd_xxxx_ccst();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_chan();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_chnl();
+    void moov_trak_mdia_minf_stbl_stsd_xxxx_acxd();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_clap();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_clli();
     void moov_trak_mdia_minf_stbl_stsd_xxxx_colr();
@@ -439,13 +458,6 @@ private :
     void Descriptors();
     void TimeCode_Associate(int32u TrackID);
     void AddCodecConfigurationBoxInfo();
-    void Loop_CheckValue(int32u& Value, int64u RemainingSize, int8u MinBlockSize, const char* Name);
-    void Loop_CheckValue(int32u& Value, int8u MinBlockSize, const char* Name);
-    void Loop_CheckValue(int16u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue(Value2, MinBlockSize, Name); Value = Value2; }
-    void Loop_CheckValue(int8u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue(Value2, MinBlockSize, Name); Value = Value2; }
-    void Loop_CheckValue_BS(int32u& Value, int8u MinBlockSize, const char* Name);
-    void Loop_CheckValue_BS(int16u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue_BS(Value2, MinBlockSize, Name); Value = Value2; }
-    void Loop_CheckValue_BS(int8u& Value, int8u MinBlockSize, const char* Name) { int32u Value2 = Value; Loop_CheckValue_BS(Value2, MinBlockSize, Name); Value = Value2; }
 
     //Temp
     int128u                                 Name_UUID;
@@ -483,7 +495,9 @@ private :
     bool                                    IsFragmented;
     size_t                                  StreamOrder;
     int32u                                  meta_pitm_item_ID;
+    bool                                    meta_iref_IsParsed;
     std::vector<std::vector<int32u> >       meta_iprp_ipma_Entries;
+    std::set<int32u>                        meta_iprp_SkippedItems; //HEIF tiles hidden by their grid, their properties are not needed
     #if MEDIAINFO_TRACE
     int64u                                  meta_iprp_ipco_File_Offset;
     #endif
@@ -610,6 +624,10 @@ private :
         std::vector<int32u>     ChaptersFor;
         std::vector<int32u>     Meta;
         std::vector<int32u>     MetaFor;
+        int32u                  infe_item_type;
+        const char*             infe_Format; //Format of a derived image item
+        bool                    infe_IsEncrypted;
+        std::vector<int32u>     iref_dimg; //Input images of a derived image
         float32                 CleanAperture_Width;
         float32                 CleanAperture_Height;
         float32                 CleanAperture_PixelAspectRatio;
@@ -696,6 +714,9 @@ private :
             MayHaveCaption=false;
             tkhd_Found=false;
             TrackID = 0;
+            infe_item_type=0x00000000;
+            infe_Format=nullptr;
+            infe_IsEncrypted=false;
             CleanAperture_Width=0;
             CleanAperture_Height=0;
             CleanAperture_PixelAspectRatio=0;
@@ -730,6 +751,7 @@ private :
         void Parsers_Clear()
         {
             Parsers.clear();
+            IsPcm=false;
             #ifdef MEDIAINFO_DVDIF_ANALYZE_YES
                 IsDvDif=false;
             #endif //MEDIAINFO_DVDIF_ANALYZE_YES
@@ -776,12 +798,9 @@ private :
     struct idat_item {
         int64u offset{};
         int64u length{};
-        std::unique_ptr<File__Analyze> parser;
     };
     std::map<int16u, idat_item> idat_items;
-
-    //Gain map
-    std::shared_ptr<void> GainMap_metadata_ISO;
+    std::vector<int8u> meta_idat_Buffer; //Content of idat when it is before iloc
 };
 
 } //NameSpace

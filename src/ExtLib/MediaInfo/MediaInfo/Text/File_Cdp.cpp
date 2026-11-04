@@ -458,6 +458,14 @@ void File_Cdp::ccdata_section()
     BS_End();
     for (int8u Pos=0; Pos<cc_count; Pos++)
     {
+        if (Element_Offset>Element_Size || Element_Size-Element_Offset<3
+         || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+         || Buffer_Size-Buffer_Offset-(size_t)Element_Offset<3)
+        {
+            Trusted_IsNot("Truncated caption unit");
+            Element_End0();
+            return;
+        }
         Element_Begin1("cc");
         int8u cc_type;
         bool  cc_valid;

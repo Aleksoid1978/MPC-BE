@@ -184,6 +184,9 @@
 #if defined(MEDIAINFO_DIRAC_YES)
     #include "MediaInfo/Video/File_Dirac.h"
 #endif
+#if defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+    #include "MediaInfo/Video/File_DolbyVisionMetadata.h"
+#endif
 #if defined(MEDIAINFO_FLIC_YES)
     #include "MediaInfo/Video/File_Flic.h"
 #endif
@@ -631,6 +634,9 @@ static File__Analyze* SelectFromExtension(const String& Parser)
     #if defined(MEDIAINFO_DIRAC_YES)
         if (Parser==__T("Dirac"))       return new File_Dirac();
     #endif
+    #if defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+        if (Parser==__T("DolbyVisionMetadata")) return new File_DolbyVisionMetadata();
+    #endif
     #if defined(MEDIAINFO_FLIC_YES)
         if (Parser==__T("Flic"))        return new File_Flic();
     #endif
@@ -1072,6 +1078,9 @@ int MediaInfo_Internal::ListFormats(const String &File_Name)
     #endif
     #if defined(MEDIAINFO_DIRAC_YES)
         SAFE_DELETE(Info); Info=new File_Dirac();              if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
+    #endif
+    #if defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+        SAFE_DELETE(Info); Info=new File_DolbyVisionMetadata(); if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;
     #endif
     #if defined(MEDIAINFO_FLIC_YES)
         SAFE_DELETE(Info); Info=new File_Flic();               if (((Reader_File*)Reader)->Format_Test_PerParser(this, File_Name)>0) return 1;

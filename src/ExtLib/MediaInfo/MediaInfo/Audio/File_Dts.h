@@ -87,6 +87,7 @@ private :
 
     //Buffer
     bool FrameSynchPoint_Test();
+    int16u CRC_Compute(size_t Size);
     const int8u* Save_Buffer;
     size_t Save_Buffer_Offset;
     size_t Save_Buffer_Size;
@@ -110,6 +111,9 @@ private :
     int8u  HD_MaximumSampleRate_Real;
     int8u  HD_TotalNumberChannels;
     int8u  HD_ExSSFrameDurationCode;
+    int8u  DtsXObjectCount;
+    int8u  DtsXSupplementalChannelCount;
+    bool   DtsXObjectCountProbeDone;
     bool   AuxiliaryData;
     bool   ExtendedCoding;
     bool   Word;
@@ -151,6 +155,7 @@ private :
         BitRate,
         BitRate_Mode,
         Compression_Mode,
+        NumberOfDynamicObjects,
         data_Max,
     };
     ZtringList Data[data_Max];

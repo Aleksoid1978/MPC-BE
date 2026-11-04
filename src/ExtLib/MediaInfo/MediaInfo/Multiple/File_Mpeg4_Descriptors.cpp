@@ -428,8 +428,22 @@ File_Mpeg4_Descriptors::File_Mpeg4_Descriptors()
     //Conformance
     #if MEDIAINFO_CONFORMANCE
         SamplingRate=0;
+        // The parent File_Mpeg4 hands these raw pointers to child parsers via
+        // Parser->X=&Y assignments (see File_Mpeg4_Elements.cpp:6359 for the AAC
+        // path and File_Mpeg4_Descriptors::Descriptor_05 for the descriptor path).
+        // On paths where a File_Mpeg4_Descriptors is constructed but its owner
+        // never gets to make that assignment, an uninitialised member propagates a
+        // stale non-null pointer down the chain, and File_Aac -> File_Usac end up
+        // dereferencing it in Streams_Finish_Conformance_Profile() -- see gh#2607.
         stss=nullptr;
+        stss_IsPresent=nullptr;
+        IsCmaf=nullptr;
+        stts=nullptr;
+        FirstOutputtedDecodedSample=nullptr;
+        sgpd_prol=nullptr;
         sbgp=nullptr;
+        sbgp_IsPresent=nullptr;
+        sgpd_prol_roll_distance=nullptr;
     #endif
 }
 
@@ -1142,6 +1156,7 @@ void File_Mpeg4_Descriptors::Descriptor_06()
                     SLConfig->timeStampResolution               =0;
                     SLConfig->OCRResolution                     =0;
                     SLConfig->timeStampLength                   =0;
+                    SLConfig->OCRLength                         =0;
                     SLConfig->AU_Length                         =0;
                     SLConfig->instantBitrateLength              =0;
                     SLConfig->degradationPriorityLength         =0;

@@ -160,7 +160,9 @@ void File_Umf::Read_Buffer_Continue()
                 Skip_L4(                                                "MPEG video attributes");
                 Skip_L4(                                                "Reserved");
                 #if MEDIAINFO_SEEK || MEDIAINFO_DEMUX
-                    GopSize=(1+P)*(1+B);
+                    GopSize=(1+(int64u)P)*(1+(int64u)B);
+                    if (!GopSize || P>=0x10000 || B>=0x10000)
+                        GopSize=(int64u)-1; //Not realistic
                 #endif //MEDIAINFO_SEEK || MEDIAINFO_DEMUX
                 }
                 break;

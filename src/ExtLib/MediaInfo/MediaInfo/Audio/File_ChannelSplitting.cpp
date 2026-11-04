@@ -205,7 +205,7 @@ void File_ChannelSplitting::Read_Buffer_Init()
 {
     if (Common==NULL)
     {
-        if (BitDepth!=16 && BitDepth!=24 && BitDepth!=32)
+        if (Channel_Total<2 || (BitDepth!=16 && BitDepth!=24 && BitDepth!=32))
         {
             Reject();
             return;

@@ -131,10 +131,20 @@ private :
         int8u WindowID;
         bool HasContent;
 
+        //Stats
+        int64u LineCount;
+        size_t MaxCountOfLinesPerFrame;
+        size_t MaxCountOfCharsPerLine;
+        size_t Events_Total;
+
         stream()
         {
             WindowID=(int8u)-1;
             HasContent=false;
+            LineCount=0;
+            MaxCountOfLinesPerFrame=0;
+            MaxCountOfCharsPerLine=0;
+            Events_Total=0;
         }
 
         ~stream()

@@ -480,6 +480,7 @@ void File_Ibi_Creation::Add(int64u ID, const ibi::stream &Stream)
     Buffers.push_back(Buffer);
 
     //Finish
+    delete[] IbiHeader; //IbiHeader=NULL;
     delete[] IbiByteOffset; //IbiByteOffset=NULL;
     delete[] IbiFrameNumber; //IbiFrameNumber=NULL;
     delete[] IbiDts; //IbiDts=NULL;
@@ -523,9 +524,16 @@ Ztring File_Ibi_Creation::Finish()
     {
         buffer Buffer;
         size_t UncompressedSize = Main_Offset - Header_Offset;
-        int8u* Compressed = new int8u[UncompressedSize];
-        unsigned long CompressedSize = (unsigned long)Main_Offset;
-        if (compress2(Compressed, &CompressedSize, Main + Header_Offset, (unsigned long)UncompressedSize, Z_BEST_COMPRESSION) == Z_OK && CompressedSize < UncompressedSize)
+        uLong UncompressedSize_Zlib=(uLong)UncompressedSize;
+        uLongf CompressedSize=(size_t)UncompressedSize_Zlib==UncompressedSize?compressBound(UncompressedSize_Zlib):0;
+        int8u* Compressed=CompressedSize?new int8u[CompressedSize]:NULL;
+        bool IsCompressed=Compressed && compress2(Compressed, &CompressedSize, Main + Header_Offset, UncompressedSize_Zlib, Z_BEST_COMPRESSION)==Z_OK && CompressedSize<UncompressedSize;
+        if (IsCompressed)
+        {
+            size_t CompressedHeaderSize=int64u2Ebml(NULL, 0x02)+int64u2Ebml(NULL, int64u2Ebml(NULL, UncompressedSize)+CompressedSize)+int64u2Ebml(NULL, UncompressedSize);
+            IsCompressed=CompressedHeaderSize<=UncompressedSize-CompressedSize;
+        }
+        if (IsCompressed)
         {
             Main_Offset = Header_Offset; //Removing uncompressed content
             Main_Offset += int64u2Ebml(Main + Main_Offset, 0x02);                                                                   //Compressed index
@@ -545,6 +553,7 @@ Ztring File_Ibi_Creation::Finish()
             Buffer.Content = new int8u[Buffer.Size];
             std::memcpy(Buffer.Content, Main, Size);
         }
+        delete[] Compressed;
 
         std::string Data_Raw((const char*)Buffer.Content, Buffer.Size);
         std::string Data_Base64(Base64::encode(Data_Raw));

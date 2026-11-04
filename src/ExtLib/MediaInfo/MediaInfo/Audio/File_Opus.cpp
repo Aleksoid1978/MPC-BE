@@ -68,12 +68,12 @@ static const char*  Opus_ChannelLayout[Opus_ChannelLayout_Max]=
 {
     "M",
     "L R",
-    "L R C",
+    "L C R",
     "L R BL BR",
-    "L R BL BR LFE",
-    "L R C BL BR LFE",
-    "L R C SL SR BC LFE",
-    "L R C SL SR BL BR LFE",
+    "L C R BL BR",
+    "L C R BL BR LFE",
+    "L C R SL SR BC LFE",
+    "L C R SL SR BL BR LFE",
 };
 
 //---------------------------------------------------------------------------

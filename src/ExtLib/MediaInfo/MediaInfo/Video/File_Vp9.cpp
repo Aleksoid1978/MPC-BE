@@ -147,7 +147,15 @@ void File_Vp9::Read_Buffer_OutOfBand()
         Get_B1 (    level,                                          "level"); Param_Info3((float)level / 10, nullptr, 1);
         BS_Begin();
         Get_S1 ( 4, bitDepth,                                       "bitDepth");
-        Get_S1 ( 3, chromaSubsampling,                              "chromaSubsampling"); Param_Info1(Vp9_ChromaSubsampling[Vp9_ChromaSubsampling_OutOfBand[chromaSubsampling]]);
+        Get_S1 ( 3, chromaSubsampling,                              "chromaSubsampling");
+        if (chromaSubsampling>=sizeof(Vp9_ChromaSubsampling_OutOfBand)/sizeof(*Vp9_ChromaSubsampling_OutOfBand))
+        {
+            Trusted_IsNot("Invalid chroma subsampling");
+            BS_End();
+            Element_End0();
+            return;
+        }
+        Param_Info1(Vp9_ChromaSubsampling[Vp9_ChromaSubsampling_OutOfBand[chromaSubsampling]]);
         Get_SB (    videoFullRangeFlag,                             "videoFullRangeFlag"); Param_Info1(Vp9_ColorRange[videoFullRangeFlag]);
         BS_End();
         Get_B1 (    colourPrimaries,                                "colourPrimaries"); Param_Info1(Mpegv_colour_primaries(colourPrimaries));

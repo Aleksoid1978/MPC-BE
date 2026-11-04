@@ -221,7 +221,7 @@ Ztring MediaInfo_Internal::Inform()
                                 if (!Source.empty())
                                 {
                                     Result += " source=\"";
-                                    Result += Source.To_UTF8();
+                                    Result += XML_Encode(Source).To_UTF8();
                                     Result += '"';
                                 }
                             }
@@ -746,6 +746,30 @@ struct nested
 };
 }
 #endif //MEDIAINFO_XML_YES || MEDIAINFO_JSON_YES
+#if defined(MEDIAINFO_CSV_YES)
+static Ztring CSV_Encode(const Ztring& Value)
+{
+    //Neutralizing spreadsheet formulas
+    Ztring Result;
+    if (!Value.empty())
+    {
+        Char First=Value[0];
+        if (First==__T('=') || First==__T('+') || First==__T('@') || First==__T('\t') || First==__T('\r')
+         || (First==__T('-') && (Value.size()==1 || ((Value[1]<__T('0') || Value[1]>__T('9')) && Value[1]!=__T('.'))))) //Keeping negative numbers
+            Result+=__T('\'');
+    }
+    Result+=Value;
+
+    //RFC 4180 quoting
+    if (Result.find_first_of(__T(",\"\r\n"))!=string::npos)
+    {
+        Result.FindAndReplace(__T("\""), __T("\"\""), 0, Ztring_Recursive);
+        Result.insert(0, 1, __T('"'));
+        Result+=__T('"');
+    }
+    return Result;
+}
+#endif //defined(MEDIAINFO_CSV_YES)
 Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool IsDirect)
 {
     //Integrity
@@ -1171,9 +1195,9 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 #if defined(MEDIAINFO_CSV_YES)
                 if (CSV)
                 {
-                    Retour+=Nom;
+                    Retour+=CSV_Encode(Nom);
                     Retour+=__T(",");
-                    Retour+=Valeur;
+                    Retour+=CSV_Encode(Valeur);
                 }
                 #endif //defined(MEDIAINFO_CSV_YES)
                 #if defined(MEDIAINFO_TEXT_YES) && (defined(MEDIAINFO_HTML_YES) || defined(MEDIAINFO_XML_YES) || defined(MEDIAINFO_JSON_YES) || defined(MEDIAINFO_CSV_YES))

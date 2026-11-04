@@ -357,6 +357,7 @@ protected :
     //Header - Info
     void Header_Fill_Code (int64u Code);
     void Header_Fill_Code (int64u Code, const Ztring &Name);
+    void Header_Fill_Code (int64u Code, const char* Name);
     #define Header_Fill_Code2(A,B) Header_Fill_Code(A,B)
     void Header_Fill_Size (int64u Size);
 
@@ -377,6 +378,12 @@ protected :
     //Data - Get info
     size_t Data_Remain ()                                                       {return (size_t)(Element_Size-(Element_Offset+BS->Offset_Get()));};
     size_t Data_BS_Remain ()                                                    {return (size_t)BS->Remain();};
+
+    //Data - Loops
+    void Loop_CheckValue(int64u& Value, int64u RemainingSize, int64u MinBlockSize, const char* Name);
+    template<typename T> void Loop_CheckValue(T& Value, int64u RemainingSize, int64u MinBlockSize, const char* Name) {int64u Value2=Value; Loop_CheckValue(Value2, RemainingSize, MinBlockSize, Name); Value=(T)Value2;}
+    template<typename T> void Loop_CheckValue(T& Value, int64u MinBlockSize, const char* Name) {Loop_CheckValue(Value, Element_Size>Element_Offset?(Element_Size-Element_Offset):0, MinBlockSize, Name);}
+    template<typename T> void Loop_CheckValue_BS(T& Value, int64u MinBlockSize, const char* Name) {Loop_CheckValue(Value, Data_BS_Remain(), MinBlockSize, Name);}
 
     //Data - Detect EOF
     virtual void Detect_EOF ()                                                  {};
@@ -464,6 +471,7 @@ protected :
 
 protected :
     //Element - Common
+    bool   Element_Begin_Common();
     void   Element_End_Common_Flush();
     void   Element_End_Common_Flush_Details();
 public :
@@ -847,6 +855,7 @@ public :
     void Get_C6 (int64u &Info, const char* Name);
     void Get_C7 (int64u &Info, const char* Name);
     void Get_C8 (int64u &Info, const char* Name);
+    void Get_C12(int128u &Info, const char* Name);
     void Skip_C1(              const char* Name);
     void Skip_C2(              const char* Name);
     void Skip_C3(              const char* Name);
@@ -855,6 +864,7 @@ public :
     void Skip_C6(              const char* Name);
     void Skip_C7(              const char* Name);
     void Skip_C8(              const char* Name);
+    void Skip_C12(             const char* Name);
     #define Info_C1(_INFO, _NAME) int8u  _INFO; Get_C1(_INFO, _NAME)
     #define Info_C2(_INFO, _NAME) int16u _INFO; Get_C2(_INFO, _NAME)
     #define Info_C3(_INFO, _NAME) int32u _INFO; Get_C3(_INFO, _NAME)
@@ -863,6 +873,7 @@ public :
     #define Info_C6(_INFO, _NAME) int64u _INFO; Get_C6(_INFO, _NAME)
     #define Info_C7(_INFO, _NAME) int64u _INFO; Get_C7(_INFO, _NAME)
     #define Info_C8(_INFO, _NAME) int64u _INFO; Get_C8(_INFO, _NAME)
+    #define Info_C12(_INFO, _NAME) int64u _INFO; Get_C12(_INFO, _NAME)
 
     //***************************************************************************
     // Text
@@ -931,6 +942,129 @@ public :
     #endif
     #if defined(MEDIAINFO_MPEGPS_YES) || defined(MEDIAINFO_MPEGTS_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MK_YES)
     void dvcC(bool has_dependency_pid=false, std::map<std::string, Ztring>* Infos=NULL);
+    #endif
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_AV1_YES) || defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+    // Dolby Vision metadata, from the RPU or from Dolby Vision XML metadata
+    struct DV_RPU {
+        // Header, from the first RPU
+        int16u rpu_format{};
+        int8u vdr_rpu_profile{};
+        int8u vdr_rpu_level{};
+        int8u coefficient_data_type{};
+        int8u coefficient_log2_denom{};
+        int8u vdr_rpu_normalized_idc{};
+        int8u bl_bit_depth{};
+        int8u el_bit_depth{};
+        int8u vdr_bit_depth{};
+        int8u ext_mapping_idc{};
+        int8u dm_compression{};
+        int8u Profile_First{};
+        int16u Profiles{}; // Bit field of the profiles deduced from each RPU header (HEVC rules)
+        bool chroma_resampling_explicit_filter_flag{};
+        bool BL_video_full_range_flag{};
+        bool spatial_resampling_filter_flag{};
+        bool el_spatial_resampling_filter_flag{};
+        bool disable_residual_flag{};
+
+        // Mapping, from the first RPU having it
+        bool Mapping_Present{};
+        int8u nlq_method_idc{};
+        int32u mapping_color_space{};
+        int32u mapping_chroma_format_idc{};
+        int32u num_x_partitions_minus1{};
+        int32u num_y_partitions_minus1{};
+
+        // Display management, from the first RPU having it
+        bool DM_Present{};
+        int8u signal_bit_depth{};
+        int8u signal_color_space{};
+        int8u signal_chroma_format{};
+        int8u signal_full_range_flag{};
+        int16u signal_eotf{};
+        int16u signal_eotf_param0{};
+        int16u signal_eotf_param1{};
+        int32u signal_eotf_param2{};
+        int16u source_diagonal{};
+        std::vector<int32u> Sources; // Unique (source_min_PQ<<16)|source_max_PQ values
+
+        // Counts
+        int32u Count{}; // RPUs
+        int32u Count_Shot{};
+        int32u Count_MEL{};
+        int32u Count_FEL{};
+        int32u Count_EL{}; // Enhancement layer NAL units in the same stream as the RPUs, none if the stream is the enhancement layer itself (e.g. UHD Blu-ray)
+        int32u Count_CMv29{};
+        int32u Count_CMv40{};
+        bool IsFilled{}; // Streams are filled, Streams_Finish() may be called again (e.g. by Matroska) and must not add the same values twice
+
+        // Extension blocks
+        struct l5 {
+            int16u Offsets[4]; // Left, right, top, bottom
+            bool operator==(const l5& b) const { for (int i=0; i<4; i++) if (Offsets[i]!=b.Offsets[i]) return false; return true; }
+        };
+        struct l6 {
+            int16u max_display_mastering_luminance;
+            int16u min_display_mastering_luminance;
+            float64 max_content_light_level;
+            float64 max_frame_average_light_level;
+            bool operator==(const l6& b) const { return max_display_mastering_luminance==b.max_display_mastering_luminance && min_display_mastering_luminance==b.min_display_mastering_luminance && max_content_light_level==b.max_content_light_level && max_frame_average_light_level==b.max_frame_average_light_level; }
+        };
+        struct l9 {
+            int8u source_primary_index;
+            bool Explicit;
+            int16u Primaries[8]; // R, G, B, W pairs
+            bool operator==(const l9& b) const { if (source_primary_index!=b.source_primary_index || Explicit!=b.Explicit) return false; for (int i=0; i<8; i++) if (Primaries[i]!=b.Primaries[i]) return false; return true; }
+        };
+        struct l10 {
+            int8u target_display_index;
+            int8u target_primary_index;
+            int16u target_max_PQ;
+            int16u target_min_PQ;
+            bool operator==(const l10& b) const { return target_display_index==b.target_display_index && target_primary_index==b.target_primary_index && target_max_PQ==b.target_max_PQ && target_min_PQ==b.target_min_PQ; }
+        };
+        struct l11 {
+            int8u content_type;
+            int8u white_point;
+            int8u reference_mode; // 0xFF if unknown
+            bool operator==(const l11& b) const { return content_type==b.content_type && white_point==b.white_point && reference_mode==b.reference_mode; }
+        };
+        int16u L1_max_PQ{}; // Maximum of the values
+        int16u L1_avg_PQ{}; // Maximum of the values
+        int16u L5_First[4]{}; // Left, right, top, bottom
+        int16u L5_Min[4]{};
+        int16u L5_Max[4]{};
+        bool L5_Present{};
+        bool L254_Present{};
+        int8u dm_mode{};
+        int8u dm_version_index{};
+        std::vector<int16u> L2_target_max_PQ;
+        std::vector<l5> L5;
+        std::vector<l6> L6;
+        std::vector<int8u> L8_target_display_index;
+        std::vector<l9> L9;
+        std::vector<l10> L10;
+        std::vector<l11> L11;
+
+        // From XML metadata only
+        Ztring CMVersion;
+        Ztring MasteringDisplay_Name;
+        Ztring MasteringDisplay_ID;
+        std::vector<std::pair<int8u, Ztring> > TargetDisplay_Names;
+        std::vector<float64> Active_DisplayAspectRatios;
+        int64u FrameRange_Start{(int64u)-1};
+        int64u FrameRange_End{};
+    };
+    enum dv_source {
+        DV_Source_HEVC,
+        DV_Source_AV1,
+        DV_Source_XML,
+    };
+    void DolbyVision_Streams_Fill(DV_RPU& Data, dv_source Source);
+    static int16u DolbyVision_Nits_ToPQ12(float64 Nits);
+    #endif
+    #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_AV1_YES)
+    // Must be in bitstream before calling this function.
+    void Get_DolbyVision_ReferenceProcessingUnit(DV_RPU& data, size_t BitsAfter = 0);
     #endif
 
     //***************************************************************************
@@ -1155,6 +1289,7 @@ public :
     //Elements - Preparation of element from external app
     size_t Stream_Prepare   (stream_t KindOfStream, size_t StreamPos=(size_t)-1);
     size_t Stream_Erase     (stream_t KindOfStream, size_t StreamPos);
+    void   Stream_Count_Update(stream_t KindOfStream);
 
     //Fill with datas (with parameter as a size_t)
     void Fill (stream_t StreamKind, size_t StreamPos, size_t Parameter, const Ztring  &Value, bool Replace=false);
@@ -1206,6 +1341,19 @@ public :
     void Fill_SetOptions(stream_t StreamKind, size_t StreamPos, const char* Parameter, const char* Options);
     vector<fill_temp_item> Fill_Temp[Stream_Max+1]; // +1 because Fill_Temp[Stream_Max] is used when StreamKind is unknown
     map<string, string> Fill_Temp_Options[Stream_Max+1]; // +1 because Fill_Temp[Stream_Max] is used when StreamKind is unknown
+    struct stream_more_index // Positions of unknown parameters per name, in order to avoid scanning all of them for each new value
+    {
+        const ZtringListList*   List=nullptr;
+        const ZtringList*       Data=nullptr;
+        size_t                  Size=0;
+        map<Ztring, size_t>     Positions; // Value is the index in Lines
+        vector<size_t>          Lines; // Position of the line, contiguous for quick update when a line is inserted
+    };
+    stream_more_index Stream_More_Index;
+    size_t Stream_More_Find(const ZtringListList& List, const Ztring& Name);
+    void Stream_More_Index_Insert(const ZtringListList& List, size_t Pos);
+    void Stream_More_Index_Erase(const ZtringListList& List, size_t Pos, const Ztring& Name);
+    bool Stream_More_IsEmpty(stream_t StreamKind, size_t StreamPos, const Ztring& Name);
     void Fill_Flush ();
     static size_t Fill_Parameter(stream_t StreamKind, generic StreamPos);
 
@@ -1270,6 +1418,7 @@ public :
     size_t Merge(MediaInfo_Internal &ToAdd, stream_t StreamKind, size_t StreamPos_From, size_t StreamPos_To, bool Erase=true); //Merge 2 streams
     size_t Merge(File__Analyze &ToAdd, bool Erase=true); //Merge 2 File_Base
     size_t Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t StreamPos_From, size_t StreamPos_To, bool Erase=true); //Merge 2 streams
+    void Merge_HDR(size_t StreamPos_To, const Ztring* Container, const Ztring* ToAdd, const Ztring& ToAdd_colour_range, const Ztring& ToAdd_matrix_coefficients); //Merge HDR formats of a container and of a stream, from Video_HDR_Format to Video_HDR_Format_Compatibility
 
     void CodecID_Fill           (const Ztring &Value, stream_t StreamKind, size_t StreamPos, infocodecid_format_t Format, stream_t StreamKind_CodecID=Stream_Max);
     void PixelAspectRatio_Fill  (const Ztring &Value, stream_t StreamKind, size_t StreamPos, size_t Parameter_Width, size_t Parameter_Height, size_t Parameter_PixelAspectRatio, size_t Parameter_DisplayAspectRatio);
@@ -1315,6 +1464,7 @@ protected :
     void Video_FrameRate_Rounding (stream_t StreamKind, size_t Pos, size_t Parameter);
     void Video_BitRate_Rounding (size_t Pos, video Parameter);
     void Audio_BitRate_Rounding (size_t Pos, audio Parameter);
+    bool Video_BitRate_Rounding_Disabled=false; //For an exact video bit rate (e.g. from the size of all elements), not rounded to a well known value
 
     //Utils - Finalize
     void Duration_Duration123   (stream_t StreamKind, size_t StreamPos, size_t Parameter);
@@ -1354,6 +1504,7 @@ protected :
 
     //Elements
     size_t Element_Level;           //Current level
+    size_t Element_Level_Overflow;  //Begins beyond the element stack capacity
     bool   Element_WantNextLevel;   //Want to go to the next leavel instead of the same level
 
     //Element
@@ -1401,8 +1552,8 @@ protected :
     //***************************************************************************
 
     bool FileHeader_Begin_0x000001();
-    bool FileHeader_Begin_XML(tinyxml2::XMLDocument &Document);
-    bool Synchronize_0x000001();
+    bool FileHeader_Begin_XML(tinyxml2::XMLDocument &Document, bool Reject_IfMalformed=true);
+    bool Synchronize_0x000001(bool NeedFour = false);
 public:
     #if defined(MEDIAINFO_FILE_YES)
     void TestContinuousFileNames(size_t CountOfFiles=24, Ztring FileExtension=Ztring(), bool SkipComputeDelay=false);
@@ -1547,13 +1698,27 @@ public :
         int64u              Hash_ParseUpTo;
     #endif //MEDIAINFO_HASH
 
+    //Errors found when testing the compliance with a specification (e.g. a profile or an edition of a standard)
+    struct conformance_error
+    {
+        string  Value;
+        string  StreamID; //ID of the stream the error is about, empty if it is about the whole file
+    };
+    struct conformance_errors : vector<conformance_error>
+    {
+        bool StopAtFirst=false; //Only the first error is needed, e.g. when testing if a file is a candidate before parsing more data
+        string StreamID; //ID of the stream the next errors are about, empty if they are about the whole file
+        bool Add(const string& Value); //Adds the error about StreamID if it is not already present for this stream (ignoring the values from " (actual "), returns true if the test must stop
+    };
+
     #if MEDIAINFO_CONFORMANCE
         void*               Conformance_Data;
-        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_General, size_t StreamPos = 0);
-        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
+        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_Max, size_t StreamPos = 0);
+        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_Max, size_t StreamPos = 0) { Fill_Conformance(Field, Value.c_str(), Flags, Level, StreamKind, StreamPos); }
+        void                Fill_Conformance_Specification(const char* Field, const string& Specification, const conformance_errors& Errors, conformance_type Level = Conformance_Error); //Errors are about the whole stream, without offset
         void                Clear_Conformance();
         void                Merge_Conformance(bool FromConfig = false);
-        void                Streams_Finish_Conformance();
+        void                Streams_Finish_Conformance(stream_t StreamKind = Stream_Max, size_t StreamPos = (size_t)-1);
         virtual string      CreateElementName();
         string              BuildConformanceName(const string& ParserName, const char* Prefix, const char* Suffix);
         void                IsTruncated(int64u ExpectedSize = (int64u)-1, bool MoreThan = false, const char* Prefix = nullptr);
@@ -1561,11 +1726,12 @@ public :
         void                RanOutOfData(const char* Prefix = nullptr);
         void                SynchLost(const char* Prefix = nullptr, int64u CountOfBytes = 0, bool AreZero = false);
     #else //MEDIAINFO_CONFORMANCE
-        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_General, size_t StreamPos = 0) {}
-        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error) { Fill_Conformance(Field, Value.c_str(), Flags, Level); }
+        void                Fill_Conformance(const char* Field, const char* Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_Max, size_t StreamPos = 0) {}
+        void                Fill_Conformance(const char* Field, const string& Value, uint8_t Flags = {}, conformance_type Level = Conformance_Error, stream_t StreamKind = Stream_Max, size_t StreamPos = 0) { Fill_Conformance(Field, Value.c_str(), Flags, Level, StreamKind, StreamPos); }
+        void                Fill_Conformance_Specification(const char* Field, const string& Specification, const conformance_errors& Errors, conformance_type Level = Conformance_Error) {}
         void                Clear_Conformance() {}
         void                Merge_Conformance(bool FromConfig = false) {}
-        void                Streams_Finish_Conformance() {}
+        void                Streams_Finish_Conformance(stream_t = Stream_Max, size_t = (size_t)-1) {}
         string              CreateElementName() { return {}; }
         string              BuildConformanceName(const string& ParserName, const char* Prefix, const char* Suffix) { return {}; }
         void                IsTruncated(int64u ExpectedSize = (int64u)-1, bool MoreThan = false, const char* = nullptr) {}

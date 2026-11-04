@@ -47,6 +47,7 @@ public:
     //In
     GainMap_metadata* output{};
     bool fromAvif{ false };
+    stream_t StreamKind{ Stream_Image }; //Kind of the stream filled with the metadata, to be merged in the image using the gain map
 
 private :
     void Data_Parse();

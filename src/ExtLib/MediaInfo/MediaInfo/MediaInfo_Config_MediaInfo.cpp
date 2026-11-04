@@ -27,9 +27,7 @@
     #include "ThirdParty/base64/base64.h"
 #endif //MEDIAINFO_IBI || MEDIAINFO_AES
 #include <algorithm>
-#if MEDIAINFO_DEMUX
-    #include <cmath>
-#endif //MEDIAINFO_DEMUX
+#include <cmath>
 using namespace ZenLib;
 using namespace std;
 //---------------------------------------------------------------------------
@@ -316,6 +314,50 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #endif //MEDIAINFO_ADVANCED
 }
 
+#if MEDIAINFO_EVENTS
+//---------------------------------------------------------------------------
+// Free the buffers copied in Event_Send() for delayed events, conditions must be same as the ones used for copying
+static void Event_Delayed_Free(int8u* Data_Content, size_t Data_Size)
+{
+    int32u EventCode;
+    std::memcpy(&EventCode, Data_Content, sizeof(EventCode));
+    if ((EventCode&0x00FFFFFF)==((MediaInfo_Event_Global_Demux<<8)|4) && Data_Size==sizeof(MediaInfo_Event_Global_Demux_4))
+    {
+        MediaInfo_Event_Global_Demux_4* New=(MediaInfo_Event_Global_Demux_4*)Data_Content;
+        if (New->Content_Size)
+        {
+            delete[] New->Content; New->Content=NULL;
+        }
+        if (New->Offsets_Size)
+        {
+            delete[] New->Offsets_Stream; New->Offsets_Stream=NULL;
+            delete[] New->Offsets_Content; New->Offsets_Content=NULL;
+        }
+        if (New->OriginalContent_Size)
+        {
+            delete[] New->OriginalContent; New->OriginalContent=NULL;
+        }
+    }
+    if ((EventCode & 0x00FFFF00) == (MediaInfo_Event_DvDif_Change << 8) && Data_Size == sizeof(MediaInfo_Event_DvDif_Change_0))
+    {
+        MediaInfo_Event_DvDif_Change_0* New = (MediaInfo_Event_DvDif_Change_0*)Data_Content;
+        delete[] New->MoreData; New->MoreData=NULL;
+    }
+    if (EventCode == ((MediaInfo_Parser_DvDif << 24) | (MediaInfo_Event_DvDif_Analysis_Frame << 8)) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
+    {
+        MediaInfo_Event_DvDif_Analysis_Frame_0* New = (MediaInfo_Event_DvDif_Analysis_Frame_0*)Data_Content;
+        delete[] New->Errors; New->Errors=NULL;
+    }
+    if ((EventCode & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1))
+    {
+        MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Data_Content;
+        delete[] New->Errors; New->Errors=NULL;
+        delete[] New->MoreData; New->MoreData=NULL;
+    }
+}
+#endif //MEDIAINFO_EVENTS
+
+//---------------------------------------------------------------------------
 MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
 {
     delete[] File_Buffer; //File_Buffer=NULL;
@@ -324,7 +366,11 @@ MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_EVENTS
         for (events_delayed::iterator Event=Events_Delayed.begin(); Event!=Events_Delayed.end(); ++Event)
             for (size_t Pos=0; Pos<Event->second.size(); Pos++)
+            {
+                if (Event->second[Pos])
+                    Event_Delayed_Free(Event->second[Pos]->Data_Content, Event->second[Pos]->Data_Size);
                 delete Event->second[Pos]; //Event->second[Pos]=NULL;
+            }
     #endif //MEDIAINFO_EVENTS
     #if MEDIAINFO_ADVANCED
         delete TimeCode_Dumps;
@@ -345,7 +391,7 @@ Ztring MediaInfo_Config_MediaInfo::Option (const String &Option, const String &V
     size_t Egal_Pos=Option_Lower.find(__T('='));
     if (Egal_Pos==string::npos)
         Egal_Pos=Option_Lower.size();
-    transform(Option_Lower.begin(), Option_Lower.begin()+Egal_Pos, Option_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(Option_Lower.begin(), Option_Lower.begin()+Egal_Pos, Option_Lower.begin(), [](unsigned char c) { return tolower(c); });
 
     if (Option_Lower==__T("file_requestterminate"))
     {
@@ -1770,7 +1816,7 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             PosPrevious--;
                         while (PosPrevious && Track[PosPrevious][Info_Name][0]==__T(' ')) // avoid injected lines
                             PosPrevious--;
-                        if (!Nested && i>j && Name[i-j]==' ' && Track[PosPrevious][Info_Name].size()>= i-j && (Track[PosPrevious][Info_Name].size()==i-j || Track[PosPrevious][Info_Name][i-j]==' ') && Name.substr(0, i-j) == Track[PosPrevious][Info_Name].substr(0, i-j))
+                        if (!Nested && Pos && i>j && Name[i-j]==' ' && Track[PosPrevious][Info_Name].size()>= i-j && (Track[PosPrevious][Info_Name].size()==i-j || Track[PosPrevious][Info_Name][i-j]==' ') && Name.substr(0, i-j) == Track[PosPrevious][Info_Name].substr(0, i-j))
                             Nested=true;
                         if (Nested)
                             Name.erase(0, i);
@@ -2329,7 +2375,8 @@ Ztring MediaInfo_Config_MediaInfo::File_Duplicate_Set (const Ztring &Value_In)
             else if (ToRemove)
             {
                 //Exists yet but Removal is wanted
-                File__Duplicate_Memory_Indexes[Memory_Pos].clear();
+                if (Memory_Pos!=Error)
+                    File__Duplicate_Memory_Indexes[Memory_Pos].clear();
                 Memory_Pos=(size_t)-1;
             }
 
@@ -2941,7 +2988,14 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
 {
     CriticalSectionLocker CSL(CS);
 
-    if (Source==NULL)
+    if (!Data_Content || Data_Size<sizeof(int32u))
+        return;
+    int32u Code;
+    std::memcpy(&Code, Data_Content, sizeof(Code));
+    bool IsGeneric=Data_Size>=sizeof(MediaInfo_Event_Generic)
+                && Code!=(MediaInfo_Parser_DvDif<<24 | MediaInfo_Event_DvDif_Analysis_Frame<<8);
+
+    if (Source==NULL && IsGeneric)
     {
         MediaInfo_Event_Generic* Temp=(MediaInfo_Event_Generic*)Data_Content;
 
@@ -3004,7 +3058,7 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
     }
 
     //Adaptation of time stamps
-    if (!FileIsReferenced && !Events_TimestampShift_Disabled)
+    if (IsGeneric && !FileIsReferenced && !Events_TimestampShift_Disabled)
     {
         MediaInfo_Event_Generic* Event=(MediaInfo_Event_Generic*)Data_Content;
 
@@ -3162,10 +3216,10 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
                 New->MoreData = MoreData;
             }
         }
-        if (((*EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
+        if (Code == ((MediaInfo_Parser_DvDif << 24) | (MediaInfo_Event_DvDif_Analysis_Frame << 8)) && Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
         {
-            MediaInfo_Event_DvDif_Analysis_Frame_1* Old = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Data_Content;
-            MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->Data_Content;
+            MediaInfo_Event_DvDif_Analysis_Frame_0* Old = (MediaInfo_Event_DvDif_Analysis_Frame_0*)Data_Content;
+            MediaInfo_Event_DvDif_Analysis_Frame_0* New = (MediaInfo_Event_DvDif_Analysis_Frame_0*)Event->Data_Content;
             if (New->Errors)
             {
                 auto Errors_Size = strlen(New->Errors) + 1;
@@ -3178,6 +3232,13 @@ void MediaInfo_Config_MediaInfo::Event_Send (File__Analyze* Source, const int8u*
         {
             MediaInfo_Event_DvDif_Analysis_Frame_1* Old = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Data_Content;
             MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->Data_Content;
+            if (New->Errors)
+            {
+                auto Errors_Size = strlen(New->Errors) + 1;
+                char* Errors = new char[Errors_Size];
+                std::memcpy(Errors, Old->Errors, Errors_Size);
+                New->Errors = Errors;
+            }
             if (New->MoreData)
             {
                 auto MoreData_Size = sizeof(size_t) + *((size_t*)New->MoreData);
@@ -3266,35 +3327,7 @@ void MediaInfo_Config_MediaInfo::Event_Accepted (File__Analyze* Source)
                     int32u EventCode=*((int32u*)Event->second[Pos]->Data_Content);
                     bool IsDemux=(EventCode&0x00FFFF00)==(MediaInfo_Event_Global_Demux<<8);
 
-                    if (IsDemux)
-                    {
-                        MediaInfo_Event_Global_Demux_4* Old=(MediaInfo_Event_Global_Demux_4*)Event->second[Pos]->Data_Content;
-                        delete[] Old->Content; Old->Content=NULL;
-                        if (Old->Offsets_Size)
-                        {
-                            delete[] Old->Offsets_Content; Old->Offsets_Content=NULL;
-                        }
-                        if (Old->Offsets_Size)
-                        {
-                            delete[] Old->OriginalContent; Old->OriginalContent=NULL;
-                        }
-                    }
-
-                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Change << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Change_0))
-                    {
-                        MediaInfo_Event_DvDif_Change_0* New = (MediaInfo_Event_DvDif_Change_0*)Event->second[Pos]->Data_Content;
-                        delete[] New->MoreData;
-                    }
-                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_0))
-                    {
-                        MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->second[Pos]->Data_Content;
-                        delete[] New->Errors;
-                    }
-                    if (((EventCode) & 0x00FFFF00) == (MediaInfo_Event_DvDif_Analysis_Frame << 8) && Event->second[Pos]->Data_Size >= sizeof(MediaInfo_Event_DvDif_Analysis_Frame_1))
-                    {
-                        MediaInfo_Event_DvDif_Analysis_Frame_1* New = (MediaInfo_Event_DvDif_Analysis_Frame_1*)Event->second[Pos]->Data_Content;
-                        delete[] New->MoreData;
-                    }
+                    Event_Delayed_Free(Event->second[Pos]->Data_Content, Event->second[Pos]->Data_Size);
 
                     delete Event->second[Pos]; Event->second[Pos]=NULL;
 
@@ -3795,7 +3828,6 @@ Ztring MediaInfo_Config_MediaInfo::File_ProbeCaption_Set (const Ztring& NewValue
         }
         File_ProbeCaption.push_back(Item);
     }
-    File_ProbeCaption_Pos=0;
     if (!HasForAll) {
         config_probe Probe;
         Probe.Start_Type = config_probe_percent;
@@ -3814,26 +3846,19 @@ config_probe MediaInfo_Config_MediaInfo::File_ProbeCaption_Get(const string& Par
     if (ParseSpeed<=0 && ParseSpeed>=1)
         return {};
 
+    //Item for this parser, else first item for all parsers (the same one for each file)
     CriticalSectionLocker CSL(CS);
-    for (;;)
-    {
-        if (File_ProbeCaption_Pos >= File_ProbeCaption.size())
-            return {};
-        const auto& Item = File_ProbeCaption[File_ProbeCaption_Pos];
-        File_ProbeCaption_Pos++;
-        if (!Item.Parser.empty()) {
-            if (Item.Parser[0] == '-') {
-                if (Item.Parser.substr(1) == ParserName) {
-                    continue;
-                }
-            }
-            else if (Item.Parser != ParserName) {
-                continue;
-            }
+    for (const auto& Item : File_ProbeCaption) {
+        if (Item.Parser == ParserName) {
+            return Item;
         }
-
-        return Item;
     }
+    for (const auto& Item : File_ProbeCaption) {
+        if (Item.Parser.empty() || (Item.Parser[0] == '-' && Item.Parser.substr(1) != ParserName)) {
+            return Item;
+        }
+    }
+    return {};
 }
 
 //---------------------------------------------------------------------------

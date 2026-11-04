@@ -57,7 +57,7 @@ bool File_Ptx::FileHeader_Begin()
     }
 
     //Element_Size
-    if (11>Buffer_Size)
+    if (17>Buffer_Size)
         return false; //Must wait for more data
 
     if (Buffer[ 0x0]!=0x03
@@ -175,7 +175,7 @@ void File_Ptx::Read_Buffer_Continue()
     Element_End();
     Element_Begin1("Info list");
         Get_L4 (Info_Count,                                     "Info count");
-        if (4*Info_Count>Element_Size)
+        if (Info_Count>Element_Size/4)
         {
             Element_End();
             Reject();
@@ -196,13 +196,13 @@ void File_Ptx::Read_Buffer_Continue()
         Skip_L4(                                                "0x00000000");
         Element_Begin1("Names list 1");
         Get_L4 (Names_Count,                                    "Names count minus 1");
-        if (4*Names_Count>Element_Size)
+        if (Names_Count>Element_Size/4)
         {
             Element_End();
             Reject();
             return;
         }
-        for (int16u Pos=0; Pos<1+Names_Count; Pos++)
+        for (int32u Pos=0; Pos<1+Names_Count; Pos++)
         {
             Element_Begin1("Name");
             Get_L4 (Name_Length,                                "Name length");
@@ -219,13 +219,13 @@ void File_Ptx::Read_Buffer_Continue()
         Skip_L4(                                                "Unknown [8]");
         Element_Begin1("Names list 2");
         Get_L4 (Names_Count,                                    "Names count");
-        if (4*Names_Count>Element_Size)
+        if (Names_Count>Element_Size/4)
         {
             Element_End();
             Reject();
             return;
         }
-        for (int16u Pos=0; Pos<Names_Count; Pos++)
+        for (int32u Pos=0; Pos<Names_Count; Pos++)
         {
             Element_Begin1("Name");
             Get_L4 (Name_Length,                                "Name length");
@@ -278,13 +278,13 @@ void File_Ptx::Read_Buffer_Continue()
         Skip_L2(                                                "0x0003");
     Element_End();
     Get_L4 (Audio_Count,                                        "Audio count");
-    if (111*Audio_Count>Element_Size)
+    if (Audio_Count>Element_Size/111)
     {
         Reject();
         return;
     }
     Element_Begin1("Audio tracks list 1");
-    for (int16u Pos=0; Pos<Audio_Count; Pos++)
+    for (int32u Pos=0; Pos<Audio_Count; Pos++)
     {
         Element_Begin1("Name");
         Skip_L2(                                                "0x0000 [New]");
@@ -306,7 +306,7 @@ void File_Ptx::Read_Buffer_Continue()
     }
     Element_End();
     Element_Begin1("Audio tracks list 2");
-    for (int16u Pos=0; Pos<Audio_Count; Pos++)
+    for (int32u Pos=0; Pos<Audio_Count; Pos++)
     {
         Element_Begin1("Name");
         int32u Size;
@@ -334,13 +334,13 @@ void File_Ptx::Read_Buffer_Continue()
     }
     Element_End();
     Get_L4 (Audio_Count,                                        "Audio count");
-    if (4*Audio_Count>Element_Size)
+    if (Audio_Count>Element_Size/4)
     {
         Reject();
         return;
     }
     Element_Begin1("Audio tracks list 3");
-    for (int16u Pos=0; Pos<Audio_Count; Pos++)
+    for (int32u Pos=0; Pos<Audio_Count; Pos++)
     {
         Element_Begin1("Name");
         int32u Size;
@@ -426,7 +426,7 @@ void File_Ptx::Read_Buffer_Continue()
     Skip_L4(                                                    "Unknown [17]");
     Skip_L4(                                                    "0x01000000");
     Get_L4 (FileName_Count,                                     "File name count");
-    if (13*FileName_Count>Element_Size)
+    if (FileName_Count>Element_Size/13)
     {
         Reject();
         return;

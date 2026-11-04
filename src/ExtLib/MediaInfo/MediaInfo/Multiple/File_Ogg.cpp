@@ -152,58 +152,50 @@ bool File_Ogg::FileHeader_Begin()
 //---------------------------------------------------------------------------
 bool File_Ogg::Synchronize()
 {
+    static const int8u Sync_Pattern[4] = { 'O', 'g', 'g', 'S' };
+
     //Synchronizing
-    while (Buffer_Offset+4<=Buffer_Size)
+    while (Buffer_Size - Buffer_Offset >= 4)
     {
-        while(Buffer_Offset+4<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x4F
-                                            || Buffer[Buffer_Offset+1]!=0x67
-                                            || Buffer[Buffer_Offset+2]!=0x67
-                                            || Buffer[Buffer_Offset+3]!=0x53)) //"OggS"
+        const size_t Candidate_End = Buffer_Size - 3;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Buffer_Offset, Sync_Pattern[0], Candidate_End - Buffer_Offset);
+        if (!Sync)
         {
-            Buffer_Offset+=1+2;
-            while(Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x67)
-                Buffer_Offset+=2;
-            if (Buffer_Offset>=Buffer_Size || Buffer[Buffer_Offset-1]==0x67)
-                Buffer_Offset--;
-            Buffer_Offset--;
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer);
+
+        if (!memcmp(Sync + 1, Sync_Pattern + 1, 3))
+        {
+            // Checking the next frame start
+            if (Buffer_Size - Buffer_Offset <= 26)
+                return false; //Need more data
+            const size_t page_segments = Buffer[Buffer_Offset + 26];
+            const size_t Segment_Table_Size = 27 + page_segments;
+            if (Buffer_Size - Buffer_Offset <= Segment_Table_Size)
+                return false; //Need more data
+            size_t Buffer_NextOffset = Buffer_Offset + Segment_Table_Size;
+            size_t Size = 0;
+            for (size_t Pos = 0; Pos < page_segments; Pos++)
+                Size += Buffer[Buffer_Offset + 27 + Pos];
+            if (Buffer_Size - Buffer_NextOffset < Size + 4)
+                return false; //Need more data
+            Buffer_NextOffset += Size;
+            if (!memcmp(Buffer + Buffer_NextOffset, Sync_Pattern, 4))
+            {
+                //Synched is OK
+                return true;
+            }
         }
 
-        if (Buffer_Offset+4<=Buffer_Size) //Testing if size is coherant
-        {
-            //Retrieving some info
-            if (Buffer_Offset+27>Buffer_Size)
-                return false; //Need more data
-            int8u page_segments=CC1(Buffer+Buffer_Offset+26);
-            if (Buffer_Offset+27+page_segments>Buffer_Size)
-                return false; //Need more data
-            size_t Size=0;
-            for (int8u Pos=0; Pos<page_segments; Pos++)
-                Size+=CC1(Buffer+Buffer_Offset+27+Pos);
-
-            //Testing
-            if (Buffer_Offset+27+page_segments+Size+4>Buffer_Size)
-                return false; //Need more data
-            if (CC4(Buffer+Buffer_Offset+27+page_segments+Size)!=0x4F676753) //"OggS"
-                Buffer_Offset++;
-            else
-                break;
-        }
+        Buffer_Offset++;
     }
 
     //Parsing last bytes if needed
-    if (Buffer_Offset+4>Buffer_Size)
-    {
-        if (Buffer_Offset+3==Buffer_Size && CC3(Buffer+Buffer_Offset)!=0x4F6767) //"Ogg"
-            Buffer_Offset++;
-        if (Buffer_Offset+2==Buffer_Size && CC2(Buffer+Buffer_Offset)!=0x4F67)   //"Og"
-            Buffer_Offset++;
-        if (Buffer_Offset+1==Buffer_Size && CC1(Buffer+Buffer_Offset)!=0x4F)     //"O"
-            Buffer_Offset++;
-        return false;
-    }
-
-    //Synched is OK
-    return true;
+    while (Buffer_Offset < Buffer_Size && memcmp(Buffer + Buffer_Offset, Sync_Pattern, Buffer_Size - Buffer_Offset))
+        Buffer_Offset++;
+    return false;
 }
 
 //---------------------------------------------------------------------------

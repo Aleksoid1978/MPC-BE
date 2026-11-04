@@ -243,6 +243,39 @@ File_Vc1::File_Vc1()
         InitData_Buffer=NULL;
         InitData_Buffer_Size=0;
     #endif //MEDIAINFO_DEMUX
+
+    //Init (also done by Synched_Init for synchronized streams)
+    //Count
+    Interlaced_Top=0;
+    Interlaced_Bottom=0;
+    //Temp
+    coded_width=0;
+    coded_height=0;
+    framerateexp=0;
+    frameratecode_enr=0;
+    frameratecode_dr=0;
+    profile=(int8u)-1;
+    level=(int8u)-1;
+    colordiff_format=1; //Default is 4:2:0
+    AspectRatio=0;
+    AspectRatioX=0;
+    AspectRatioY=0;
+    hrd_num_leaky_buckets=0;
+    max_b_frames=7; //Default for advanced profile
+    interlace=false;
+    tfcntrflag=false;
+    framerate_present=false;
+    framerate_form=false;
+    hrd_param_flag=false;
+    finterpflag=false;
+    rangered=false;
+    psf=false;
+    pulldown=false;
+    panscan_flag=false;
+    TemporalReference_Offset=0;
+
+    //Streams init (also done by Synched_Init for synchronized streams)
+    Streams.resize(0x100);
 }
 
 //---------------------------------------------------------------------------
@@ -274,8 +307,13 @@ void File_Vc1::Streams_Accept()
 void File_Vc1::Streams_Fill()
 {
     //Calculating - PixelAspectRatio
+    // AspectRatio, profile and colordiff_format come straight from the bitstream;
+    // 0x0F is the 'custom AR' escape and (int8u)-1 the 'unset' sentinel, but a crafted
+    // VC-1 stream can supply any 8-bit value up to 0xFE and slip past both guards into
+    // Vc1_PixelAspectRatio[16] / Vc1_Profile[4] / Vc1_ChromaSubsamplingFormat[4] --
+    // see gh#2611.
     float32 PixelAspectRatio;
-    if (AspectRatio!=0x0F)
+    if (AspectRatio!=0x0F && AspectRatio<sizeof(Vc1_PixelAspectRatio)/sizeof(*Vc1_PixelAspectRatio))
         PixelAspectRatio=Vc1_PixelAspectRatio[AspectRatio];
     else if (AspectRatioY)
         PixelAspectRatio=((float)AspectRatioX)/((float)AspectRatioY);
@@ -283,14 +321,15 @@ void File_Vc1::Streams_Fill()
         PixelAspectRatio=1; //Unknown
 
     Ztring Profile;
-    if (profile!=(int8u)-1)
+    if (profile!=(int8u)-1 && profile<sizeof(Vc1_Profile)/sizeof(*Vc1_Profile))
         Profile=Vc1_Profile[profile];
     if (profile==3 && level!=(int8u)-1)
         Profile+=__T("@L")+Ztring::ToZtring(level);
     Fill(Stream_Video, 0, Video_Format_Profile, Profile);
     Fill(Stream_Video, 0, Video_Codec_Profile, Profile);
     Fill(Stream_Video, 0, Video_ColorSpace, "YUV");
-    Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc1_ChromaSubsamplingFormat[colordiff_format]);
+    if (colordiff_format<sizeof(Vc1_ChromaSubsamplingFormat)/sizeof(*Vc1_ChromaSubsamplingFormat))
+        Fill(Stream_Video, 0, Video_ChromaSubsampling, Vc1_ChromaSubsamplingFormat[colordiff_format]);
     if (coded_width && coded_height)
     {
         Fill(Stream_Video, StreamPos_Last, Video_Width, (coded_width+1)*2);
@@ -374,27 +413,6 @@ void File_Vc1::Streams_Finish()
         if (Numerator)
             Ibi_Stream_Finish(Numerator, Denominator);
     #endif //MEDIAINFO_IBIUSAGE
-}
-
-//***************************************************************************
-// Buffer - File header
-//***************************************************************************
-
-//---------------------------------------------------------------------------
-bool File_Vc1::FileHeader_Begin()
-{
-    if (!File__Analyze::FileHeader_Begin_0x000001())
-        return false;
-
-    if (!MustSynchronize)
-    {
-        Synched_Init();
-        Buffer_TotalBytes_FirstSynched+=0;
-        File_Offset_FirstSynched=File_Offset;
-    }
-
-    //All should be OK
-    return true;
 }
 
 //***************************************************************************
@@ -706,9 +724,9 @@ bool File_Vc1::Header_Parser_QuickSearch()
 
         //Synchronizing
         Buffer_Offset+=4;
-        Synched=false;
         if (!Synchronize())
         {
+            Synched=false;
             UnSynched_IsNotJunk=true;
             return false;
         }
@@ -722,7 +740,7 @@ bool File_Vc1::Header_Parser_QuickSearch()
 
     if (Buffer_Offset+3==Buffer_Size)
         return false; //Sync is OK, but start_code is not available
-    Trusted_IsNot("VC-1, Synchronisation lost");
+    Trusted_IsNot("VC-1, Synchronization lost");
     return Synchronize();
 }
 

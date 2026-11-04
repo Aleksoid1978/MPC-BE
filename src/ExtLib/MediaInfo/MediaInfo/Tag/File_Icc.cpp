@@ -193,7 +193,7 @@ void File_Icc::FileHeader_Parse()
         Get_B2 (hh,                                             "Hour");
         Get_B2 (mm,                                             "Minute");
         Get_B2 (ss,                                             "Second");
-        if (!IsSub && (YY || MM || DD || hh || mm || ss) && (YY<=1970 || MM>=12 || DD>=31 || hh>=24 || mm>=60 || ss>=60))
+        if (!IsSub && (YY || MM || DD || hh || mm || ss) && (YY<=1970 || MM>12 || DD>31 || hh>=24 || mm>=60 || ss>=60))
         {
             Element_End0();
             Reject();
@@ -254,7 +254,7 @@ void File_Icc::FileHeader_Parse()
     Fill(Stream_General, 0, General_Format_Version, __T("Version ")+Ztring::ToZtring(Version_M)+__T('.')+Ztring::ToZtring(Version_m));
     if (Version_M!=2 && Version_M!=4)
     {
-        Finish();
+        ForceFinish(); //Tags are not parsed for other versions, nothing else to do (Finish() continues parsing if ParseSpeed>=1)
         return;
     }
     Stream_Prepare(StreamKind);
@@ -382,7 +382,7 @@ void File_Icc::Read_Buffer_Continue()
         P->Tags.pop();
     }
 
-    Finish();
+    ForceFinish(); //All tags are parsed, nothing else to do (Finish() continues parsing if ParseSpeed>=1)
 }
 
 //***************************************************************************
@@ -525,8 +525,9 @@ void File_Icc::Skip_curv(int32u Size)
 {
     int32u Count;
     Get_B4 (Count,                                              "Count");
-    if (4+4*((Count+1)/2)!=Size)
+    if (4+4*(((int64u)Count+1)/2)!=Size)
         return;
+    Loop_CheckValue(Count, 2, "Count");
     for (int32u i=0; i<Count; i++)
         Skip_B2(                                                "Value");
     if (Count%2)

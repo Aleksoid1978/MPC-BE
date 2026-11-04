@@ -51,6 +51,7 @@ static const char* Id3v2_PictureType_Data[] =
     "DuringRecording",
     "DuringPerformance",
     "ScreenCapture",
+    "BrightColouredFish",
     "Illustration",
     "PerformerLogo",
     "PublisherLogo",

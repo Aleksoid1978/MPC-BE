@@ -1414,6 +1414,10 @@ TopFrontToSide;
 Total;Total
 TotalNumberOfParts;Nombre total parts
 TotalProgrammeDuration;Duració total programa
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Nom de la pista
 Track_Count;Total de pistes
 TrackFormat;

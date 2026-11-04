@@ -426,6 +426,7 @@ private :
     void ac4_toc();
     void ac4_presentation_info(presentation& P);
     void ac4_presentation_v1_info(presentation& P);
+    size_t ac4_presentation_v1_info_Depth=0;
     void ac4_sgi_specifier(presentation& P);
     void ac4_substream_info(presentation& P);
     void ac4_substream_group_info(group& G);

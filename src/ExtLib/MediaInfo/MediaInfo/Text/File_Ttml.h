@@ -43,20 +43,6 @@ public :
     #endif //MEDIAINFO_EVENTS
 
 private :
-    //Types
-    struct timeline
-    {
-        TimeCode    Time_Begin;
-        TimeCode    Time_End;
-        size_t      LineCount;
-
-        timeline(TimeCode Time_Begin_, TimeCode Time_End_, size_t LineCount_)
-            : Time_Begin(Time_Begin_)
-            , Time_End(Time_End_)
-            , LineCount(LineCount_)
-        {}
-    };
-
     //Streams management
     void Streams_Accept();
     void Streams_Finish();
@@ -74,9 +60,9 @@ private :
     //Temp
     TimeCode Time_Begin;
     TimeCode Time_End;
-    int64u FrameCount;
     int64u LineCount;
-    int64u LineMaxCountPerEvent;
+    size_t MaxCountOfLinesPerFrame = 0;
+    size_t MaxCountOfCharsPerLine = 0;
     int64u EmptyCount;
     int64u FrameRate_Int;
     int64u FrameRateMultiplier_Num;

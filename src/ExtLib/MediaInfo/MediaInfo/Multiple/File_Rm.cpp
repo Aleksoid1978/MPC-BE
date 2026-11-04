@@ -300,6 +300,7 @@ void File_Rm::INDX()
     Get_B4 (num_indices,                                        "num_indices"); //Number of index records in the index chunk.
     Skip_B2(                                                    "stream_number"); //The stream number for which the index records in this index chunk are associated.
     Skip_B4(                                                    "next_index_header"); //Offset from start of file to the next index chunk. This member enables RealMedia file format readers to find all the index chunks quickly. A value of zero for this member indicates there are no more index headers in this file.
+    Loop_CheckValue(num_indices, 14, "num_indices");
     for (int32u Pos=0; Pos<num_indices; Pos++)
     {
         Element_Begin1("index");
@@ -669,8 +670,14 @@ void File_Rm::RJMD()
 }
 
 //---------------------------------------------------------------------------
-void File_Rm::RJMD_property(std::string Name)
+void File_Rm::RJMD_property(std::string Name, int8u Depth)
 {
+    if (Depth>=32)
+    {
+        Trusted_IsNot("Too many nested metadata properties");
+        Skip_XX(Element_Size-Element_Offset,                    "Metadata properties");
+        return;
+    }
     //Element_Name("Property");
 
     //Parsing
@@ -759,6 +766,7 @@ void File_Rm::RJMD_property(std::string Name)
     Fill(Stream_General, 0, Name.c_str(), value);
 
     //Parsing
+    Loop_CheckValue(num_subproperties, 8+32, "num_subproperties"); //PropListEntry and MetadataProperty
     for (int32u Pos=0; Pos<num_subproperties; Pos++)
     {
         Element_Begin1("PropListEntry");
@@ -767,9 +775,7 @@ void File_Rm::RJMD_property(std::string Name)
         Element_End0();
     }
     for (int32u Pos=0; Pos<num_subproperties; Pos++)
-    {
-        RJMD_property(Name);
-    }
+        RJMD_property(Name, Depth+1);
 
     Element_End0();
 }

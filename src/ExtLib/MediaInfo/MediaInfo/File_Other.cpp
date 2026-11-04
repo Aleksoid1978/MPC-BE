@@ -142,8 +142,8 @@ void File_Other::Read_Buffer_Continue()
         Finish("SRT");
         return;
     }
-    else if ((CC1(Buffer+0)==CC1("[") && CC1(Buffer+2)==CC1("S") && CC1(Buffer+22)==CC1("o") && CC1(Buffer+24)==CC1("]")) //Unicode Text is : "[Script Info]
-          || (CC1(Buffer+2)==CC1("[") && CC1(Buffer+4)==CC1("S") && CC1(Buffer+24)==CC1("o") && CC1(Buffer+26)==CC1("]")))
+    else if ((Buffer_Size>=25 && CC1(Buffer+0)==CC1("[") && CC1(Buffer+2)==CC1("S") && CC1(Buffer+22)==CC1("o") && CC1(Buffer+24)==CC1("]")) //Unicode Text is : "[Script Info]
+          || (Buffer_Size>=27 && CC1(Buffer+2)==CC1("[") && CC1(Buffer+4)==CC1("S") && CC1(Buffer+24)==CC1("o") && CC1(Buffer+26)==CC1("]")))
     {
         Accept("SSA");
 

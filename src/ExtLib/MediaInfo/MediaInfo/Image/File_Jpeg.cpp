@@ -427,6 +427,11 @@ void File_Jpeg::Streams_Finish_PerImage()
         ICC_Parser.reset();
     }
     #endif
+    if (GainMap_Parser) {
+        if (GainMap_Parser->Count_Get(StreamKind)) // Only version in the primary image
+            Merge(*GainMap_Parser, StreamKind, 0, CurrentMainStream);
+        GainMap_Parser.reset();
+    }
     for (const auto& Item : XmpExt_List)
     {
         if (Item.second.Parser) {
@@ -1693,7 +1698,7 @@ void File_Jpeg::APP1()
         APP1_XMP();
         return;
     }
-    if (Element_Size >= 29 && !strncmp((const char*)Buffer + Buffer_Offset, "http://ns.adobe.com/xmp/extension/", 35)) { // the char* contains a terminating \0
+    if (Element_Size >= 35 && !strncmp((const char*)Buffer + Buffer_Offset, "http://ns.adobe.com/xmp/extension/", 35)) { // the char* contains a terminating \0
         Skip_String(35,                                         "Name");
         APP1_XMP_Extension();
         return;
@@ -1798,6 +1803,8 @@ void File_Jpeg::APP1_XMP_Extension()
     Item->second.LastOffset += (int32u)(Element_Size - Element_Offset);
     auto& MI = *(File_Xmp*)Item->second.Parser.get();
     MI.Wait = Item->second.LastOffset < Size;
+    auto Element_Offset_Sav = Element_Offset;
+    MI.NoTrace = true; // Handle trace here to see each chunk
     gc_items GContainerItems;
     MI.GContainerItems = &GContainerItems;
     Open_Buffer_Continue(&MI);
@@ -1821,9 +1828,10 @@ void File_Jpeg::APP1_XMP_Extension()
             ImgOffset += Entry.Padding;
         }
     }
-    #else
-        Skip_UTF8(Element_Size - Element_Offset,                "XMP metadata");
+    Element_Offset = Element_Offset_Sav;
+    Element_Show();
     #endif
+    Skip_UTF8(Element_Size - Element_Offset,                    "XMP metadata");
     return;
 }
 
@@ -1907,12 +1915,14 @@ void File_Jpeg::APP2_ISO21496_1()
     Element_Info1("ISO 21496-1 Gain map metadata for image conversion");
 
     //Parsing
-    File_GainMap MI;
+    auto MI = new File_GainMap;
+    GainMap_Parser.reset(MI);
     GainMap_metadata_ISO.reset(new GainMap_metadata());
-    MI.output = static_cast<GainMap_metadata*>(GainMap_metadata_ISO.get());
-    Open_Buffer_Init(&MI);
-    Open_Buffer_Continue(&MI);
-    Open_Buffer_Finalize(&MI);
+    MI->output = static_cast<GainMap_metadata*>(GainMap_metadata_ISO.get());
+    MI->StreamKind = StreamKind;
+    Open_Buffer_Init(MI);
+    Open_Buffer_Continue(MI);
+    Open_Buffer_Finalize(MI);
 }
 
 //---------------------------------------------------------------------------

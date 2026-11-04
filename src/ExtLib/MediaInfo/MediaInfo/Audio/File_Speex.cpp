@@ -131,7 +131,17 @@ void File_Speex::Comment()
     {
         Ztring value;
         int32u size;
+        if (Element_Size-Element_Offset<4)
+        {
+            Trusted_IsNot("size not valid");
+            break;
+        }
         Get_L4(size,                                            "size");
+        if (size>Element_Size-Element_Offset)
+        {
+            Trusted_IsNot("size not valid");
+            break;
+        }
         if (size)
             Get_UTF8(size, value,                               "value");
 

@@ -172,7 +172,7 @@ protected :
     void AudioMuxElement                    ();
     void StreamMuxConfig                    ();
     int32u LatmGetValue                     ();
-    void PayloadLengthInfo                  ();
+    bool PayloadLengthInfo                  ();
     void PayloadMux                         ();
     bool muxConfigPresent;
 
@@ -190,7 +190,8 @@ protected :
     //Temp
     int8u   numSubFrames;
     int8u   numProgram;
-    int8u   numLayer;
+    int8u   numLayer[16];
+    int8u   streamCnt;
     int8u   numChunk;
     bool    audioMuxVersionA;
     int8u   streamID[16][8];

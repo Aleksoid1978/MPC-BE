@@ -1417,6 +1417,10 @@ TopFrontToSide;Avant haut vers le côté
 Total;Total
 TotalNumberOfParts;Nombre total de parties
 TotalProgrammeDuration;Durée totale du programme
+TraceLevel0;Niveau de traçage - 0
+TraceLevel5;Niveau de traçage - 5
+TraceLevel9;Niveau de traçage - 9
+TraceLevel10;Niveau de traçage - 10
 Track;Piste
 Track_Count;Nombre de pistes
 TrackFormat;Format de piste

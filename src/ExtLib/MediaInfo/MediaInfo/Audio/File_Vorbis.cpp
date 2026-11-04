@@ -146,6 +146,7 @@ void File_Vorbis::Setup()
         {
             int32u sparse;
             Get_BT (1, sparse,                                  "sparse");
+            Loop_CheckValue(codebook_entries, BT->Remain(), sparse?1:5, "codebook_entries");
             for (int32u Pos2=0; Pos2<codebook_entries; Pos2++)
             {
                 if (sparse)
@@ -165,10 +166,16 @@ void File_Vorbis::Setup()
         }
         else
         {
-            Skip_BT(5,                                          "length");
-            int32u num;
-            for(int32u i=0; i<codebook_entries; )
+            int32u length, num;
+            Get_BT (5, length,                                  "length");
+            length++;
+            for(int32u i=0; i<codebook_entries; length++) //num can be 0, length is incremented at each loop
             {
+                if (length>32 || !BT->Remain())
+                {
+                    Trusted_IsNot("num not valid");
+                    break;
+                }
                 Get_BT (ilog(codebook_entries-i), num,          "num");
                 for(int32u j=0; j<num && i<codebook_entries; j++, i++);
             }
@@ -186,30 +193,44 @@ void File_Vorbis::Setup()
             Get_T1 ( 4, codebook_value_bits,                    "codebook_value_bits");
             codebook_value_bits++;
             Info_BT( 1, codebook_sequence_p,                    "codebook_sequence_p");
-            int32s vals;
+            int64u vals;
             if (codebook_lookup_type==1)
             {
-                vals=(int32u)floor(pow((float)codebook_entries,1.f/codebook_dimensions));
-                for (;;)
+                if (!codebook_dimensions)
                 {
-                    int32u acc=1, acc1=1;
+                    Trusted_IsNot("codebook_dimensions not valid");
+                    BS_End_LE();
+                    return;
+                }
+                vals=(int64u)floor(pow((float)codebook_entries,1.f/codebook_dimensions));
+                for (int Tries=0; ; Tries++)
+                {
+                    if (Tries>=16) {
+                        Trusted_IsNot("lookup values not valid"); //Not converging
+                        BS_End_LE();
+                        return;
+                    }
+                    int64u acc=1, acc1=1;
                     for(int32u i=0; i<codebook_dimensions; i++)
                     {
-                        acc*=vals;
-                        acc1*=vals+1;
+                        if (acc<=codebook_entries) //Stop multiplying when it is known that the result is too big (avoid overflow)
+                            acc*=vals;
+                        if (acc1<=codebook_entries)
+                            acc1*=vals+1;
                     }
                     if(acc<=codebook_entries && acc1>codebook_entries)
                         break;
-                    else if(acc>codebook_entries)
+                    else if(acc>codebook_entries && vals)
                         vals--;
                     else
                         vals++;
                 }
             }
             else //codebook_lookup_type==2
-                vals=codebook_entries*codebook_dimensions;
+                vals=((int64u)codebook_entries)*codebook_dimensions;
             int32u codebook_multiplicands;
-            for(int i=0; i<vals; i++)
+            Loop_CheckValue(vals, BT->Remain(), codebook_value_bits, "vals");
+            for(int64u i=0; i<vals; i++)
                 Get_BT (codebook_value_bits, codebook_multiplicands, "codebook_multiplicands");
         }
         Element_End0();

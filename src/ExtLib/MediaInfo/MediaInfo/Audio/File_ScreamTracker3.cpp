@@ -35,10 +35,10 @@ namespace MediaInfoLib
 bool File_ScreamTracker3::FileHeader_Begin()
 {
     //Element_Size
-    if (Buffer_Size<44)
+    if (Buffer_Offset>Buffer_Size || Buffer_Size-Buffer_Offset<48)
         return false; //Must wait for more data
 
-    if (CC1(Buffer+28)!=0x1A || CC4(Buffer+44)!=0x5343524D) //"SCRM"
+    if (CC1(Buffer+Buffer_Offset+28)!=0x1A || CC4(Buffer+Buffer_Offset+44)!=0x5343524D) //"SCRM"
     {
         Reject("Scream Tracker 3");
         return false;

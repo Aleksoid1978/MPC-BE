@@ -244,12 +244,21 @@ void File_Av1::Streams_Finish()
                     Fill(Stream_Video, 0, HDR_Item.first, Value.Read());
             }
         }
+        HDR.clear(); //Streams_Finish() may be called again (e.g. by Matroska), values must not be added twice
     }
 
     if (!maximum_content_light_level.empty())
+    {
         Fill(Stream_Video, 0, Video_MaxCLL, maximum_content_light_level);
+        maximum_content_light_level.clear();
+    }
     if (!maximum_frame_average_light_level.empty())
+    {
         Fill(Stream_Video, 0, Video_MaxFALL, maximum_frame_average_light_level);
+        maximum_frame_average_light_level.clear();
+    }
+
+    DolbyVision_Streams_Fill(DV_RPU_data, DV_Source_AV1);
 }
 
 //***************************************************************************
@@ -301,6 +310,13 @@ void File_Av1::Header_Parse()
     int64u obu_size{};
     if (IsAnnexB) {
         Get_leb128 (obu_size,                                   "obu_size");
+        if (obu_size == 0 && Element_Offset < Element_Size) {
+            // Prevents looping on zero bytes
+            // Real AV1 files should have OBU of at least one byte for the OBU header
+            // Exclude conditions where Get_leb128 runs out of buffer on valid files and returns 0
+            Reject();
+            return;
+        }
         obu_size += Element_Offset;
         DataMustAlwaysBeComplete = Element_Level > 3;
         if (!DataMustAlwaysBeComplete)
@@ -768,9 +784,230 @@ void File_Av1::metadata_itu_t_t35_B5()
 
     switch (itu_t_t35_terminal_provider_code)
     {
+    case 0x003B: Param_Info1("Dolby Laboratories, Inc."); metadata_itu_t_t35_B5_003B(); break;
     case 0x003C: Param_Info1("Samsung Electronics America"); metadata_itu_t_t35_B5_003C(); break;
     case 0x5890: Param_Info1("AOMedia"); metadata_itu_t_t35_B5_5890(); break;
     }
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_itu_t_t35_B5_003B()
+{
+    int32u itu_t_t35_terminal_provider_oriented_code;
+    Get_B4(itu_t_t35_terminal_provider_oriented_code,           "itu_t_t35_terminal_provider_oriented_code");
+
+    switch (itu_t_t35_terminal_provider_oriented_code)
+    {
+    case 0x00000800: metadata_itu_t_t35_B5_003B_00000800(); break;
+    }
+
+}
+
+//---------------------------------------------------------------------------
+void File_Av1::metadata_itu_t_t35_B5_003B_00000800()
+{
+    Element_Info1("Extensible Metadata Delivery Format (EMDF)");
+
+    auto Get_V4{ [this](int8u Bits, int32u& Info, const char* Name)
+            {
+                Info = 0;
+
+            #if MEDIAINFO_TRACE
+                int8u Count = 0;
+            #endif //MEDIAINFO_TRACE
+                for (;;)
+                {
+                    if (BS->Remain() < Bits + 1u)
+                    {
+                        Trusted_IsNot("Variable length value not valid");
+                        break;
+                    }
+                    Info += BS->Get4(Bits);
+            #if MEDIAINFO_TRACE
+                    Count += Bits;
+            #endif //MEDIAINFO_TRACE
+                    if (!BS->GetB())
+                        break;
+                    Info <<= Bits;
+                    Info += (1 << Bits);
+                }
+            #if MEDIAINFO_TRACE
+                if (Trace_Activated)
+                {
+                    Param(Name, Info, Count);
+                    Param_Info(__T("(") + Ztring::ToZtring(Count) + __T(" bits)"));
+                }
+            #endif //MEDIAINFO_TRACE
+            }
+        };
+
+    auto Skip_V4{ [&](int8u Bits, const char* Name) {
+                int32u Info;
+                Get_V4(Bits, Info, Name);
+            }
+        };
+
+    BS_Begin();
+    size_t Start = Data_BS_Remain();
+    int32u version, key_id;
+    Element_Begin1("emdf_container");
+    Get_S4 (2, version,                                         "emdf_version");
+    if (version == 3)
+    {
+        int32u add;
+        Get_V4(2, add,                                          "emdf_version addition");
+        version += add;
+    }
+    if (version)
+    {
+        Skip_BS(Data_BS_Remain(),                               "(Unparsed emdf_container data)");
+        Element_End0(); 
+        BS_End();
+        return;
+    }
+
+    Get_S4 (3, key_id,                                          "key_id");
+    if (key_id == 7)
+    {
+        int32u add;
+        Get_V4 (3, add,                                         "key_id addition");
+        key_id += add;
+    }
+    Param_Info1C(key_id == 0x6, "Ignore protection bits");
+
+    int32u emdf_payload_id = 0;
+        
+    for(;;)
+    {
+        Element_Begin1("emdf_payload");
+        Get_S4 (5, emdf_payload_id,                             "emdf_payload_id");
+        if (emdf_payload_id==0x1F)
+        {
+            int32u add;
+            Get_V4 (5, add,                                     "emdf_payload_id addition");
+            emdf_payload_id += add;
+        }
+
+        Element_Info1C(emdf_payload_id == 256, "Dolby Vision Reference Processing Unit (RPU)");
+        if (emdf_payload_id == 0x00)
+        {
+            Element_End0();
+            break;
+        }
+
+        Element_Begin1("emdf_payload_config");
+
+        bool smploffste = false;
+        Get_SB (smploffste,                                     "smploffste");
+        if (smploffste)
+        {
+            Skip_S2(11,                                         "smploffst");
+            Skip_SB(                                            "reserved");
+        }
+
+        TEST_SB_SKIP(                                           "duratione");
+            Skip_V4(11,                                         "duration");
+        TEST_SB_END();
+        TEST_SB_SKIP(                                           "groupide");
+            Skip_V4(2,                                          "groupid");
+        TEST_SB_END();
+        TEST_SB_SKIP(                                           "codecdatae");
+            Skip_S1(8,                                          "reserved");
+        TEST_SB_END();
+
+        bool discard_unknown_payload = false;
+        Get_SB(discard_unknown_payload,                         "discard_unknown_payload");
+        if (!discard_unknown_payload)
+        {
+            bool payload_frame_aligned = false;
+            if (!smploffste)
+            {
+                Get_SB (payload_frame_aligned,                  "payload_frame_aligned");
+                if (payload_frame_aligned)
+                {
+                    Skip_SB(                                    "create_duplicate");
+                    Skip_SB(                                    "remove_duplicate");
+                }
+            }
+
+            if (smploffste || payload_frame_aligned)
+            {
+                Skip_S1(5,                                      "priority");
+                Skip_S1(2,                                      "proc_allowed");
+            }
+        }
+
+        Element_End0(); // emdf_payload_config
+
+        int32u emdf_payload_size = 0;
+        Get_V4 (8, emdf_payload_size,                           "emdf_payload_size");
+        if (emdf_payload_size > Data_BS_Remain() / 8)
+        {
+            Trusted_IsNot("emdf_payload_size is too large");
+            Skip_BS(Data_BS_Remain(),                           "(Problem)");
+            Element_End0(); // emdf_payload
+            break;
+        }
+        size_t emdf_payload_End = Data_BS_Remain() - static_cast<size_t>(emdf_payload_size) * 8;
+
+        Element_Begin1("emdf_payload_bytes");
+            switch (emdf_payload_id)
+            {
+                case 256: Get_DolbyVision_ReferenceProcessingUnit(DV_RPU_data, emdf_payload_End); break;
+                default : Skip_BS(static_cast<size_t>(emdf_payload_size) * 8, "(Unknown)"); break;
+            }
+            size_t RemainginBits=Data_BS_Remain();
+            if (RemainginBits>=emdf_payload_End)
+            {
+                if (RemainginBits>emdf_payload_End)
+                    Skip_BS(RemainginBits-emdf_payload_End,     "(Unparsed bits)");
+            }
+            else
+            {
+                //There is a problem, too many bits were consumed by the parser. //TODO: prevent the parser to consume more bits than count of bits in this element
+                if (Data_BS_Remain())
+                    Skip_BS(Data_BS_Remain(),                   "(Problem during emdf_payload parsing)");
+                else
+                    Skip_BS(Data_BS_Remain(),                   "(Problem during emdf_payload parsing, going to end directly)");
+                Element_End0();
+                Element_End0();
+                break;
+            }
+        Element_End0(); // emdf_payload_bytes
+
+        Element_End0(); // emdf_payload
+    }
+
+    Element_Begin1("emdf_protection");
+
+    int8u len_primary = 0, len_second = 0;
+    Get_S1(2, len_primary,                                      "protection_length_primary");
+    Get_S1(2, len_second,                                       "protection_length_secondary");
+
+    switch (len_primary)
+    {
+        //case 0: break; //protection_length_primary coherency was already tested in sync layer
+        case 1: len_primary = 8; break;
+        case 2: len_primary = 32; break;
+        case 3: len_primary = 128; break;
+        default:; //Cannot append, read only 2 bits
+    };
+    switch (len_second)
+    {
+        case 0: len_second = 0; break;
+        case 1: len_second = 8; break;
+        case 2: len_second = 32; break;
+        case 3: len_second = 128; break;
+        default:; //Cannot append, read only 2 bits
+    };
+    Skip_BS(len_primary,                                        "protection_bits_primary");
+    if (len_second)
+        Skip_BS(len_second,                                     "protection_bits_secondary");
+
+    Element_End0(); // emdf_protection
+
+    Element_End0(); // emdf_container
+    BS_End();
 }
 
 //---------------------------------------------------------------------------

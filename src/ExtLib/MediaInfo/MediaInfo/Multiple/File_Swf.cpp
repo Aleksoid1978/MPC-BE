@@ -668,6 +668,12 @@ bool File_Swf::Decompress()
     }
 
     //Sizes
+    if (FileLength<8 || File_Size<8 || FileLength-8>0x4000000 || (FileLength-8)/1032>File_Size-8) // 1032 is the maximum zlib compression ratio
+    {
+        Trusted_IsNot("Invalid FileLength");
+        Reject("SWF");
+        return false;
+    }
     unsigned long Source_Size=(unsigned long)(File_Size-8);
     unsigned long Dest_Size=(unsigned long)(FileLength-8);
 

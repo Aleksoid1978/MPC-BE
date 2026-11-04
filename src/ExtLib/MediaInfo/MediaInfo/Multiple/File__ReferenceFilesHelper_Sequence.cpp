@@ -64,7 +64,9 @@ sequence::sequence()
 //---------------------------------------------------------------------------
 sequence::~sequence()
 {
-        delete MI;
+    for (size_t i=0; i<Resources.size(); i++)
+        delete Resources[i];
+    delete MI;
 }
 
 //***************************************************************************

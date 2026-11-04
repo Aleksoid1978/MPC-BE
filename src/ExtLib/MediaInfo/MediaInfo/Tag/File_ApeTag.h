@@ -42,6 +42,7 @@ private :
 
     //Temp
     std::string Key;
+    bool IsBinary{};
 };
 
 } //NameSpace

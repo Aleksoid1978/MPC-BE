@@ -3612,11 +3612,19 @@ void File_Aac::section_data()
         int8u i=0;
         while (k<max_sfb)
         {
+            if (i>=sizeof(sect_cb[g])/sizeof(*sect_cb[g]))
+            {
+                Trusted_IsNot("Too many sections");
+                if (num_window_groups>1)
+                    Element_End0();
+                Element_End0();
+                return; //Error
+            }
             if (aacSectionDataResilienceFlag)
                 Get_S1(5, sect_cb[g][i],                        "sect_cb[g][i]");
             else
                 Get_S1(4, sect_cb[g][i],                        "sect_cb[g][i]");
-            int8u sect_len=0;
+            int16u sect_len=0;
             int8u sect_len_incr;
             if (!aacSectionDataResilienceFlag || sect_cb[g][i]<11 || (sect_cb[g][i]>11 && sect_cb[g][i]<16))
             {
@@ -3631,28 +3639,35 @@ void File_Aac::section_data()
                         return; //Error
                     }
                     Get_S1 ((window_sequence==2?3:5), sect_len_incr, "sect_len_incr"); // (window_sequence == EIGHT_SHORT_SEQUENCE) => 3
+                    if (sect_len_incr>max_sfb-k-sect_len)
+                    {
+                        Trusted_IsNot("Section length is too large");
+                        if (num_window_groups>1)
+                            Element_End0();
+                        Element_End0();
+                        return; //Error
+                    }
+                    sect_len+=sect_len_incr;
                     if (sect_len_incr!=sect_esc_val)
                         break;
-                    sect_len+=sect_esc_val;
                 }
             }
             else
-                sect_len_incr=1;
-            sect_len+=sect_len_incr;
+                sect_len=1;
+            if (!sect_len)
+            {
+                Trusted_IsNot("Section length is zero");
+                if (num_window_groups>1)
+                    Element_End0();
+                Element_End0();
+                return; //Error
+            }
             sect_start[g][i]=k;
             sect_end[g][i]=k+sect_len;
             for (int16u sfb=k; sfb<k+sect_len; sfb++)
                 sfb_cb[g][sfb]=sect_cb[g][i];
             k+= sect_len;
             i++;
-            if (i>64)
-            {
-                Trusted_IsNot("Increment is wrong");
-                if (num_window_groups>1)
-                    Element_End0();
-                Element_End0();
-                return; //Error
-            }
         }
         num_sec[g]=i;
         if (num_window_groups>1)

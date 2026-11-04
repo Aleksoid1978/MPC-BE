@@ -2186,8 +2186,8 @@ void File_Mpeg_Descriptors::Descriptor_07()
 {
     //Parsing
     BS_Begin();
-    Skip_S1(14,                                                 "horizontal_size");
-    Skip_S1(14,                                                 "vertical_size");
+    Skip_S2(14,                                                 "horizontal_size");
+    Skip_S2(14,                                                 "vertical_size");
     Skip_S1( 4,                                                 "aspect_ratio_information"); //Same as ISO/IEC 13818-2
     BS_End();
 }
@@ -2197,8 +2197,8 @@ void File_Mpeg_Descriptors::Descriptor_08()
 {
     //Parsing
     BS_Begin();
-    Skip_S1(14,                                                 "horizontal_offset");
-    Skip_S1(14,                                                 "vertical_offset");
+    Skip_S2(14,                                                 "horizontal_offset");
+    Skip_S2(14,                                                 "vertical_offset");
     Skip_S1( 4,                                                 "window_priority");
     BS_End();
 }
@@ -2689,7 +2689,7 @@ void File_Mpeg_Descriptors::Descriptor_3F_08()
     Get_B1 (mpegh3daProfileLevelIndication,                 "mpegh3daProfileLevelIndication"); Param_Info1(Mpegh3da_Profile_Get(mpegh3daProfileLevelIndication));
     BS_Begin();
     Skip_SB(                                                "interactivityEnabled");
-    Skip_S1(9,                                              "reserved");
+    Skip_S2(9,                                              "reserved");
     Get_S1 (6, referenceChannelLayout,                      "referenceChannelLayout"); Param_Info1(Aac_ChannelLayout_GetString(referenceChannelLayout, true));
     BS_End();
 

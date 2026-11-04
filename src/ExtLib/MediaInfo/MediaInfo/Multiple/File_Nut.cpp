@@ -156,6 +156,7 @@ void File_Nut::main()
     Skip_VS(                                                    "stream_count");
     Skip_VS(                                                    "max_distance");
     Get_VS (time_base_count,                                    "time_base_count");
+    Loop_CheckValue(time_base_count, 2, "time_base_count");
     for(int64u i=0; i<time_base_count; i++)
     {
         Skip_VS(                                                "time_base_num");
@@ -166,9 +167,15 @@ void File_Nut::main()
 
     for(int16u i=0; i<256;)
     {
+        if (Element_Offset>=Element_Size)
+        {
+            Trusted_IsNot("frame codes not valid");
+            break;
+        }
         int64u tmp_fields, tmp_size, tmp_res, count;
         Skip_VS(                                                "tmp_flag");
         Get_VS (tmp_fields,                                     "tmp_fields");
+        Loop_CheckValue(tmp_fields, 1, "tmp_fields"); //1 value per field
         if(tmp_fields>0)
             Skip_VS(                                            "tmp_pts"); //TODO: signed
         if(tmp_fields>1)
@@ -189,6 +196,11 @@ void File_Nut::main()
             count=tmp_mul-tmp_size;
         for(int64u j=6; j<tmp_fields; j++)
             Skip_VS(                                            "tmp_reserved[i]");
+        if (!count)
+        {
+            Trusted_IsNot("count not valid");
+            break; //No progress
+        }
 
         for(int64u j=0; j<count && i<256; j++, i++)
         {

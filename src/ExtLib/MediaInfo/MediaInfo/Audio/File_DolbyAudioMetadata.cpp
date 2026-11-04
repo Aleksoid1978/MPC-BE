@@ -50,7 +50,7 @@ static const char* metadata_segment_Name[] =
     "Dolby Atmos Metadata",
     "Dolby Atmos Supplemental Metadata",
 };
-static size_t metadata_segment_Name_Size=sizeof(metadata_segment_Name)/sizeof(const char*);
+static const size_t metadata_segment_Name_Size=sizeof(metadata_segment_Name)/sizeof(const char*);
 
 static const char* binaural_render_mode_Name[] =
 {
@@ -200,8 +200,7 @@ void File_DolbyAudioMetadata::Read_Buffer_Continue()
         Element_Begin1("metadata_segment");
         int8u metadata_segment_id;
         Get_L1 (metadata_segment_id,                            "metadata_segment_id"); Element_Info1(Ztring::ToZtring(metadata_segment_id));
-        if (metadata_segment_id<metadata_segment_Name_Size && metadata_segment_Name[metadata_segment_id])
-            Element_Info1(metadata_segment_Name[metadata_segment_id]);
+        Element_Info1C(metadata_segment_id<metadata_segment_Name_Size && metadata_segment_Name[metadata_segment_id], metadata_segment_Name[metadata_segment_id]);
         if (!metadata_segment_id)
         {
             Element_End0();
@@ -326,7 +325,7 @@ void File_DolbyAudioMetadata::Dolby_Atmos_Metadata_Segment()
                 first_action_time_HH=(int8u)((-((int8s)first_action_time_HH)));
             const int32u FrameRate = 100000;
             TimeCode TC(first_action_time_HH, first_action_time_MM, first_action_time_SS/FrameRate, first_action_time_SS%FrameRate, FrameRate-1, TimeCode::Timed().Negative(IsNegative));
-            Merge_FillTimeCode(*this, "Dolby_Atmos_Metadata FirstFrameOfAction", TC, frames_per_second_Values[frames_per_second], frames_per_second==4, TimeCode::Ceil, 48000);
+            Merge_FillTimeCode(*this, "Dolby_Atmos_Metadata FirstFrameOfAction", TC, frames_per_second<frames_per_second_Size?frames_per_second_Values[frames_per_second]:0, frames_per_second==4, TimeCode::Ceil, 48000);
         }
         FILLING_END()
 }

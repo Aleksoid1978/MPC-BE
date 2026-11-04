@@ -188,46 +188,25 @@ void File_H263::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_H263::Synchronize()
 {
-    //Synchronizing
-    while(Buffer_Offset+5<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                        || Buffer[Buffer_Offset+1]!=0x00
-                                        || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
-                                        || (Buffer[Buffer_Offset+3]&0x03)!=0x02
-                                        || (Buffer[Buffer_Offset+4]&0x1C)==0x00))
+    while (Buffer_Size - Buffer_Offset >= 5)
     {
-        Buffer_Offset+=2;
-        while(Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
-            Buffer_Offset+=2;
-        if ((Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset-1]==0x00) || Buffer_Offset>=Buffer_Size)
-            Buffer_Offset--;
+        if (Buffer[Buffer_Offset + 1])
+        {
+            Buffer_Offset += 2;
+            continue;
+        }
+
+        if ((BigEndian2int32u(Buffer + Buffer_Offset) & 0xFFFFFC03) == 0x00008002
+            && (BigEndian2int8u(Buffer + Buffer_Offset + 4) & 0x1C))
+        {
+            //Synched is OK
+            return true;
+        }
+
+        Buffer_Offset++;
     }
 
-    //Parsing last bytes if needed
-    if (Buffer_Offset+4==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00
-                                      || (Buffer[Buffer_Offset+2]&0xFC)!=0x80
-                                      || (Buffer[Buffer_Offset+3]&0x03)!=0x02))
-        Buffer_Offset++;
-    if (Buffer_Offset+3==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00
-                                      || (Buffer[Buffer_Offset+2]&0xFC)!=0x80))
-        Buffer_Offset++;
-    if (Buffer_Offset+2==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00))
-        Buffer_Offset++;
-    if (Buffer_Offset+1==Buffer_Size &&  Buffer[Buffer_Offset  ]!=0x00)
-        Buffer_Offset++;
-
-    if (Buffer_Offset+5>Buffer_Size)
-    {
-        if (Frame_Count==0 && Buffer_TotalBytes+Buffer_Offset>Buffer_TotalBytes_FirstSynched_Max)
-            Reject();
-        return false;
-    }
-
-    //Synched is OK
-    Synched=true;
-    return true;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -348,6 +327,7 @@ void File_H263::Data_Parse()
         if (!Status[IsFilled])
             Frame_Count=0; // Back to start of sync
         Trusted_IsNot("Out of Order");
+        BS_End();
         return;
     }
     Temporal_Reference=Temporal_Reference_Temp;

@@ -166,7 +166,7 @@ bool File_DvbSubtitle::Synched_Test()
     if (MustFindDvbHeader)
     {
         //Must have enough buffer for having header
-        if (Buffer_Offset+1>Buffer_Size)
+        if (Buffer_Offset>Buffer_Size || Buffer_Size-Buffer_Offset<2)
             return false;
 
         if (CC2(Buffer+Buffer_Offset)!=0x2000)
@@ -377,9 +377,9 @@ void File_DvbSubtitle::region_composition_segment()
         BS_Begin();
         Get_S1 ( 2, object_type,                                "object_type");
         Skip_S1( 2,                                             "object_provider_flag");
-        Skip_S1(12,                                             "object_horizontal_position");
+        Skip_S2(12,                                             "object_horizontal_position");
         Skip_S1( 4,                                             "reserved");
-        Skip_S1(12,                                             "object_vertical_position");
+        Skip_S2(12,                                             "object_vertical_position");
         BS_End();
         switch (object_type)
         {

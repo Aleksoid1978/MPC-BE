@@ -1565,10 +1565,14 @@ void File_Ac3::Streams_Fill()
             Fill(Stream_Audio, 0, "dmixmod", AC3_dmixmod[dmixmod_Max[0][0] - 1]);
             Fill_SetOptions(Stream_Audio, 0, "dmixmod", "Y NTY");
         }
-        AC3_Level_Fill(this, 0, ltrtcmixlev_Max[0][0], 3, 1.5, "ltrtcmixlev");
-        AC3_Level_Fill(this, 0, ltrtsurmixlev_Max[0][0], 3, 1.5, "ltrtsurmixlev");
-        AC3_Level_Fill(this, 0, lorocmixlev_Max[0][0], 3, 1.5, "lorocmixlev");
-        AC3_Level_Fill(this, 0, lorosurmixlev_Max[0][0], 3, 1.5, "lorosurmixlev");
+        if (ltrtcmixlev_Max[0][0]!=(int8u)-1) //Only with a center channel
+            AC3_Level_Fill(this, 0, ltrtcmixlev_Max[0][0], 3, 1.5, "ltrtcmixlev");
+        if (ltrtsurmixlev_Max[0][0]!=(int8u)-1) //Only with surround channels
+            AC3_Level_Fill(this, 0, ltrtsurmixlev_Max[0][0], 3, 1.5, "ltrtsurmixlev");
+        if (lorocmixlev_Max[0][0]!=(int8u)-1)
+            AC3_Level_Fill(this, 0, lorocmixlev_Max[0][0], 3, 1.5, "lorocmixlev");
+        if (lorosurmixlev_Max[0][0]!=(int8u)-1)
+            AC3_Level_Fill(this, 0, lorosurmixlev_Max[0][0], 3, 1.5, "lorosurmixlev");
         if (adconvtyp_Max[0][0])
         {
             Fill(Stream_Audio, 0, "adconvtyp", "HDCD");
@@ -1948,7 +1952,7 @@ bool File_Ac3::Synched_Test()
         return true;
 
     //Must have enough buffer for having header
-    if (Buffer_Offset+(TimeStamp_IsPresent?16:0)+6>Buffer_Size)
+    if (Buffer_Offset>Buffer_Size || Buffer_Size-Buffer_Offset<(TimeStamp_IsPresent?16U:0U)+8)
         return false;
 
     //TimeStamp
@@ -2572,7 +2576,7 @@ void File_Ac3::Core_Frame()
                     Get_S1 (3, ltrtcmixlev,                         "ltrtcmixlev");
                     Get_S1 (3, lorocmixlev,                         "lorocmixlev");
                 }
-                if(acmod>0x4)
+                if(acmod&0x4)
                 {
                     Get_S1 (3, ltrtsurmixlev,                       "ltrtsurmixlev");
                     Get_S1 (3, lorosurmixlev,                       "lorosurmixlev");
@@ -2590,8 +2594,8 @@ void File_Ac3::Core_Frame()
                     TEST_SB_END();
                     if (acmod == 0x0)
                     {
-                        TEST_SB_SKIP(                               "pgmscle12e");
-                            Skip_S1 (6,                             "pgmscl12e");
+                        TEST_SB_SKIP(                               "pgmscl2e");
+                            Skip_S1 (6,                             "pgmscl2");
                         TEST_SB_END();
                     }
                     TEST_SB_SKIP(                                   "extpgmscle");
@@ -2609,8 +2613,10 @@ void File_Ac3::Core_Frame()
                     {
                         int8u mixdeflen;
                         Get_S1 (5, mixdeflen,                       "mixdeflen");
+                        size_t mixdata_Size=8*(mixdeflen+2); //Including mixdata2e and mixdata3e parameters
+                        size_t mixdata_End=(Data_BS_Remain()>mixdata_Size)?(Data_BS_Remain()-mixdata_Size):0;
                         TEST_SB_SKIP(                               "mixdata2e");
-                            Skip_S1 (6,                             "premixcmpsel");
+                            Skip_S1 (1,                             "premixcmpsel");
                             Skip_S1 (1,                             "drcsrc");
                             Skip_S1 (3,                             "premixcmpscl");
                             TEST_SB_SKIP(                           "extpgmlscle");
@@ -2622,11 +2628,11 @@ void File_Ac3::Core_Frame()
                             TEST_SB_SKIP(                           "extpgmrscle");
                                 Skip_S1 (4,                         "extpgmrscl");
                             TEST_SB_END();
-                            TEST_SB_SKIP(                           "extpgmlssle");
-                                Skip_S1 (4,                         "extpgmlssl");
+                            TEST_SB_SKIP(                           "extpgmlsscle");
+                                Skip_S1 (4,                         "extpgmlsscl");
                             TEST_SB_END();
-                            TEST_SB_SKIP(                           "extpgmrssle");
-                                Skip_S1 (4,                         "extpgmrssl");
+                            TEST_SB_SKIP(                           "extpgmrsscle");
+                                Skip_S1 (4,                         "extpgmrsscl");
                             TEST_SB_END();
                             TEST_SB_SKIP(                           "extpgmlfescle");
                                 Skip_S1 (4,                         "extpgmlfescl");
@@ -2648,26 +2654,26 @@ void File_Ac3::Core_Frame()
                             TEST_SB_SKIP(                           "addspchdate");
                                 Skip_S1 (5,                         "spchdat1");
                                 Skip_S1 (2,                         "spchan1att");
-                                TEST_SB_SKIP(                       "addspdat1e");
+                                TEST_SB_SKIP(                       "addspchdat1e");
                                     Skip_S1 (5,                     "spchdat2");
-                                    Skip_S1 (2,                     "spchan2att");
+                                    Skip_S1 (3,                     "spchan2att");
                                 TEST_SB_END();
                             TEST_SB_END();
                         TEST_SB_END();
-                        Skip_S2 (8*(mixdeflen+2),                   "mixdata");
-                        //Skip_S1 (,                                 "mixdatafill");
+                        if (Data_BS_Remain()>mixdata_End)
+                            Skip_BS(Data_BS_Remain()-mixdata_End,   "mixdata");
                     }
                     if(acmod<0x2)
                     {
                         TEST_SB_SKIP(                               "paninfoe");
-                            Skip_S1 (6,                             "panmean");
-                            Skip_S1 (8,                             "paninfo");
+                            Skip_S1 (8,                             "panmean");
+                            Skip_S1 (6,                             "paninfo");
                         TEST_SB_END();
                         if(acmod==0x0)
                         {
                             TEST_SB_SKIP(                           "paninfo2e");
-                               Skip_S1 (6,                          "panmean2");
-                               Skip_S1 (8,                          "paninfo2");
+                               Skip_S1 (8,                          "panmean2");
+                               Skip_S1 (6,                          "paninfo2");
                             TEST_SB_END();
                         }
                     }
@@ -4022,8 +4028,7 @@ void File_Ac3::emdf_container()
             emdf_payload_id += add;
         }
 
-        if (emdf_payload_id<16)
-            Element_Info1(Ac3_emdf_payload_id[emdf_payload_id]);
+        Element_Info1C(emdf_payload_id<16, Ac3_emdf_payload_id[emdf_payload_id]);
         if (emdf_payload_id == 0x00)
         {
             Element_End0();
@@ -4256,7 +4261,7 @@ void File_Ac3::program_assignment()
             int8u reserved_data_size_bits;
             Get_S1 (4, reserved_data_size_bits,                 "reserved_data_size_bits");
             int8u padding = 8 - (reserved_data_size_bits % 8);
-            Skip_S1(reserved_data_size_bits,                    "reserved_data()");
+            Skip_S2(reserved_data_size_bits,                    "reserved_data()");
             if (padding)
                 Skip_S1(padding,                                "padding");
         }
@@ -4459,6 +4464,7 @@ void File_Ac3::HD()
         if ((!restart_nonexistent && Synch!=0xF8726F) || (restart_nonexistent && Synch==0xF8726F))
         {
             Element_End0();
+            BS_End();
             return;
         }
         Skip_SB(                                                "crc_present");
@@ -4638,7 +4644,7 @@ void File_Ac3::HD_format_info()
         Get_S1 ( 4, HD_Resolution2,                             "Resolution2"); Param_Info2(AC3_MLP_Resolution[HD_Resolution2], " bits");
         Get_S1 ( 4, HD_SamplingRate1,                           "Sampling rate"); Param_Info2(AC3_HD_SamplingRate(HD_SamplingRate1), " Hz");
         Get_S1 ( 4, HD_SamplingRate2,                           "Sampling rate"); Param_Info2(AC3_HD_SamplingRate(HD_SamplingRate2), " Hz");
-        Skip_S1(11,                                             "Unknown");
+        Skip_S2(11,                                             "Unknown");
         Get_S1 ( 5, HD_Channels1,                               "Channels"); Param_Info1(AC3_MLP_Channels[HD_Channels1]);
         BS_End();
         HD_Channels2=HD_Channels1;
@@ -5047,6 +5053,11 @@ void File_Ac3::Get_V4(int8u  Bits, int32u  &Info, const char* Name)
 #endif //MEDIAINFO_TRACE
     for (;;)
     {
+        if (BS->Remain() < Bits + 1u)
+        {
+            Trusted_IsNot("Variable length value not valid");
+            break;
+        }
         Info += BS->Get4(Bits);
 #if MEDIAINFO_TRACE
         Count += Bits;
@@ -5077,9 +5088,17 @@ void File_Ac3::Skip_V4(int8u  Bits, const char* Name)
     else
 #endif //MEDIAINFO_TRACE
     {
-        do
+        for (;;)
+        {
+            if (BS->Remain() < Bits + 1u)
+            {
+                Trusted_IsNot("Variable length value not valid");
+                break;
+            }
             BS->Skip(Bits);
-        while (BS->GetB());
+            if (!BS->GetB())
+                break;
+        }
     }
 }
 

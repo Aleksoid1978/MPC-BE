@@ -93,7 +93,7 @@ private :
     void pHYs();
     void sBIT();
     void sPLT() { Data_Common(); }
-    void sRGB() { Data_Common(); }
+    void sRGB();
     void tEXt() { Textual(bitset8()); }
     void tIME();
     void tRNS() { Data_Common(); }
@@ -114,6 +114,7 @@ private :
     int64u Data_Size{};
     int32u Signature{};
     std::shared_ptr<void> GainMap_metadata_ISO;
+    std::unique_ptr<File__Analyze> GainMap_Parser;
     bool IDATseen{};
     bool isAPNG{};
     int32u framecount{};

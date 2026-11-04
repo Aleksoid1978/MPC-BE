@@ -130,12 +130,16 @@ void File_Avc::File__Duplicate_Write (int64u Element_Code, int32u frame_num)
     {
         if (Element_Code==7)
         {
+            if (ToAdd_Size>sizeof(Duplicate_Buffer))
+                return;
             std::memcpy(Duplicate_Buffer, ToAdd, ToAdd_Size);
             Duplicate_Buffer_Size=ToAdd_Size;
 
         }
         else if (Element_Code==8)
         {
+            if (Duplicate_Buffer_Size>0xFFFF || ToAdd_Size>0xFFFF)
+                return;
 
             // Form:
             //  8 bytes : PTS
@@ -224,6 +228,8 @@ void File_Avc::File__Duplicate_Write (int64u Element_Code, int32u frame_num)
 
 
         //NALU
+        if (Duplicate_Buffer_Size>sizeof(Duplicate_Buffer)-4 || ToAdd_Size>sizeof(Duplicate_Buffer)-Duplicate_Buffer_Size-4)
+            return;
         int32u2BigEndian(Duplicate_Buffer+Duplicate_Buffer_Size, (int32u)ToAdd_Size); //4 bytes for NALU header
         Duplicate_Buffer_Size+=4;
 

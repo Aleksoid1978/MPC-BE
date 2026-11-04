@@ -146,6 +146,7 @@ void File_OtherText::Read_Buffer_Continue()
     }
     else if (Lines[0].size()>10
           && Lines[0][0]==__T('~') && Lines[0][1]==__T('C') && Lines[0][2]==__T('P') && Lines[0][3]==__T('C') && Lines[0][9]==__T('~')
+          && Lines.size()>1 && Lines[1].size()>8
           && Lines[1][ 0]==__T('0') && Lines[1][ 1]==__T('0')
           && Lines[1][ 2]==__T(':') && Lines[1][ 5]==__T(':') && Lines[1][ 8]==__T(':')
     )

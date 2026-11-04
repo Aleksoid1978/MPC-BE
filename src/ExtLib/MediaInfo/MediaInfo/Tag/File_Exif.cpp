@@ -1212,6 +1212,22 @@ static const char* Exif_IFD0_Orientation_Name(int16u orientation)
 }
 
 //---------------------------------------------------------------------------
+// Clockwise rotation, then left-right mirror, like HEIF irot and imir
+static const struct {
+    int16u Rotation;
+    bool   Mirror;
+} Exif_IFD0_Orientation_Transform[] = {
+    {   0, false },
+    {   0, true  },
+    { 180, false },
+    { 180, true  },
+    {  90, true  },
+    {  90, false },
+    { 270, true  },
+    { 270, false },
+};
+
+//---------------------------------------------------------------------------
 static const char* Exif_ExifIFD_Tag_LightSource_Name(int16u value) {
     switch (value) {
     case 0: return "Unknown";
@@ -1656,6 +1672,19 @@ void File_Exif::Streams_Finish()
                 }
                 break;
             }
+            case IFD0::Orientation: {
+                Parameter = (size_t)-1;
+                const auto Orientation = Item.second.Read().To_int16u();
+                if (Orientation >= 1 && Orientation <= 8) {
+                    const auto& Transform = Exif_IFD0_Orientation_Transform[Orientation - 1];
+                    Fill(Stream_Image, 0, Image_Rotation, Transform.Rotation);
+                    if (Transform.Rotation)
+                        Fill(Stream_Image, 0, Image_Rotation_String, Ztring::ToZtring(Transform.Rotation) + __T("\xB0")); //degree sign
+                    if (Transform.Mirror)
+                        Fill(Stream_Image, 0, "Mirror", "Vertical");
+                }
+                break;
+            }
             case IFD0::WinExpTitle: Parameter = General_Title; break;
             case IFD0::WinExpComment: Parameter = General_Comment; break;
             case IFD0::WinExpAuthor: Parameter = General_Performer; break;
@@ -1706,11 +1735,11 @@ void File_Exif::Streams_Finish()
                 else {
                     ShutterSpeed_Time = std::to_string(exposure_time);
                     ShutterSpeed_Time.erase(ShutterSpeed_Time.find_last_not_of('0') + 1);
-                    if (ShutterSpeed_Time.back() == '.')
+                    if (!ShutterSpeed_Time.empty() && ShutterSpeed_Time.back() == '.')
                         ShutterSpeed_Time.pop_back();
                 }
                 Value = Item.second.Read();
-                ParameterS = ShutterSpeed_Time + " s";
+                ParameterS = !ShutterSpeed_Time.empty() ? ShutterSpeed_Time + " s" : "";
                 break;
             }
             case IFDExif::FNumber: ParameterC = "IrisFNumber"; Value.From_Number(Item.second.Read().To_float64(), 1); break;
@@ -1840,7 +1869,7 @@ void File_Exif::Streams_Finish()
                 const auto GPSLongitudeRef = Infos_GPS.find(IFDGPS::GPSLongitudeRef);
                 const auto GPSAltitudeRef = Infos_GPS.find(IFDGPS::GPSAltitudeRef);
                 const auto GPSAltitude = Infos_GPS.find(IFDGPS::GPSAltitude);
-                if (GPSLatitude->second.size() == 3 && GPSLatitudeRef != Infos_GPS.end() && GPSLongitude != Infos_GPS.end() && GPSLongitude->second.size() == 3 && GPSLongitudeRef != Infos_GPS.end()) {
+                if (GPSLatitude->second.size() == 3 && GPSLatitudeRef != Infos_GPS.end() && !GPSLatitudeRef->second.empty() && GPSLongitude != Infos_GPS.end() && GPSLongitude->second.size() == 3 && GPSLongitudeRef != Infos_GPS.end() && !GPSLongitudeRef->second.empty()) {
                     Value = GPSLatitude->second.at(0) + Ztring().From_UTF8("\xC2\xB0");
                     if (GPSLatitude->second.at(1) != __T("0") || GPSLatitude->second.at(0).find(__T('.')) == string::npos) {
                         Value += GPSLatitude->second.at(1) + __T('\'');
@@ -1937,7 +1966,7 @@ void File_Exif::Streams_Finish()
             case IFDMakernoteNikon::Quality:
                 ParameterC = "Quality";
                 Value = Item.second.Read();
-                while (Value.back() == __T(' ')) Value.pop_back();
+                while (!Value.empty() && Value.back() == __T(' ')) Value.pop_back();
                 break;
             }
             FillMetadata(Value, Item, Parameter, ParameterC, ParameterS);
@@ -2120,7 +2149,7 @@ void File_Exif::Header_Parse()
         }
         if (Offset != IfdItems.begin()->first) {
             IfdItems.clear(); //There was a problem during the seek, trashing remaining positions from last IFD
-            Finish();
+            ForceFinish();
             return;
         }
         #ifdef MEDIAINFO_TRACE
@@ -2181,7 +2210,7 @@ void File_Exif::Header_Parse()
             int32u temp;
             Skip_C4(                                            "Alignment");
             Get_X4(temp,                                        "Makernote offset");
-            Finish();
+            ForceFinish();
             return;
         }
     }
@@ -2279,7 +2308,7 @@ void File_Exif::Data_Parse()
             }
         }
 
-        if (!HasFooter) Finish(); //No more IFDs
+        if (!HasFooter) ForceFinish(); //No more IFDs, the remaining content is not parsed even if the whole file is requested
     }
 }
 
@@ -2777,10 +2806,9 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<Count; Pos++)
         {
-            int16u Ret16u;
             int16s Ret16;
             #if MEDIAINFO_TRACE
-                Get_X2 (Ret16u,                                 "Data");
+                Info_X2(Ret16u,                                 "Data");
                 Ret16 = static_cast<int16s>(Ret16u);
                 Element_Info1(Ztring::ToZtring(Ret16));
             #else //MEDIAINFO_TRACE
@@ -2807,10 +2835,9 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<Count; Pos++)
         {
-            int32u Ret32u;
             int32s Ret32;
             #if MEDIAINFO_TRACE
-                Get_X4 (Ret32u,                                 "Data");
+                Info_X4(Ret32u,                                 "Data");
                 Ret32 = static_cast<int32s>(Ret32u);
                 Element_Info1(Ztring::ToZtring(Ret32));
             #else //MEDIAINFO_TRACE
@@ -2839,11 +2866,10 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
         auto Count = IfdItem.Count > 16 ? 16 : IfdItem.Count;
         for (int16u Pos=0; Pos<Count; Pos++)
         {
-            int32u NU, DU;
             int32s N, D;
             #if MEDIAINFO_TRACE
-                Get_X4 (NU,                                     "Numerator");
-                Get_X4 (DU,                                     "Denominator");
+                Info_X4(NU,                                     "Numerator");
+                Info_X4(DU,                                     "Denominator");
                 N = static_cast<int32s>(NU);
                 D = static_cast<int32s>(DU);
                 if (D)
@@ -2924,7 +2950,13 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             switch (IfdItem.Tag) {
             case IFDMPF::MPEntry:
             {
-                int32u num_imgs{ Infos.find(Kind_MPF)->second.find(IFDMPF::NumberOfImages)->second.Read().To_int32u() };
+                auto Mpf=Infos.find(Kind_MPF);
+                if (Mpf==Infos.end())
+                    break;
+                auto NumberOfImages=Mpf->second.find(IFDMPF::NumberOfImages);
+                if (NumberOfImages==Mpf->second.end())
+                    break;
+                int32u num_imgs{ NumberOfImages->second.Read().To_int32u() };
                 for (int32u i = 0; i < num_imgs; ++i) {
                     Element_Begin1(("MP Entry " + std::to_string(i + 1)).c_str());
                     mp_entry entry{};
@@ -2940,7 +2972,13 @@ void File_Exif::GetValueOffsetu(ifditem &IfdItem)
             }
             case IFDMPF::ImageUIDList:
             {
-                int32u num_imgs{ Infos.find(Kind_MPF)->second.find(IFDMPF::NumberOfImages)->second.Read().To_int32u() };
+                auto Mpf=Infos.find(Kind_MPF);
+                if (Mpf==Infos.end())
+                    break;
+                auto NumberOfImages=Mpf->second.find(IFDMPF::NumberOfImages);
+                if (NumberOfImages==Mpf->second.end())
+                    break;
+                int32u num_imgs{ NumberOfImages->second.Read().To_int32u() };
                 for (int32u i = 0; i < num_imgs; ++i) {
                     string Data;
                     Get_String(33, Data,                        "Individual Image Unique ID"); Element_Info1(Data.c_str());

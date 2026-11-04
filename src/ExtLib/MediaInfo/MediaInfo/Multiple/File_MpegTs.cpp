@@ -832,8 +832,20 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                 Fill((stream_t)StreamKind, StreamPos, "Encryption", "Encrypted");
 
             //TS info
+            Ztring HDR_Container[Video_HDR_Format_Compatibility-Video_HDR_Format+1];
             for (std::map<std::string, ZenLib::Ztring>::iterator Info=Temp->Infos.begin(); Info!=Temp->Infos.end(); ++Info)
             {
+                //Special case: HDR formats, merged with the ones from the stream after all infos
+                if ((stream_t)StreamKind==Stream_Video && Info->first.rfind("HDR_Format", 0)==0)
+                {
+                    size_t Parameter=MediaInfoLib::Config.Info_Get(Stream_Video).Find(Ztring().From_UTF8(Info->first));
+                    if (Parameter>=Video_HDR_Format && Parameter<=Video_HDR_Format_Compatibility)
+                    {
+                        HDR_Container[Parameter-Video_HDR_Format]=Info->second;
+                        continue;
+                    }
+                }
+
                 //Special case: Preselections
                 string First=Info->first;
                 if ((stream_t)StreamKind==Stream_Audio && First.rfind("Preselection", 12)==0 && Retrieve_Const((stream_t)Stream_Audio, StreamPos, Audio_Format)==__T("AC-4"))
@@ -934,10 +946,20 @@ void File_MpegTs::Streams_Update_Programs_PerStream(size_t StreamID)
                 {
                     Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second+__T('-')+Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()), true);
                 }
-                else if (Info->first.find("HDR_Format")==0)
+            }
+            if (!HDR_Container[0].empty())
+            {
+                Ztring HDR_Stream[Video_HDR_Format_Compatibility-Video_HDR_Format+1];
+                for (size_t i=Video_HDR_Format; i<=Video_HDR_Format_Compatibility; i++)
+                    HDR_Stream[i-Video_HDR_Format]=Retrieve_Const(Stream_Video, StreamPos, i);
+                if (HDR_Stream[0].empty())
                 {
-                    Fill((stream_t)StreamKind, StreamPos, Info->first.c_str(), Info->second+__T(" / ")+Retrieve((stream_t)StreamKind, StreamPos, Info->first.c_str()), true);
+                    for (size_t i=Video_HDR_Format; i<=Video_HDR_Format_Compatibility; i++)
+                        if (!HDR_Container[i-Video_HDR_Format].empty())
+                            Fill(Stream_Video, StreamPos, i, HDR_Container[i-Video_HDR_Format], true);
                 }
+                else
+                    Merge_HDR(StreamPos, HDR_Container, HDR_Stream, Retrieve(Stream_Video, StreamPos, Video_colour_range), Retrieve(Stream_Video, StreamPos, Video_matrix_coefficients));
             }
 
             //Common
@@ -1489,40 +1511,45 @@ void File_MpegTs::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_MpegTs::Synchronize()
 {
-    //Synchronizing
-    while (       Buffer_Offset+188*16+BDAV_Size*16+TSP_Size*16<=Buffer_Size
-      && !(Buffer[Buffer_Offset+188* 0+BDAV_Size* 1+TSP_Size* 0]==0x47
-        && Buffer[Buffer_Offset+188* 1+BDAV_Size* 2+TSP_Size* 1]==0x47
-        && Buffer[Buffer_Offset+188* 2+BDAV_Size* 3+TSP_Size* 2]==0x47
-        && Buffer[Buffer_Offset+188* 3+BDAV_Size* 4+TSP_Size* 3]==0x47
-        && Buffer[Buffer_Offset+188* 4+BDAV_Size* 5+TSP_Size* 4]==0x47
-        && Buffer[Buffer_Offset+188* 5+BDAV_Size* 6+TSP_Size* 5]==0x47
-        && Buffer[Buffer_Offset+188* 6+BDAV_Size* 7+TSP_Size* 6]==0x47
-        && Buffer[Buffer_Offset+188* 7+BDAV_Size* 8+TSP_Size* 7]==0x47
-        && Buffer[Buffer_Offset+188* 8+BDAV_Size* 9+TSP_Size* 8]==0x47
-        && Buffer[Buffer_Offset+188* 9+BDAV_Size*10+TSP_Size* 9]==0x47
-        && Buffer[Buffer_Offset+188*10+BDAV_Size*11+TSP_Size*10]==0x47
-        && Buffer[Buffer_Offset+188*11+BDAV_Size*12+TSP_Size*11]==0x47
-        && Buffer[Buffer_Offset+188*12+BDAV_Size*13+TSP_Size*12]==0x47
-        && Buffer[Buffer_Offset+188*13+BDAV_Size*14+TSP_Size*13]==0x47
-        && Buffer[Buffer_Offset+188*14+BDAV_Size*15+TSP_Size*14]==0x47
-        && Buffer[Buffer_Offset+188*15+BDAV_Size*16+TSP_Size*15]==0x47))
+    #ifdef MEDIAINFO_ARIBSTDB24B37_YES
+        if (FromAribStdB24B37)
+            return true;
+    #endif
+
+    const size_t Frame_Size = 188 + BDAV_Size + TSP_Size;
+    const size_t Required_Length = Frame_Size * 16;
+
+    while (Buffer_Size - Buffer_Offset >= Required_Length)
     {
+        const size_t Candidate_End = Buffer_Size - Frame_Size + 1;
+        const size_t Search_Begin = Buffer_Offset + BDAV_Size;
+        const size_t Search_End = Candidate_End + BDAV_Size;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Search_Begin, 0x47, Search_End - Search_Begin);
+        if (!Sync)
+        {
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer) - BDAV_Size;
+
+        bool IsNOK = false;
+        size_t Offset = Buffer_Offset + BDAV_Size;
+        for (size_t i = 0; i < 15; ++i)
+        {
+            Offset += Frame_Size;
+            if (Buffer[Offset] != 0x47)
+            {
+                IsNOK = true;
+                break;
+            }
+        }
+        if (!IsNOK)
+            return true;
+
         Buffer_Offset++;
-        while (       Buffer_Offset+BDAV_Size+1<=Buffer_Size
-            && Buffer[Buffer_Offset+BDAV_Size]!=0x47)
-            Buffer_Offset++;
     }
 
-    if (Buffer_Offset+188*16+BDAV_Size*16+TSP_Size*16>=Buffer_Size
-    #ifdef MEDIAINFO_ARIBSTDB24B37_YES
-     && !FromAribStdB24B37
-    #endif
-        )
-        return false;
-
-    //Synched is OK
-    return true;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -2307,9 +2334,9 @@ size_t File_MpegTs::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
 
                             InfiniteLoop_Detect=0;
                             Config->Demux_IsSeeking=false;
-                            if (Complete_Stream && Complete_Stream->Streams[(size_t)IbiStream_Temp->first] && Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser)
+                            if (Complete_Stream && IbiStream_Temp->first<Complete_Stream->Streams.size() && Complete_Stream->Streams[(size_t)IbiStream_Temp->first] && Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser)
                                 Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser->Unsynch_Frame_Count=IbiStream_Temp->second->Infos[Pos].FrameNumber;
-                            else
+                            else if (IbiStream_Temp->first<0x2000)
                                 Unsynch_Frame_Counts[(int16u)IbiStream_Temp->first]=IbiStream_Temp->second->Infos[Pos].FrameNumber;
 
                             GoTo(IbiStream_Temp->second->Infos[Pos].StreamOffset);
@@ -2350,9 +2377,9 @@ size_t File_MpegTs::Read_Buffer_Seek (size_t Method, int64u Value, int64u ID)
                                 Pos--;
 
                             Config->Demux_IsSeeking=false;
-                            if (Complete_Stream && Complete_Stream->Streams[(size_t)IbiStream_Temp->first] && Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser)
+                            if (Complete_Stream && IbiStream_Temp->first<Complete_Stream->Streams.size() && Complete_Stream->Streams[(size_t)IbiStream_Temp->first] && Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser)
                                 Complete_Stream->Streams[(size_t)IbiStream_Temp->first]->Parser->Unsynch_Frame_Count=IbiStream_Temp->second->Infos[Pos].FrameNumber;
-                            else
+                            else if (IbiStream_Temp->first<0x2000)
                                 Unsynch_Frame_Counts[(int16u)IbiStream_Temp->first]=IbiStream_Temp->second->Infos[Pos].FrameNumber;
 
                             GoTo(IbiStream_Temp->second->Infos[Pos].StreamOffset);
@@ -2704,18 +2731,20 @@ void File_MpegTs::Header_Parse_AdaptationField()
     else
     {
     #endif //MEDIAINFO_TRACE
+        if (Element_Size>=BDAV_Size+5)
+        {
         int8u adaptation_field_length=Buffer[Buffer_Offset+BDAV_Size+4];
+        if (adaptation_field_length>188-(4+1)) //TS size - header - adaptation_field_length
+            adaptation_field_length=188-(4+1);
         #ifdef MEDIAINFO_MPEGTS_PCR_YES
-            if (adaptation_field_length>188-4-1) //TS size - header - adaptation_field_length
-                adaptation_field_length=188-4-1;
-            else if (adaptation_field_length)
+            if (adaptation_field_length)
             {
                 bool discontinuity_indicator=(Buffer[Buffer_Offset+BDAV_Size+5]&0x80)!=0;
                 bool PCR_flag=(Buffer[Buffer_Offset+BDAV_Size+5]&0x10)!=0;
                 bool OPCR_flag=(Buffer[Buffer_Offset+BDAV_Size+5]&0x08)!=0;
                 bool splicing_point_flag=(Buffer[Buffer_Offset+BDAV_Size+5]&0x04)!=0;
                 bool transport_private_data_flag=(Buffer[Buffer_Offset+BDAV_Size+5]&0x02)!=0;
-                if (PCR_flag)
+                if (PCR_flag && adaptation_field_length>=6)
                 {
                     int64u program_clock_reference=(  (((int64u)Buffer[Buffer_Offset+BDAV_Size+6])<<25)
                                                     | (((int64u)Buffer[Buffer_Offset+BDAV_Size+7])<<17)
@@ -2861,13 +2890,14 @@ void File_MpegTs::Header_Parse_AdaptationField()
                         }
                     }
                 }
-                if (transport_private_data_flag && adaptation_field_length>1+(PCR_flag?6:0)+(OPCR_flag?6:0)+(splicing_point_flag?1:0)+1)
+                auto adaptation_field_length_Min=1+(PCR_flag?6:0)+(OPCR_flag?6:0)+(splicing_point_flag?1:0);
+                if (transport_private_data_flag && adaptation_field_length>adaptation_field_length_Min+1)
                 {
-                    int8u transport_private_data_length=Buffer[Buffer_Offset+BDAV_Size+5+1+(PCR_flag?6:0)+(OPCR_flag?6:0)+(splicing_point_flag?1:0)];
-                    if (1+(PCR_flag?6:0)+(OPCR_flag?6:0)+(splicing_point_flag?1:0)+1+transport_private_data_length<=adaptation_field_length)
+                    int8u transport_private_data_length=Buffer[Buffer_Offset+BDAV_Size+5+adaptation_field_length_Min];
+                    if (transport_private_data_length<=adaptation_field_length-(adaptation_field_length_Min+1))
                     {
                         int64u Element_Offset_Save=Element_Offset;
-                        Element_Offset=5+1+(PCR_flag?6:0)+(OPCR_flag?6:0)+(splicing_point_flag?1:0)+1;
+                        Element_Offset=5+adaptation_field_length_Min+1;
                         transport_private_data(transport_private_data_length);
                         Element_Offset=Element_Offset_Save;
                     }
@@ -2875,6 +2905,7 @@ void File_MpegTs::Header_Parse_AdaptationField()
             }
         #endif //MEDIAINFO_MPEGTS_PCR_YES
         Element_Offset+=1+adaptation_field_length;
+        }
     #if MEDIAINFO_TRACE
     }
     #endif //MEDIAINFO_TRACE

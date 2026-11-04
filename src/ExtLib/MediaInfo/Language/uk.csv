@@ -1414,6 +1414,10 @@ TopFrontToSide;Верхні передні канали в бічний кана
 Total;Всього
 TotalNumberOfParts;Загальна кількість частин
 TotalProgrammeDuration;Загальна тривалість програми
+TraceLevel0;
+TraceLevel5;
+TraceLevel9;
+TraceLevel10;
 Track;Назва доріжки
 Track_Count;Кількість доріжок
 TrackFormat;Формат доріжки

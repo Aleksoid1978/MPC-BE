@@ -633,7 +633,6 @@ private :
     #endif //defined(MEDIAINFO_LIBMMS_YES)
     display_captions        DisplayCaptions;
     std::vector<config_probe> File_ProbeCaption;
-    size_t                  File_ProbeCaption_Pos;
     #if defined(MEDIAINFO_AC3_YES)
     bool                    File_Ac3_IgnoreCrc;
     #endif //defined(MEDIAINFO_AC3_YES)

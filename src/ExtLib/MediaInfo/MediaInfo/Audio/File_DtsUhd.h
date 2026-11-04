@@ -86,7 +86,7 @@ protected :
     struct UHDAudPresParam
     {
         bool Selectable=false;
-        int DepAuPresMask=0;
+        int64u DepAuPresMask=0;
     };
 
     struct md_chunk
@@ -113,7 +113,7 @@ protected :
     MDObject* FindDefaultAudio();
     void ExtractObjectInfo(MDObject*);
     void UpdateDescriptor();
-    int ExtractExplicitObjectsLists(int Mask, int Index);
+    int ExtractExplicitObjectsLists(int64u Mask, int Index);
     int ResolveAudPresParams();
     void DecodeVersion();
     int ExtractStreamParams();

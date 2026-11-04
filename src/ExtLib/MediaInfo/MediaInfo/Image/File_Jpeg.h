@@ -229,6 +229,7 @@ private :
     std::unique_ptr<File__Analyze> Exif_Parser;
     std::unique_ptr<File__Analyze> PSD_Parser;
     std::unique_ptr<File__Analyze> ICC_Parser;
+    std::unique_ptr<File__Analyze> GainMap_Parser;
     struct xmpext
     {
         xmpext(File__Analyze* NewParser)

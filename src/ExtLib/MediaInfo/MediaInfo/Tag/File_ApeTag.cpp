@@ -30,6 +30,9 @@ using namespace std;
 namespace MediaInfoLib
 {
 
+//---------------------------------------------------------------------------
+extern std::string Id3v2_PictureType(int8u Type);
+
 //***************************************************************************
 // Buffer - File header
 //***************************************************************************
@@ -83,7 +86,7 @@ void File_ApeTag::Header_Parse()
     Get_L4 (Length,                                         "Length");
     Get_L4 (Flags,                                          "Flags");
         Skip_Flags(Flags,  0,                               "Read Only");
-        Skip_Flags(Flags,  1,                               "Binary");
+        Get_Flags (Flags,  1, IsBinary,                     "Binary");
         Skip_Flags(Flags,  2,                               "Locator of external stored information");
         Skip_Flags(Flags, 29,                               "Is the header");
         Skip_Flags(Flags, 30,                               "Contains a footer");
@@ -139,12 +142,58 @@ void File_ApeTag::Data_Parse()
         return;
     }
 
+    // Mapping APEv2 Cover Art keys to MediaInfo's names matching ID3v2 PictureType
+    auto APEKeyToID3v2 = [](std::string& APE_Key) -> std::string {
+            struct KeyMapping {
+                const char* APE_Key;
+                int8u ID3v2_Type;
+            };
+            static constexpr KeyMapping mappings[] = {
+                { "Cover Art (Other)",              0x00 },
+                { "Cover Art (Png Icon)",           0x01 },
+                { "Cover Art (Icon)",               0x02 },
+                { "Cover Art (Front)",              0x03 },
+                { "Cover Art (Back)",               0x04 },
+                { "Cover Art (Leaflet)",            0x05 },
+                { "Cover Art (Media)",              0x06 },
+                { "Cover Art (Lead Artist)",        0x07 },
+                { "Cover Art (Artist)",             0x08 },
+                { "Cover Art (Conductor)",          0x09 },
+                { "Cover Art (Band)",               0x0A }, 
+                { "Cover Art (Composer)",           0x0B },
+                { "Cover Art (Lyricist)",           0x0C },
+                { "Cover Art (Recording Location)", 0x0D },
+                { "Cover Art (During Recording)",   0x0E },
+                { "Cover Art (During Performance)", 0x0F },
+                { "Cover Art (Video Capture)",      0x10 },
+                { "Cover Art (Fish)",               0x11 },
+                { "Cover Art (Illustration)",       0x12 }, 
+                { "Cover Art (Band Logotype)",      0x13 },
+                { "Cover Art (Publisher Logotype)", 0x14 }
+            };
+            for (const auto& mapping : mappings) {
+                if (APE_Key == mapping.APE_Key) {
+                    return Id3v2_PictureType(mapping.ID3v2_Type);
+                }
+            }
+            return APE_Key;
+        };
+
     //Parsing
     Ztring Value;
-    Get_UTF8(Element_Size, Value,                               "Value"); Element_Info1(Value);
+    if (IsBinary && Key.rfind("Cover Art (", 0) == 0)
+    {
+        Get_UTF8(SizeUpTo0(), Value,                            "Filename"); Element_Info1(Value);
+        Skip_B1(                                                "zero");
+        Attachment("APEv2", Value, Ztring(APEKeyToID3v2(Key).c_str()), {}, true);
+    }
+    else
+    {
+        Get_UTF8(Element_Size, Value,                           "Value"); Element_Info1(Value);
+    }
 
     //Filling
-    transform(Key.begin(), Key.end(), Key.begin(), (int(*)(int))toupper); //(int(*)(int)) is a patch for unix
+    transform(Key.begin(), Key.end(), Key.begin(), [](unsigned char c) { return toupper(c); });
          if (Key=="ALBUM")          Fill(Stream_General, 0, General_Album, Value);
     else if (Key=="ALBUM ARTIST")   Fill(Stream_General, 0, General_Album_Performer, Value);
     else if (Key=="ARTIST")         Fill(Stream_General, 0, General_Performer, Value);
@@ -168,6 +217,7 @@ void File_ApeTag::Data_Parse()
     else if (Key=="DISCSUBTITLE")   Fill(Stream_General, 0, General_Part, Value);
     else if (Key=="ENCODEDBY")      Fill(Stream_General, 0, General_EncodedBy, Value);
     else if (Key=="GENRE")          Fill(Stream_General, 0, General_Genre, Value);
+    else if (Key=="LABEL")          Fill(Stream_General, 0, General_Label, Value);
     else if (Key=="LYRICS")         Fill(Stream_General, 0, General_Lyrics, Value);
     else if (Key=="LYRICIST")       Fill(Stream_General, 0, General_Lyricist, Value);
     else if (Key=="ORIGARTIST")     Fill(Stream_General, 0, General_Original_Performer, Value);
@@ -193,6 +243,7 @@ void File_ApeTag::Data_Parse()
     else if (Key=="MP3GAIN_UNDO") Fill(Stream_Audio, 0, "MP3Gain, Undo", Value);
     else if (Key=="REPLAYGAIN_TRACK_GAIN") Fill(Stream_Audio, 0, Audio_ReplayGain_Gain, Value.To_float64(), 2, true);
     else if (Key=="REPLAYGAIN_TRACK_PEAK") Fill(Stream_Audio, 0, Audio_ReplayGain_Peak, Value.To_float64(), 6, true);
+    else if (IsBinary && Key.rfind("COVER ART (", 0) == 0) { /* Already handled by Attachment */ }
     else                            Fill(Stream_General, 0, Key.c_str(), Value);
 }
 

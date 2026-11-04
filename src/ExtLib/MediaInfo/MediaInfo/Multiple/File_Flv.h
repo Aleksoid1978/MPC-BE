@@ -67,6 +67,7 @@ private :
     void meta_SCRIPTDATAOBJECT();
     void meta_SCRIPTDATAVARIABLE();
     void meta_SCRIPTDATAVALUE(const std::string &StringData);
+    void meta_SCRIPTDATAVALUE_Content(const std::string &StringData);
     void Rm();
 
     //Streams
@@ -102,6 +103,7 @@ private :
     std::vector<int32u> video_stream_FrameRate;
     int32u Time;
     int8u  meta_Level;
+    int8u  meta_Depth;
     std::map<int8u, bool> meta_LevelFinished;
     bool Searching_Duration;
     bool MetaData_NotTrustable;

@@ -56,6 +56,39 @@ public :
     static avcintra_header AVC_Intra_Headers_Data(int32u CodecID);
     static int32u AVC_Intra_CodecID_FromMeta(int32u Width, int32u Height, int32u Fields, int32u SampleDuration, int32u TimeScale, int64u SizePerFrame);
 
+    //Helper for BitRate_Mode
+    static void Fill_BitRate_Mode(File__Analyze* Instance, bool cbr_flag, bool cbr_flag_IsSet, bool cbr_flag_IsValid, int64u bit_rate_value, bool bit_rate_value_IsValid);
+
+    //Out, statistics about parsed pictures and parameter sets, for checking compliance with specifications
+    struct pictures_info
+    {
+        int64u  Count=0;                                //Pictures
+        int64u  WithoutPicTiming=0;                     //Pictures without pic_timing SEI
+        int64u  I_Count=0;                              //I pictures
+        int64u  Idr_Count=0;                            //IDR pictures
+        int64u  I_WithoutSps=0;                         //I pictures without SPS
+        int64u  I_WithoutPps=0;                         //I pictures without PPS
+        int64u  I_WithoutBufferingPeriod=0;             //I pictures without buffering_period SEI
+        int64u  I_WithoutRecoveryPoint=0;               //I pictures without recovery_point SEI
+        int64u  UserDataUnregistered_WithKlv=0;         //user_data_unregistered SEI with KLV data
+        size_t  SliceCount_Min=(size_t)-1;
+        size_t  SliceCount_Max=0;
+        size_t  GOP_Max=0;                              //Maximum count of pictures from an I picture to the next one (excluded)
+        size_t  BConsecutive_Max=0;                     //Maximum count of consecutive B pictures
+        char    First_Type=0;                           //Type of the first picture: I, P or B
+        int16u  log2_max_frame_num_minus4=0;            //Bit per value present in parsed SPS
+        int16u  log2_max_pic_order_cnt_lsb_minus4=0;    //Bit per value present in parsed SPS with pic_order_cnt_type 0
+        int8u   seq_scaling_matrix_present_flag=0;      //Bit per value present in parsed SPS
+        int8u   transform_8x8_mode_flag=0;              //Bit per value present in parsed PPS
+        int8u   chroma_loc_info_present_flag=0;         //Bit per value present in parsed VUI
+        int64u  WithoutAud=0;                           //Pictures without access unit delimiter
+        int64u  FirstSlice_Offset_Min=(int64u)-1;       //Offset of the first slice from the access unit delimiter
+        int64u  FirstSlice_Offset_Max=0;
+        int64u  Sps_Different=0;                        //SPS different from the previous one with the same id
+        int64u  Pps_Different=0;                        //PPS different from the previous one with the same id
+    };
+    pictures_info PicturesInfo;
+
 private :
     File_Avc(const File_Avc &File_Avc); //No copy
     File_Avc &operator =(const File_Avc &);
@@ -356,10 +389,10 @@ private :
     void Streams_Finish();
 
     //Buffer - File header
-    bool FileHeader_Begin();
+    bool FileHeader_Begin() { return FileHeader_Begin_0x000001(); }
 
     //Buffer - Synchro
-    bool Synchronize();
+    bool Synchronize() {return Synchronize_0x000001(true);}
     bool Synched_Test();
     void Synched_Init();
 
@@ -551,6 +584,30 @@ private :
     size_t                              Structure_Frame;
     size_t                              Slices_CountInThisFrame;
     size_t                              MaxSlicesCount;
+
+    //Pictures info
+    enum picture_flags : int8u
+    {
+        Picture_Sps                 =1<<0,
+        Picture_Pps                 =1<<1,
+        Picture_BufferingPeriod     =1<<2,
+        Picture_PicTiming           =1<<3,
+        Picture_RecoveryPoint       =1<<4,
+        Picture_Idr                 =1<<5,
+        Picture_Aud                 =1<<6,
+    };
+    int8u                               Picture_Flags_Pending; //NAL units parsed since the last slice, for the next picture
+    int8u                               Picture_Flags;
+    char                                Picture_Type; //I, P or B, 0 if no current picture
+    size_t                              Picture_SliceCount;
+    size_t                              Picture_GOP; //Count of pictures since the last I picture, (size_t)-1 if unknown
+    size_t                              Picture_BConsecutive;
+    int64u                              Picture_Aud_Offset; //Offset of the last access unit delimiter
+    int64u                              Picture_FirstSlice_Offset; //Offset of the first slice from the access unit delimiter, (int64u)-1 if there is no access unit delimiter
+    std::vector<std::string>            ParameterSets_Content[2]; //Content of the last SPS and PPS per id, without trailing zeros
+    void                                Picture_Slice(bool IsFirst, int32u slice_type, bool IsIdr);
+    void                                Picture_End();
+    void                                ParameterSet_Compare(bool IsPps, int32u Id);
 
     //Temp
     Ztring                              Encoded_Library;

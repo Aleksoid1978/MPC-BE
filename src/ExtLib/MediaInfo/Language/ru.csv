@@ -757,6 +757,9 @@ Genre_188;Джи-фанк
 Genre_189;Дабстеп
 Genre_190;Гаражный рок
 Genre_191;Псибиент
+Geolocation_Permission_Help;Чтобы включить чтение метаданных геолокации, выполните предложенные на следующем экране шаги:\n\n1. Откройте «Разрешения»\n2. Выберите «Фото и видео»\n3. Выберите «Разрешить».
+Geolocation_Permission_Summary;Для чтения метаданных геолокации из медиафайлов требуется разрешение на доступ к фото и видео.
+Geolocation_Permission_Title;Доступ к данным геолокации
 Go to WebSite;Перейти на сайт программы
 Gop_OpenClosed;GOP, открыто/закрыто
 Gop_OpenClosed_Closed;Закрыто
@@ -1414,6 +1417,10 @@ TopFrontToSide;Верхние передние каналы в боковой к
 Total;Всего
 TotalNumberOfParts;Общее количество частей
 TotalProgrammeDuration;Общая продолжительность программы
+TraceLevel0;Уровень трассировки 0
+TraceLevel10;Уровень трассировки 10
+TraceLevel5;Уровень трассировки 5
+TraceLevel9;Уровень трассировки 9
 Track;Дорожка
 Track_Count;Количество дорожек
 TrackFormat;Формат дорожки

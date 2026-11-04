@@ -497,6 +497,8 @@ size_t Reader_File::Format_Test_PerParser_Continue (MediaInfo_Internal* MI)
                 MI->Config.File_Buffer_Size_ToRead>MI->Config.File_Buffer_Size_Max)
             {
                 delete[] MI->Config.File_Buffer;
+                if (MI->Config.File_Buffer_Size_ToRead>64*1024*1024)
+                    MI->Config.File_Buffer_Size_ToRead=64*1024*1024; //limitation of the buffer in order to avoid to big memory usage
                 if (MI->Config.File_Buffer_Size_Max==0)
                     MI->Config.File_Buffer_Size_Max=1;
                 while (MI->Config.File_Buffer_Size_ToRead>MI->Config.File_Buffer_Size_Max)

@@ -675,12 +675,12 @@ void File__Analyze::Get_EB(int64u &Info)
     //Element size
     INTEGRITY_SIZE_ATLEAST_INT(1);
     int8u  Size=0;
-    int8u  Size_Mark=0;
+    int32u Size_Mark=0;
     BS_Begin();
     while (Size_Mark==0 && BS->Remain() && Size<=8)
     {
         Size++;
-        Peek_S1(Size, Size_Mark);
+        Peek_BS(Size, Size_Mark);
     }
     BS_End();
 
@@ -755,12 +755,12 @@ void File__Analyze::Get_ES(int64s &Info)
     //Element size
     INTEGRITY_SIZE_ATLEAST_INT(1);
     int8u  Size=0;
-    int8u  Size_Mark=0;
+    int32u Size_Mark=0;
     BS_Begin();
     while (Size_Mark==0 && BS->Remain() && Size<=8)
     {
         Size++;
-        Peek_S1(Size, Size_Mark);
+        Peek_BS(Size, Size_Mark);
     }
     BS_End();
 
@@ -1165,6 +1165,16 @@ void File__Analyze::Get_C8(int64u &Info)
     INTEGRITY_SIZE_ATLEAST_INT(8);
     Info=CC8(Buffer+Buffer_Offset+(size_t)Element_Offset);
     Element_Offset+=8;
+}
+
+
+//---------------------------------------------------------------------------
+void File__Analyze::Get_C12(int128u& Info)
+{
+    INTEGRITY_SIZE_ATLEAST_INT(12);
+    Info.hi=CC4(Buffer+Buffer_Offset+(size_t)Element_Offset);
+    Info.lo=CC8(Buffer+Buffer_Offset+(size_t)Element_Offset+4);
+    Element_Offset+=12;
 }
 
 //***************************************************************************

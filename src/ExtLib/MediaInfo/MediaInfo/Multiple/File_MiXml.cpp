@@ -304,7 +304,10 @@ bool File_MiXml::FileHeader_Begin()
                                     {
                                         string Name(Element->Name());
                                              if (Name == "Format_Version")
-                                            Fill(StreamKind_Last, StreamPos_Last, Element->Name(), string("Version ")+Element->GetText(), true, true);
+                                        {
+                                            if (Element->GetText())
+                                                Fill(StreamKind_Last, StreamPos_Last, Element->Name(), string("Version ")+Element->GetText(), true, true);
+                                        }
                                         else if (MediaInfoLib::Config.Info_Get(StreamKind_Last).Read(Ztring().From_UTF8(Element->Name()), Info_Measure) == __T(" ms"))
                                         {
                                             //Converting seconds to milliseconds while keeping precision
@@ -344,6 +347,19 @@ bool File_MiXml::FileHeader_Begin()
                                             nested* LastNested = &Nested[0];
                                             LastNested->Target = Extra;
 
+                                            // Move to the next element, unwinding completed nested groups.
+                                            auto AdvanceExtra = [&]()
+                                            {
+                                                if (Extra)
+                                                    Extra = Extra->NextSiblingElement();
+                                                while (!Extra && Nested.size() > 1)
+                                                {
+                                                    Nested.pop_back();
+                                                    LastNested = &Nested.back();
+                                                    Extra = LastNested->Target->NextSiblingElement();
+                                                }
+                                            };
+
                                             while (Extra)
                                             {
                                                 // Nested elements
@@ -362,12 +378,14 @@ bool File_MiXml::FileHeader_Begin()
                                                     LastNested->Name += ' ';
                                                     LastNested->Target = NULL;
                                                     Nested_Pos[LastNested->Name]++;
+                                                    if (!Extra)
+                                                        AdvanceExtra();
                                                     continue;
                                                 }
 
                                                 if (strstr(Extra->Name(), "_String"))
                                                 {
-                                                    Extra = Extra->NextSiblingElement();
+                                                    AdvanceExtra();
                                                     continue;
                                                 }
 
@@ -445,16 +463,7 @@ bool File_MiXml::FileHeader_Begin()
                                                     }
                                                 }
 
-                                                Extra = Extra->NextSiblingElement();
-                                                if (!Extra && !Nested.empty())
-                                                {
-                                                    Nested.pop_back();
-                                                    if (!Nested.empty())
-                                                    {
-                                                        LastNested = &Nested[Nested.size() - 1];
-                                                        Extra = LastNested->Target->NextSiblingElement();
-                                                    }
-                                                }
+                                                AdvanceExtra();
                                             }
                                         }
 

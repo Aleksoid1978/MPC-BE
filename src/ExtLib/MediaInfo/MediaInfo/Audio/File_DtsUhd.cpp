@@ -232,7 +232,7 @@ void File_DtsUhd::UpdateDescriptor()
 }
 
 /* Table 6-17 p47 */
-int File_DtsUhd::ExtractExplicitObjectsLists(int DepAuPresExplObjListMask, int CurrentAuPresInd)
+int File_DtsUhd::ExtractExplicitObjectsLists(int64u DepAuPresExplObjListMask, int CurrentAuPresInd)
 {
     Element_Begin1("ExtractExplicitObjectsLists");
     constexpr int8u Table[4] = {4, 8, 16, 32};
@@ -283,15 +283,15 @@ int File_DtsUhd::ResolveAudPresParams()
         {
             if (SyncFrameFlag)
             {
-                int32u DepAuPresMask;
-                Get_S4 (AuPresInd, DepAuPresMask,               "DepAuPresMask");
+                int64u DepAuPresMask;
+                Get_S8 (AuPresInd, DepAuPresMask,               "DepAuPresMask");
                 AudPresParam[AuPresInd].DepAuPresMask=0;
                 for (int i = 0; DepAuPresMask; i++, DepAuPresMask>>=1)
                     if (DepAuPresMask&1)
                     {
                         bool DepAuPresMask;
                         Get_SB (DepAuPresMask,                  "DepAuPresExplObjListPresMask");
-                        AudPresParam[AuPresInd].DepAuPresMask|=DepAuPresMask<<i;
+                        AudPresParam[AuPresInd].DepAuPresMask|=(int64u)DepAuPresMask<<i;
                     }
             }
 
@@ -548,6 +548,12 @@ int File_DtsUhd::ExtractMDChunkObjIDList(MD01* MD01)
     {
         constexpr int8u Table[4] = {3, 4, 6, 8};
         Get_VR (Table, MD01->NumObjects,                        "NumObjects");
+        if (MD01->NumObjects>sizeof(MD01->ObjectList)/sizeof(*MD01->ObjectList))
+        {
+            Param_Error("NumObjects");
+            Element_End0();
+            return 1;
+        }
         for (int32u i=0; i<MD01->NumObjects; i++)
         {
             bool NumBitsforObjID_b;
@@ -665,6 +671,15 @@ int File_DtsUhd::ExtractMultiFrameDistribStaticMD(MD01* MD01)
             MD01->StaticMDPacketByteSize+=3;
         }
 
+        if (MD01->NumStaticMDPackets*MD01->StaticMDPacketByteSize>0x10000) //Arbitrary limit of 64 KiB, real streams use only few bytes
+        {
+            MD01->NumStaticMDPackets=0;
+            MD01->StaticMDPacketByteSize=0;
+            MD01->Buffer.clear();
+            Trusted_IsNot("Static metadata too big");
+            Element_End0();
+            return 1;
+        }
         MD01->Buffer.resize(MD01->NumStaticMDPackets*MD01->StaticMDPacketByteSize);
         if (MD01->NumStaticMDPackets>1)
             Get_SB (MD01->StaticMetadataUpdtFlag,               "StaticMetadataUpdtFlag");
@@ -989,20 +1004,31 @@ int File_DtsUhd::Frame()
     int32u SyncWord;
     Get_B4 (SyncWord,                                           "SyncWord");
     SyncFrameFlag=SyncWord==DTSUHD_SYNCWORD;
-    if (SyncFrameFlag)
-        Element_Info1("Key frame");
+    Element_Info1C(SyncFrameFlag, "Key frame");
     BS_Begin();
     static constexpr int8u Table[4]={5, 8, 10, 12};
     Get_VR (Table, FTOCPayloadinBytes,                          "FTOCPayloadinBytes");
     FTOCPayloadinBytes++;
     if (FTOCPayloadinBytes<=4 || FTOCPayloadinBytes>=FrameSize)
+    {
+        BS_End();
         return DTSUHD_INCOMPLETE;  //Data buffer does not contain entire FTOC
+    }
     if (ExtractStreamParams())
+    {
+        BS_End();
         return DTSUHD_INVALID_FRAME;
+    }
     if (ResolveAudPresParams())
+    {
+        BS_End();
         return DTSUHD_INVALID_FRAME;
+    }
     if (ExtractChunkNaviData())  //AudioChunkTypes and payload sizes.
+    {
+        BS_End();
         return DTSUHD_INVALID_FRAME;
+    }
     size_t Remain8=Data_BS_Remain()%8;
     if (Remain8)
         Skip_S1(Remain8,                                        "Padding");

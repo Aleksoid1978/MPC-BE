@@ -137,6 +137,12 @@ void File_Mga::Data_Parse()
     for (int8u i=0; i<SectionCount; i++)
     {
         Element_Begin1("Section");
+        if (Element_Offset>Element_Size || Element_Size-Element_Offset<6)
+        {
+            Trusted_IsNot("Truncated section header");
+            Element_End0();
+            return;
+        }
         Element_Begin1("Header");
             int32u Length;
             int8u Identifier;
@@ -145,7 +151,18 @@ void File_Mga::Data_Parse()
             Get_B4 (Length,                                     "Length");
         Element_End0();
         Element_Info1(Identifier<Mga_Section_Names_Size?Mga_Section_Names[Identifier]:(Identifier==0xFF?"Fill":to_string(Identifier).c_str()));
+        if (!Trusted_Get() || Element_IsWaitingForMoreData()
+         || Element_Offset>Element_Size || Length>Element_Size-Element_Offset
+         || Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset
+         || Length>Buffer_Size-Buffer_Offset-Element_Offset)
+        {
+            Trusted_IsNot("Invalid section length");
+            Element_End0();
+            return;
+        }
         auto End=Element_Offset+Length;
+        auto Element_Size_Save=Element_Size;
+        Element_Size=End;
         switch (Identifier)
         {
             case 0x00 : Skip_XX(Length,                         "PCM data");
@@ -154,6 +171,7 @@ void File_Mga::Data_Parse()
         }
         if (Element_Offset<End)
             Skip_XX(End-Element_Offset,                         "(Unknown)");
+        Element_Size=Element_Size_Save;
         Element_End0();
     }
 
@@ -181,6 +199,14 @@ void File_Mga::AudioMetadataPayload()
     Get_BER(Tag,                                                "Tag");
     Get_BER(Length,                                             "Length");
     Element_End0();
+    if (!Trusted_Get() || Element_IsWaitingForMoreData() || Tag==(int64u)-1
+     || Element_Offset>Element_Size || Length>Element_Size-Element_Offset
+     || (Tag==0x12 && Length<2))
+    {
+        Trusted_IsNot("Invalid metadata length");
+        Element_End0();
+        return;
+    }
     auto End=Element_Offset+Length;
     switch (Tag)
     {
@@ -204,7 +230,16 @@ void File_Mga::SerialAudioDefinitionModelMetadataPayload(int64u Length)
     Get_B1(Format,                                              "Format");
     Element_End0();
     if (Format>1)
+    {
+        Element_End0();
         return;
+    }
+    if (Format==1 && Length-2>(int64u)((uInt)-1))
+    {
+        Trusted_IsNot("Metadata is too large");
+        Element_End0();
+        return;
+    }
 
     int8u* UncompressedData=NULL;
     size_t UncompressedData_Size=0;
@@ -213,7 +248,7 @@ void File_Mga::SerialAudioDefinitionModelMetadataPayload(int64u Length)
         //Uncompress init
         z_stream strm;
         strm.next_in=(Bytef*)Buffer+Buffer_Offset+(size_t)Element_Offset;
-        strm.avail_in=(int)(Length-2);
+        strm.avail_in=(uInt)(Length-2);
         strm.next_out=NULL;
         strm.avail_out=0;
         strm.total_out=0;
@@ -234,7 +269,7 @@ void File_Mga::SerialAudioDefinitionModelMetadataPayload(int64u Length)
                 break;
 
             //Check if we need to stop
-            if (strm.avail_out || inflate_Result)
+            if (strm.avail_out || inflate_Result || strm.total_out>=0x4000000) //Arbitrary limit of 64 MiB
                 break;
 
             //Need to increase buffer

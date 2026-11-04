@@ -216,7 +216,7 @@ void File_Y4m::FileHeader_Parse()
     }
 
     //Duration (we expect no meta per frame)
-    if (Width && Height && Multiplier)
+    if (Width && Height && Multiplier && Divisor && Width<=0x100000 && Height<=0x100000) //Avoid overflow with unrealistic values
     {
         int64u Frame_ByteSize=6+Width*Height*Multiplier/Divisor; //5 for "FRAME\0"
         Fill(Stream_Video, 0, Video_FrameCount, File_Size/Frame_ByteSize);

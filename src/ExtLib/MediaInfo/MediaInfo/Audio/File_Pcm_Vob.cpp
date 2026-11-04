@@ -120,6 +120,11 @@ File_Pcm_Vob::File_Pcm_Vob()
     ParserName="PCM VOB";
     StreamSource=IsStream;
     PTS_DTS_Needed=true;
+
+    //Temp
+    BitDepth=0;
+    Frequency=0;
+    NumberOfChannelsMinusOne=0;
 }
 
 //***************************************************************************
@@ -161,8 +166,12 @@ void File_Pcm_Vob::Streams_Fill()
 //---------------------------------------------------------------------------
 void File_Pcm_Vob::Read_Buffer_Continue()
 {
-    if (Buffer_Size==0)
+    if (Element_Offset>Element_Size || Element_Size-Element_Offset<6
+     || Buffer_Offset>Buffer_Size || Element_Size>Buffer_Size-Buffer_Offset)
+    {
+        Trusted_IsNot("Truncated PCM header");
         return;
+    }
 
     //Parsing
     Skip_B1(                                                    "Frame number");

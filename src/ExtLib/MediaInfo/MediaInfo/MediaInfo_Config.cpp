@@ -138,7 +138,7 @@ namespace MediaInfoLib
 {
 
 //---------------------------------------------------------------------------
-const Char*  MediaInfo_Version=__T("MediaInfoLib - v26.05");
+const Char*  MediaInfo_Version=__T("MediaInfoLib - v26.10");
 const Char*  MediaInfo_Url=__T("http://MediaArea.net/MediaInfo");
       Ztring EmptyZtring;       //Use it when we can't return a reference to a true Ztring
 const Ztring EmptyZtring_Const; //Use it when we can't return a reference to a true Ztring, const version
@@ -607,11 +607,10 @@ static String _DecodeEscapeC(String::const_iterator first, String::const_iterato
                         inc = 2;
                         for (int i = 0; i < 3; ++i)
                         {
-                            if ((it+3+i) != last && (d = _HexDigitValue(*(it+3+i))) >= 0)
-                            {
-                                ch = (ch << 4) | String::value_type(d);
-                                ++inc;
-                            }
+                            if ((it+3+i) == last || (d = _HexDigitValue(*(it+3+i))) < 0)
+                                break;
+                            ch = (ch << 4) | String::value_type(d);
+                            ++inc;
                         }
                     }
                 }
@@ -663,7 +662,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     size_t Egal_Pos=Option_Lower.find(__T('='));
     if (Egal_Pos==string::npos)
         Egal_Pos=Option_Lower.size();
-    transform(Option_Lower.begin(), Option_Lower.begin()+Egal_Pos, Option_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(Option_Lower.begin(), Option_Lower.begin()+Egal_Pos, Option_Lower.begin(), [](unsigned char c) { return tolower(c); });
 
     //Parsing pointer to a file
     Ztring Value;
@@ -756,7 +755,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     if (Option_Lower==__T("demux"))
     {
         String Value_Lower(Value);
-        transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), [](unsigned char c) { return tolower(c); });
 
              if (Value_Lower==__T("all"))
             Demux_Set(7);
@@ -1161,7 +1160,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     if (Option_Lower==__T("trace_format"))
     {
         String NewValue_Lower(Value);
-        transform(NewValue_Lower.begin(), NewValue_Lower.end(), NewValue_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        transform(NewValue_Lower.begin(), NewValue_Lower.end(), NewValue_Lower.begin(), [](unsigned char c) { return tolower(c); });
 
         if (NewValue_Lower==__T("csv"))
             Trace_Format_Set(Trace_Format_CSV);
@@ -1487,7 +1486,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         #if MEDIAINFO_ADVANCED
             String Value_Lower(Value);
-            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), [](unsigned char c) { return tolower(c); });
             return Collection_Display_Set(Value_Lower);
         #else // MEDIAINFO_ADVANCED
             return __T("advanced features are disabled due to compilation options");
@@ -1592,7 +1591,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         #if defined(MEDIAINFO_LIBCURL_YES)
             String Value_Lower(Value);
-            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), [](unsigned char c) { return tolower(c); });
 
                  if (Value_Lower==__T("guess"))
                 URLEncode_Set(URLEncode_Guess);
@@ -1656,6 +1655,23 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
         #endif // MEDIAINFO_CONFORMANCE
     }
 
+    if (Option_Lower==__T("mxfprofile"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(MxfProfile(Value));
+        #else // MEDIAINFO_CONFORMANCE
+            return __T("conformance features are disabled due to compilation options");
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+    if (Option_Lower==__T("mxfprofile_list"))
+    {
+        #if MEDIAINFO_CONFORMANCE
+            return Ztring().From_UTF8(MxfProfile_List());
+        #else // MEDIAINFO_CONFORMANCE
+            return Ztring();
+        #endif // MEDIAINFO_CONFORMANCE
+    }
+
     if (Option_Lower==__T("usacprofile"))
     {
         #if MEDIAINFO_CONFORMANCE
@@ -1685,7 +1701,7 @@ Ztring MediaInfo_Config::Option (const String &Option, const String &Value_Raw)
     {
         #if MEDIAINFO_CONFORMANCE
             String Value_Lower(Value);
-            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+            transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), [](unsigned char c) { return tolower(c); });
             WarningError(Value_Lower==__T("error"));
             return Ztring();
         #else // MEDIAINFO_CONFORMANCE
@@ -2211,7 +2227,7 @@ void MediaInfo_Config::Trace_Modificator_Set (const ZtringList &NewValue)
     ZtringList List(NewValue);
     if (List.size()!=2)
         return;
-    transform(List[0].begin(), List[0].end(), List[0].begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(List[0].begin(), List[0].end(), List[0].begin(), [](unsigned char c) { return tolower(c); });
 
     CriticalSectionLocker CSL(CS);
     Trace_Modificators[List[0]]=List[1]==__T("1");
@@ -2701,7 +2717,7 @@ bool MediaInfo_Config::Inform_Timestamp_Get ()
 Ztring MediaInfo_Config::Cover_Data_Set (const Ztring &NewValue_)
 {
     Ztring NewValue(NewValue_);
-    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), [](unsigned char c) { return tolower(c); });
     const int64u Mask=~((1<<Flags_Cover_Data_base64));
     int64u Value;
     if (NewValue.empty())
@@ -2734,7 +2750,7 @@ Ztring MediaInfo_Config::Cover_Data_Get ()
 Ztring MediaInfo_Config::Flags_Enable_Mesh_Vertex_Data_Set (const Ztring &NewValue_)
 {
     Ztring NewValue(NewValue_);
-    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), [](unsigned char c) { return tolower(c); });
     const int64u Mask=~((1<<Flags_Enable_Mesh_Vertex_Data));
     int64u Value;
     if (NewValue.empty())
@@ -2786,7 +2802,7 @@ bool MediaInfo_Config::Enable_FFmpeg_Get ()
 Ztring MediaInfo_Config::Inform_Compress_Set (const Ztring &NewValue_)
 {
     Ztring NewValue(NewValue_);
-    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), [](unsigned char c) { return tolower(c); });
     const int64u Mask=~((1<<Flags_Inform_zlib)|(1<<Flags_Inform_base64));
     int64u Value;
     if (NewValue.empty())
@@ -2826,7 +2842,7 @@ Ztring MediaInfo_Config::Inform_Compress_Get ()
 Ztring MediaInfo_Config::Input_Compressed_Set (const Ztring &NewValue_)
 {
     Ztring NewValue(NewValue_);
-    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(NewValue.begin(), NewValue.end(), NewValue.begin(), [](unsigned char c) { return tolower(c); });
     const int64u Mask=~((1<<Flags_Input_zlib)|(1<<Flags_Input_base64));
     int64u Value;
     if (NewValue.empty())
@@ -3589,7 +3605,7 @@ Ztring MediaInfo_Config::Conformance_Limit_Set(const Ztring& Value)
 {
     int64s ValueI;
     auto Value_Lower(Value);
-    transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(Value_Lower.begin(), Value_Lower.end(), Value_Lower.begin(), [](unsigned char c) { return tolower(c); });
     if (Value_Lower==__T("inf"))
         ValueI=-1;
     else
@@ -3919,7 +3935,7 @@ bool MediaInfo_Config::GraphSvgPluginState()
 string MediaInfo_Config::AdmProfile(const Ztring& Value2)
 {
     Ztring Value(Value2);
-    transform(Value.begin(), Value.end(), Value.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(Value.begin(), Value.end(), Value.begin(), [](unsigned char c) { return tolower(c); });
     ZtringList List;
     List.Separator_Set(0, __T(","));
     List.Write(Value);
@@ -3928,17 +3944,17 @@ string MediaInfo_Config::AdmProfile(const Ztring& Value2)
     {
         const auto Item = ItemZ.To_UTF8();
         if (Item == "auto")
-            Adm_Profile.Auto = true;
+            Result.Auto = true;
         else if (Item == "itu-r_bs.2076-0")
-            Adm_Profile.BS2076 = 0;
+            Result.BS2076 = 0;
         else if (Item == "itu-r_bs.2076-1")
-            Adm_Profile.BS2076 = 1;
+            Result.BS2076 = 1;
         else if (Item == "itu-r_bs.2076-2")
-            Adm_Profile.BS2076 = 2;
+            Result.BS2076 = 2;
         else if (Item.rfind("urn:ebu:tech:3392:1.0:", 0) == 0)
         {
             if (Item.size() > 22 && Item[22] >= '1' && Item[22] <= '4')
-                Adm_Profile.Ebu3392 = Item[22] - '0';
+                Result.Ebu3392 = Item[22] - '0';
             else
                 return "Unknown ADM profile " + Item;
         }
@@ -4015,6 +4031,102 @@ string MediaInfo_Config::Mp4Profile_List()
 #endif //MEDIAINFO_CONFORMANCE
 
 #if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::ProfileList_Set(const Ztring& Value, const char* const* Names, size_t Names_Size, const char* Kind, string& Result)
+{
+    const auto Normalize = [](string Name) { //Case, hyphens and underscores are ignored
+        transform(Name.begin(), Name.end(), Name.begin(), [](unsigned char c) { return toupper(c); });
+        Name.erase(remove_if(Name.begin(), Name.end(), [](char c) { return c == '-' || c == '_'; }), Name.end());
+        return Name;
+    };
+    ZtringList List;
+    List.Separator_Set(0, __T(","));
+    List.Write(Value);
+    Result.clear();
+    for (const auto& ItemZ : List)
+    {
+        const auto Item = Normalize(ItemZ.To_UTF8());
+        const char* Name = nullptr;
+        for (size_t i = 0; i < Names_Size; i++)
+            if (Item == Normalize(Names[i]))
+                Name = Names[i];
+        if (!Name)
+            return string("Unknown ") + Kind + ' ' + ItemZ.To_UTF8();
+        if (!Result.empty())
+            Result += ',';
+        Result += Name;
+    }
+    return {};
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::ProfileList_Get(const char* const* Names, size_t Names_Size)
+{
+    string Result;
+    const auto LineSep = LineSeparator_Get().To_UTF8();
+    for (size_t i = 0; i < Names_Size; i++)
+    {
+        if (!Result.empty())
+            Result += LineSep;
+        Result += Names[i];
+    }
+    return Result;
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+static const char* const MxfProfile_Names[] =
+{
+    "ARD_ZDF", //ARD/ZDF profile matching the kind of content
+    "ARD_ZDF_HDF-01a",
+    "ARD_ZDF_HDF-01b",
+    "ARD_ZDF_HDF-02a",
+    "ARD_ZDF_HDF-02b",
+    "ARD_ZDF_HDF-03a",
+    "ARD_ZDF_HDF-03b",
+    "ARD_ZDF_SDF-01",
+    "ARD_ZDF_SDF-02",
+    "ARD_ZDF_XDF-01",
+    "ARD_ZDF_XDF-02",
+    "SMPTE_ST_2067-2", //IMF Track File (Image, Audio, Timed Text or Ancillary Data)
+    "SMPTE_ST_2067-204", //ADM Audio Track File (IMF), with Operational Mode A
+    "SMPTE_ST_2067-5", //IMF Essence Component
+    "SMPTE_ST_337_2008", //Editions of SMPTE ST 337 and associated standards, only one can be requested (by default, latest edition without check of the data types)
+    "SMPTE_ST_337_2015",
+    "SMPTE_ST_337_2016",
+    "SMPTE_ST_337_2019",
+};
+string MediaInfo_Config::MxfProfile(const Ztring& Value)
+{
+    string Temp;
+    const auto Error = ProfileList_Set(Value, MxfProfile_Names, sizeof(MxfProfile_Names)/sizeof(*MxfProfile_Names), "MXF profile", Temp);
+    if (!Error.empty())
+        return Error;
+    if (Temp.find("SMPTE_ST_337_") != Temp.rfind("SMPTE_ST_337_"))
+        return "Only one SMPTE ST 337 edition can be requested";
+
+    CriticalSectionLocker CSL(CS);
+    Mxf_Profile = Temp;
+    return {};
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::MxfProfile()
+{
+    CriticalSectionLocker CSL(CS);
+    return Mxf_Profile;
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
+string MediaInfo_Config::MxfProfile_List()
+{
+    return ProfileList_Get(MxfProfile_Names, sizeof(MxfProfile_Names)/sizeof(*MxfProfile_Names));
+}
+#endif //MEDIAINFO_CONFORMANCE
+
+#if MEDIAINFO_CONFORMANCE
 extern string Mpeg4_Descriptors_AudioProfileLevelString(int8u AudioProfileLevelIndication);
 string MediaInfo_Config::UsacProfile(const Ztring& ValueZ)
 {
@@ -4025,7 +4137,7 @@ string MediaInfo_Config::UsacProfile(const Ztring& ValueZ)
         Usac_Profile = (int8u)-1;
         return {};
     }
-    transform(Value.begin(), Value.end(), Value.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+    transform(Value.begin(), Value.end(), Value.begin(), [](unsigned char c) { return tolower(c); });
 
     for (int8u AudioProfileLevelIndication = 0; AudioProfileLevelIndication < 0xFF; AudioProfileLevelIndication++)
     {
@@ -4037,7 +4149,7 @@ string MediaInfo_Config::UsacProfile(const Ztring& ValueZ)
             case 0xFF : Test = "No Audio"; break;
             default   : Test = Mpeg4_Descriptors_AudioProfileLevelString(AudioProfileLevelIndication);
         }
-        transform(Test.begin(), Test.end(), Test.begin(), (int(*)(int))tolower); //(int(*)(int)) is a patch for unix
+        transform(Test.begin(), Test.end(), Test.begin(), [](unsigned char c) { return tolower(c); });
         if (Test == Value)
         {
             CriticalSectionLocker CSL(CS);

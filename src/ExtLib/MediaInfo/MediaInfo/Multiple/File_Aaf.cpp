@@ -175,16 +175,25 @@ void File_Aaf::Read_Buffer_Continue()
         Skip_L4(                                                "sectDifStart");
         Skip_L4(                                                "sectDif");
         Element_Begin1("sectFat");
-            for (int16u Pos=0; Pos<(csectFat>109?109:csectFat); Pos++)
+            if (csectFat>109)
+                csectFat=109; // Max supported by the spec
+            sectsFat.reserve(csectFat);
+            for (int16u Pos=0; Pos<csectFat; Pos++)
             {
                 int32u sectFat;
                 Get_L4 (sectFat,                                "sectFat");
                 sectsFat.push_back(sectFat);
             }
             if (csectFat<109)
-                Skip_XX((109-csectFat)*4,                       "unused sectsFat");
+                Skip_XX(0x200-Element_Offset,                   "unused sectsFat");
         Element_End();
     Element_End();
+
+    //Coherency check
+    if (SectorShift >= 32 || MiniSectorShift > SectorShift) {
+        Reject("Aaf");
+        return;
+    }
 
     FILLING_BEGIN();
         Fill("Aaf");
@@ -192,10 +201,10 @@ void File_Aaf::Read_Buffer_Continue()
         sectsFat_Pos=0;
         if (sectsFat.empty())
         {
-            Finish();
+            ForceFinish();
         }
         else
-            GoTo((1+sectsFat[0])*(1<<SectorShift));
+            GoTo((((int64u)1)+sectsFat[0])<<SectorShift);
     FILLING_END();
 }
 
@@ -218,7 +227,7 @@ void File_Aaf::Header_Parse()
                                   Header_Fill_Size(((int64u)1) << SectorShift);
                                   break;
         case Step_Stream        : Header_Fill_Code(0, "Stream");
-                                  Header_Fill_Size(((int64u)1) << (Streams[0]->Size<MiniSectorCutoff ? MiniSectorShift : SectorShift));
+                                  Header_Fill_Size(((int64u)1) << (!Streams.empty() && Streams[0]->Size<MiniSectorCutoff ? MiniSectorShift : SectorShift));
                                   break;
         default                 : ;
     }
@@ -240,19 +249,26 @@ void File_Aaf::Data_Parse()
     size_t Pointers_Pos=(size_t)((File_Offset+Buffer_Offset)>>SectorShift)-1;
     if (Pointers_Pos<Pointers.size())
     {
-        if (Pointers[Pointers_Pos]<0xFFFFFFF0)
-            GoTo((1+Pointers[Pointers_Pos])*(1<<SectorShift));
+        bool IsChainEnd=Pointers[Pointers_Pos]>=0xFFFFFFF0;
+        if (!IsChainEnd && ++Chain_Count>Pointers.size())
+        {
+            Trusted_IsNot("FAT chain not valid"); //Loop in the chain
+            IsChainEnd=true;
+        }
+        if (!IsChainEnd)
+            GoTo((((int64u)1)+Pointers[Pointers_Pos])<<SectorShift);
         else if (Step==Step_MiniFat)
         {
             Step=Step_Directory;
             Directory_Pos=0;
-            GoTo((1+sectDirStart)*(1<<SectorShift));
+            Chain_Count=0;
+            GoTo((((int64u)1)+sectDirStart)<<SectorShift);
         }
         else if (Step==Step_Directory)
         {
             Step=Step_Stream;
-            if (Streams.empty())
-                Finish();
+            if (Streams.empty() || Streams[0]->StreamOffsets.empty())
+                ForceFinish();
             else
             {
                 Streams_Pos=0;
@@ -261,10 +277,10 @@ void File_Aaf::Data_Parse()
             }
         }
         else
-            Finish();
+            ForceFinish();
     }
     else
-        Finish();
+        ForceFinish();
 }
 
 //---------------------------------------------------------------------------
@@ -283,11 +299,12 @@ void File_Aaf::Fat()
     //Next FAT sector or next step
     sectsFat_Pos++;
     if (sectsFat_Pos<sectsFat.size())
-        GoTo((1+sectsFat[sectsFat_Pos])*(1<<SectorShift));
+        GoTo((((int64u)1)+sectsFat[sectsFat_Pos])<<SectorShift);
     else
     {
         Step=Step_MiniFat;
-        GoTo((1+sectMiniFatStart)*(1<<SectorShift));
+        Chain_Count=0;
+        GoTo((((int64u)1)+sectMiniFatStart)<<SectorShift);
     }
 }
 
@@ -352,8 +369,13 @@ void File_Aaf::Directory_Entry()
     {
         //Building sectMiniFats_FatPointers
         int32u Pointers_Pos=SectStart;
-        while (Pointers_Pos<Pointers.size())
+        while (Pointers_Pos<Pointers.size() && Pointers_Pos<0xFFFFFFF0)
         {
+            if (sectsMiniStream.size()>=Pointers.size())
+            {
+                Trusted_IsNot("MiniFAT root chain not valid"); //Loop in the chain
+                break;
+            }
             Param_Info1(Ztring::ToZtring(Pointers_Pos<<SectorShift));
             sectsMiniStream.push_back(Pointers_Pos);
             Pointers_Pos=Pointers[Pointers_Pos];
@@ -367,27 +389,30 @@ void File_Aaf::Directory_Entry()
                                     Directory_Pos,
                                     Size
                                    );
-        if (Size<MiniSectorCutoff) //MiniFAT
+        int32u Pointers_Pos=SectStart;
+        bool isMini=Size<MiniSectorCutoff;
+        int32u ChainCount=0;
+        int32u MaxChainPos=Size>>(isMini?MiniSectorShift:SectorShift);
+        auto& PointersRef=(isMini?MiniPointers:Pointers);
+        while (Pointers_Pos < PointersRef.size() && Pointers_Pos != 0xFFFFFFFE && ChainCount <= MaxChainPos)
         {
-            int32u Pointers_Pos=SectStart;
-            while (Pointers_Pos<MiniPointers.size())
+            int32u StreamOffset;
+            if (isMini) //MiniFAT
             {
                 int32u SectPos=Pointers_Pos>>(SectorShift-MiniSectorShift);
+                if (SectPos >= sectsMiniStream.size())
+                    break;
                 int32u MiniSectPos=Pointers_Pos&((((size_t)1)<<(SectorShift-MiniSectorShift))-1);
-                Stream->StreamOffsets.push_back(((1+sectsMiniStream[SectPos])<<SectorShift)+(MiniSectPos<<MiniSectorShift));
-                Param_Info1(Ztring::ToZtring(((1+sectsMiniStream[SectPos])<<SectorShift)+(MiniSectPos<<MiniSectorShift)));
-                Pointers_Pos=MiniPointers[Pointers_Pos];
+                StreamOffset=((((int64u)1)+sectsMiniStream[SectPos])<<SectorShift)+(((int64u)MiniSectPos)<<MiniSectorShift);
             }
-        }
-        else //FAT
-        {
-            int32u Pointers_Pos=SectStart;
-            while (Pointers_Pos<Pointers.size())
+            else //FAT
             {
-                Stream->StreamOffsets.push_back((1+Pointers_Pos)<<SectorShift);
-                Param_Info1(Ztring::ToZtring((1+Pointers_Pos)<<SectorShift));
-                Pointers_Pos=Pointers[Pointers_Pos];
+                StreamOffset=(((int64u)1)+Pointers_Pos)<<SectorShift;
             }
+            Stream->StreamOffsets.push_back(StreamOffset);
+            Param_Info1(StreamOffset);
+            Pointers_Pos=PointersRef[Pointers_Pos];
+            ChainCount++;
         }
         Streams.push_back(Stream);
     }
@@ -407,9 +432,20 @@ void File_Aaf::StreamElement()
     {
         Skip_XX(Element_Size,                                    "Stream data");
         int16u Shift=(Streams[Streams_Pos]->Size<MiniSectorCutoff?MiniSectorShift:SectorShift);
+        if (Shift>=32 || Shift<6)
+            return; // Invalid shift value (too large causes UB, too small is unreasonable)
         if (Streams[Streams_Pos]->Buffer==NULL)
-            Streams[Streams_Pos]->Buffer=new int8u[(size_t)((1+(Streams[Streams_Pos]->Size>>Shift))<<Shift)];
-        memcpy(Streams[Streams_Pos]->Buffer+Streams_Pos2*(((int64u)1)<<Shift), Buffer+Buffer_Offset, (size_t)Element_Size);
+        {
+            size_t AllocSize=(size_t)((1+(Streams[Streams_Pos]->Size>>Shift))<<Shift);
+            if (AllocSize<Streams[Streams_Pos]->Size)
+                return; // Overflow in size calculation
+            Streams[Streams_Pos]->Buffer=new int8u[AllocSize];
+            Streams[Streams_Pos]->Buffer_MaxSize=AllocSize;
+        }
+        int64u Offset=(((int64u)Streams_Pos2)<<Shift);
+        if (Offset>=(int64u)Streams[Streams_Pos]->Buffer_MaxSize || Element_Size>(int64u)Streams[Streams_Pos]->Buffer_MaxSize-Offset)
+            return; // Write would exceed stream end
+        memcpy(Streams[Streams_Pos]->Buffer+Offset, Buffer+Buffer_Offset, (size_t)Element_Size);
     }
 
     //Next Element
@@ -420,11 +456,13 @@ void File_Aaf::StreamElement()
         StreamElement_Parse();
         Streams_Pos++;
         Streams_Pos2=0;
+        while (Streams_Pos<Streams.size() && Streams[Streams_Pos]->StreamOffsets.empty()) //No content
+            Streams_Pos++;
     }
     if (Streams_Pos<Streams.size())
         GoTo(Streams[Streams_Pos]->StreamOffsets[Streams_Pos2]);
     else
-        Finish();
+        ForceFinish();
 }
 
 //---------------------------------------------------------------------------

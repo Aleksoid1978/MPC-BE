@@ -357,7 +357,7 @@ bool File_AvsV::Header_Parser_QuickSearch()
 
     if (Buffer_Offset+3==Buffer_Size)
         return false; //Sync is OK, but start_code is not available
-    Trusted_IsNot("AVS Video, Synchronisation lost");
+    Trusted_IsNot("AVS Video, Synchronization lost");
     return Synchronize();
 }
 

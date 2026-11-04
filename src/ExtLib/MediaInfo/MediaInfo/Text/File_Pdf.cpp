@@ -535,11 +535,24 @@ void File_Pdf::Object_Metadata()
             break;
         else if (Key=="stream")
         {
+            if (Buffer_Offset>Buffer_Size || Element_Offset>Buffer_Size-Buffer_Offset)
+            {
+                Trusted_IsNot("Invalid metadata offset");
+                return;
+            }
+
             //Removig end of lines
-            if (Element_Offset<Element_Size && Buffer[Buffer_Offset+(size_t)Element_Offset]=='\r')
+            if (Element_Offset<Element_Size && Element_Offset<Buffer_Size-Buffer_Offset && Buffer[Buffer_Offset+(size_t)Element_Offset]=='\r')
                 Element_Offset++;
-            if (Element_Offset<Element_Size && Buffer[Buffer_Offset+(size_t)Element_Offset]=='\n')
+            if (Element_Offset<Element_Size && Element_Offset<Buffer_Size-Buffer_Offset && Buffer[Buffer_Offset+(size_t)Element_Offset]=='\n')
                 Element_Offset++;
+
+            if (Element_Offset>Element_Size || Length>Element_Size-Element_Offset
+             || Length>Buffer_Size-Buffer_Offset-Element_Offset)
+            {
+                Trusted_IsNot("Invalid metadata length");
+                return;
+            }
 
             #if defined(MEDIAINFO_XMP_YES)
             File_Xmp MI;

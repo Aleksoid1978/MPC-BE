@@ -835,7 +835,8 @@ void File_Riff::AIFF_COMT()
     //Parsing
     int16u numComments;
     Get_B2(numComments,                                         "numComments");
-    for (int16u Pos=0; Pos<=numComments; Pos++)
+    Loop_CheckValue(numComments, 10, "numComments");
+    for (int16u Pos=0; Pos<numComments; Pos++)
     {
         Ztring text;
         int16u count;
@@ -1212,6 +1213,7 @@ void File_Riff::AVI__hdlr_strl_indx_FieldIndex(int32u Entry_Count, int32u)
     //Parsing
     Skip_L8(                                                    "Offset");
     Skip_L4(                                                    "Reserved2");
+    Loop_CheckValue(Entry_Count, 12, "Entry_Count");
     for (int32u Pos=0; Pos<Entry_Count; Pos++)
     {
         Element_Begin1("Index");
@@ -1233,6 +1235,7 @@ void File_Riff::AVI__hdlr_strl_indx_SuperIndex(int32u Entry_Count, int32u ChunkI
     Skip_L4(                                                    "Reserved1");
     Skip_L4(                                                    "Reserved2");
     stream& StreamItem = Stream[Stream_ID];
+    Loop_CheckValue(Entry_Count, 16, "Entry_Count");
     for (int32u Pos=0; Pos<Entry_Count; Pos++)
     {
         int32u Duration;
@@ -2141,6 +2144,7 @@ void File_Riff::AVI__hdlr_strl_vprp()
     Skip_L4(                                                    "FrameWidthInPixels");
     Skip_L4(                                                    "FrameHeightInLines");
     Get_L4 (FieldPerFrame,                                      "FieldPerFrame");
+    Loop_CheckValue(FieldPerFrame, 32, "FieldPerFrame");
     vector<int32u> VideoYValidStartLines;
     for (int32u Pos=0; Pos<FieldPerFrame; Pos++)
     {
@@ -2434,19 +2438,16 @@ void File_Riff::AVI__JUNK()
     else if (CC8(Buffer+Buffer_Offset)==CC8("odmldmlh"))
         dmlh_TotalFrame=0; //this is not normal to have this string in a JUNK block!!! and in files tested, in this case TotalFrame is broken too
     //VirtualDubMod
-    else if (CC8(Buffer+Buffer_Offset)==CC8("INFOISFT"))
+    else if (CC8(Buffer+Buffer_Offset)==CC8("INFOISFT")
+          || CC8(Buffer+Buffer_Offset)==CC8("INFOIENG"))
     {
-        int32u Size=LittleEndian2int32u(Buffer+Buffer_Offset+8);
-        if (Size>Element_Size-12)
-            Size=(int32u)Element_Size-12;
-        Fill(Stream_General, 0, General_Encoded_Library, (const char*)(Buffer+Buffer_Offset+12), Size);
-    }
-    else if (CC8(Buffer+Buffer_Offset)==CC8("INFOIENG"))
-    {
-        int32u Size=LittleEndian2int32u(Buffer+Buffer_Offset+8);
-        if (Size>Element_Size-12)
-            Size=(int32u)Element_Size-12;
-        Fill(Stream_General, 0, General_Encoded_Library, (const char*)(Buffer+Buffer_Offset+12), Size);
+        if (Element_Size>=12)
+        {
+            int32u Size=LittleEndian2int32u(Buffer+Buffer_Offset+8);
+            if (Size>Element_Size-12)
+                Size=(int32u)Element_Size-12;
+            Fill(Stream_General, 0, General_Encoded_Library, (const char*)(Buffer+Buffer_Offset+12), Size);
+        }
     }
     //Other libraries?
     else if (CC1(Buffer+Buffer_Offset)>=CC1("A") && CC1(Buffer+Buffer_Offset)<=CC1("z") && Retrieve(Stream_General, 0, General_Encoded_Library).empty())
@@ -3150,6 +3151,7 @@ void File_Riff::INDX_xxxx()
         Skip_L4(                                                    "Unknown");
         Skip_L4(                                                    "Unknown");
 
+        Loop_CheckValue(Entry_Count, 24, "EntriesInUse");
         for (int32u Pos=0; Pos<Entry_Count; Pos++)
         {
             Skip_L8(                                                "Offset");
@@ -3269,6 +3271,7 @@ void File_Riff::QLCM_fmt_()
     Get_L2 (sample_size,                                        "sample-size");
     Element_Begin1("rate-map-table");
         Get_L4 (num_rates,                                      "num-rates");
+        Loop_CheckValue(num_rates, 4, "num-rates");
         for (int32u rate=0; rate<num_rates; rate++)
         {
             Skip_L2(                                            "rate-size");
@@ -3721,7 +3724,7 @@ void File_Riff::WAVE_axml()
                 break;
 
             //Check if we need to stop
-            if (strm.avail_out || inflate_Result)
+            if (strm.avail_out || inflate_Result || strm.total_out>=0x4000000) //Arbitrary limit of 64 MiB
                 break;
 
             //Need to increase buffer
@@ -3989,6 +3992,7 @@ void File_Riff::WAVE_cue_()
     //Parsing
     int32u numCuePoints;
     Get_L4(numCuePoints,                                        "numCuePoints");
+    Loop_CheckValue(numCuePoints, 24, "numCuePoints");
     for (int32u Pos=0; Pos<numCuePoints; Pos++)
     {
         Element_Begin1("Cue point");
@@ -4095,6 +4099,7 @@ void File_Riff::WAVE_ds64()
     if (Element_Offset<Element_Size)
     {
         Get_L4 (tableLength,                                    "tableLength");
+        Loop_CheckValue(tableLength, 12, "tableLength");
         DS64_Table.resize(tableLength);
         for (int32u Pos=0; Pos<tableLength; Pos++)
         {

@@ -381,6 +381,11 @@ bool File__Tags_Helper::Synched_Test()
                     Parser->Read_Buffer_Finalize();
                     Base->Merge(*Parser, Stream_General, 0, 0, Priority);
                     Base->Merge(*Parser, Stream_Audio  , 0, 0, Priority);
+                    auto ImageCount = (*Parser).Count_Get(Stream_Image);
+                    for (size_t i = 0; i < ImageCount; ++i) {
+                        Base->Stream_Prepare(Stream_Image);
+                        Base->Merge(*Parser, Stream_Image, i, Base->StreamPos_Last);
+                    }
                     delete Parser; Parser=NULL;
                 }
                 else

@@ -535,7 +535,7 @@ void File_Ancillary::Header_Parse()
         Skip_S1(6,                                              "000000");
         Skip_SB(                                                "c_not_y_channel_flag");
         Get_S4 (11, LineNumber,                                 "line_number");
-        Skip_S1(12,                                             "horizontal_offset");
+        Skip_S2(12,                                             "horizontal_offset");
         Skip_S1( 2,                                             "parity");
         Get_S1 ( 8, DataID,                                     "DID");
         Skip_S1( 2,                                             "parity");

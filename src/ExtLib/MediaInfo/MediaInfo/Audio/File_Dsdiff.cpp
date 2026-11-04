@@ -377,6 +377,7 @@ void File_Dsdiff::DSD__COMT()
     //Parsing
     int16u numComments;
     Get_B2 (numComments,                                        "numComments");
+    Loop_CheckValue(numComments, 14, "numComments");
     for (int16u i=0; i<numComments; i++)
     {
         Element_Begin1("comment");
@@ -680,6 +681,11 @@ void File_Dsdiff::DSD__PROP_CHNL()
     Get_B2 (numChannels,                                        "numChannels");
     while (Element_Offset<Element_Size)
     {
+        if (Element_Size-Element_Offset<4)
+        {
+            Trusted_IsNot("chID not valid");
+            break;
+        }
         int32u chID;
         Get_C4 (chID,                                           "chID");
         chIDs.push_back(chID);

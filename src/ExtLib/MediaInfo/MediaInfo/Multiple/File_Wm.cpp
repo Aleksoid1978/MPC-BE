@@ -237,7 +237,7 @@ void File_Wm::Header_Parse()
         Get_L8 (Size,                                               "Size");
 
         //Handling buggy streams
-        if (Size<0x100 && Name.hi==0x3626B2758E66CF11 && Name.lo==0xA6d900AA0062CE6C) // Data
+        if (Size<0x100 && File_Offset + Buffer_Offset + Size < File_Size / 2 && Name.hi==0x3626B2758E66CF11 && Name.lo==0xA6d900AA0062CE6C) // Data
             Size=File_Size-File_Offset;
 
         //Filling

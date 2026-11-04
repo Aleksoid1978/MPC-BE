@@ -272,7 +272,7 @@ static std::array<char, 12> DvDif_Time2String(int32u Value, bool DSF = false)
     unsigned FU = Value & 0xF;
     Value >>= 4;
     unsigned FT = Value & 0x3;
-    std::array<char, 12> Result;
+    std::array<char, 12> Result{};
     if (HU >= 10 || MU >= 10 || SU >= 10 || HH >= 0x24 || MM >= 0x60 || SS >= 0x60) {
         Result[0] = '\0';
         return Result;
@@ -648,7 +648,7 @@ void File_DvDif::Streams_Finish()
         if (Date[0]) {
             string Recorded_Date(Date.data(), sizeof(Date));
             const auto Time = DvDif_Time2String(Recorded_Date_Time, DSF);
-            if (!Time.empty()) {
+            if (Time[0]) {
                 Recorded_Date += ' ';
                 Recorded_Date.append(Time.data(), Time[8] ? sizeof(Time) : 8);
             }
@@ -717,36 +717,43 @@ bool File_DvDif::FileHeader_Begin()
 bool File_DvDif::Synchronize()
 {
     if (AuxToAnalyze)
-    {
-        Accept();
         return true;
-    }
 
-    while (Buffer_Offset+8*80<=Buffer_Size //8 blocks
-        && !((Buffer[Buffer_Offset+0*80]&0xE0)==0x00 && (Buffer[Buffer_Offset+0*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+0*80+2]==0x00   //Header 0
-          && (Buffer[Buffer_Offset+1*80]&0xE0)==0x20 && (Buffer[Buffer_Offset+1*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+1*80+2]==0x00   //Subcode 0
-          && (Buffer[Buffer_Offset+2*80]&0xE0)==0x20 && (Buffer[Buffer_Offset+2*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+2*80+2]==0x01   //Subcode 1
-          && (Buffer[Buffer_Offset+3*80]&0xE0)==0x40 && (Buffer[Buffer_Offset+3*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+3*80+2]==0x00   //VAUX 0
-          && (Buffer[Buffer_Offset+4*80]&0xE0)==0x40 && (Buffer[Buffer_Offset+4*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+4*80+2]==0x01   //VAUX 1
-          && (Buffer[Buffer_Offset+5*80]&0xE0)==0x40 && (Buffer[Buffer_Offset+5*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+5*80+2]==0x02   //VAUX 2
-          && (Buffer[Buffer_Offset+6*80]&0xE0)==0x60 && (Buffer[Buffer_Offset+6*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+6*80+2]==0x00   //Audio 0
-          && (Buffer[Buffer_Offset+7*80]&0xE0)==0x80 && (Buffer[Buffer_Offset+7*80+1]&0xF0)==0x00 && Buffer[Buffer_Offset+7*80+2]==0x00)) //Video 0
-            Buffer_Offset++;
+    constexpr size_t Block_Size = 80;
+    constexpr size_t Block_Count = 8;
+    constexpr size_t Frame_Size = Block_Size * Block_Count;
+    constexpr size_t Sync_Pos = 5 * Block_Size + 2;
 
-    if (Buffer_Offset+8*80>Buffer_Size)
-        return false;
-
-    if (!Status[IsAccepted])
+    while (Buffer_Size - Buffer_Offset >= Frame_Size)
     {
-        Accept();
+        const size_t Candidate_End = Buffer_Size - Frame_Size + 1;
+        const size_t Search_Begin = Buffer_Offset + Sync_Pos;
+        const size_t Search_End = Candidate_End + Sync_Pos;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Search_Begin, 0x02, Search_End - Search_Begin);
+        if (!Sync)
+        {
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer) - Sync_Pos;
 
-        #if MEDIAINFO_DEMUX
-            if (Config->Demux_Unpacketize_Get())
-                Demux_UnpacketizeContainer=true;
-        #endif //MEDIAINFO_DEMUX
+        const int8u* Candidate = Buffer + Buffer_Offset;
+        if (   (BigEndian2int24u(Candidate + 0 * Block_Size) & 0xE0F0FF) == 0x000000
+            && (BigEndian2int24u(Candidate + 1 * Block_Size) & 0xE0F0FF) == 0x200000
+            && (BigEndian2int24u(Candidate + 2 * Block_Size) & 0xE0F0FF) == 0x200001
+            && (BigEndian2int24u(Candidate + 3 * Block_Size) & 0xE0F0FF) == 0x400000
+            && (BigEndian2int24u(Candidate + 4 * Block_Size) & 0xE0F0FF) == 0x400001
+            && (BigEndian2int24u(Candidate + 5 * Block_Size) & 0xE0F0FF) == 0x400002
+            && (BigEndian2int24u(Candidate + 6 * Block_Size) & 0xE0F0FF) == 0x600000
+            && (BigEndian2int24u(Candidate + 7 * Block_Size) & 0xE0F0FF) == 0x800000)
+        {
+            return true;
+        }
+
+        Buffer_Offset++;
     }
 
-    return true;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -886,6 +893,16 @@ void File_DvDif::Synched_Init()
         FrameInfo.PTS=0; //No PTS in container
     if (!IsSub && Frame_Count_NotParsedIncluded==(int64u)-1)
         Frame_Count_NotParsedIncluded=0; //No Frame_Count_NotParsedIncluded in the container
+
+    if (!Status[IsAccepted])
+    {
+        Accept();
+
+        #if MEDIAINFO_DEMUX
+            if (Config->Demux_Unpacketize_Get())
+                Demux_UnpacketizeContainer=true;
+        #endif //MEDIAINFO_DEMUX
+    }
 }
 
 //***************************************************************************

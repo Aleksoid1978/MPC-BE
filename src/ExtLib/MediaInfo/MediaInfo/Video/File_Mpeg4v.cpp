@@ -254,6 +254,85 @@ File_Mpeg4v::File_Mpeg4v()
     //Temp
     video_object_layer_start_IsParsed=false;
     colour_description=false;
+
+    //Init (also done by Synched_Init for synchronized streams)
+    //Count of a Packets
+    IVOP_Count=0;
+    PVOP_Count=0;
+    BVOP_Count=0;
+    BVOP_Count_Max=0;
+    SVOP_Count=0;
+    NVOP_Count=0;
+    Interlaced_Top=0;
+    Interlaced_Bottom=0;
+    Frame_Count_InThisBlock_Max=0;
+    //From VOL, needed in VOP
+    fixed_vop_time_increment=0;
+    Time_Begin_Seconds=(int32u)-1;
+    Time_End_Seconds=(int32u)-1;
+    bit_rate=(int32u)-1;
+    vbv_buffer_size=(int32u)-1;
+    Time_Begin_MilliSeconds=(int16u)-1;
+    Time_End_MilliSeconds=(int16u)-1;
+    object_layer_width=0;
+    object_layer_height=0;
+    vop_time_increment_resolution=0;
+    visual_object_verid=1;
+    profile_and_level_indication=0;
+    no_of_sprite_warping_points=0;
+    aspect_ratio_info=0;
+    par_width=0;
+    par_height=0;
+    bits_per_pixel=8;
+    shape=0;
+    sprite_enable=0;
+    estimation_method=0;
+    chroma_format=(int8u)-1;
+    colour_primaries=(int8u)-1;
+    transfer_characteristics=(int8u)-1;
+    matrix_coefficients=(int8u)-1;
+    frame_rate_code=(int8u)-1;
+    quarter_sample=false;
+    low_delay=false;
+    load_intra_quant_mat=false;
+    load_nonintra_quant_mat=false;
+    load_intra_quant_mat_grayscale=false;
+    load_nonintra_quant_mat_grayscale=false;
+    interlaced=false;
+    newpred_enable=0;
+    visual_object_type=0;
+    time_size=0;
+    reduced_resolution_vop_enable=0;
+    scalability=0;
+    enhancement_type=0;
+    complexity_estimation_disable=false;
+    opaque=false;
+    transparent=false;
+    intra_cae=false;
+    inter_cae=false;
+    no_update=false;
+    upsampling=false;
+    intra_blocks=false;
+    inter_blocks=false;
+    inter4v_blocks=false;
+    not_coded_blocks=false;
+    dct_coefs=false;
+    dct_lines=false;
+    vlc_symbols=false;
+    vlc_bits=false;
+    apm=false;
+    npm=false;
+    interpolate_mc_q=false;
+    forw_back_mc_q=false;
+    halfpel2=false;
+    halfpel4=false;
+    sadct=false;
+    quarterpel=false;
+    quant_type=false;
+    rgb_components=false;
+
+    //Streams init (also done by Synched_Init for synchronized streams)
+    Streams.resize(0x100);
 }
 
 //---------------------------------------------------------------------------
@@ -418,7 +497,10 @@ void File_Mpeg4v::Streams_Fill()
         Fill(Stream_Video, 0, Video_Codec_Profile, Mpeg4v_Profile_Level(profile_and_level_indication));
     }
 
-    if (frame_rate_code!=(int8u)-1)
+    // frame_rate_code is bitstream-controlled; the existing (int8u)-1 sentinel guard
+    // catches only 0xFF, so a crafted MPEG-4 Visual bitstream can index past the
+    // 16-entry Mpegv_frame_rate table -- see gh#2608.
+    if (frame_rate_code!=(int8u)-1 && frame_rate_code<sizeof(Mpegv_frame_rate)/sizeof(*Mpegv_frame_rate))
         Fill(Stream_Video, StreamPos_Last, Video_FrameRate, Mpegv_frame_rate[frame_rate_code]);
     if (bit_rate!=(int32u)-1)
         Fill(Stream_Video, StreamPos_Last, Video_BitRate_Nominal, bit_rate*400);
@@ -773,9 +855,9 @@ bool File_Mpeg4v::Header_Parser_QuickSearch()
 
         //Synchronizing
         Buffer_Offset+=4;
-        Synched=false;
         if (!Synchronize())
         {
+            Synched=false;
             UnSynched_IsNotJunk=true;
             return false;
         }
@@ -789,7 +871,7 @@ bool File_Mpeg4v::Header_Parser_QuickSearch()
 
     if (Buffer_Offset+3==Buffer_Size)
         return false; //Sync is OK, but start_code is not available
-    Trusted_IsNot("MPEG-4 Visual, Synchronisation lost");
+    Trusted_IsNot("MPEG-4 Visual, Synchronization lost");
     return Synchronize();
 }
 

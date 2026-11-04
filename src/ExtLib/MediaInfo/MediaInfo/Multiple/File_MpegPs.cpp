@@ -217,6 +217,7 @@ File_MpegPs::File_MpegPs()
     #ifdef MEDIAINFO_MPEG4_YES
         ParserFromTs=NULL;
         SLConfig=NULL;
+        SL_accessUnitEndFlag_Last=true; //The stream is expected to start with an access unit
     #endif
     #if MEDIAINFO_DEMUX
         SubStream_Demux=NULL;
@@ -820,39 +821,20 @@ void File_MpegPs::Bitrate_Calc()
 bool File_MpegPs::Synchronize()
 {
     //Synchronizing
-    while (Buffer_Offset+4<=Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                         || Buffer[Buffer_Offset+1]!=0x00
-                                         || Buffer[Buffer_Offset+2]!=0x01
-                                         || Buffer[Buffer_Offset+3]< 0xB9))
+    while (Buffer_Size - Buffer_Offset >= 4)
     {
-        Buffer_Offset+=2;
-        while(Buffer_Offset<Buffer_Size && Buffer[Buffer_Offset]!=0x00)
-            Buffer_Offset+=2;
-        if (Buffer_Offset>=Buffer_Size || Buffer[Buffer_Offset-1]==0x00)
-            Buffer_Offset--;
+        if (!Synchronize_0x000001())
+            return false;
+        if (Buffer[Buffer_Offset + 3] >= 0xB9)
+        {
+            //Synched is OK
+            return true;
+        }
+
+        Buffer_Offset++;
     }
 
-    //Parsing last bytes if needed
-    if (Buffer_Offset+4==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00
-                                      || Buffer[Buffer_Offset+2]!=0x01
-                                      || Buffer[Buffer_Offset+3]< 0xB9))
-        Buffer_Offset++;
-    if (Buffer_Offset+3==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00
-                                      || Buffer[Buffer_Offset+2]!=0x01))
-        Buffer_Offset++;
-    if (Buffer_Offset+2==Buffer_Size && (Buffer[Buffer_Offset  ]!=0x00
-                                      || Buffer[Buffer_Offset+1]!=0x00))
-        Buffer_Offset++;
-    if (Buffer_Offset+1==Buffer_Size &&  Buffer[Buffer_Offset  ]!=0x00)
-        Buffer_Offset++;
-
-    if (Buffer_Offset+3>Buffer_Size)
-        return false;
-
-    //Synched is OK
-    return true;
+    return false;
 }
 
 //---------------------------------------------------------------------------
@@ -880,7 +862,7 @@ bool File_MpegPs::Synched_Test()
     {
         Frame_Count=(int64u)-1;
         Frame_Count_NotParsedIncluded=(int64u)-1;
-        if (Streams[stream_id].TimeStamp_End.PTS.TimeStamp!=(int64u)-1 && Streams[stream_id].TimeStamp_Start.PTS.TimeStamp!=(int64u)-1)
+        if (!Streams.empty() && Streams[stream_id].TimeStamp_End.PTS.TimeStamp!=(int64u)-1 && Streams[stream_id].TimeStamp_Start.PTS.TimeStamp!=(int64u)-1)
             FrameInfo.PTS=(Streams[stream_id].TimeStamp_End.PTS.TimeStamp-Streams[stream_id].TimeStamp_Start.PTS.TimeStamp)*100000/9;
         SynchLost("MPEG-PS");
         Frame_Count=0;
@@ -1008,6 +990,9 @@ void File_MpegPs::Read_Buffer_Unsynched()
     video_stream_Unlimited=false;
     Buffer_DataSizeToParse=0;
     PES_FirstByte_IsAvailable=false;
+    #ifdef MEDIAINFO_MPEG4_YES
+        SL_accessUnitEndFlag_Last=true;
+    #endif //MEDIAINFO_MPEG4_YES
 }
 
 //---------------------------------------------------------------------------
@@ -3634,11 +3619,13 @@ void File_MpegPs::SL_packetized_stream()
         {
             BS_Begin();
             int8u paddingBits=0;
-            bool paddingFlag=false, idleFlag=false, OCRflag=false, accessUnitStartFlag=false;
+            bool paddingFlag=false, idleFlag=false, OCRflag=false, accessUnitStartFlag=true;
             if (SLConfig->useAccessUnitStartFlag)
                 Get_SB (accessUnitStartFlag,                        "accessUnitStartFlag");
+            else if (SLConfig->useAccessUnitEndFlag)
+                accessUnitStartFlag=SL_accessUnitEndFlag_Last; //From the previous SL packet, else each SL packet is an access unit (ISO/IEC 14496-1:2001 10.2.4.2)
             if (SLConfig->useAccessUnitEndFlag)
-                Skip_SB(                                            "accessUnitEndFlag");
+                Get_SB (SL_accessUnitEndFlag_Last,                  "accessUnitEndFlag");
             if (SLConfig->OCRLength>0)
                 Get_SB (OCRflag,                                    "OCRflag");
             if (SLConfig->useIdleFlag)
@@ -3651,20 +3638,20 @@ void File_MpegPs::SL_packetized_stream()
             {
                 bool DegPrioflag=false;
                 if (SLConfig->packetSeqNumLength>0)
-                    Skip_S2(SLConfig->packetSeqNumLength,           "packetSequenceNumber");
+                    Skip_BS(SLConfig->packetSeqNumLength,           "packetSequenceNumber");
                 if (SLConfig->degradationPriorityLength>0)
                     Get_SB (DegPrioflag,                            "DegPrioflag");
                 if (DegPrioflag)
                     Skip_S2(SLConfig->degradationPriorityLength,    "degradationPriority");
                 if (OCRflag)
-                    Skip_S8(SLConfig->OCRLength,                    "objectClockReference");
+                    Skip_BS(SLConfig->OCRLength,                    "objectClockReference");
                 if (accessUnitStartFlag)
                 {
                     bool decodingTimeStampFlag=false, compositionTimeStampFlag=false, instantBitrateFlag=false;
                     if (SLConfig->useRandomAccessPointFlag)
                         Skip_SB(                                    "randomAccessPointFlag");
                     if (SLConfig->AU_seqNumLength >0)
-                        Skip_S2(SLConfig->AU_seqNumLength,          "AU_sequenceNumber");
+                        Skip_BS(SLConfig->AU_seqNumLength,          "AU_sequenceNumber");
                     if (SLConfig->useTimeStampsFlag)
                     {
                         Get_SB (decodingTimeStampFlag,              "decodingTimeStampFlag");
@@ -3673,13 +3660,13 @@ void File_MpegPs::SL_packetized_stream()
                     if (SLConfig->instantBitrateLength>0)
                         Get_SB (instantBitrateFlag,                 "instantBitrateFlag");
                     if (decodingTimeStampFlag)
-                        Skip_S2(SLConfig->timeStampLength,          "decodingTimeStamp");
+                        Skip_BS(SLConfig->timeStampLength,          "decodingTimeStamp");
                     if (compositionTimeStampFlag)
-                        Skip_S2(SLConfig->timeStampLength,          "compositionTimeStamp");
+                        Skip_BS(SLConfig->timeStampLength,          "compositionTimeStamp");
                     if (SLConfig->AU_Length > 0)
-                        Skip_S2(SLConfig->AU_Length,                "accessUnitLength");
+                        Skip_BS(SLConfig->AU_Length,                "accessUnitLength");
                     if (instantBitrateFlag)
-                        Skip_S2(SLConfig->instantBitrateLength,     "instantBitrate");
+                        Skip_BS(SLConfig->instantBitrateLength,     "instantBitrate");
                 }
             }
             BS_End();
@@ -4158,7 +4145,7 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
                     if (!SubStream_Demux->Buffers.empty() && SubStream_Demux->Buffers[0] && SubStream_Demux->Buffers[0]->DTS<FrameInfo.DTS)
                     {
                         Demux(SubStream_Demux->Buffers[0]->Buffer, SubStream_Demux->Buffers[0]->Buffer_Size, ContentType_SubStream);
-                        delete SubStream_Demux->Buffers[0]->Buffer; SubStream_Demux->Buffers[0]->Buffer=NULL;
+                        delete SubStream_Demux->Buffers[0];
                         SubStream_Demux->Buffers.erase(SubStream_Demux->Buffers.begin()); //Moving 2nd Buffer to 1st position
                     }
                 }
@@ -4187,18 +4174,21 @@ void File_MpegPs::xxx_stream_Parse(ps_stream &Temp, int8u &stream_Count)
                     SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size=0;
                     SubStream_Demux->Buffers[Buffers_Pos]->Buffer=new int8u[SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max];
                 }
-                if (SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max>SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size+(size_t)(Element_Size-Element_Offset) && SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max<=16*1024*1024)
+                size_t Buffer_Size_ToAdd=(size_t)(Element_Size-Element_Offset);
+                if (Buffer_Size_ToAdd<=32*1024*1024-SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size)
                 {
-                    SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max*=2;
-                    int8u* Buffer_Demux=SubStream_Demux->Buffers[Buffers_Pos]->Buffer;
-                    SubStream_Demux->Buffers[Buffers_Pos]->Buffer=new int8u[SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max];
-                    std::memcpy(SubStream_Demux->Buffers[Buffers_Pos]->Buffer, Buffer_Demux, SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size);
-                    delete[] Buffer_Demux; //Buffer_Demux=NULL;
-                }
-                if (SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size+(size_t)(Element_Size-Element_Offset)<=SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max)
-                {
-                    std::memcpy(SubStream_Demux->Buffers[Buffers_Pos]->Buffer+SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size, Buffer+Buffer_Offset+(size_t)Element_Offset, (size_t)(Element_Size-Element_Offset));
-                    SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size+=(size_t)(Element_Size-Element_Offset);
+                    size_t Buffer_Size_Required=SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size+Buffer_Size_ToAdd;
+                    if (Buffer_Size_Required>SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max)
+                    {
+                        while (SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max<Buffer_Size_Required)
+                            SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max*=2;
+                        int8u* Buffer_Demux=SubStream_Demux->Buffers[Buffers_Pos]->Buffer;
+                        SubStream_Demux->Buffers[Buffers_Pos]->Buffer=new int8u[SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size_Max];
+                        std::memcpy(SubStream_Demux->Buffers[Buffers_Pos]->Buffer, Buffer_Demux, SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size);
+                        delete[] Buffer_Demux; //Buffer_Demux=NULL;
+                    }
+                    std::memcpy(SubStream_Demux->Buffers[Buffers_Pos]->Buffer+SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size, Buffer+Buffer_Offset+(size_t)Element_Offset, Buffer_Size_ToAdd);
+                    SubStream_Demux->Buffers[Buffers_Pos]->Buffer_Size=Buffer_Size_Required;
                 }
             }
         #endif //MEDIAINFO_DEMUX
@@ -4393,9 +4383,9 @@ bool File_MpegPs::Header_Parser_QuickSearch()
     if (Buffer_Offset+3==Buffer_Size)
         return false; //Sync is OK, but stream_id is not available
     if (Buffer_Offset+4<=Buffer_Size)
-        Trusted_IsNot("MPEG-PS, Synchronisation lost");
+        Trusted_IsNot("MPEG-PS, Synchronization lost");
     Synched=false;
-    return Synchronize();
+    return Buffer_Offset < Buffer_Size ? Synchronize() : false;
 }
 
 //***************************************************************************

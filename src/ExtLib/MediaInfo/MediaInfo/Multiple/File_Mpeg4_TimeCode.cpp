@@ -245,7 +245,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
                 {
                     int64u Frame_Count_Temp=0;
                     size_t i=0;
-                    for (; Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
+                    for (; i<DurationsPerFrame->size() && Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
                         Frame_Count_Temp+=(*DurationsPerFrame)[i].SampleCount;
                     if (i<DurationsPerFrame->size() && (*DurationsPerFrame)[i].SampleDuration==0)
                         ShouldIgnore=true;
@@ -290,7 +290,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
 
     FILLING_BEGIN();
         int64u SamplesInThisBlock=Element_Size/4;
-        if (File_Offset+Buffer_Offset==LastUsedOffset)
+        if (File_Offset+Buffer_Offset==LastUsedOffset && DurationsPerFrame)
         {
             //TODO: this compute should be generic in MP4 parser
             Frame_Count_NotParsedIncluded=0;
@@ -302,7 +302,7 @@ void File_Mpeg4_TimeCode::Read_Buffer_Continue()
         {
             int64u Frame_Count_Temp=0;
             size_t i=0;
-            for (; Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
+            for (; i<DurationsPerFrame->size() && Frame_Count_NotParsedIncluded-Frame_Count_Temp>=(*DurationsPerFrame)[i].SampleCount; i++)
                 Frame_Count_Temp+=(*DurationsPerFrame)[i].SampleCount;
             if (i<DurationsPerFrame->size())
             {

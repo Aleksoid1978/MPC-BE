@@ -218,7 +218,8 @@ bool File_MpegTs::File__Duplicate_Set (const Ztring &Value)
                         *Duplicate=NULL;
 
             //Duplicate
-            Complete_Stream->Duplicates.erase(**Target);
+            delete Pointer->second;
+            Complete_Stream->Duplicates.erase(Pointer);
         }
     }
 
@@ -258,6 +259,8 @@ void File_MpegTs::File__Duplicate_Write ()
         for (size_t Pos=0; Pos<Duplicates_Speed_Size; Pos++)
         {
             File__Duplicate_MpegTs* Dup=Complete_Stream->Duplicates_Speed[Pos];
+            if (!Dup)
+                continue;
             size_t program_map_PIDs_Size=Complete_Stream->Duplicates_Speed[Pos]->program_map_PIDs.size();
             for (size_t program_map_PIDs_Pos=0; program_map_PIDs_Pos<program_map_PIDs_Size; program_map_PIDs_Pos++)
                 if (Dup->program_map_PIDs[program_map_PIDs_Pos])

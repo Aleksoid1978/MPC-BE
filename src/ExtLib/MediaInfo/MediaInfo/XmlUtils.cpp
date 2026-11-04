@@ -60,7 +60,10 @@ const char *LocalName(const XMLElement* Elem, const char* &Ns /* out */)
 {
     const char* Name=Elem->Name();
     if (!Name)
+    {
+        Ns=nullptr;
         return "";
+    }
     if (const char* Colon=strrchr(Name, ':'))
     {
         // Search element and ancestors for given namespace prefix

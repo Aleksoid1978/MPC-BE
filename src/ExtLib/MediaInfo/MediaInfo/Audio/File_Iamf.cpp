@@ -85,6 +85,7 @@ namespace CodecIDs
 #define LINEAR       1
 #define BEZIER       2
 #define INTER_LINEAR 3
+#define INTER_BEZIER 4
 
 //---------------------------------------------------------------------------
 static const char* Iamf_obu_type(int8u obu_type)
@@ -210,6 +211,7 @@ static string Iamf_animation_type(int64u animation_type)
     case LINEAR         : return "LINEAR";
     case BEZIER         : return "BEZIER";
     case INTER_LINEAR   : return "INTER_LINEAR";
+    case INTER_BEZIER   : return "INTER_BEZIER";
     default: return std::to_string(animation_type);
     }
 }
@@ -231,9 +233,9 @@ static string Iamf_binaural_filter_profile(int8u binaural_filter_profile)
 {
     switch (binaural_filter_profile)
     {
-    case 0: return "BINAURAL_FILTER_PROFILE_AMBIENT";
-    case 1: return "BINAURAL_FILTER_PROFILE_DIRECT";
-    case 2: return "BINAURAL_FILTER_PROFILE_REVERBERANT";
+    case 0: return "AMBIENT";
+    case 1: return "DIRECT";
+    case 2: return "REVERBERANT";
     default: return std::to_string(binaural_filter_profile);
     }
 }
@@ -266,15 +268,16 @@ static string Iamf_parameter_definition_type(int64u parameter_definition_type)
 {
     switch (parameter_definition_type)
     {
-    case PARAMETER_DEFINITION_MIX_GAIN      : return "MIX_GAIN";
-    case PARAMETER_DEFINITION_DEMIXING      : return "DEMIXING";
-    case PARAMETER_DEFINITION_RECON_GAIN    : return "RECON_GAIN";
-    case PARAMETER_DEFINITION_POLAR         : return "POLAR";
-    case PARAMETER_DEFINITION_CART_8        : return "CART_8";
-    case PARAMETER_DEFINITION_CART_16       : return "CART_16";
-    case PARAMETER_DEFINITION_DUAL_POLAR    : return "DUAL_POLAR";
-    case PARAMETER_DEFINITION_DUAL_CART_8   : return "DUAL_CART_8";
-    case PARAMETER_DEFINITION_DUAL_CART_16  : return "DUAL_CART_16";
+    case PARAMETER_DEFINITION_MIX_GAIN          : return "MIX_GAIN";
+    case PARAMETER_DEFINITION_DEMIXING          : return "DEMIXING";
+    case PARAMETER_DEFINITION_RECON_GAIN        : return "RECON_GAIN";
+    case PARAMETER_DEFINITION_POLAR             : return "POLAR";
+    case PARAMETER_DEFINITION_CART_8            : return "CART_8";
+    case PARAMETER_DEFINITION_CART_16           : return "CART_16";
+    case PARAMETER_DEFINITION_DUAL_POLAR        : return "DUAL_POLAR";
+    case PARAMETER_DEFINITION_DUAL_CART_8       : return "DUAL_CART_8";
+    case PARAMETER_DEFINITION_DUAL_CART_16      : return "DUAL_CART_16";
+    case PARAMETER_DEFINITION_MOMENTARY_LOUDNESS: return "MOMENTARY_LOUDNESS";
     default: return std::to_string(parameter_definition_type);
     }
 }
@@ -399,14 +402,14 @@ void File_Iamf::Header_Parse()
     Get_S1      (5,     obu_type,                               "obu_type");
     Get_SB      (       obu_redundant_copy,                     "obu_redundant_copy");
     switch (obu_type) {
-    case 0x02: // OBU_IA_Mix_Presentation
+    case 2: // OBU_IA_Mix_Presentation
         Get_SB  (       optional_fields_flag,                   "optional_fields_flag");
         break;
-    case 0x04: // OBU_IA_Temporal_Delimiter
+    case 4: // OBU_IA_Temporal_Delimiter
         Skip_SB (                                               "is_not_key_frame");
         break;
     default:
-        if (obu_type >= 0x05 && obu_type <= 0x17)
+        if (obu_type > 4 && obu_type < 24)
             Get_SB (    obu_trimming_status_flag,               "obu_trimming_status_flag");
         else
             Skip_SB(                                            "reserved");
@@ -416,7 +419,7 @@ void File_Iamf::Header_Parse()
     BS_End();
     Get_leb128  (       obu_size,                               "obu_size");
     int64u obu_size_begin{ Element_Offset };
-    if (obu_trimming_status_flag) {
+    if ((obu_type > 4 && obu_type < 24) && obu_trimming_status_flag) {
         Get_leb128(     num_samples_to_trim_at_end,             "num_samples_to_trim_at_end");
         Get_leb128(     num_samples_to_trim_at_start,           "num_samples_to_trim_at_start");
     }
@@ -648,6 +651,15 @@ void File_Iamf::ia_audio_element()
             Element_End0();
             break;
         }
+        case PARAMETER_DEFINITION_POLAR:
+        case PARAMETER_DEFINITION_CART_8:
+        case PARAMETER_DEFINITION_CART_16:
+        case PARAMETER_DEFINITION_DUAL_POLAR:
+        case PARAMETER_DEFINITION_DUAL_CART_8:
+        case PARAMETER_DEFINITION_DUAL_CART_16:
+            Trusted_IsNot("PARAMETER_DEFINITION_POLAR/CART SHALL NOT be present in Audio Element OBU");
+            return;
+            break;
         default: {
             int64u param_definition_size;
             Get_leb128 (param_definition_size,              "param_definition_size");
@@ -685,7 +697,7 @@ void File_Iamf::ia_audio_element()
                 }
                 if (num_layers == 1 && loudspeaker_layout == 15) {
                     int8u expanded_loudspeaker_layout;
-                    Get_B1(expanded_loudspeaker_layout, "expanded_loudspeaker_layout"); Param_Info1(Iamf_expanded_loudspeaker_layout(expanded_loudspeaker_layout));
+                    Get_B1(expanded_loudspeaker_layout,     "expanded_loudspeaker_layout"); Param_Info1(Iamf_expanded_loudspeaker_layout(expanded_loudspeaker_layout));
                 }
                 recon_gain_is_present_flag_Vec.push_back(recon_gain_is_present_flag);
                 Element_End0();
@@ -768,6 +780,7 @@ void File_Iamf::ia_mix_presentation()
         Reject();
         return;
     }
+    Loop_CheckValue(count_label, 2, "count_label"); // annotations_language and localized_presentation_annotations
     for (int64u i = 0; i < count_label; ++i) {
         Skip_UTF8(SizeUpTo0(),                              "annotations_language");
         Skip_B1(                                            "zero");
@@ -781,6 +794,7 @@ void File_Iamf::ia_mix_presentation()
         Reject();
         return;
     }
+    Loop_CheckValue(num_sub_mixes, 2, "num_sub_mixes"); // num_audio_elements and num_layouts
     for (int64u i = 0; i < num_sub_mixes; ++i) {
         int64u num_audio_elements;
         Get_leb128(     num_audio_elements,                 "num_audio_elements");
@@ -788,6 +802,7 @@ void File_Iamf::ia_mix_presentation()
             Reject();
             return;
         }
+        Loop_CheckValue(num_audio_elements, 1 + count_label, "num_audio_elements"); // audio_element_id and localized_element_annotations
         for (int64u j = 0; j < num_audio_elements; ++j) {
             int64u audio_element_id;
             Get_leb128( audio_element_id,                   "audio_element_id");
@@ -811,6 +826,7 @@ void File_Iamf::ia_mix_presentation()
             Reject();
             return;
         }
+        Loop_CheckValue(num_layouts, 6, "num_layouts"); // loudness_layout and loudness
         for (int64u j = 0; j < num_layouts; ++j) {
             Element_Begin1("loudness_layout");
                 int8u layout_type;
@@ -1000,11 +1016,9 @@ void File_Iamf::ParamDefinition(int64u param_definition_type)
         Skip_S1(6,                                          "first_bin_center");
         Skip_S1(1,                                          "reserved_momentary_loudness");
         BS_End();
-        for (int8u i = 0; i <= num_bin_pairs_minus_one; ++i) {
-            Element_Begin1("bin_Pair");
-            Skip_B1(                                        "bin[0]");
-            Skip_B1(                                        "bin[1]");
-            Element_End0();
+        for (int8u i = 0; i < (num_bin_pairs_minus_one + 1) * 2; ++i) {
+            int64u count;
+            Get_leb128(count,                               "count");
         }
     }
 
@@ -1030,7 +1044,7 @@ void File_Iamf::RenderingConfig()
     Get_S1    (2, headphones_rendering_mode,                    "headphones_rendering_mode"); Param_Info1(Iamf_headphones_rendering_mode(headphones_rendering_mode));
     Get_SB    (element_gain_offset_flag,                        "element_gain_offset_flag");
     Get_S1    (2, binaural_filter_profile,                      "binaural_filter_profile"); Param_Info1(Iamf_binaural_filter_profile(binaural_filter_profile));
-    Skip_S1   (3,                                               "reserved");
+    Skip_S1   (3,                                               "reserved_for_future_use");
     BS_End();
     Get_leb128(rendering_config_extension_size,                 "rendering_config_extension_size");
     auto Element_Offset_Ext_Begin = Element_Offset;
@@ -1050,9 +1064,9 @@ void File_Iamf::RenderingConfig()
                 Element_End0();
             }
             else {
-                int64u rendering_config_params_extension_size;
-                Get_leb128(rendering_config_params_extension_size, "rendering_config_params_extension_size");
-                Skip_XX(rendering_config_params_extension_size, "rendering_config_params_extension_bytes");
+                int64u param_definition_size;
+                Get_leb128(param_definition_size,               "param_definition_size");
+                Skip_XX(param_definition_size,                  "param_definition_bytes");
             }
         }
         if (element_gain_offset_flag) {
@@ -1060,7 +1074,7 @@ void File_Iamf::RenderingConfig()
             int8u element_gain_offset_config_type;
             int64u element_gain_offset_size;
             Get_B1(element_gain_offset_config_type,             "element_gain_offset_config_type");
-            Param_Info1(element_gain_offset_config_type == 0 ? "VALUE_TYPE" : element_gain_offset_config_type == 1 ? "RANGE_TYPE" : "");
+            Param_Info1(element_gain_offset_config_type == 0 ? "VALUE" : element_gain_offset_config_type == 1 ? "RANGE" : "");
             switch (element_gain_offset_config_type) {
             case 0: // value type
                 int16u element_gain_offset;
@@ -1094,6 +1108,32 @@ void File_Iamf::RenderingConfig()
 //---------------------------------------------------------------------------
 void File_Iamf::ia_parameter_block()
 {
+    auto AnimatedParameterData = [&](const int64u& animation_type, const int64u& data_size) {
+        switch (animation_type) {
+        case STEP:
+            Skip_S2(data_size,                                  "start_point_value");
+            break;
+        case LINEAR:
+            Skip_S2(data_size,                                  "start_point_value");
+            Skip_S2(data_size,                                  "end_point_value");
+            break;
+        case BEZIER:
+            Skip_S2(data_size,                                  "start_point_value");
+            Skip_S2(data_size,                                  "end_point_value");
+            Skip_S2(data_size,                                  "control_point_value");
+            Skip_S1(8,                                          "control_point_relative_time");
+            break;
+        case INTER_LINEAR:
+            Skip_S2(data_size,                                  "end_point_value");
+            break;
+        case INTER_BEZIER:
+            Skip_S2(data_size,                                  "end_point_value");
+            Skip_S2(data_size,                                  "control_point_value");
+            Skip_S1(8,                                          "control_point_relative_time");
+            break;
+        }
+        };
+
     //Parsing
     int64u parameter_id, subblock_duration;
     Get_leb128    (parameter_id,                                "parameter_id");
@@ -1128,21 +1168,9 @@ void File_Iamf::ia_parameter_block()
                 int64u animation_type;
                 Get_leb128(animation_type,                      "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
                 Element_Begin1("param_data");
-                    switch (animation_type) {
-                    case STEP:
-                        Skip_B2(                                "start_point_value");
-                        break;
-                    case LINEAR:
-                        Skip_B2(                                "start_point_value");
-                        Skip_B2(                                "end_point_value");
-                        break;
-                    case BEZIER:
-                        Skip_B2(                                "start_point_value");
-                        Skip_B2(                                "end_point_value");
-                        Skip_B2(                                "control_point_value");
-                        Skip_B1(                                "control_point_relative_time");
-
-                    }
+                    BS_Begin();
+                    AnimatedParameterData(animation_type, 16);
+                    BS_End();
                 Element_End0();
             Element_End0();
             break;
@@ -1176,9 +1204,15 @@ void File_Iamf::ia_parameter_block()
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
             BS_Begin();
-            Skip_S2(9,                                          "azimuth");
-            Skip_S1(8,                                          "elevation");
-            Skip_S1(7,                                          "distance");
+            Element_Begin1(                                     "azimuth");
+                AnimatedParameterData(animation_type, 9);
+            Element_End0();
+            Element_Begin1(                                     "elevation");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "distance");
+                AnimatedParameterData(animation_type, 7);
+            Element_End0();
             BS_End();
             Element_End0();
             break;
@@ -1187,9 +1221,17 @@ void File_Iamf::ia_parameter_block()
             Element_Begin1("cart8_parameter_data");
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
-            Skip_B1(                                            "x");
-            Skip_B1(                                            "y");
-            Skip_B1(                                            "z");
+            BS_Begin();
+            Element_Begin1(                                     "x");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "y");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "z");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            BS_End();
             Element_End0();
             break;
         }
@@ -1197,9 +1239,17 @@ void File_Iamf::ia_parameter_block()
             Element_Begin1("cart16_parameter_data");
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
-            Skip_B2(                                            "x");
-            Skip_B2(                                            "y");
-            Skip_B2(                                            "z");
+            BS_Begin();
+            Element_Begin1(                                     "x");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "y");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "z");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            BS_End();
             Element_End0();
             break;
         }
@@ -1208,12 +1258,24 @@ void File_Iamf::ia_parameter_block()
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
             BS_Begin();
-            Skip_S2(9,                                          "first_azimuth");
-            Skip_S1(8,                                          "first_elevation");
-            Skip_S1(7,                                          "first_distance");
-            Skip_S2(9,                                          "second_azimuth");
-            Skip_S1(8,                                          "second_elevation");
-            Skip_S1(7,                                          "second_distance");
+            Element_Begin1(                                     "first_azimuth");
+                AnimatedParameterData(animation_type, 9);
+            Element_End0();
+            Element_Begin1(                                     "first_elevation");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "first_distance");
+                AnimatedParameterData(animation_type, 7);
+            Element_End0();
+            Element_Begin1(                                     "second_azimuth");
+                AnimatedParameterData(animation_type, 9);
+            Element_End0();
+            Element_Begin1(                                     "second_elevation");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "second_distance");
+                AnimatedParameterData(animation_type, 7);
+            Element_End0();
             BS_End();
             Element_End0();
             break;
@@ -1222,12 +1284,26 @@ void File_Iamf::ia_parameter_block()
             Element_Begin1("dual_cart8_parameter_data");
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
-            Skip_B1(                                            "first_x");
-            Skip_B1(                                            "first_y");
-            Skip_B1(                                            "first_z");
-            Skip_B1(                                            "second_x");
-            Skip_B1(                                            "second_y");
-            Skip_B1(                                            "second_z");
+            BS_Begin();
+            Element_Begin1(                                     "first_x");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "first_y");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "first_z");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "second_x");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "second_y");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            Element_Begin1(                                     "second_z");
+                AnimatedParameterData(animation_type, 8);
+            Element_End0();
+            BS_End();
             Element_End0();
             break;
         }
@@ -1235,12 +1311,26 @@ void File_Iamf::ia_parameter_block()
             Element_Begin1("dual_cart16_parameter_data");
             int8u animation_type;
             Get_B1(animation_type,                              "animation_type"); Param_Info1(Iamf_animation_type(animation_type));
-            Skip_B2(                                            "first_x");
-            Skip_B2(                                            "first_y");
-            Skip_B2(                                            "first_z");
-            Skip_B2(                                            "second_x");
-            Skip_B2(                                            "second_y");
-            Skip_B2(                                            "second_z");
+            BS_Begin();
+            Element_Begin1(                                     "first_x");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "first_y");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "first_z");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "second_x");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "second_y");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            Element_Begin1(                                     "second_z");
+                AnimatedParameterData(animation_type, 16);
+            Element_End0();
+            BS_End();
             Element_End0();
             break;
         }

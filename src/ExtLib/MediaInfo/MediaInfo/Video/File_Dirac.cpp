@@ -1,4 +1,4 @@
-/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
+﻿/*  Copyright (c) MediaArea.net SARL. All Rights Reserved.
  *
  *  Use of this source code is governed by a BSD-style license that can
  *  be found in the License.html file in the root of the source tree.
@@ -456,24 +456,50 @@ void File_Dirac::Streams_Finish()
 //---------------------------------------------------------------------------
 bool File_Dirac::Synchronize()
 {
-    //Synchronizing
-    for (;; Buffer_Offset++)
-    {
-        if (Buffer_Size - Buffer_Offset < 13)
-            return false;
+    static const int8u Sync_Pattern[5] = { 'B', 'B', 'C', 'D', 0x00 };
 
-        auto prefix_and_start_code = BigEndian2int40u(Buffer + Buffer_Offset);
-        auto size = BigEndian2int32u(Buffer + Buffer_Offset + 5);
-        if (prefix_and_start_code != 0x4242434400 || size < 13 || size > 1024) continue; //"BBCD" + start_code 0x00
-        if (size > Buffer_Size - Buffer_Offset - 13) return false;
-        auto prefix2 = BigEndian2int32u(Buffer + Buffer_Offset + size);
-        auto previous_size2 = BigEndian2int32u(Buffer + Buffer_Offset + size + 9);
-        if (prefix2 != 0x42424344 || previous_size2 != size) continue; //"BBCD" + previous size of next packet
-        break;
+    //Synchronizing
+    while (Buffer_Size - Buffer_Offset >= 5)
+    {
+        const size_t Candidate_End = Buffer_Size - 4;
+        const int8u* Sync = (const int8u*)memchr(Buffer + Buffer_Offset, Sync_Pattern[0], Candidate_End - Buffer_Offset);
+        if (!Sync)
+        {
+            Buffer_Offset = Candidate_End;
+            break;
+        }
+        Buffer_Offset = (size_t)(Sync - Buffer);
+
+        if (!memcmp(Sync + 1, Sync_Pattern + 1, 4))
+        {
+            // Checking the next frame start
+            if (Buffer_Size - Buffer_Offset <= 9)
+                return false; //Need more data
+            const auto Size = BigEndian2int32u(Buffer + Buffer_Offset + 5);
+            if (Size >= 13 && Size <= 1024)
+            {
+                if (Buffer_Size - Buffer_Offset <= Size)
+                    return false; //Need more data
+                if (!memcmp(Sync + Size, Sync_Pattern, 4))
+                {
+                    auto previous_size2 = BigEndian2int32u(Buffer + Buffer_Offset + Size + 9);
+                    if (previous_size2 == Size)
+                        return true; //Synched is OK
+                }
+            }
+        }
+
+        Buffer_Offset++;
     }
 
-    //Synched is OK
-    return true;
+    //Parsing last bytes if needed
+    while (Buffer_Offset < Buffer_Size
+        && memcmp(Buffer + Buffer_Offset, Sync_Pattern, Buffer_Size - Buffer_Offset))
+    {
+        Buffer_Offset++;
+    }
+
+    return false;
 }
 
 //---------------------------------------------------------------------------

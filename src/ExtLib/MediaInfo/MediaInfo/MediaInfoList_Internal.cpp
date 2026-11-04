@@ -196,11 +196,14 @@ void MediaInfoList_Internal::Entry()
                         ToParse_ToIgnore.erase(ToParse_ToIgnore.begin()+i);
                         ToParse_AlreadyDone++;
                         Skip=true;
-                        continue;
+                        break;
                     }
                 }
                 if (Skip)
+                {
+                    CS.Leave();
                     continue;
+                }
             #endif //defined(MEDIAINFO_FILE_YES)
             MediaInfo_Internal* MI=new MediaInfo_Internal();
             for (std::map<String, String>::iterator Config_MediaInfo_Item=Config_MediaInfo_Items.begin(); Config_MediaInfo_Item!=Config_MediaInfo_Items.end(); ++Config_MediaInfo_Item)

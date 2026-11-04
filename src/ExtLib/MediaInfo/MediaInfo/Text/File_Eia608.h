@@ -130,6 +130,7 @@ private :
         size_t  Count_PaintOn;
         int64u  LineCount;
         int64u  LineMaxCountPerEvent;
+        size_t  MaxCountOfCharsPerLine;
         bool    Count_CurrentHasContent;
         int8u   FirstDisplay_Delay_Type;
         size_t  FirstDisplay_Delay_Frames;
@@ -154,6 +155,7 @@ private :
             Count_PaintOn=0;
             LineCount=0;
             LineMaxCountPerEvent=0;
+            MaxCountOfCharsPerLine=0;
             Count_CurrentHasContent=false;
             FirstDisplay_Delay_Type=(int8u)-1;
             FirstDisplay_Delay_Frames=(size_t)-1;

@@ -164,6 +164,9 @@
 #if defined(MEDIAINFO_DIRAC_YES)
     #include "MediaInfo/Video/File_Dirac.h"
 #endif
+#if defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+    #include "MediaInfo/Video/File_DolbyVisionMetadata.h"
+#endif
 #if defined(MEDIAINFO_FLIC_YES)
     #include "MediaInfo/Video/File_Flic.h"
 #endif
@@ -623,6 +626,9 @@ File__MultipleParsing::File__MultipleParsing()
     #endif
     #if defined(MEDIAINFO_DIRAC_YES)
         Parser.push_back(new File_Dirac());
+    #endif
+    #if defined(MEDIAINFO_MPEG4_YES) || defined(MEDIAINFO_MXF_YES)
+        Parser.push_back(new File_DolbyVisionMetadata());
     #endif
     #if defined(MEDIAINFO_FLIC_YES)
         Parser.push_back(new File_Flic());

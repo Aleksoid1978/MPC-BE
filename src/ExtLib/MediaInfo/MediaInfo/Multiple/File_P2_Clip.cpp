@@ -144,7 +144,7 @@ bool File_P2_Clip::FileHeader_Begin()
 
                             //StartTimecode
                             ChildElement=Track->FirstChildElement("StartTimecode");
-                            if (ChildElement)
+                            if (ChildElement && ChildElement->GetText())
                             {
                                 string Text=ChildElement->GetText();
                                 if (Text.size()==11)
@@ -217,8 +217,10 @@ bool File_P2_Clip::FileHeader_Begin()
                                     Sequence->StreamKind=Stream_Video;
                                     Sequence->StreamID=ReferenceFiles->Sequences_Size()+1;
                                     ReferenceFiles->AddSequence(Sequence);
+                                    Sequence=NULL; //Ownership transfered
                                 }
                             #endif //defined(MEDIAINFO_MXF_YES)
+                            delete Sequence;
                         }
                         else if (Field=="Audio")
                         {
@@ -312,7 +314,7 @@ bool File_P2_Clip::FileHeader_Begin()
                         //Manufacturer+ModelName
                         XMLElement* Manufacturer=Device->FirstChildElement("Manufacturer");
                         XMLElement* ModelName=Device->FirstChildElement("ModelName");
-                        if (Manufacturer && ModelName)
+                        if (Manufacturer && ModelName && Manufacturer->GetText() && ModelName->GetText())
                             Fill(Stream_General, 0, General_Encoded_Application, string(Manufacturer->GetText())+" "+ModelName->GetText());
                     }
 
@@ -332,7 +334,7 @@ bool File_P2_Clip::FileHeader_Begin()
                             //Longitude+Latitude
                             XMLElement* Longitude=Location->FirstChildElement("Longitude");
                             XMLElement* Latitude=Location->FirstChildElement("Latitude");
-                            if (Longitude && Latitude)
+                            if (Longitude && Latitude && Longitude->GetText() && Latitude->GetText())
                                 Fill(Stream_General, 0, General_Recorded_Location, string(Latitude->GetText())+", "+Longitude->GetText());
                         }
                     }

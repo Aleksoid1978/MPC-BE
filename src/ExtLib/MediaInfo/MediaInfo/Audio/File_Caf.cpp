@@ -69,7 +69,7 @@ File_Caf::File_Caf()
 bool File_Caf::FileHeader_Begin()
 {
     //Synchro
-    if (3>Buffer_Size)
+    if (4>Buffer_Size)
         return false;
     if (Buffer[0]!=0x63 //"caff"
      || Buffer[1]!=0x61

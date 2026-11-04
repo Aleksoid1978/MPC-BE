@@ -2137,11 +2137,32 @@ void File_Ac4::raw_ac4_frame_substreams()
     int64u Substreams_StartOffset=Element_Offset;
 
     //Check integrity
+    if (Substreams_StartOffset>Element_Size
+     || Buffer_Offset>Buffer_Size || Element_Size>Buffer_Size-Buffer_Offset)
+    {
+        Trusted_IsNot("Invalid substream range");
+        Substream_Size.clear();
+        return;
+    }
     if (Substream_Size.empty())
         Substream_Size.push_back(Element_Size-Substreams_StartOffset); // 1 substream only
-    size_t Substreams_EndOffset=Substreams_StartOffset;
+    if (n_substreams>Substream_Size.size())
+    {
+        Trusted_IsNot("Missing substream sizes");
+        Substream_Size.clear();
+        return;
+    }
+    int64u Substreams_EndOffset=Substreams_StartOffset;
     for (size_t i=0; i<Substream_Size.size(); i++)
+    {
+        if (Substream_Size[i]>Element_Size-Substreams_EndOffset)
+        {
+            Trusted_IsNot("Invalid substream size");
+            Substream_Size.clear();
+            return;
+        }
         Substreams_EndOffset+=Substream_Size[i];
+    }
 
     //Parsing presentation substreams first
     if (bitstream_version>=2)
@@ -3075,7 +3096,7 @@ void File_Ac4::ac4_substream_info_obj(group_substream& G, bool b_substreams_pres
                 int8u res_bytes;
                 Get_S1 (4, res_bytes,                           "res_bytes");
                 if (res_bytes)
-                    Skip_S8(res_bytes*8,                        "reserved_data");
+                    Skip_BS(res_bytes*8,                        "reserved_data");
             TESTELSE_SB_END();
        TESTELSE_SB_END();
     TESTELSE_SB_END();
@@ -3147,22 +3168,32 @@ void File_Ac4::presentation_config_ext_info(presentation& P)
         n_skip_bytes=(int8u)n_skip_bytes32<<5;
     TEST_SB_END();
 
-    if (bitstream_version==1 && P.presentation_config==7)
+    if (bitstream_version==1 && P.presentation_config==7 && ac4_presentation_v1_info_Depth<4) //Arbitrary limit of nested levels
     {
         size_t Pos_Before=Data_BS_Remain();
+        ac4_presentation_v1_info_Depth++;
         ac4_presentation_v1_info(P);
+        ac4_presentation_v1_info_Depth--;
         size_t Pos_After=Data_BS_Remain();
-        size_t n_bits_read=Pos_After-Pos_Before;
+        size_t n_bits_read=Pos_Before-Pos_After;
         if (n_bits_read%8)
         {
             int8u n_skip_bits=8-(n_bits_read%8);
             Skip_S8(n_skip_bits,                                "reserved");
             n_bits_read+=n_skip_bits;
         }
-        n_skip_bytes-=(n_bits_read/8);
+        if (n_skip_bytes>=n_bits_read/8)
+            n_skip_bytes-=(int16u)(n_bits_read/8);
+        else
+            n_skip_bytes=0;
     }
 
-    Skip_S8(n_skip_bytes*8,                                     "reserved");
+    if ((size_t)n_skip_bytes*8>Data_BS_Remain())
+    {
+        Trusted_IsNot("n_skip_bytes not valid");
+        n_skip_bytes=(int16u)(Data_BS_Remain()/8);
+    }
+    Skip_BS(n_skip_bytes*8,                                     "reserved");
     Element_End0();
 }
 
@@ -3490,7 +3521,7 @@ void File_Ac4::oamd_common_data()
         }
         //TODO: bits_used=trim();
         //TODO: bits_used+=bed_render_info();
-        Skip_S8(add_data_bytes*8,                               "add_data");
+        Skip_BS(add_data_bytes*8,                               "add_data");
     TEST_SB_END();
     Element_End0();
 }
@@ -4765,7 +4796,14 @@ void File_Ac4::further_loudness_info(loudness_info& L, bool sus_ver, bool b_pres
             int32u prgmbndy=1;
             bool prgmbndy_bit=false;
             while(!prgmbndy_bit)
+            {
+                if (!Data_BS_Remain())
+                {
+                    Trusted_IsNot("prgmbndy_bit not valid");
+                    break;
+                }
                 Get_SB (prgmbndy_bit,                           "prgmbndy_bit");
+            }
             Element_Info1(prgmbndy);
             Element_End0();
             Skip_SB(                                            "b_end_or_start");
