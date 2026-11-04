@@ -468,12 +468,12 @@ cmsUInt32Number CubeSize(const cmsUInt32Number Dims[], cmsUInt32Number b)
     for (rv = 1; b > 0; b--) {
 
         dim = Dims[b-1];
-        if (dim <= 1) return 0;  // Error
-
-        rv *= dim;
+        if (dim <= 1) return 0;  
 
         // Check for overflow
         if (rv > UINT_MAX / dim) return 0;
+
+        rv *= dim;
     }
 
     // Again, prevent overflow
@@ -1509,7 +1509,7 @@ cmsPipeline* CMSEXPORT cmsPipelineDup(const cmsPipeline* lut)
 
     if (!BlessLUT(NewLUT))
     {
-        _cmsFree(lut->ContextID, NewLUT);
+        cmsPipelineFree(NewLUT);        
         return NULL;
     }
 

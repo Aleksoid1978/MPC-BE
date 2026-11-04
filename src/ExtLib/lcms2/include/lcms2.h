@@ -23,7 +23,7 @@
 //
 //---------------------------------------------------------------------------------
 //
-// Version 2.19a1
+// Version 2.20
 //
 
 #ifndef _lcms2_H
@@ -36,6 +36,13 @@
 // Uncomment this one if your compiler/machine does NOT support the
 // "long long" type.
 // #define CMS_DONT_USE_INT64        1
+
+// Uncomment this one to enable large file support on file/stream I/O.
+// LittleCMS is still limited by ICC 32-bit offsets and sizes, so the
+// practical maximum remains 4 GiB minus profile overhead. Be careful 
+// because such huge profiles have to be loaded into memory and that's
+// usually a very bad idea.
+// #define CMS_LARGE_FILE_SUPPORT    1
 
 // Uncomment this if your compiler doesn't work with fast floor function
 // #define CMS_DONT_USE_FAST_FLOOR 1
@@ -79,15 +86,17 @@
 
 #ifndef CMS_USE_CPP_API
 #   ifdef __cplusplus
-#       if __cplusplus >= 201703L
-#            define CMS_NO_REGISTER_KEYWORD 1  
+        // MSVC keeps __cplusplus at 199711L unless /Zc:__cplusplus is passed, so also
+        // honor _MSVC_LANG; otherwise the C++17 'register' removal below never triggers.
+#       if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#            define CMS_NO_REGISTER_KEYWORD 1
 #       endif
 extern "C" {
 #   endif
 #endif
 
 // Version/release
-#define LCMS_VERSION        2190
+#define LCMS_VERSION        2200
 
 // I will give the chance of redefining basic types for compilers that are not fully C99 compliant
 #ifndef CMS_BASIC_TYPES_ALREADY_DEFINED
@@ -168,6 +177,9 @@ typedef double               cmsFloat64Number;
 #ifdef CMS_DONT_USE_INT64
     typedef cmsUInt32Number      cmsUInt64Number[2];
     typedef cmsInt32Number       cmsInt64Number[2];
+#   if defined(CMS_LARGE_FILE_SUPPORT) 
+#      error "You need int64 for large file support"
+#   endif
 #endif
 
 // Derivative types
@@ -1084,8 +1096,12 @@ CMSAPI int               CMSEXPORT cmsGetEncodedCMMversion(void);
 // Support of non-standard functions --------------------------------------------------------------------------------------
 
 CMSAPI int               CMSEXPORT cmsstrcasecmp(const char* s1, const char* s2);
-CMSAPI long int          CMSEXPORT cmsfilelength(FILE* f);
 
+#ifdef CMS_LARGE_FILE_SUPPORT
+CMSAPI long long int     CMSEXPORT cmsfilelength(FILE* f);
+#else
+CMSAPI long int          CMSEXPORT cmsfilelength(FILE* f);
+#endif
 
 // Context handling --------------------------------------------------------------------------------------------------------
 
@@ -1532,6 +1548,8 @@ CMSAPI void              CMSEXPORT cmsGetHeaderAttributes(cmsHPROFILE hProfile, 
 CMSAPI void              CMSEXPORT cmsGetHeaderProfileID(cmsHPROFILE hProfile, cmsUInt8Number* ProfileID);
 CMSAPI cmsBool           CMSEXPORT cmsGetHeaderCreationDateTime(cmsHPROFILE hProfile, struct tm *Dest);
 CMSAPI cmsUInt32Number   CMSEXPORT cmsGetHeaderRenderingIntent(cmsHPROFILE hProfile);
+CMSAPI cmsUInt32Number   CMSEXPORT cmsGetHeaderCMM(cmsHPROFILE hProfile);
+
 
 CMSAPI void              CMSEXPORT cmsSetHeaderFlags(cmsHPROFILE hProfile, cmsUInt32Number Flags);
 CMSAPI cmsUInt32Number   CMSEXPORT cmsGetHeaderManufacturer(cmsHPROFILE hProfile);
@@ -1873,6 +1891,13 @@ CMSAPI cmsContext       CMSEXPORT cmsGetTransformContextID(cmsHTRANSFORM hTransf
 // Grab the input/output formats
 CMSAPI cmsUInt32Number CMSEXPORT cmsGetTransformInputFormat(cmsHTRANSFORM hTransform);
 CMSAPI cmsUInt32Number CMSEXPORT cmsGetTransformOutputFormat(cmsHTRANSFORM hTransform);
+
+// Access the optimized pipeline and gamut-check pipeline inside a transform.
+CMSAPI cmsPipeline*    CMSEXPORT cmsGetTransformPipeline(cmsHTRANSFORM hTransform);
+CMSAPI cmsPipeline*    CMSEXPORT cmsGetTransformGamutCheckPipeline(cmsHTRANSFORM hTransform);
+// Grab colorants
+CMSAPI cmsNAMEDCOLORLIST* CMSEXPORT cmsGetTransformInputColorants(cmsHTRANSFORM hTransform);
+CMSAPI cmsNAMEDCOLORLIST* CMSEXPORT cmsGetTransformOutputColorants(cmsHTRANSFORM hTransform);
 
 // For backwards compatibility
 CMSAPI cmsBool          CMSEXPORT cmsChangeBuffersFormat(cmsHTRANSFORM hTransform,

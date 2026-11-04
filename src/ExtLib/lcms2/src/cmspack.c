@@ -573,7 +573,8 @@ cmsUInt8Number* UnrollAnyWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
    cmsUInt32Number SwapEndian  = T_ENDIAN16(info -> InputFormat);
    cmsUInt32Number DoSwap      = T_DOSWAP(info ->InputFormat);
    cmsUInt32Number Reverse     = T_FLAVOR(info ->InputFormat);
-   cmsUInt32Number SwapFirst   = T_SWAPFIRST(info -> InputFormat);   
+   cmsUInt32Number SwapFirst   = T_SWAPFIRST(info -> InputFormat);
+   cmsUInt32Number Extra       = T_EXTRA(info -> InputFormat);
    cmsUInt32Number ExtraFirst  = DoSwap ^ SwapFirst;
    cmsUInt32Number i;
 
@@ -581,7 +582,7 @@ cmsUInt8Number* UnrollAnyWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
    cmsUInt32Number alpha_factor = _cmsToFixedDomain(alpha);
 
     if (ExtraFirst) {
-        accum += sizeof(cmsUInt16Number);
+        accum += Extra * sizeof(cmsUInt16Number);
     }
 
     for (i=0; i < nChan; i++) {
@@ -604,7 +605,7 @@ cmsUInt8Number* UnrollAnyWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
     }
 
     if (!ExtraFirst) {
-        accum += sizeof(cmsUInt16Number);
+        accum += Extra * sizeof(cmsUInt16Number);
     }
 
     return accum;
@@ -658,15 +659,16 @@ cmsUInt8Number* UnrollPlanarWordsPremul(CMSREGISTER _cmsTRANSFORM* info,
     cmsUInt32Number SwapFirst = T_SWAPFIRST(info->InputFormat);
     cmsUInt32Number Reverse= T_FLAVOR(info ->InputFormat);
     cmsUInt32Number SwapEndian = T_ENDIAN16(info -> InputFormat);
+    cmsUInt32Number Extra = T_EXTRA(info -> InputFormat);
     cmsUInt32Number i;
     cmsUInt32Number ExtraFirst = DoSwap ^ SwapFirst;
     cmsUInt8Number* Init = accum;
-    
+
     cmsUInt16Number alpha = (ExtraFirst ? ((cmsUInt16Number*)accum)[0] : ((cmsUInt16Number*)accum)[nChan * Stride / 2]);
     cmsUInt32Number alpha_factor = _cmsToFixedDomain(alpha);
 
     if (ExtraFirst) {
-        accum += Stride;
+        accum += Extra * Stride;
     }
 
     for (i=0; i < nChan; i++) {
@@ -1887,7 +1889,7 @@ cmsUInt8Number* PackPlanarWords(CMSREGISTER _cmsTRANSFORM* info,
     else
     {
         if (Premul && Extra)
-            alpha_factor = _cmsToFixedDomain(((cmsUInt16Number*)output)[nChan * Stride]);
+            alpha_factor = _cmsToFixedDomain(*(cmsUInt16Number*) (&output[nChan * Stride]));
     }
 
     for (i=0; i < nChan; i++) {
@@ -2733,6 +2735,8 @@ cmsUInt8Number* PackLabDoubleFrom16(CMSREGISTER _cmsTRANSFORM* info,
         cmsFloat64Number* Out = (cmsFloat64Number*) output;
         cmsLabEncoded2Float(&Lab, wOut);
 
+        Stride /= PixelSize(info->OutputFormat);
+
         Out[0]        = Lab.L;
         Out[Stride]   = Lab.a;
         Out[Stride*2] = Lab.b;
@@ -3373,7 +3377,7 @@ cmsUInt8Number* UnrollHalfTo16(CMSREGISTER _cmsTRANSFORM* info,
     cmsFloat32Number maximum = IsInkSpace(info ->InputFormat) ? 655.35F : 65535.0F;
 
 
-    Stride /= PixelSize(info->OutputFormat);
+    Stride /= PixelSize(info->InputFormat);
 
     if (ExtraFirst)
             start = Extra;

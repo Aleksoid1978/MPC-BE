@@ -31,6 +31,7 @@ Updated Turkish translation (by cmhrky).
 Updated libraries:
 	ffmpeg n9.1-dev-2940-g11ef8d60d6;
 	libpng git-v1.6.59-9-gac0c35324;
+	Little-CMS git-lcms2.20-2-g689a84b;
 	vvdec v3.2.1.
 
 
