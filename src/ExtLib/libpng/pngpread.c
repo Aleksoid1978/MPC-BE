@@ -1,6 +1,6 @@
 /* pngpread.c - read a png file in push mode
  *
- * Copyright (c) 2018-2025 Cosmin Truta
+ * Copyright (c) 2018-2026 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -489,6 +489,13 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
+
+      /* This is the end of an IDAT chunk, but not necessarily the end
+       * of the zstream.  The next chunk may continue the zstream, with
+       * a partial row still pending in 'next_out' and 'avail_out'.
+       * Unlike at the release sites in pngrutil.c, the zstream buffers
+       * must not be detached here.
+       */
       png_ptr->zowner = 0;
    }
 }

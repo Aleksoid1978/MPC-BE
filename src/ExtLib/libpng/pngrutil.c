@@ -405,6 +405,18 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size)
 }
 #endif /* READ_iCCP|iTXt|pCAL|sCAL|sPLT|tEXt|zTXt|eXIf|SEQUENTIAL_READ */
 
+/* Detach the zstream from the input and output buffers left by
+ * the current or a previous owner, and possibly deallocated since.
+ */
+static void
+png_inflate_detach_buffers(png_structrp png_ptr)
+{
+   png_ptr->zstream.next_in = NULL;
+   png_ptr->zstream.avail_in = 0;
+   png_ptr->zstream.next_out = NULL;
+   png_ptr->zstream.avail_out = 0;
+}
+
 /* png_inflate_claim: claim the zstream for some nefarious purpose that involves
  * decompression.  Returns Z_OK on success, else a zlib error code.  It checks
  * the owner but, in final release builds, just issues a warning if some other
@@ -465,13 +477,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
 #endif /* ZLIB_VERNUM >= 0x1240 */
 
-      /* Set this for safety, just in case the previous owner left pointers to
-       * memory allocations.
-       */
-      png_ptr->zstream.next_in = NULL;
-      png_ptr->zstream.avail_in = 0;
-      png_ptr->zstream.next_out = NULL;
-      png_ptr->zstream.avail_out = 0;
+      png_inflate_detach_buffers(png_ptr);
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
@@ -808,7 +814,8 @@ png_decompress_chunk(png_structrp png_ptr,
          else if (ret == Z_OK)
             ret = PNG_UNEXPECTED_ZLIB_RETURN;
 
-         /* Release the claimed stream */
+         /* Release the claimed stream. */
+         png_inflate_detach_buffers(png_ptr);
          png_ptr->zowner = 0;
       }
 
@@ -1053,19 +1060,6 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       /* A valid PLTE chunk has been read */
       png_ptr->mode |= PNG_HAVE_PLTE;
 
-      /* TODO: png_set_PLTE has the side effect of setting png_ptr->palette to
-       * its own copy of the palette.  This has the side effect that when
-       * png_start_row is called (this happens after any call to
-       * png_read_update_info) the info_ptr palette gets changed.  This is
-       * extremely unexpected and confusing.
-       *
-       * REVIEW: there have been consistent bugs in the past about gamma and
-       * similar transforms to colour mapped images being useless because the
-       * modified palette cannot be accessed because of the above.
-       *
-       * CONSIDER: Fix this by not sharing the palette in this way.  But does
-       * this completely fix the problem?
-       */
       png_set_PLTE(png_ptr, info_ptr, palette, num);
       return handled_ok;
    }
@@ -1504,6 +1498,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                                     if (errmsg == NULL)
                                     {
+                                       png_inflate_detach_buffers(png_ptr);
                                        png_ptr->zowner = 0;
                                        return handled_ok;
                                     }
@@ -1530,7 +1525,8 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                else /* profile truncated */
                   errmsg = png_ptr->zstream.msg;
 
-               /* Release the stream */
+               /* Release the claimed stream. */
+               png_inflate_detach_buffers(png_ptr);
                png_ptr->zowner = 0;
             }
 
@@ -1772,10 +1768,6 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return handled_error;
    }
 
-   /* TODO: this is a horrible side effect in the palette case because the
-    * png_struct ends up with a pointer to the tRNS buffer owned by the
-    * png_info.  Fix this.
-    */
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
    return handled_ok;
@@ -3079,7 +3071,7 @@ read_chunks[PNG_INDEX_unknown] =
 #  define CDiTXt  NoCheck,    6U,      0, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
 #  define CDbKGD       6U,    1U,  hIDAT, hIHDR,        0
-#  define CDhIST    1024U,    0U,  hPLTE, hIHDR,        0
+#  define CDhIST    1024U,    0U,  hIDAT, hPLTE,        0
 #  define CDpHYs       9U,    9U,  hIDAT, hIHDR,        0
 #  define CDsPLT  NoCheck,    3U,  hIDAT, hIHDR,        1
       /* Allocates 'length+1'; checked in the handler */
@@ -4354,11 +4346,7 @@ png_read_finish_IDAT(png_structrp png_ptr)
     */
    if (png_ptr->zowner == png_IDAT)
    {
-      /* Always do this; the pointers otherwise point into the read buffer. */
-      png_ptr->zstream.next_in = NULL;
-      png_ptr->zstream.avail_in = 0;
-
-      /* Now we no longer own the zstream. */
+      png_inflate_detach_buffers(png_ptr);
       png_ptr->zowner = 0;
 
       /* The slightly weird semantics of the sequential IDAT reading is that we
@@ -4621,6 +4609,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    {
       png_free(png_ptr, png_ptr->big_row_buf);
       png_free(png_ptr, png_ptr->big_prev_row);
+      png_ptr->big_row_buf = png_ptr->big_prev_row = NULL;
 
       if (png_ptr->interlaced != 0)
          png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,

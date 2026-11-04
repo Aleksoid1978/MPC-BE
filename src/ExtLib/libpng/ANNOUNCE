@@ -1,4 +1,4 @@
-libpng 1.6.56.git
+libpng 1.6.60.git
 =================
 
 This is a development version, not intended to be a public release.
@@ -6,8 +6,8 @@ It will be replaced by a public release, or by another development
 version, at a later time.
 
 
-libpng 1.6.55 - February 9, 2026
-================================
+libpng 1.6.59 - September 28, 2026
+==================================
 
 This is a public release of libpng, intended for use in production code.
 
@@ -17,10 +17,10 @@ Files available for download
 
 Source files:
 
- * libpng-1.6.55.tar.xz (LZMA-compressed, recommended)
- * libpng-1.6.55.tar.gz (deflate-compressed)
- * lpng1655.7z (LZMA-compressed)
- * lpng1655.zip (deflate-compressed)
+ * libpng-1.6.59.tar.xz (LZMA-compressed, recommended)
+ * libpng-1.6.59.tar.gz (deflate-compressed)
+ * lpng1659.7z (LZMA-compressed)
+ * lpng1659.zip (deflate-compressed)
 
 Other information:
 
@@ -30,14 +30,22 @@ Other information:
  * TRADEMARK.md
 
 
-Changes from version 1.6.54 to version 1.6.55
+Changes from version 1.6.58 to version 1.6.59
 ---------------------------------------------
 
- * Fixed CVE-2026-25646 (high severity):
-   Heap buffer overflow in `png_set_quantize`.
-   (Reported and fixed by Joshua Inscoe.)
- * Resolved an oss-fuzz build issue involving nalloc.
-   (Contributed by Philippe Antoine.)
+ * Fixed CVE-2026-46675 (medium severity):
+   Use-after-free of zlib input in `png_read_end` after incomplete zTXt, iTXt
+   or iCCP decompression.
+   (Reported independently by Ze Sheng and
+   <JasonHonKL@users.noreply.github.com>.)
+ * Fixed a regression introduced in version 1.6.47 that caused libpng to reject
+   hIST chunks in their correct position, after PLTE.
+   (Contributed by Yuki Sekiguchi.)
+ * Prevented a double free of `png_struct` members after an allocation failure.
+   (Contributed by Anthony Hurtado.)
+ * Applied fixes and updates to the CMake build.
+ * Adopted the REUSE Specification for licensing the CI files.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit

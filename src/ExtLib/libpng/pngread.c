@@ -682,8 +682,10 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    if (png_ptr == NULL)
       return;
 
-   /* If png_read_end is called in the middle of reading the rows there may
-    * still be pending IDAT data and an owned zstream.  Deal with this here.
+   /* If png_read_end is called in the middle of reading the rows,
+    * there may still be pending IDAT data and an owned zstream.
+    * If it is called before row reading starts, there is pending
+    * IDAT data but no owned zstream.
     */
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    if (png_chunk_unknown_handling(png_ptr, png_IDAT) == 0)
@@ -779,21 +781,19 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->quantize_index = NULL;
 #endif
 
-   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
-   {
-      png_zfree(png_ptr, png_ptr->palette);
-      png_ptr->palette = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_PLTE;
+   /* png_ptr->palette is always independently allocated (not aliased
+    * with info_ptr->palette), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->palette);
+   png_ptr->palette = NULL;
 
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-   if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
-   {
-      png_free(png_ptr, png_ptr->trans_alpha);
-      png_ptr->trans_alpha = NULL;
-   }
-   png_ptr->free_me &= ~PNG_FREE_TRNS;
+   /* png_ptr->trans_alpha is always independently allocated (not aliased
+    * with info_ptr->trans_alpha), so free it unconditionally.
+    */
+   png_free(png_ptr, png_ptr->trans_alpha);
+   png_ptr->trans_alpha = NULL;
 #endif
 
    inflateEnd(&png_ptr->zstream);
@@ -4113,7 +4113,7 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
             row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (row_stride < 0)
-            check = (png_uint_32)(-row_stride);
+            check = 0U - (png_uint_32)row_stride;
 
          else
             check = (png_uint_32)row_stride;
