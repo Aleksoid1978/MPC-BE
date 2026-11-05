@@ -1,6 +1,6 @@
 ﻿В этом файле отображаются только ключевые изменения между разными версиями Media Player Classic - BE.
 
-1.9.2.x dev
+1.9.3 - 2026-11-05
 =============================
 AudioSplitter
 Устранены потенциальные падения.
@@ -34,7 +34,7 @@ VideoRenderers
 	Little-CMS git-lcms2.20-2-g689a84b;
 	MediaInfo git-v26.10-253-g3ae7b32d4;
 	vvdec v3.2.1;
-	ZenLib git-v0.4.41-121-g2785fe6;
+	ZenLib git-v0.4.41-121-g2785fe6.
 
 
 1.9.2 - 2026-10-13
