@@ -2,6 +2,7 @@
 
 1.9.3.x dev
 =============================
+Updated Italian translation (by mapi68).
 
 
 1.9.3 - 2026-11-05
