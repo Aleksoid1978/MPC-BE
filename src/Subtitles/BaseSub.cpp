@@ -94,10 +94,7 @@ ColorConvert::ColorSpace CBaseSub::ResolveColorSpace(SHORT width) const
 		return colorSpace;
 	}
 
-	return width > 1920
-		? ColorConvert::ColorSpace::BT2020
-		: (width > 720
-			? ColorConvert::ColorSpace::REC709
-			: ColorConvert::ColorSpace::REC601
-		);
+	return width > 720
+		? ColorConvert::ColorSpace::REC709
+		: ColorConvert::ColorSpace::REC601;
 }
