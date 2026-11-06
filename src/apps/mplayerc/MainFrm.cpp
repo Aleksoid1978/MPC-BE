@@ -16778,6 +16778,13 @@ void CMainFrame::SetSubtitle(ISubStream* pSubStream, int iSubtitleSel/* = -1*/, 
 	}
 
 	if (m_pCAP) {
+		if (CComQIPtr<ISubPicProvider> pSubPicProvider = m_pCurrentSubStream.p) {
+			bool bIsPGS = pSubPicProvider->GetType() == ST_HDMV;
+			if (CComQIPtr<IExFilterConfig> pIExFilterConfig = m_pCAP.p) {
+				pIExFilterConfig->Flt_SetBool("pgs_subtitles", bIsPGS);
+			}
+		}
+
 		m_pCAP->SetSubpicSettings(&s.m_VRSettings.SubpicSets);
 
 		g_bExternalSubtitle = (std::find(m_ExternalSubstreams.cbegin(), m_ExternalSubstreams.cend(), pSubStream) != m_ExternalSubstreams.cend());
