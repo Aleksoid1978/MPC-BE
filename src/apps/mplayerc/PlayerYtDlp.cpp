@@ -195,6 +195,12 @@ static int aformat_cmp(const YT_DLP::yt_aformat_t& a, const YT_DLP::yt_aformat_t
 	if (a.bitrate < b.bitrate) {
 		return +1;
 	}
+	if (a.source_preference > b.source_preference) {
+		return -1;
+	}
+	if (a.source_preference < b.source_preference) {
+		return +1;
+	}
 
 	return 0;
 }
@@ -644,6 +650,7 @@ bool YT_DLP::GetFormats(const rapidjson::Document& doc)
 
 			getJsonValue(format, "language", aformat.language);
 			getJsonValue(format, "language_preference", aformat.language_preference);
+			getJsonValue(format, "source_preference", aformat.source_preference);
 
 			if (aformat.protocol == protocol_hls) {
 				hlsAudioFormats.emplace_back(aformat);

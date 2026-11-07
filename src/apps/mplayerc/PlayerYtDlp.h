@@ -74,6 +74,7 @@ public:
 		CStringA ext;
 		CStringA language;
 		int language_preference = -1;
+		int source_preference = -1;
 		UINT menuflags = 0;
 	};
 
