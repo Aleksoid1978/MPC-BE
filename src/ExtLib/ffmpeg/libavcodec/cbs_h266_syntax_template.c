@@ -1116,12 +1116,12 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
 
     flag(sps_conformance_window_flag);
     if (current->sps_conformance_window_flag) {
-        uint16_t width = current->sps_pic_width_max_in_luma_samples / sub_width_c;
-        uint16_t height = current->sps_pic_height_max_in_luma_samples / sub_height_c;
-        ue(sps_conf_win_left_offset, 0, width);
-        ue(sps_conf_win_right_offset, 0, width - current->sps_conf_win_left_offset);
-        ue(sps_conf_win_top_offset, 0, height);
-        ue(sps_conf_win_bottom_offset, 0, height - current->sps_conf_win_top_offset);
+        uint16_t max_offsets_x = (current->sps_pic_width_max_in_luma_samples - 1) / sub_width_c;
+        uint16_t max_offsets_y = (current->sps_pic_height_max_in_luma_samples - 1) / sub_height_c;
+        ue(sps_conf_win_left_offset, 0, max_offsets_x);
+        ue(sps_conf_win_right_offset, 0, max_offsets_x - current->sps_conf_win_left_offset);
+        ue(sps_conf_win_top_offset, 0, max_offsets_y);
+        ue(sps_conf_win_bottom_offset, 0, max_offsets_y - current->sps_conf_win_top_offset);
     } else {
         infer(sps_conf_win_left_offset, 0);
         infer(sps_conf_win_right_offset, 0);
@@ -1587,7 +1587,7 @@ static int FUNC(sps)(CodedBitstreamContext *ctx, RWContext *rw,
 
     flag(sps_virtual_boundaries_enabled_flag);
     if (current->sps_virtual_boundaries_enabled_flag) {
-        flag(sps_virtual_boundaries_present_flag);
+        u(1, sps_virtual_boundaries_present_flag, 0, !current->sps_res_change_in_clvs_allowed_flag);
         if (current->sps_virtual_boundaries_present_flag) {
             ue(sps_num_ver_virtual_boundaries,
                0, current->sps_pic_width_max_in_luma_samples <= 8 ? 0 : VVC_MAX_VBS);

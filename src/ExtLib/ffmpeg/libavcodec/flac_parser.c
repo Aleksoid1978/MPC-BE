@@ -34,7 +34,10 @@
 
 #include "libavutil/attributes.h"
 #include "libavutil/crc.h"
+#include "libavutil/intreadwrite.h"
+#include "libavutil/macros.h"
 #include "libavutil/mem.h"
+#include "flac.h"
 #include "flac_parse.h"
 #include "parser_internal.h"
 
@@ -75,6 +78,8 @@ typedef struct FLACHeaderMarker {
     struct FLACHeaderMarker *next;       /**< next CRC-8 verified header that
                                               immediately follows this one in
                                               the bytestream                  */
+    struct FLACHeaderMarker *prev;       /**< CRC-8 verified header that
+                                              immediately precedes this one  */
     struct FLACHeaderMarker *best_child; /**< following frame header with
                                               which this frame has the best
                                               score with                      */
@@ -99,6 +104,41 @@ typedef struct FLACParseContext {
     FLACFrameInfo last_fi;         /**< last decoded frame header info        */
     int last_fi_valid;             /**< set if last_fi is valid               */
 } FLACParseContext;
+
+/**
+ * Reject a variable-blocksize candidate when STREAMINFO declares a fixed
+ * blocksize.  This is only a sync-search check: complete container packets
+ * already have known boundaries, and their STREAMINFO can change mid-stream.
+ */
+static int flac_blocking_strategy_matches(const AVCodecContext *avctx,
+                                          const FLACFrameInfo *fi)
+{
+    const uint8_t *si = avctx->extradata;
+    int size = avctx->extradata_size;
+    int min_blocksize, max_blocksize;
+
+    /* Raw/headerless FLAC has no STREAMINFO to validate against. */
+    if (!si || size < FLAC_STREAMINFO_SIZE)
+        return 1;
+
+    /* Also accept a 4-byte marker + metadata block header before STREAMINFO. */
+    if (AV_RL32(si) == MKTAG('f', 'L', 'a', 'C')) {
+        if (size < 8 + FLAC_STREAMINFO_SIZE)
+            return 1;
+        si += 8;
+    }
+
+    min_blocksize = AV_RB16(si);
+    max_blocksize = AV_RB16(si + 2);
+    /* A fixed-blocksize stream cannot contain variable-blocksize frames.
+     * Compare the strategy bit, not the blocksize: the final frame of a
+     * fixed stream may legitimately be shorter than the declared size. */
+    if (min_blocksize && max_blocksize && min_blocksize == max_blocksize &&
+        fi->is_var_size)
+        return 0;
+
+    return 1;
+}
 
 static int frame_header_is_valid(AVCodecContext *avctx, const uint8_t *buf,
                                  FLACFrameInfo *fi)
@@ -320,12 +360,14 @@ static int find_headers_search_validate(FLACParseContext *fpc, int offset)
                                      MAX_FRAME_VERIFY_SIZE + AV_INPUT_BUFFER_PADDING_SIZE,
                                      &fpc->wrap_buf,
                                      &fpc->wrap_buf_allocated_size);
-    if (frame_header_is_valid(fpc->avctx, header_buf, &fi)) {
-        FLACHeaderMarker **end_handle = &fpc->headers;
+    if (frame_header_is_valid(fpc->avctx, header_buf, &fi) &&
+        flac_blocking_strategy_matches(fpc->avctx, &fi)) {
+        FLACHeaderMarker **end_handle = &fpc->headers, *prev = NULL;
         int i;
 
         size = 0;
         while (*end_handle) {
+            prev = *end_handle;
             end_handle = &(*end_handle)->next;
             size++;
         }
@@ -338,6 +380,7 @@ static int find_headers_search_validate(FLACParseContext *fpc, int offset)
         }
         (*end_handle)->fi     = fi;
         (*end_handle)->offset = offset;
+        (*end_handle)->prev   = prev;
 
         for (i = 0; i < FLAC_MAX_SEQUENTIAL_HEADERS; i++)
             (*end_handle)->link_penalty[i] = FLAC_HEADER_NOT_PENALIZED_YET;
@@ -615,15 +658,18 @@ static int score_header(FLACParseContext *fpc, FLACHeaderMarker *header)
 
 static void score_sequences(FLACParseContext *fpc)
 {
-    FLACHeaderMarker *curr;
+    FLACHeaderMarker *curr, *last = NULL;
     int best_score = FLAC_HEADER_NOT_SCORED_YET;
     /* First pass to clear all old scores. */
-    for (curr = fpc->headers; curr; curr = curr->next)
-        curr->max_score = FLAC_HEADER_NOT_SCORED_YET;
-
-    /* Do a second pass to score them all. */
     for (curr = fpc->headers; curr; curr = curr->next) {
-        if (score_header(fpc, curr) > best_score) {
+        curr->max_score = FLAC_HEADER_NOT_SCORED_YET;
+        last = curr;
+    }
+
+    /* Score from the last header backwards, so the children of each header
+       are already scored and score_header() does not recurse. */
+    for (curr = last; curr; curr = curr->prev) {
+        if (score_header(fpc, curr) >= best_score) {
             fpc->best_header = curr;
             best_score       = curr->max_score;
         }
@@ -728,6 +774,7 @@ static int flac_parse(AVCodecParserContext *s, AVCodecContext *avctx,
             curr->offset -= best_child->offset;
 
         best_child->offset = 0;
+        best_child->prev   = NULL;
         fpc->headers       = best_child;
         if (fpc->nb_headers_buffered >= FLAC_MIN_HEADERS) {
             fpc->best_header = best_child;
@@ -744,6 +791,8 @@ static int flac_parse(AVCodecParserContext *s, AVCodecContext *avctx,
             fpc->nb_headers_buffered--;
         }
         fpc->headers = fpc->best_header->next;
+        if (fpc->headers)
+            fpc->headers->prev = NULL;
         av_freep(&fpc->best_header);
         fpc->nb_headers_buffered--;
     }

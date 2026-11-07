@@ -42,34 +42,47 @@ static void process_memcpy(const SwsOpExec *exec, const void *priv,
                            int x_start, int y_start, int x_end, int y_end)
 {
     const MemcpyPriv *p = priv;
-    const int lines = y_end - y_start;
     av_assert1(x_start == 0 && x_end == exec->width);
 
     for (int i = 0; i < p->num_planes; i++) {
-        uint8_t *out = exec->out[i];
-        const int idx = p->index[i];
-        const int bytes = x_end * exec->block_size_out[i];
-        const int use_loop = exec->out_stride[i] < 0 ||
-                             exec->out_stride[i] > bytes + SWS_MAX_PADDING;
-        const size_t span = (size_t) (lines - 1) * exec->out_stride[i] + bytes;
-        if (idx < 0 && !use_loop) {
-            memset(out, p->clear_value[i], span);
-        } else if (idx < 0) {
-            for (int y = y_start; y < y_end; y++) {
-                memset(out, p->clear_value[i], bytes);
-                out += exec->out_stride[i];
-            }
-        } else if (out == exec->in[idx]) {
-            av_assert1(exec->out_stride[i] == exec->in_stride[idx]);
+        uint8_t         *out        = exec->out[i];
+        const ptrdiff_t  out_stride = exec->out_stride[i];
+        const int        idx        = p->index[i];
+        const uint8_t   *in         = (idx >= 0) ? exec->in[idx] : NULL;
+        const ptrdiff_t  in_stride  = (idx >= 0) ? exec->in_stride[idx] : 0;
+
+        if (out == in) {
+            av_assert1(out_stride == in_stride);
             continue; /* plane was already ref'd */
-        } else if (exec->out_stride[i] == exec->in_stride[idx] && !use_loop) {
-            memcpy(out, exec->in[idx], span);
+        }
+
+        size_t bytes = x_end * exec->block_size_out[i];
+        int lines = y_end - y_start;
+
+        /* Replace the per-line loop with a bulk memset/memcpy when possible. */
+        const size_t abs_stride = FFABS(out_stride);
+        if ((!in || out_stride == in_stride) &&
+            abs_stride <= bytes + SWS_MAX_PADDING) {
+            if (out_stride < 0) {
+                const ptrdiff_t offset = (lines - 1) * out_stride;
+                out += offset;
+                if (in)
+                    in += offset;
+            }
+            bytes += (lines - 1) * abs_stride;
+            lines = 1;
+        }
+
+        if (!in) {
+            for (int y = 0; y < lines; y++) {
+                memset(out, p->clear_value[i], bytes);
+                out += out_stride;
+            }
         } else {
-            const uint8_t *in = exec->in[idx];
-            for (int y = y_start; y < y_end; y++) {
+            for (int y = 0; y < lines; y++) {
                 memcpy(out, in, bytes);
-                out += exec->out_stride[i];
-                in  += exec->in_stride[idx];
+                out += out_stride;
+                in  += in_stride;
             }
         }
     }

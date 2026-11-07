@@ -71,7 +71,8 @@
 #define SAMPLE(tab, x, y) ((tab)[(y) * s->sps->width + (x)])
 #define SAMPLE_CTB(tab, x, y) ((tab)[(y) * min_cb_width + (x)])
 
-#define IS_IDR(s) ((s)->nal_unit_type == HEVC_NAL_IDR_W_RADL || (s)->nal_unit_type == HEVC_NAL_IDR_N_LP)
+#define IS_IDR_TYPE(t) ((t) == HEVC_NAL_IDR_W_RADL || (t) == HEVC_NAL_IDR_N_LP)
+#define IS_IDR(s) IS_IDR_TYPE((s)->nal_unit_type)
 #define IS_BLA(s) ((s)->nal_unit_type == HEVC_NAL_BLA_W_RADL || (s)->nal_unit_type == HEVC_NAL_BLA_W_LP || \
                    (s)->nal_unit_type == HEVC_NAL_BLA_N_LP)
 #define IS_IRAP(s) ((s)->nal_unit_type >= HEVC_NAL_BLA_W_LP && (s)->nal_unit_type <= HEVC_NAL_RSV_IRAP_VCL23)
@@ -341,8 +342,6 @@ typedef struct TransformUnit {
     int chroma_mode_c;
     uint8_t is_cu_qp_delta_coded;
     uint8_t is_cu_chroma_qp_offset_coded;
-    int8_t  cu_qp_offset_cb;
-    int8_t  cu_qp_offset_cr;
     uint8_t cross_pf;
 } TransformUnit;
 
@@ -388,17 +387,36 @@ typedef struct HEVCFrame {
     uint8_t flags;
 } HEVCFrame;
 
-typedef struct HEVCLocalContext {
-    uint8_t cabac_state[HEVC_CONTEXTS];
+/* State carried from one CTB to the next within a substream: one per tile
+ * column, or one per row for WPP. */
+typedef struct HEVCSubstream {
+    const uint8_t *data;    ///< CABAC bytes of this substream
+    size_t         size;
+    /* 0: open CABAC on data at first use, 1: already open, continue in it */
+    uint8_t        opened;
 
+    CABACContext cc;
+    uint8_t cabac_state[HEVC_CONTEXTS];
     uint8_t stat_coeff[HEVC_STAT_COEFFS];
 
+    int8_t  qp_y;
+    int     qPy_pred;
     uint8_t first_qp_group;
+    int8_t  cu_qp_offset_cb;
+    int8_t  cu_qp_offset_cr;
+} HEVCSubstream;
+
+typedef struct HEVCLocalContext {
+    HEVCSubstream sub;
 
     void *logctx;
     const struct HEVCContext *parent;
 
-    CABACContext cc;
+    /* Slice being decoded, read instead of HEVCContext so that tiles of
+     * different slices can be decoded interleaved. */
+    const SliceHeader *sh;
+    const RefPicList  *rpl;             ///< reference lists of that slice, NULL for I slices
+    const HEVCFrame   *collocated_ref;  ///< picture read by the temporal MVP, NULL if none
 
     /**
      * This is a pointer to the common CABAC state.
@@ -411,11 +429,6 @@ typedef struct HEVCLocalContext {
      * shared between threads.
      */
     HEVCCABACState *common_cabac_state;
-
-    int8_t qp_y;
-    int8_t curr_qp_y;
-
-    int qPy_pred;
 
     TransformUnit tu;
 
@@ -446,6 +459,7 @@ typedef struct HEVCLocalContext {
 
     /* decoding tiles in parallel: defer tile-boundary BS to a serial pass */
     int tile_bs_defer;
+    int slice_bs_defer;
 
     // an array of these structs is used for per-thread state - pad its size
     // to avoid false sharing
@@ -489,6 +503,32 @@ typedef struct HEVCLayerContext {
     struct AVRefStructPool *tab_mvf_pool;
     struct AVRefStructPool *rpl_tab_pool;
 } HEVCLayerContext;
+
+/* A slice deferred to be decoded with the rest of its picture. sh is a
+ * shallow copy with the heap arrays cleared, see defer_tile_slice(). */
+typedef struct HEVCTileSlice {
+    SliceHeader sh;
+    const uint8_t *data;
+    int size;
+    int start_ts;
+    int end_ts;
+    int qp_y_seed;      ///< lc[0].qp_y before deferring, the initial QP predictor
+    const RefPicList *rpl;              ///< reference lists of this slice
+    const HEVCFrame *collocated_ref;    ///< temporal MVP target of this slice
+} HEVCTileSlice;
+
+/* Start and state of one tile, for tiles bound by entry points and for one
+ * slice per tile alike. */
+typedef struct HEVCTileStream {
+    const SliceHeader *sh;  ///< header of the slice this tile belongs to
+    const RefPicList *rpl;  ///< reference lists of that slice, NULL for I slices
+    const HEVCFrame *collocated_ref;    ///< temporal MVP target of that slice
+    const uint8_t *data;    ///< start of the CABAC substream
+    size_t size;
+    int qp_y_seed;
+    int start_ts;           ///< first CTB of the tile, in tile scan order
+    int ended;              ///< the substream signalled its end (damaged input)
+} HEVCTileStream;
 
 typedef struct HEVCContext {
     const AVClass *c;  // needed by private avoptions
@@ -588,6 +628,26 @@ typedef struct HEVCContext {
 
     AVBufferRef *rpu_buf;       ///< 0 or 1 Dolby Vision RPUs.
     DOVIContext dovi_ctx;       ///< Dolby Vision decoding context
+
+    /* Slices deferred when every tile carries its own slice, or when the
+     * slices of an untiled picture are decoded in parallel. Frame and layer
+     * are kept so that leftovers are dropped, not decoded into another
+     * frame. */
+    HEVCTileSlice *tile_slices;
+    unsigned nb_tile_slices;
+    unsigned tile_slices_alloc;
+    const HEVCFrame *tile_slices_frame;
+    int tile_slices_layer;
+
+    /* Per-tile substream table of the picture, one entry per tile */
+    HEVCTileStream *tile_streams;
+    unsigned tile_streams_alloc;
+
+    /* Substream state per tile column, only ever grows */
+    HEVCSubstream *substreams;
+    unsigned nb_substreams;
+
+    int tile_interleave;
 } HEVCContext;
 
 /**
@@ -615,8 +675,7 @@ int ff_hevc_slice_rpl(HEVCContext *s);
 void ff_hevc_save_states(HEVCLocalContext *lc, const HEVCPPS *pps,
                          int ctb_addr_ts);
 int ff_hevc_cabac_init(HEVCLocalContext *lc, const HEVCPPS *pps,
-                       int ctb_addr_ts, const uint8_t *data, size_t size,
-                       int is_wpp);
+                       int ctb_addr_ts);
 int ff_hevc_sao_merge_flag_decode(HEVCLocalContext *lc);
 int ff_hevc_sao_type_idx_decode(HEVCLocalContext *lc);
 int ff_hevc_sao_band_position_decode(HEVCLocalContext *lc);
@@ -713,8 +772,8 @@ void ff_hevc_set_qPy(HEVCLocalContext *lc,
 void ff_hevc_deblocking_boundary_strengths(HEVCLocalContext *lc, const HEVCLayerContext *l,
                                            const HEVCPPS *pps,
                                            int x0, int y0, int log2_trafo_size);
-void ff_hevc_tile_boundary_bs(HEVCLocalContext *lc, const HEVCLayerContext *l,
-                              const HEVCPPS *pps, int x0, int y0);
+void ff_hevc_ctb_edge_bs(HEVCLocalContext *lc, const HEVCLayerContext *l,
+                         const HEVCPPS *pps, int x0, int y0, unsigned edges);
 int ff_hevc_cu_qp_delta_sign_flag(HEVCLocalContext *lc);
 int ff_hevc_cu_qp_delta_abs(HEVCLocalContext *lc);
 int ff_hevc_cu_chroma_qp_offset_flag(HEVCLocalContext *lc);

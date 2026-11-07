@@ -59,6 +59,7 @@ typedef struct FLACContext {
     int sample_shift;                       ///< shift required to make output samples 16-bit or 32-bit
     int ch_mode;                            ///< channel decorrelation type in the current frame
     int got_streaminfo;                     ///< indicates if the STREAMINFO has been read
+    unsigned streaminfo_serial;             ///< counts the STREAMINFOs taken from packet side data
 
     int32_t *decoded[FLAC_MAX_CHANNELS];    ///< decoded samples
     uint8_t *decoded_buffer;
@@ -95,10 +96,40 @@ static void flac_set_bps(FLACContext *s)
     }
 }
 
+/**
+ * Set the decoder up for s->stream_info, which it cannot decode with until the
+ * buffers are allocated.
+ */
+static int setup_streaminfo(FLACContext *s)
+{
+    int ret;
+
+    s->got_streaminfo = 0;
+    ret = allocate_buffers(s);
+    if (ret < 0)
+        return ret;
+    flac_set_bps(s);
+    ff_flacdsp_init(&s->dsp, s->avctx->sample_fmt,
+                    s->stream_info.channels);
+    s->got_streaminfo = 1;
+
+    return 0;
+}
+
+static int apply_streaminfo(FLACContext *s, const uint8_t *streaminfo)
+{
+    FLACStreaminfo stream_info;
+    int ret = ff_flac_parse_streaminfo(s->avctx, &stream_info, streaminfo);
+    if (ret < 0)
+        return ret;
+    s->stream_info = stream_info;
+
+    return setup_streaminfo(s);
+}
+
 static av_cold int flac_decode_init(AVCodecContext *avctx)
 {
     uint8_t *streaminfo;
-    int ret;
     FLACContext *s = avctx->priv_data;
     s->avctx = avctx;
 
@@ -111,18 +142,7 @@ static av_cold int flac_decode_init(AVCodecContext *avctx)
         return AVERROR_INVALIDDATA;
 
     /* initialize based on the demuxer-supplied streamdata header */
-    ret = ff_flac_parse_streaminfo(avctx, &s->stream_info, streaminfo);
-    if (ret < 0)
-        return ret;
-    ret = allocate_buffers(s);
-    if (ret < 0)
-        return ret;
-    flac_set_bps(s);
-    ff_flacdsp_init(&s->dsp, avctx->sample_fmt,
-                    s->stream_info.channels);
-    s->got_streaminfo = 1;
-
-    return 0;
+    return apply_streaminfo(s, streaminfo);
 }
 
 static void dump_headers(AVCodecContext *avctx, FLACStreaminfo *s)
@@ -186,7 +206,7 @@ static int allocate_buffers(FLACContext *s)
  */
 static int parse_streaminfo(FLACContext *s, const uint8_t *buf, int buf_size)
 {
-    int metadata_type, metadata_size, ret;
+    int metadata_type, metadata_size;
 
     if (buf_size < FLAC_STREAMINFO_SIZE+8) {
         /* need more data */
@@ -197,18 +217,7 @@ static int parse_streaminfo(FLACContext *s, const uint8_t *buf, int buf_size)
         metadata_size != FLAC_STREAMINFO_SIZE) {
         return AVERROR_INVALIDDATA;
     }
-    ret = ff_flac_parse_streaminfo(s->avctx, &s->stream_info, &buf[8]);
-    if (ret < 0)
-        return ret;
-    ret = allocate_buffers(s);
-    if (ret < 0)
-        return ret;
-    flac_set_bps(s);
-    ff_flacdsp_init(&s->dsp, s->avctx->sample_fmt,
-                    s->stream_info.channels);
-    s->got_streaminfo = 1;
-
-    return 0;
+    return apply_streaminfo(s, &buf[8]);
 }
 
 /**
@@ -606,9 +615,9 @@ static inline int decode_subframe(FLACContext *s, int channel)
     return 0;
 }
 
-static int decode_frame(FLACContext *s)
+static int decode_frame_header(FLACContext *s)
 {
-    int i, ret;
+    int ret;
     GetBitContext *gb = &s->gb;
     FLACFrameInfo fi;
 
@@ -677,6 +686,14 @@ static int decode_frame(FLACContext *s)
 
 //    dump_headers(s->avctx, &s->stream_info);
 
+    return 0;
+}
+
+static int decode_subframes(FLACContext *s)
+{
+    int i, ret;
+    GetBitContext *gb = &s->gb;
+
     /* subframes */
     for (i = 0; i < s->stream_info.channels; i++) {
         if ((ret = decode_subframe(s, i)) < 0)
@@ -717,10 +734,30 @@ static int flac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     const uint8_t *buf = avpkt->data;
     int buf_size = avpkt->size;
     FLACContext *s = avctx->priv_data;
+    const uint8_t *streaminfo;
+    size_t streaminfo_size;
     int bytes_read = 0;
     int ret;
 
     *got_frame_ptr = 0;
+
+    if (!ff_thread_can_start_frame(avctx)) {
+        av_log(avctx, AV_LOG_ERROR, "frame threads need one FLAC frame per packet\n");
+        return AVERROR_PATCHWELCOME;
+    }
+
+    streaminfo = av_packet_get_side_data(avpkt, AV_PKT_DATA_NEW_EXTRADATA,
+                                         &streaminfo_size);
+    if (streaminfo) {
+        if (streaminfo_size >= 8 + FLAC_STREAMINFO_SIZE &&
+            AV_RB32(streaminfo) == MKBETAG('f','L','a','C'))
+            streaminfo += 8;
+        else if (streaminfo_size != FLAC_STREAMINFO_SIZE)
+            return AVERROR_INVALIDDATA;
+        if ((ret = apply_streaminfo(s, streaminfo)) < 0)
+            return ret;
+        s->streaminfo_serial++;
+    }
 
     if (buf_size > 5 && !memcmp(buf, "\177FLAC", 5)) {
         av_log(s->avctx, AV_LOG_DEBUG, "skipping flac header packet 1\n");
@@ -750,7 +787,19 @@ static int flac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     /* decode frame */
     if ((ret = init_get_bits8(&s->gb, buf, buf_size)) < 0)
         return ret;
-    if ((ret = decode_frame(s)) < 0) {
+    if ((ret = decode_frame_header(s)) < 0) {
+        av_log(s->avctx, AV_LOG_ERROR, "decode_frame() failed\n");
+        return ret;
+    }
+
+    /* get output buffer */
+    frame->nb_samples = s->blocksize;
+    if ((ret = ff_thread_get_buffer(avctx, frame, 0)) < 0)
+        return ret;
+
+    ff_thread_finish_setup(avctx);
+
+    if ((ret = decode_subframes(s)) < 0) {
         av_log(s->avctx, AV_LOG_ERROR, "decode_frame() failed\n");
         return ret;
     }
@@ -763,11 +812,6 @@ static int flac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
         if (s->avctx->err_recognition & AV_EF_EXPLODE)
             return AVERROR_INVALIDDATA;
     }
-
-    /* get output buffer */
-    frame->nb_samples = s->blocksize;
-    if ((ret = ff_thread_get_buffer(avctx, frame, 0)) < 0)
-        return ret;
 
     if (s->stream_info.bps == 32 && s->ch_mode > 0) {
         decorrelate_33bps(s->ch_mode, s->decoded, s->decoded_33bps, s->blocksize);
@@ -792,6 +836,27 @@ static int flac_decode_frame(AVCodecContext *avctx, AVFrame *frame,
 
     return bytes_read;
 }
+
+#if HAVE_THREADS
+/**
+ * Hand the stream parameters on to the next frame thread, so that a STREAMINFO
+ * taken from packet side data holds for the frames after the one carrying it.
+ */
+static int flac_update_thread_context(AVCodecContext *dst,
+                                      const AVCodecContext *src)
+{
+    FLACContext *s        = dst->priv_data;
+    const FLACContext *s1 = src->priv_data;
+
+    if (s == s1 || s->streaminfo_serial == s1->streaminfo_serial)
+        return 0;
+
+    s->streaminfo_serial = s1->streaminfo_serial;
+    s->stream_info       = s1->stream_info;
+
+    return setup_streaminfo(s);
+}
+#endif
 
 static av_cold int flac_decode_close(AVCodecContext *avctx)
 {
@@ -824,6 +889,7 @@ const FFCodec ff_flac_decoder = {
     .init           = flac_decode_init,
     .close          = flac_decode_close,
     FF_CODEC_DECODE_CB(flac_decode_frame),
+    UPDATE_THREAD_CONTEXT(flac_update_thread_context),
     .p.capabilities = AV_CODEC_CAP_CHANNEL_CONF |
                       AV_CODEC_CAP_DR1 |
                       AV_CODEC_CAP_FRAME_THREADS,

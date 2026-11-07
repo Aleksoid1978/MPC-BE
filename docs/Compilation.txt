@@ -4,21 +4,28 @@
   Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2019/release-notes
   Install Visual Studio 2019 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
-     * MSVC v142 - Build Tools C++ 
-     * Windows SDK 10.0.19041.0 or newer (latest).
-     * C++ ATL support
-     * C++ MFC support
+     * MSVC v142 - VS 2019 C++ x64/x86 build tools
+     * Windows SDK 10.0.19041.0 or newer
+     * C++ ATL for latest v142 build tools (x86 & x64)
+     * C++ MFC for latest v142 build tools (x86 & x64)
 
  Visual Studio 2022
   Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2022/release-notes
   Install Visual Studio 2022 (any edition will work fine). During installation, you must select the following components: 
    * Desktop development with C++
-     * MSVC v143 - Build Tools C++ 
-     * Windows SDK 10.0.19041.0 or newer (latest).
-     * C++ ATL support
-     * C++ MFC support
+     * MSVC v143 - VS 2022 C++ x64/x86 build tools
+     * Windows SDK 10.0.19041.0 or newer
+     * C++ ATL for latest v143 build tools (x86 & x64)
+     * C++ MFC for latest v143 build tools (x86 & x64)
 
-PS: Do not use Windows SDK 10.0.26100.0. It is broken and generates bad x86 code.
+ Visual Studio 2026
+  Download URL: https://learn.microsoft.com/en-us/visualstudio/releases/2026/release-notes
+  Install Visual Studio 2026 (any edition will work fine). During installation, you must select the following components: 
+   * Desktop development with C++
+     * MSVC Build Tools for x64/x86 (Latest)
+     * Windows SDK 10.0.22621.0 or newer
+     * C++ ATL for x64/x86 (Latest MSVC)
+     * C++ MFC for x64/x86 (Latest MSVC)
 
 
 2. Preparing the GCC environment (NASM is already included)
