@@ -292,7 +292,7 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		}
 		*/
 
-		hr = pDevice->SetPixelShader(nullptr);
+		//hr = pDevice->SetPixelShader(nullptr);
 
 		if (m_bExternalRenderer && FAILED(hr = pDevice->BeginScene())) {
 			break;
