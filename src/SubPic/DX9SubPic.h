@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2024 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -30,12 +30,12 @@ class CDX9SubPicAllocator;
 class CDX9SubPic : public CSubPicImpl
 {
 	CComPtr<IDirect3DSurface9> m_pSurface;
-	const bool m_bExternalRenderer;
+	const int m_iExternalRenderer; // 0 if built into the player
 
 public:
 	CDX9SubPicAllocator *m_pAllocator;
 
-	CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, bool bExternalRenderer);
+	CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, int iExternalRenderer);
 	~CDX9SubPic();
 
 	// ISubPic
@@ -56,7 +56,7 @@ class CDX9SubPicAllocator : public CSubPicAllocatorImpl, public CCritSec
 {
 	CComPtr<IDirect3DDevice9> m_pDevice;
 	CSize m_maxsize;
-	const bool m_bExternalRenderer;
+	const int m_iExternalRenderer;
 
 	// CSubPicAllocatorImpl
 	bool Alloc(bool fStatic, ISubPic** ppSubPic) override;
@@ -66,7 +66,7 @@ public:
 	std::deque<CComPtr<IDirect3DSurface9> > m_FreeSurfaces;
 	std::deque<CDX9SubPic*> m_AllocatedSurfaces;
 
-	CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, bool bExternalRenderer);
+	CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, int iExternalRenderer);
 	~CDX9SubPicAllocator();
 
 	void GetStats(int &_nFree, int &_nAlloc);

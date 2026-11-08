@@ -27,10 +27,10 @@
 // CDX9SubPic
 //
 
-CDX9SubPic::CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, bool bExternalRenderer)
+CDX9SubPic::CDX9SubPic(IDirect3DSurface9* pSurface, CDX9SubPicAllocator *pAllocator, int iExternalRenderer)
 	: m_pSurface(pSurface)
 	, m_pAllocator(pAllocator)
-	, m_bExternalRenderer(bExternalRenderer)
+	, m_iExternalRenderer(iExternalRenderer)
 {
 	D3DSURFACE_DESC d3dsd;
 	ZeroMemory(&d3dsd, sizeof(d3dsd));
@@ -292,18 +292,18 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		}
 		*/
 
-		if (m_eSubtitleType != ST_HDMV) {
+		if (m_iExternalRenderer != 'MPC') {
 			hr = pDevice->SetPixelShader(nullptr);
 		}
 
-		if (m_bExternalRenderer && FAILED(hr = pDevice->BeginScene())) {
+		if (m_iExternalRenderer && FAILED(hr = pDevice->BeginScene())) {
 			break;
 		}
 
 		hr = pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_TEX1);
 		hr = pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, pVertices, sizeof(pVertices[0]));
 
-		if (m_bExternalRenderer) {
+		if (m_iExternalRenderer) {
 			hr = pDevice->EndScene();
 		}
 
@@ -325,11 +325,11 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 // CDX9SubPicAllocator
 //
 
-CDX9SubPicAllocator::CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, bool bExternalRenderer)
+CDX9SubPicAllocator::CDX9SubPicAllocator(IDirect3DDevice9* pDevice, SIZE maxsize, int iExternalRenderer)
 	: CSubPicAllocatorImpl(maxsize, true)
 	, m_pDevice(pDevice)
 	, m_maxsize(maxsize)
-	, m_bExternalRenderer(bExternalRenderer)
+	, m_iExternalRenderer(iExternalRenderer)
 {
 }
 
@@ -428,7 +428,7 @@ bool CDX9SubPicAllocator::Alloc(bool fStatic, ISubPic** ppSubPic)
 		}
 	}
 
-	*ppSubPic = DNew CDX9SubPic(pSurface, fStatic ? 0 : this, m_bExternalRenderer);
+	*ppSubPic = DNew CDX9SubPic(pSurface, fStatic ? 0 : this, m_iExternalRenderer);
 	if (!(*ppSubPic)) {
 		return false;
 	}

@@ -851,7 +851,7 @@ HRESULT CDX9AllocatorPresenter::InitializeISR(CString& _Error, const CSize& desk
 	if (m_pSubPicAllocator) {
 		m_pSubPicAllocator->ChangeDevice(m_pDevice9Ex);
 	} else {
-		m_pSubPicAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, false);
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(m_pDevice9Ex, m_maxSubtitleTextureSize, 0);
 	}
 	if (!m_pSubPicAllocator) {
 		_Error += L"CDX9SubPicAllocator failed\n";

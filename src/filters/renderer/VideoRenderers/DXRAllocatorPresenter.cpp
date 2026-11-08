@@ -1,5 +1,5 @@
 /*
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -74,7 +74,7 @@ HRESULT CDXRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	if (m_pSubPicAllocator) {
 		m_pSubPicAllocator->ChangeDevice(pD3DDev);
 	} else {
-		m_pSubPicAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, 'DXR');
 		if (!m_pSubPicAllocator) {
 			return E_FAIL;
 		}

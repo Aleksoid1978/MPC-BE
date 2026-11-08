@@ -86,7 +86,7 @@ HRESULT CmadVRAllocatorPresenter::SetDevice(IDirect3DDevice9* pD3DDev)
 	if (m_pSubPicAllocator) {
 		m_pSubPicAllocator->ChangeDevice(pD3DDev);
 	} else {
-		m_pSubPicAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, true);
+		m_pSubPicAllocator = DNew CDX9SubPicAllocator(pD3DDev, m_maxSubtitleTextureSize, 'MAD');
 		if (!m_pSubPicAllocator) {
 			return E_FAIL;
 		}
