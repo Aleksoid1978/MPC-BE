@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -82,7 +82,8 @@ HRESULT CMpaSplitterFile::Init()
 		(memcmp(data,   sign_iff,    std::size(sign_iff)) == 0) ||
 		(memcmp(data,   sign_mpegts, std::size(sign_mpegts)) == 0) ||
 		(memcmp(data+4, sign_mpegts, std::size(sign_mpegts)) == 0) ||
-		(memcmp(data,   sign_wtv,    std::size(sign_wtv)) == 0)) {
+		(memcmp(data,   sign_wtv,    std::size(sign_wtv)) == 0) ||
+		(data[0] = 'M' && data[1] == 'Z')) { // EXE, DLL
 		return E_FAIL;
 	}
 
