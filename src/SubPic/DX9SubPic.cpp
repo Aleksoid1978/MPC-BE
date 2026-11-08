@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2022 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -292,7 +292,9 @@ STDMETHODIMP CDX9SubPic::AlphaBlt(RECT* pSrc, RECT* pDst, SubPicDesc* pTarget)
 		}
 		*/
 
-		//hr = pDevice->SetPixelShader(nullptr);
+		if (m_eSubtitleType != ST_HDMV) {
+			hr = pDevice->SetPixelShader(nullptr);
+		}
 
 		if (m_bExternalRenderer && FAILED(hr = pDevice->BeginScene())) {
 			break;
