@@ -1058,23 +1058,42 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 	HANDLE hFind = FindFirstFileW(strPath + L"\\PLAYLIST\\*.mpls", &fd);
 	if (hFind != INVALID_HANDLE_VALUE) {
 		std::vector<CPlaylist> PlaylistArray;
-		REFERENCE_TIME rtMax = 0;
+		REFERENCE_TIME rtMax = 0; // duration of the currently selected playlist
 		REFERENCE_TIME rtCurrent;
 		CString        strCurrentPlaylist;
 		__int64        mpls_size_max = 0;
 		unsigned       max_video_res = 0;
+		unsigned       selected_stream_count = 0;
+		// Some UHD discs contain several playlists for the same program (per-menu-language
+		// subtitle defaults, reduced stream variants, ...). Such variants can differ in total
+		// duration only by sub-millisecond PlayItem in/out rounding. Treat duration differences
+		// below the tolerance as a tie and prefer the variant with more complete stream
+		// declarations.
+		const REFERENCE_TIME rtDurTolerance = 100000; // 10 ms
 		do {
 			CPlaylist Playlist;
 			strCurrentPlaylist = strPath + L"\\PLAYLIST\\" + fd.cFileName;
 			// Main movie shouldn't have duplicate M2TS filename ...
 			if (ReadPlaylist(strCurrentPlaylist, rtCurrent, Playlist) == S_OK) {
-				if ((rtCurrent > rtMax && Playlist.m_max_video_res >= max_video_res)
-						|| (rtCurrent == rtMax && Playlist.m_mpls_size > mpls_size_max)
+				unsigned stream_count = 0;
+				for (const auto& item : Playlist) {
+					stream_count += item.m_num_streams;
+				}
+
+				const REFERENCE_TIME durDiff  = (rtCurrent > rtMax) ? rtCurrent - rtMax : rtMax - rtCurrent;
+				const bool           bLonger  = rtCurrent - rtMax > rtDurTolerance;
+				const bool           bSimilar = durDiff <= rtDurTolerance;
+				const bool           bSameRes = bSimilar && Playlist.m_max_video_res == max_video_res;
+				if ((bLonger && Playlist.m_max_video_res >= max_video_res)
+						|| (bSimilar && Playlist.m_max_video_res > max_video_res)
+						|| (bSameRes && stream_count > selected_stream_count)
+						|| (bSameRes && stream_count == selected_stream_count && Playlist.m_mpls_size > mpls_size_max)
 						|| ((rtCurrent < rtMax && rtCurrent >= rtMax / 2) && Playlist.m_max_video_res > max_video_res)) {
-					rtMax           = rtCurrent;
-					mpls_size_max   = Playlist.m_mpls_size;
-					max_video_res   = Playlist.m_max_video_res;
-					strPlaylistFile = strCurrentPlaylist;
+					rtMax                  = rtCurrent;
+					mpls_size_max          = Playlist.m_mpls_size;
+					max_video_res          = Playlist.m_max_video_res;
+					selected_stream_count  = stream_count;
+					strPlaylistFile        = strCurrentPlaylist;
 					hr = S_OK;
 				}
 
