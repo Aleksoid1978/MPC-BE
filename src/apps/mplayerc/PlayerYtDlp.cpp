@@ -778,7 +778,7 @@ void YT_DLP::SetInfo(const rapidjson::Document& doc)
 	getJsonValue(doc, "uploader", mAuthor);
 
 	getJsonValue(doc, "description", mDescription);
-	if (mDescription.Find('\n') && mDescription.Find(L"\r\n") == -1) {
+	if (mDescription.Find('\n') >= 0 && mDescription.Find(L"\r\n") == -1) {
 		mDescription.Replace(L"\n", L"\r\n");
 	}
 
@@ -901,7 +901,7 @@ UINT YT_DLP::GetVideo(
 			if (bHighFps && sel.fps > fmt.fps) {
 				break;
 			}
-			if (bHDR && sel.hdr > sel.hdr) {
+			if (bHDR && sel.hdr > fmt.hdr) {
 				break;
 			}
 			if (bHighBitrate && sel.bitrate > fmt.bitrate) {

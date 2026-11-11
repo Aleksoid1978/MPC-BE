@@ -121,8 +121,8 @@ CString CID3Tag::ReadField(CGolombBuffer& gb, DWORD &size, const BYTE encoding)
 	*/
 
 	if (size && size < fieldseparatorSize) {
-		size = 0;
 		gb.SkipBytes(size);
+		size = 0;
 	}
 
 	return str;
@@ -142,6 +142,10 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 
 pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size)
 {
+	if (!size) {
+		return {};
+	}
+
 	BYTE encoding = (BYTE)gbData.BitRead(8);
 	size--;
 
@@ -149,6 +153,9 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 
 		CString mime;
 		if (tag == '\0PIC') {
+			if (size < 3) {
+				return {};
+			}
 			mime.AppendChar((wchar_t)gbData.BitRead(8));
 			mime.AppendChar((wchar_t)gbData.BitRead(8));
 			mime.AppendChar((wchar_t)gbData.BitRead(8));
@@ -158,6 +165,9 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 			mime = ReadField(gbData, size, ID3v2Encoding::ISO8859);
 		}
 
+		if (!size) {
+			return {};
+		}
 		BYTE pict_type = (BYTE)gbData.BitRead(8);
 		size--;
 		CString pictStr = ID3v2PictureTypeToStr(pict_type);
@@ -181,6 +191,9 @@ pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size
 		return std::make_unique<CID3TagItem>(tag, std::move(data), mime, pictStr);
 	} else {
 		if (tag == 'COMM' || tag == '\0ULT' || tag == 'USLT') {
+			if (size < 3) {
+				return {};
+			}
 			ReadLang(gbData, size);
 			CString Desc = ReadField(gbData, size, encoding);
 			UNREFERENCED_PARAMETER(Desc);
@@ -215,6 +228,10 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 	CString chapterName;
 	CString element = ReadField(gbData, size, ID3v2Encoding::ISO8859);
 
+	if (size < 16) {
+		return;
+	}
+
 	DWORD start = gbData.ReadDword();
 	DWORD end   = gbData.ReadDword();
 	gbData.SkipBytes(8);
@@ -230,11 +247,11 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 		DWORD flags = (WORD)gbData.BitRead(16); UNREFERENCED_PARAMETER(flags);
 		size -= 10;
 
-		pos += gbData.GetPos() + len;
-
 		if (len > size || tag == 0) {
 			break;
 		}
+
+		pos = gbData.GetPos() + len;
 
 		if (!len) {
 			continue;
@@ -313,7 +330,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			}
 		}
 
-		if (pos + tagsize + size > len) {
+		if ((UINT64)pos + tagsize + size > len) {
 			break;
 		}
 

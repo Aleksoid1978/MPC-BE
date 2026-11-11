@@ -41,15 +41,21 @@ bool CAPETag::LoadItems(CGolombBuffer &gb) {
 		b = gb.ReadByte();
 	}
 
+	const int remaining = gb.GetSize() - gb.GetPos();
+	if (remaining < 0 || tag_size > (DWORD)remaining) {
+		return false;
+	}
+
 	if (flags & APE_TAG_FLAG_IS_BINARY) {
 		const CString desc(key);
 		key.Empty();
-		b = gb.ReadByte();
-		tag_size--;
-		while (b && tag_size) {
-			key += b;
+		while (tag_size) {
 			b = gb.ReadByte();
 			tag_size--;
+			if (!b) {
+				break;
+			}
+			key += b;
 		}
 
 		if (tag_size) {

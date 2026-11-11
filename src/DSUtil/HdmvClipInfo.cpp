@@ -1118,6 +1118,10 @@ HRESULT CHdmvClipInfo::FindMainMovie(LPCWSTR strFolder, CString& strPlaylistFile
 							if (duplicate) {
 								duplicate = (item.m_mpls_size == Playlist.m_mpls_size);
 							}
+
+							if (duplicate) {
+								break;
+							}
 						}
 					}
 					if (duplicate) {

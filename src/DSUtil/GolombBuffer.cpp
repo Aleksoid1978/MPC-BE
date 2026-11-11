@@ -151,6 +151,9 @@ void CGolombBuffer::ReadBuffer(BYTE* pDest, int nSize)
 	ASSERT(m_nPos + nSize <= m_nSize);
 	ASSERT(m_bitlen == 0);
 	nSize = std::min(nSize, m_nSize - m_nPos);
+	if (nSize <= 0) {
+		return;
+	}
 
 	memcpy(pDest, m_pBuffer + m_nPos, nSize);
 	m_nPos += nSize;
