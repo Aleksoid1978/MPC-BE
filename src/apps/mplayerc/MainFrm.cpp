@@ -11640,7 +11640,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			}
 		}
 
-		if (GetRenderersSettings().iVideoRenderer = VIDRNDT_EVR) {
+		if (GetRenderersSettings().iVideoRenderer == VIDRNDT_EVR) {
 			m_wndView.SetVideoRect(rVid);
 		} else {
 			// A hack to prevent subtitles in the black bars from being erased when moving the player window.
@@ -17553,7 +17553,6 @@ bool CMainFrame::BuildGraphVideoAudio(int fVPreview, bool fVCapture, int fAPrevi
 
 		if (m_pMFVDC) {
 			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
-			m_pMFVDC->SetAspectRatioMode(MFVideoARMode_None); // to control the frame position for EVR
 		}
 		else if (m_pVMRWC) {
 			m_pVMRWC->SetVideoClippingWindow(m_pVideoWnd->m_hWnd);
