@@ -11640,7 +11640,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			}
 		}
 
-		m_wndView.SetVideoRect(rWnd);
+		m_wndView.SetVideoRect(rVid);
 
 		if (bShowStats && rVid.Height() > 0) {
 			CString info;
