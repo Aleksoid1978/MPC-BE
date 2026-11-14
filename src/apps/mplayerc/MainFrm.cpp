@@ -11630,7 +11630,7 @@ void CMainFrame::MoveVideoWindow(bool bShowStats/* = false*/, bool bForcedSetVid
 			hr = m_pVW->SetWindowPosition(rWnd.left, rWnd.top, wnd_w, wnd_h);
 
 			if (m_pMFVDC) {
-				m_pMFVDC->SetVideoPosition(nullptr, rWnd);
+				m_pMFVDC->SetVideoPosition(nullptr, rVid);
 			}
 		}
 
@@ -14570,6 +14570,7 @@ bool CMainFrame::OpenMediaPrivate(std::unique_ptr<OpenMediaData>& pOMD)
 			m_pVideoWnd->GetClientRect(&Rect);
 			m_pMFVDC->SetVideoWindow(m_pVideoWnd->m_hWnd);
 			m_pMFVDC->SetVideoPosition(nullptr, &Rect);
+			m_pMFVDC->SetAspectRatioMode(MFVideoARMode_None); // to control the frame position for EVR
 
 			m_pPlaybackNotify = m_pMFVDC;
 		}
