@@ -1,5 +1,5 @@
 ;*****************************************************************************
-;* MMX/SSE2-optimized H.264 iDCT
+;* ASM-optimized H.264 iDCT
 ;*****************************************************************************
 ;* Copyright (C) 2004-2005 Michael Niedermayer, Loren Merritt
 ;* Copyright (C) 2003-2008 x264 project
@@ -67,23 +67,6 @@ SECTION .text
 %endif
 %endmacro
 
-; %1=uint8_t *dst, %2=int16_t *block, %3=ptrdiff_t stride
-; STORE_DIFFx2 not suitable here: it uses movh
-%macro STORE_DIFFx4 8 ; add1, add2, reg1, reg2, zero, shift, source, stride
-    movd       %3, [%7]
-    movd       %4, [%7+%8]
-    psraw      %1, %6
-    psraw      %2, %6
-    punpcklbw  %3, %5
-    punpcklbw  %4, %5
-    paddw      %3, %1
-    paddw      %4, %2
-    packuswb   %3, %5
-    packuswb   %4, %5
-    movd     [%7], %3
-    movd  [%7+%8], %4
-%endmacro
-
 %macro IDCT4_ADD 3
     ; Load dct coeffs
     movq         m0, [%2]
@@ -93,31 +76,22 @@ SECTION .text
 
     IDCT4_1D      w, 0, 1, 2, 3, 4, 5
     mova         m6, [pw_32]
-    %if mmsize == 8
-        TRANSPOSE4x4W 0, 1, 2, 3, 4
-    %else
-        punpcklwd m0, m1
-        punpcklwd m2, m3
-        SBUTTERFLY dq, 0, 2, 4
-        MOVHL m1, m0
-        MOVHL m3, m2
-    %endif
+
+    punpcklwd    m0, m1
+    punpcklwd    m2, m3
+    SBUTTERFLY   dq, 0, 2, 4
+    MOVHL        m1, m0
+    MOVHL        m3, m2
+
     paddw        m0, m6
     IDCT4_1D      w, 0, 1, 2, 3, 4, 5
-    pxor         m7, m7
-    %if mmsize == 16
-        mova    [%2+ 0], m7
-        mova    [%2+16], m7
-    %else
-        movq    [%2+ 0], m7
-        movq    [%2+ 8], m7
-        movq    [%2+16], m7
-        movq    [%2+24], m7
-    %endif
+    pxor         m6, m6
+    mova    [%2+ 0], m6
+    mova    [%2+16], m6
 
-    STORE_DIFFx4 m0, m1, m4, m5, m7, 6, %1, %3
+    STORE_DIFFx2 m0, m1, m4, m5, m6, 6, %1, %3, movd
     lea          %1, [%1+%3*2]
-    STORE_DIFFx4 m2, m3, m4, m5, m7, 6, %1, %3
+    STORE_DIFFx2 m2, m3, m4, m5, m6, 6, %1, %3, movd
 %endmacro
 
 %macro IDCT8_1D 2
@@ -246,18 +220,20 @@ cglobal h264_idct8_add_8, 3, 4, 10
     IDCT8_ADD_SSE r0, r1, r2, r3
     RET
 
-%macro DC_ADD_SSE2_INIT 2
-    add          %1, 32
-    sar          %1, 6
+%macro DC_ADD_INIT 3
+    add         %1d, 32
+    sar         %1d, 6
     movd         m0, %1d
-    lea          %1, [%2*3]
+    lea          %1, [3*%2]
     pshuflw      m0, m0, 0
     pxor         m1, m1
     psubw        m1, m0
     packuswb     m0, m0
     packuswb     m1, m1
+%if %3 > 4
     pshufd       m0, m0, 0
     pshufd       m1, m1, 0
+%endif
 %endmacro
 
 %macro DC_ADD_SSE2_OP 4
@@ -285,7 +261,7 @@ INIT_XMM sse2
 cglobal h264_idct8_dc_add_8, 3, 4, 6
     movsx        r3, word [r1]
     mov  dword [r1], 0
-    DC_ADD_SSE2_INIT r3, r2
+    DC_ADD_INIT r3, r2, 8
     DC_ADD_SSE2_OP movq, r0, r2, r3
     lea          r0, [r0+r2*4]
     DC_ADD_SSE2_OP movq, r0, r2, r3
@@ -296,7 +272,7 @@ cglobal h264_idct8_dc_add_8, 2, 3, 6
     movsx        r2, word [r1]
     mov  dword [r1], 0
     mov          r1, r2m
-    DC_ADD_SSE2_INIT r2, r1
+    DC_ADD_INIT r2, r1, 8
     DC_ADD_SSE2_OP movq, r0, r1, r2
     lea          r0, [r0+r1*4]
     DC_ADD_SSE2_OP movq, r0, r1, r2
@@ -323,7 +299,7 @@ cglobal h264_idct8_add4_8, 5, 8 + npicregs, 10, dst1, block_offset, block, strid
     test         r6, r6
     jz .no_dc
     mov   word [r2], 0
-    DC_ADD_SSE2_INIT r6, r3
+    DC_ADD_INIT r6, r3, 8
 %if ARCH_X86_64 == 0
 %define dst2q r1
 %define dst2d r1d
@@ -356,7 +332,7 @@ cglobal h264_idct8_add4_8, 5, 8 + npicregs, 10, dst1, block_offset, block, strid
     RET
 
 INIT_XMM sse2
-cglobal h264_idct_add8_422_8, 5, 8 + npicregs, 8, dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
+cglobal h264_idct_add8_422_8, 5, 8 + npicregs, 7, dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
 ; dst1, block_offset, block, stride, nnzc, cntr, coeff, dst2, picreg
 %if PIC
     lea     picregq, [scan8_mem]
@@ -715,30 +691,18 @@ cglobal h264_luma_dc_dequant_idct, 3, 4, 6
     DEQUANT_STORE m6
     RET
 
-%macro DC_ADD_INIT 1
-    add      %1d, 32
-    sar      %1d, 6
-    movd     m0, %1d
-    pshuflw  m0, m0, 0
-    lea      %1, [3*stride_q]
-    pxor     m1, m1
-    psubw    m1, m0
-    packuswb m0, m0
-    packuswb m1, m1
-%endmacro
-
 %macro IDCT_XMM 1
 
 INIT_XMM %1
 
-cglobal h264_idct_add_8, 3, 3, 8, dst_, block_, stride_
+cglobal h264_idct_add_8, 3, 3, 7, dst_, block_, stride_
     IDCT4_ADD    dst_q, block_q, stride_q
 RET
 
 cglobal h264_idct_dc_add_8, 3, 4, 6, dst_, block_, stride_
     movsx             r3d, word [block_q]
     mov   dword [block_q], 0
-    DC_ADD_INIT r3
+    DC_ADD_INIT r3, stride_q, 4
     DC_ADD_SSE2_OP movd, dst_q, stride_q, r3
 RET
 

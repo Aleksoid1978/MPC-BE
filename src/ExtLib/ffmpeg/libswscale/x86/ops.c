@@ -43,23 +43,34 @@ static int setup_rw_packed(const SwsImplParams *params, SwsImplResult *out)
     return 0;
 }
 
+/* Private data for the filter kernels; layout hard-coded in ops_float.asm */
+typedef struct FilterPriv {
+    void *weights;
+    size_t filter_size;
+} FilterPriv;
+
+static_assert(offsetof(FilterPriv, filter_size) == sizeof(void *),
+              "FilterPriv layout mismatch");
+
 static int setup_filter_v(const SwsImplParams *params, SwsImplResult *out)
 {
     const SwsFilterWeights *filter = params->uop->data.kernel;
-    static_assert(sizeof(out->priv.ptr) <= sizeof(int32_t[2]),
-                  ">8 byte pointers not supported");
 
     /* Pre-convert weights to float */
-    float *weights = av_calloc(filter->num_weights, sizeof(float));
+    float *weights = ff_refstruct_calloc(filter->num_weights, sizeof(float));
     if (!weights)
         return AVERROR(ENOMEM);
 
     for (int i = 0; i < filter->num_weights; i++)
         weights[i] = (float) filter->weights[i] / SWS_FILTER_SCALE;
 
-    out->priv.ptr = weights;
-    out->priv.uptr[1] = filter->filter_size;
-    out->free = ff_op_priv_free;
+    const FilterPriv priv = {
+        .weights     = weights,
+        .filter_size = filter->filter_size,
+    };
+
+    SWS_OP_PRIV_PACK(out, priv);
+    out->ref = priv.weights;
     return 0;
 }
 
@@ -100,7 +111,7 @@ static int setup_filter_h(const SwsImplParams *params, SwsImplResult *out)
     } weights;
 
     const int sizeof_weight = hscale_sizeof_weight(uop);
-    weights.ptr = av_calloc(line_size, sizeof_weight * aligned_size);
+    weights.ptr = ff_refstruct_calloc(line_size, sizeof_weight * aligned_size);
     if (!weights.ptr)
         return AVERROR(ENOMEM);
 
@@ -150,9 +161,13 @@ static int setup_filter_h(const SwsImplParams *params, SwsImplResult *out)
         }
     }
 
-    out->priv.ptr = weights.ptr;
-    out->priv.uptr[1] = aligned_size;
-    out->free = ff_op_priv_free;
+    const FilterPriv priv = {
+        .weights     = weights.ptr,
+        .filter_size = aligned_size,
+    };
+
+    SWS_OP_PRIV_PACK(out, priv);
+    out->ref = priv.weights;
 
     for (int i = 0; i < 4; i++) {
         if (uop->mask & SWS_COMP(i))
@@ -205,7 +220,7 @@ static int setup_filter_h_4x4(const SwsImplParams *params, SwsImplResult *out)
         float *f32;
     } weights;
 
-    weights.ptr = av_calloc(line_size, aligned_size * sizeof_weights);
+    weights.ptr = ff_refstruct_calloc(line_size, aligned_size * sizeof_weights);
     if (!weights.ptr)
         return AVERROR(ENOMEM);
 
@@ -237,9 +252,13 @@ static int setup_filter_h_4x4(const SwsImplParams *params, SwsImplResult *out)
         }
     }
 
-    out->priv.ptr = weights.ptr;
-    out->priv.uptr[1] = aligned_size * sizeof_weights;
-    out->free = ff_op_priv_free;
+    const FilterPriv priv = {
+        .weights     = weights.ptr,
+        .filter_size = aligned_size * sizeof_weights,
+    };
+
+    SWS_OP_PRIV_PACK(out, priv);
+    out->ref = priv.weights;
 
     for (int i = 0; i < 4; i++) {
         if (uop->mask & SWS_COMP(i))
@@ -250,12 +269,16 @@ static int setup_filter_h_4x4(const SwsImplParams *params, SwsImplResult *out)
 
 static int setup_scale(const SwsImplParams *params, SwsImplResult *out)
 {
-    const SwsUOp *uop = params->uop;
-    switch (uop->type) {
-    case SWS_PIXEL_U8:  out->priv.u16[0] = uop->data.scalar.u8;  break; /* for pmullw */
-    case SWS_PIXEL_U16: out->priv.u16[0] = uop->data.scalar.u16; break;
-    case SWS_PIXEL_U32: out->priv.u32[0] = uop->data.scalar.u32; break;
-    case SWS_PIXEL_F32: out->priv.f32[0] = uop->data.scalar.f32; break;
+    const SwsPixel scalar = params->uop->data.scalar;
+    switch (params->uop->type) {
+    case SWS_PIXEL_U8: {
+        const uint32_t u32 = scalar.u8; /* for movd */
+        SWS_OP_PRIV_PACK(out, u32);
+        break;
+    }
+    case SWS_PIXEL_U16: SWS_OP_PRIV_PACK(out, scalar.u16); break;
+    case SWS_PIXEL_U32: SWS_OP_PRIV_PACK(out, scalar.u32); break;
+    case SWS_PIXEL_F32: SWS_OP_PRIV_PACK(out, scalar.f32); break;
     default: return AVERROR(EINVAL);
     }
 
@@ -266,14 +289,13 @@ static int setup_clear(const SwsImplParams *params, SwsImplResult *out)
 {
     const SwsUOp *uop = params->uop;
     for (int i = 0; i < 4; i++)
-        out->priv.u32[i] = uop->data.vec4[i].u32;
+        SWS_OP_PRIV_PACK(out, uop->data.vec4[i].u32);
     return 0;
 }
 
 static int setup_dither(const SwsImplParams *params, SwsImplResult *out)
 {
-    out->priv.ptr = av_refstruct_ref(params->uop->data.ptr);
-    out->free = ff_op_priv_unref;
+    ff_sws_op_priv_pack_refptr(out, av_refstruct_ref(params->uop->data.ptr));
     return 0;
 }
 
@@ -298,16 +320,17 @@ static int setup_linear(const SwsImplParams *params, SwsImplResult *out)
 {
     const SwsUOp *uop = params->uop;
     if (uop->type == SWS_PIXEL_F32) {
-        out->priv.ptr = av_memdup(uop->data.mat4x5, sizeof(uop->data.mat4x5));
-        out->free = ff_op_priv_free;
-        return out->priv.ptr ? 0 : AVERROR(ENOMEM);
+        /* Layout hard-coded in ops_float.asm */
+        static_assert(sizeof(uop->data.mat4x5) == 4 * 5 * sizeof(float),
+                      "mat4x5 layout mismatch");
+        SWS_OP_PRIV_PACK(out, uop->data.mat4x5);
+        return 0;
     }
 
-    uint8_t *mat = av_malloc(4 * 5 * 16); /* one lane per component */
+    uint8_t *mat = av_refstruct_allocz(4 * 5 * 16); /* one lane per component */
     if (!mat)
         return AVERROR(ENOMEM);
-    out->priv.ptr = mat;
-    out->free = ff_op_priv_free;
+    ff_sws_op_priv_pack_refptr(out, mat);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 5; j++) {
@@ -622,24 +645,6 @@ do {                                                                            
     return 0;
 }
 
-/* Expand pixel value to 32-bits by repeating as necessary */
-static uint32_t expand32(const SwsPixelType type, const SwsPixel value)
-{
-    switch (type) {
-    case SWS_PIXEL_U8:  return value.u8  * 0x01010101u;
-    case SWS_PIXEL_U16: return value.u16 * 0x00010001u;
-    case SWS_PIXEL_U32: return value.u32;
-    case SWS_PIXEL_F32: return value.u32; /* reinterpret */
-    default: return 0;
-    }
-}
-
-static void normalize_clear(SwsUOp *uop)
-{
-    for (int i = 0; i < 4; i++)
-        uop->data.vec4[i].u32 = expand32(uop->type, uop->data.vec4[i]);
-}
-
 static int compile_uops_x86(SwsContext *ctx, const SwsUOpList *uops, SwsCompiledOp *out)
 {
     int ret, mmsize = get_mmsize();
@@ -665,8 +670,6 @@ static int compile_uops_x86(SwsContext *ctx, const SwsUOpList *uops, SwsCompiled
         /* Use at most two full YMM regs during the widest precision section */
         .block_size  = 2 * FFMIN(mmsize, 32) / uops->pixel_size_max,
         .slice_align = 1,
-        .free        = ff_sws_op_chain_free_cb,
-        .priv        = chain,
     };
 
     for (int i = 0; i < uops->num_ops; i++) {
@@ -674,8 +677,6 @@ static int compile_uops_x86(SwsContext *ctx, const SwsUOpList *uops, SwsCompiled
         int op_block_size = out->block_size;
 
         if (uop_is_type_invariant(uop->uop)) {
-            if (uop->uop == SWS_UOP_CLEAR)
-                normalize_clear(uop);
             op_block_size *= ff_sws_pixel_type_size(uop->type);
             uop->type = SWS_PIXEL_U8;
         }
@@ -693,17 +694,8 @@ static int compile_uops_x86(SwsContext *ctx, const SwsUOpList *uops, SwsCompiled
     case 4: out->func = ff_sws_process4_x86; break;
     }
 
-    if (ret < 0) {
-        ff_sws_op_chain_free(chain);
-        return ret;
-    }
-
-    out->cpu_flags = chain->cpu_flags;
-    memcpy(out->over_read,  chain->over_read,  sizeof(out->over_read));
-    memcpy(out->over_write, chain->over_write, sizeof(out->over_write));
-
     ff_sws_uop_list_print(ctx, AV_LOG_DEBUG, uops);
-
+    ff_sws_op_chain_attach(chain, out);
     return 0;
 
 fail:

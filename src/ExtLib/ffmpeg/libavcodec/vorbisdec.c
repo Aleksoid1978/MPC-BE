@@ -30,6 +30,7 @@
 #include <math.h>
 
 #include "libavutil/avassert.h"
+#include "libavutil/dict.h"
 #include "libavutil/float_dsp.h"
 #include "libavutil/mem.h"
 #include "libavutil/tx.h"
@@ -158,6 +159,10 @@ typedef struct vorbis_context_s {
     int8_t       previous_window;
     float        *channel_residues;
     float        *saved;
+    /**
+     * Tags of a dropped priming frame, added to the first frame with samples.
+     */
+    AVDictionary *pending_metadata;
 } vorbis_context;
 
 /* Helper functions */
@@ -1052,25 +1057,14 @@ static int vorbis_parse_id_hdr(vorbis_context *vc)
 
 // Process the extradata using the functions above (identification header, setup header)
 
-static av_cold int vorbis_decode_init(AVCodecContext *avctx)
+static int vorbis_parse_headers(AVCodecContext *avctx,
+                                const uint8_t *headers, int headers_len)
 {
     vorbis_context *vc = avctx->priv_data;
-    uint8_t *headers   = avctx->extradata;
-    int headers_len    = avctx->extradata_size;
     const uint8_t *header_start[3];
     int header_len[3];
     GetBitContext *gb = &vc->gb;
     int hdr_type, ret;
-
-    vc->avctx = avctx;
-    ff_vorbisdsp_init(&vc->dsp);
-
-    avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-
-    if (!headers_len) {
-        av_log(avctx, AV_LOG_ERROR, "Extradata missing.\n");
-        return AVERROR_INVALIDDATA;
-    }
 
     if ((ret = avpriv_split_xiph_headers(headers, headers_len, 30, header_start, header_len)) < 0) {
         av_log(avctx, AV_LOG_ERROR, "Extradata corrupt.\n");
@@ -1113,6 +1107,23 @@ static av_cold int vorbis_decode_init(AVCodecContext *avctx)
     avctx->sample_rate = vc->audio_samplerate;
 
     return 0;
+}
+
+static av_cold int vorbis_decode_init(AVCodecContext *avctx)
+{
+    vorbis_context *vc = avctx->priv_data;
+
+    vc->avctx = avctx;
+    ff_vorbisdsp_init(&vc->dsp);
+
+    avctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+
+    if (!avctx->extradata_size) {
+        av_log(avctx, AV_LOG_ERROR, "Extradata missing.\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    return vorbis_parse_headers(avctx, avctx->extradata, avctx->extradata_size);
 }
 
 // Decode audiopackets -------------------------------------------------
@@ -1786,9 +1797,22 @@ static int vorbis_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     vorbis_context *vc = avctx->priv_data;
     GetBitContext *gb = &vc->gb;
     float *channel_ptrs[255];
+    const uint8_t *new_headers;
+    size_t new_headers_size;
     int i, len, ret;
 
     ff_dlog(NULL, "packet length %d \n", buf_size);
+
+    new_headers = av_packet_get_side_data(avpkt, AV_PKT_DATA_NEW_EXTRADATA,
+                                          &new_headers_size);
+    if (new_headers) {
+        if (new_headers_size > INT_MAX)
+            return AVERROR_INVALIDDATA;
+        vorbis_free(vc);
+        vc->first_frame = 0;
+        if ((ret = vorbis_parse_headers(avctx, new_headers, new_headers_size)) < 0)
+            return ret;
+    }
 
     if (*buf == 1 && buf_size > 7) {
         if ((ret = init_get_bits8(gb, buf + 1, buf_size - 1)) < 0)
@@ -1859,6 +1883,22 @@ static int vorbis_decode_frame(AVCodecContext *avctx, AVFrame *frame,
     if (!vc->first_frame) {
         vc->first_frame = 1;
         avctx->internal->skip_samples = len;
+        if (!(avctx->flags2 & AV_CODEC_FLAG2_SKIP_MANUAL)) {
+            av_dict_free(&vc->pending_metadata);
+            vc->pending_metadata = frame->metadata;
+            frame->metadata      = NULL;
+        }
+    } else if (vc->pending_metadata) {
+        if (!frame->metadata) {
+            frame->metadata      = vc->pending_metadata;
+            vc->pending_metadata = NULL;
+        } else {
+            ret = av_dict_copy(&frame->metadata, vc->pending_metadata,
+                               AV_DICT_DONT_OVERWRITE);
+            av_dict_free(&vc->pending_metadata);
+            if (ret < 0)
+                return ret;
+        }
     }
 
     ff_dlog(NULL, "parsed %d bytes %d bits, returned %d samples (*ch*bits) \n",
@@ -1877,6 +1917,7 @@ static av_cold int vorbis_decode_close(AVCodecContext *avctx)
     vorbis_context *vc = avctx->priv_data;
 
     vorbis_free(vc);
+    av_dict_free(&vc->pending_metadata);
 
     return 0;
 }
@@ -1885,6 +1926,7 @@ static av_cold void vorbis_decode_flush(AVCodecContext *avctx)
 {
     vorbis_context *vc = avctx->priv_data;
 
+    av_dict_free(&vc->pending_metadata);
     if (vc->saved) {
         memset(vc->saved, 0, (vc->blocksize[1] / 4) * vc->audio_channels *
                              sizeof(*vc->saved));

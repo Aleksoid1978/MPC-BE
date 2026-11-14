@@ -134,9 +134,8 @@ struc SwsOpExec
 endstruc
 
 struc SwsOpImpl
-    .cont resb 16
-    .priv resb 16
-    .next resb 0
+    .func resq 1
+    .priv resb 0
 endstruc
 
 %define SWS_COMP_NONE           0
@@ -182,6 +181,10 @@ endstruc
     %endif
     %assign BITS (BYTES * 8)
 
+    ; Initialize the size of this kernel's private data. This will be
+    ; overridden by the kernel itself on demand.
+    %assign PRIV_SIZE 0
+
     ; Calculate block size helpers
     %ifdef V2
         %assign BLOCK_SIZE (mmsize * (1 + V2))
@@ -215,6 +218,7 @@ endstruc
     %undef COMPS
     %undef BYTES
     %undef BITS
+    %undef PRIV_SIZE
     %undef BLOCK_SIZE
     %undef BLOCK_WIDTH
     %undef ADD_MUL
@@ -301,14 +305,16 @@ endstruc
 ;---------------------------------------------------------
 ; Common macros for linking together different kernels
 
+%define sizeof_impl (SwsOpImpl.priv + ((PRIV_SIZE + gprsize - 1) & ~(gprsize - 1)))
+
 ; Load the next operation kernel's address to a register
 %macro LOAD_CONT 1 ; reg
-    mov %1, [implq + SwsOpImpl.cont]
+    mov %1, [implq + sizeof_impl + SwsOpImpl.func]
 %endmacro
 
 ; Tail call into the next operation kernel, given that kernel's address
 %macro CONTINUE 1 ; reg
-    add implq, SwsOpImpl.next
+    add implq, sizeof_impl
     jmp %1
     annotate_function_size
 %endmacro

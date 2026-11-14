@@ -123,7 +123,7 @@ static void av_always_inline FUNC(put_uni_w_scaled)(uint8_t *_dst, const ptrdiff
     pixel *dst                   = (pixel*)_dst;
     const ptrdiff_t dst_stride   = _dst_stride / sizeof(pixel);
     const ptrdiff_t src_stride   = _src_stride / sizeof(pixel);
-    const int shift              = FFMAX(2, 14 - BIT_DEPTH);
+    const int shift              = denom + FFMAX(2, 14 - BIT_DEPTH);
     const int offset             = 1 << (shift - 1);
     const int ox                 = _ox * (1 << (BIT_DEPTH - 8));
     const int taps               = is_chroma ? VVC_INTER_CHROMA_TAPS : VVC_INTER_LUMA_TAPS;
@@ -166,16 +166,16 @@ static void av_always_inline FUNC(put_uni_w_scaled)(uint8_t *_dst, const ptrdiff
 
 static void FUNC(put_uni_luma_w_scaled)(uint8_t *_dst, const ptrdiff_t _dst_stride,
     const uint8_t *_src, ptrdiff_t _src_stride, const int src_height,
-    const int x, const int y, const int dx, const int dy, const int denom, const int wx, const int ox,
-    const int height, const int8_t *hf, const int8_t *vf, const int width)
+    const int x, const int y, const int dx, const int dy, const int height,
+    const int denom, const int wx, const int ox, const int8_t *hf, const int8_t *vf, const int width)
 {
     FUNC(put_uni_w_scaled)(_dst, _dst_stride, _src, _src_stride, src_height, x, y, dx, dy, denom, wx, ox, height, hf, vf, width, 0);
 }
 
 static void FUNC(put_uni_chroma_w_scaled)(uint8_t *_dst, const ptrdiff_t _dst_stride,
     const uint8_t *_src, ptrdiff_t _src_stride, const int src_height,
-    const int x, const int y, const int dx, const int dy, const int denom, const int wx, const int ox,
-    const int height, const int8_t *hf, const int8_t *vf, const int width)
+    const int x, const int y, const int dx, const int dy, const int height,
+    const int denom, const int wx, const int ox, const int8_t *hf, const int8_t *vf, const int width)
 {
     FUNC(put_uni_w_scaled)(_dst, _dst_stride, _src, _src_stride, src_height, x, y, dx, dy,  denom, wx, ox, height, hf, vf, width, 1);
 }

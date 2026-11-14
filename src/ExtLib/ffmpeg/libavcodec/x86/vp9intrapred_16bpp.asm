@@ -82,16 +82,17 @@ SECTION .text
 %endif
 %endmacro
 
-INIT_MMX mmx
+INIT_XMM sse
 cglobal vp9_ipred_v_4x4_16, 2, 4, 1, dst, stride, l, a
     movifnidn               aq, amp
-    mova                    m0, [aq]
+    xorps                   m0, m0
+    movlps                  m0, [aq]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    mova      [dstq+strideq*0], m0
-    mova      [dstq+strideq*1], m0
-    mova      [dstq+strideq*2], m0
-    mova      [dstq+stride3q ], m0
+    movlps    [dstq+strideq*0], m0
+    movlps    [dstq+strideq*1], m0
+    movlps    [dstq+strideq*2], m0
+    movlps    [dstq+stride3q ], m0
     RET
 
 INIT_XMM sse
@@ -156,19 +157,19 @@ cglobal vp9_ipred_v_32x32_16, 2, 4, 4, dst, stride, l, a
     jg .loop
     RET
 
-INIT_MMX mmxext
+INIT_XMM sse2
 cglobal vp9_ipred_h_4x4_16, 3, 3, 4, dst, stride, l, a
-    mova                    m3, [lq]
+    movq                    m3, [lq]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    pshufw                  m0, m3, q3333
-    pshufw                  m1, m3, q2222
-    pshufw                  m2, m3, q1111
-    pshufw                  m3, m3, q0000
-    mova      [dstq+strideq*0], m0
-    mova      [dstq+strideq*1], m1
-    mova      [dstq+strideq*2], m2
-    mova      [dstq+stride3q ], m3
+    pshuflw                 m0, m3, q3333
+    pshuflw                 m1, m3, q2222
+    pshuflw                 m2, m3, q1111
+    pshuflw                 m3, m3, q0000
+    movq      [dstq+strideq*0], m0
+    movq      [dstq+strideq*1], m1
+    movq      [dstq+strideq*2], m2
+    movq      [dstq+stride3q ], m3
     RET
 
 INIT_XMM sse2
@@ -253,22 +254,23 @@ cglobal vp9_ipred_h_32x32_16, 3, 5, 4, dst, stride, l, stride3, cnt
     jge .loop
     RET
 
-INIT_MMX mmxext
+INIT_XMM sse2
 cglobal vp9_ipred_dc_4x4_16, 4, 4, 2, dst, stride, l, a
-    mova                    m0, [lq]
-    paddw                   m0, [aq]
+    movq                    m0, [lq]
+    movq                    m1, [aq]
+    paddw                   m0, m1
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
     pmaddwd                 m0, [pw_1]
-    pshufw                  m1, m0, q3232
+    pshuflw                 m1, m0, q3232
     paddd                   m0, [pd_4]
     paddd                   m0, m1
     psrad                   m0, 3
-    pshufw                  m0, m0, q0000
-    mova      [dstq+strideq*0], m0
-    mova      [dstq+strideq*1], m0
-    mova      [dstq+strideq*2], m0
-    mova      [dstq+stride3q ], m0
+    pshuflw                 m0, m0, 0
+    movq      [dstq+strideq*0], m0
+    movq      [dstq+strideq*1], m0
+    movq      [dstq+strideq*2], m0
+    movq      [dstq+stride3q ], m0
     RET
 
 INIT_XMM sse2
@@ -366,21 +368,21 @@ cglobal vp9_ipred_dc_32x32_16, 4, 4, 2, dst, stride, l, a
     RET
 
 %macro DC_1D_FNS 2
-INIT_MMX mmxext
+INIT_XMM sse2
 cglobal vp9_ipred_dc_%1_4x4_16, 4, 4, 2, dst, stride, l, a
-    mova                    m0, [%2]
+    movq                    m0, [%2]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
     pmaddwd                 m0, [pw_1]
-    pshufw                  m1, m0, q3232
+    pshuflw                 m1, m0, q3232
     paddd                   m0, [pd_2]
     paddd                   m0, m1
     psrad                   m0, 2
-    pshufw                  m0, m0, q0000
-    mova      [dstq+strideq*0], m0
-    mova      [dstq+strideq*1], m0
-    mova      [dstq+strideq*2], m0
-    mova      [dstq+stride3q ], m0
+    pshuflw                 m0, m0, 0
+    movq      [dstq+strideq*0], m0
+    movq      [dstq+strideq*1], m0
+    movq      [dstq+strideq*2], m0
+    movq      [dstq+stride3q ], m0
     RET
 
 INIT_XMM sse2
@@ -473,21 +475,21 @@ cglobal vp9_ipred_dc_%1_32x32_16, 4, 4, 2, dst, stride, l, a
 DC_1D_FNS top,  aq
 DC_1D_FNS left, lq
 
-INIT_MMX mmxext
+INIT_XMM sse2
 cglobal vp9_ipred_tm_4x4_10, 4, 4, 6, dst, stride, l, a
     mova                    m5, [pw_1023]
 .body:
-    mova                    m4, [aq]
-    mova                    m3, [lq]
+    movq                    m4, [aq]
+    movq                    m3, [lq]
     movd                    m0, [aq-4]
-    pshufw                  m0, m0, q1111
+    pshuflw                 m0, m0, q1111
     psubw                   m4, m0
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    pshufw                  m0, m3, q3333
-    pshufw                  m1, m3, q2222
-    pshufw                  m2, m3, q1111
-    pshufw                  m3, m3, q0000
+    pshuflw                 m0, m3, q3333
+    pshuflw                 m1, m3, q2222
+    pshuflw                 m2, m3, q1111
+    pshuflw                 m3, m3, q0000
     paddw                   m0, m4
     paddw                   m1, m4
     paddw                   m2, m4
@@ -501,10 +503,10 @@ cglobal vp9_ipred_tm_4x4_10, 4, 4, 6, dst, stride, l, a
     pminsw                  m1, m5
     pminsw                  m2, m5
     pminsw                  m3, m5
-    mova      [dstq+strideq*0], m0
-    mova      [dstq+strideq*1], m1
-    mova      [dstq+strideq*2], m2
-    mova      [dstq+stride3q ], m3
+    movq      [dstq+strideq*0], m0
+    movq      [dstq+strideq*1], m1
+    movq      [dstq+strideq*2], m2
+    movq      [dstq+stride3q ], m3
     RET
 
 cglobal vp9_ipred_tm_4x4_12, 4, 4, 6, dst, stride, l, a

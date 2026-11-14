@@ -566,6 +566,7 @@ static av_cold void flush(AVCodecContext *avctx)
                 for (j = 0; j <= 1; j++) {
                     memset(che->ch[j].saved, 0, sizeof(che->ch[j].saved));
                 }
+                ac->proc.sbr_ctx_reset(ac, che);
             }
         }
     }
@@ -1507,7 +1508,9 @@ static int decode_ics_info(AACDecContext *ac, IndividualChannelStream *ics,
                 ics->tns_max_bands =  ff_tns_max_bands_512[sampling_index];
             }
             if (!ics->num_swb || !ics->swb_offset) {
-                ret_fail = AVERROR_BUG;
+                av_log(ac->avctx, AV_LOG_ERROR,
+                       "Unsupported sample rate index %d for LD/ELD\n",
+                       sampling_index);
                 goto fail;
             }
         } else {
@@ -2336,6 +2339,15 @@ static int aac_decode_er_frame(AVCodecContext *avctx, AVFrame *frame,
     }
 
     spectral_to_sample(ac, samples);
+
+    if (avctx->sample_rate <= 0)
+        avctx->sample_rate = m4ac->sample_rate;
+
+    if (avctx->sample_rate <= 0) {
+        av_log(avctx, AV_LOG_ERROR,
+               "Cannot output a frame without a valid sample rate\n");
+        return AVERROR_INVALIDDATA;
+    }
 
     if (!ac->frame->data[0] && samples) {
         av_log(avctx, AV_LOG_ERROR, "no frame data found\n");

@@ -200,10 +200,10 @@ IF Y,   movu [out1q + mmsize], my2
 IF Z,   movu [out2q + mmsize], mz2
 IF W,   movu [out3q + mmsize], mw2
 %endif
-IF X,   add out0q, BLOCK_WIDTH
-IF Y,   add out1q, BLOCK_WIDTH
-IF Z,   add out2q, BLOCK_WIDTH
-IF W,   add out3q, BLOCK_WIDTH
+IF X,   add out0q, BLOCK_SIZE
+IF Y,   add out1q, BLOCK_SIZE
+IF Z,   add out2q, BLOCK_SIZE
+IF W,   add out3q, BLOCK_SIZE
         RET
 %endmacro
 
@@ -598,13 +598,15 @@ IF V2,  mova %3, %2
 %endmacro
 
 %macro CLEAR 2
+%assign PRIV_SIZE 4 * 4
 %assign ONE_MASK  %1
 %assign ZERO_MASK %2
+        LOAD_CONT tmp0q
 IF1 X,  clear 0, mx, mx2
 IF1 Y,  clear 1, my, my2
 IF1 Z,  clear 2, mz, mz2
 IF1 W,  clear 3, mw, mw2
-        CONTINUE
+        CONTINUE tmp0q
 %endmacro
 
 ;---------------------------------------------------------
@@ -734,6 +736,12 @@ IF W,   packuswb %4, m11
 %endmacro
 
 %macro SCALE 0
+%if BITS == 8
+    %assign PRIV_SIZE 4 ; packed as dword
+%else
+    %assign PRIV_SIZE BYTES
+%endif
+
         LOAD_CONT tmp0q
 %if BITS == 8
 %if cpuflag(avx2)
@@ -870,6 +878,7 @@ IF W,   mova IN3, m11
 %endmacro
 
 %macro LINEAR 2
+%assign PRIV_SIZE  gprsize
 %assign ONE_MASK   %1
 %assign ZERO_MASK  %2
 

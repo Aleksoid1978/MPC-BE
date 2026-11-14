@@ -22,6 +22,7 @@
 #include "libavutil/channel_layout.h"
 #include "libavutil/emms.h"
 #include "libavutil/frame.h"
+#include "libavutil/hwcontext.h"
 #include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "libavutil/mem.h"
@@ -257,9 +258,11 @@ static int encode_set_packet_props(AVCodecContext *avctx, AVPacket *avpkt, const
                 int discard_padding = AV_RL32(frame_sd->data + 4);
 
                 if (discard_padding > 0 && avctx->frame_size && ec->last_audio_frame) {
+                    if (!frame->duration)
+                        avpkt->duration = ff_samples_to_time_base(avctx, frame->nb_samples - discard_padding);
                     avpkt->duration = av_sat_add64(avpkt->duration, ff_samples_to_time_base(avctx, avctx->initial_padding));
-                    avpkt->duration = FFMIN(avpkt->duration, ff_samples_to_time_base(avctx, avctx->frame_size));
-                    discard_padding = avctx->frame_size - ff_samples_from_time_base(avctx, avpkt->duration);
+                    avpkt->duration = FFMIN(avpkt->duration, ff_samples_to_time_base(avctx, frame->nb_samples));
+                    discard_padding = FFMAX(0, discard_padding - avctx->initial_padding);
                 }
 
                 if (skip_samples > 0 || discard_padding > 0) {
@@ -507,7 +510,8 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
                 ec->last_audio_frame = 1;
                 if (!(avctx->codec->capabilities & AV_CODEC_CAP_SMALL_LAST_FRAME) ||
                     (avctx->flags2 & AV_CODEC_FLAG2_FIXED_FRAME_SIZE)) {
-                    int pad_samples = avci->pad_samples ? avci->pad_samples : avctx->frame_size;
+                    int pad_samples = avci->pad_samples && !(avctx->flags2 & AV_CODEC_FLAG2_FIXED_FRAME_SIZE) ?
+                                      avci->pad_samples : avctx->frame_size;
                     int out_samples = (src->nb_samples + pad_samples - 1) / pad_samples * pad_samples;
 
                     if (out_samples != src->nb_samples) {
@@ -522,9 +526,17 @@ static int encode_send_frame_internal(AVCodecContext *avctx, const AVFrame *src)
     } else if (!(avctx->codec->capabilities & AV_CODEC_CAP_PARAM_CHANGE)) {
         const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(src->format);
 
-        if (!(desc && desc->flags & AV_PIX_FMT_FLAG_HWACCEL) &&
-            (src->format != avctx->pix_fmt ||
-             src->width != avctx->width || src->height != avctx->height)) {
+        if (desc && desc->flags & AV_PIX_FMT_FLAG_HWACCEL) {
+            if (src->hw_frames_ctx) {
+                const AVHWFramesContext *frames_ctx = (AVHWFramesContext *)src->hw_frames_ctx->data;
+
+                if (frames_ctx->width < avctx->width || frames_ctx->height < avctx->height) {
+                    av_log(avctx, AV_LOG_ERROR, "Hardware frames are smaller than the encoder\n");
+                    return AVERROR(EINVAL);
+                }
+            }
+        } else if (src->format != avctx->pix_fmt ||
+                   src->width != avctx->width || src->height != avctx->height) {
             av_log(avctx, AV_LOG_ERROR, "Frame size or pixel format does not match the encoder\n");
             return AVERROR(EINVAL);
         }

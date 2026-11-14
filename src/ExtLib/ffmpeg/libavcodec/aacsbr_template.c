@@ -123,6 +123,24 @@ av_cold void AAC_RENAME(ff_aac_sbr_ctx_close)(ChannelElement *che)
     av_tx_uninit(&sbr->mdct_ana);
 }
 
+av_cold void AAC_RENAME(ff_aac_sbr_ctx_reset)(AACDecContext *ac, ChannelElement *che)
+{
+    SpectralBandReplication *sbr = get_sbr(che);
+    int id_aac = sbr->id_aac;
+
+    /* Discard all inter-frame state. The transform contexts (mdct_ana,
+     * mdct) and the function pointer tables (dsp, c) at the end of the
+     * struct are set up once in ff_aac_sbr_ctx_alloc_init() and hold no
+     * stream state, so they are deliberately left untouched. */
+    memset(sbr, 0, offsetof(SpectralBandReplication, mdct_ana));
+
+    sbr->id_aac = id_aac;
+    sbr_turnoff(sbr);
+    sbr->data[0].synthesis_filterbank_samples_offset = SBR_SYNTHESIS_BUF_SIZE - (1280 - 128);
+    sbr->data[1].synthesis_filterbank_samples_offset = SBR_SYNTHESIS_BUF_SIZE - (1280 - 128);
+    AAC_RENAME(ff_ps_ctx_init)(&sbr->ps);
+}
+
 static int qsort_comparison_function_int16(const void *a, const void *b)
 {
     return *(const int16_t *)a - *(const int16_t *)b;
@@ -687,9 +705,8 @@ static int read_sbr_grid(AACDecContext *ac, SpectralBandReplication *sbr,
         ch_data->t_env[0]                   = 0;
         ch_data->t_env[ch_data->bs_num_env] = abs_bord_trail;
 
-        for (i = 0; i < num_rel_trail; i++)
-            ch_data->t_env[ch_data->bs_num_env - 1 - i] =
-                ch_data->t_env[ch_data->bs_num_env - i] - 2 * get_bits(gb, 2) - 2;
+        for (i = num_rel_trail; i > 0; i--)
+            ch_data->t_env[i] = ch_data->t_env[i + 1] - 2 * get_bits(gb, 2) - 2;
 
         bs_pointer = get_bits(gb, ceil_log2[ch_data->bs_num_env]);
 
@@ -722,15 +739,17 @@ static int read_sbr_grid(AACDecContext *ac, SpectralBandReplication *sbr,
                    bs_num_env);
             return -1;
         }
+        /* Make the bounds implied by the two-bit counts explicit for GCC. */
+        if (bs_num_env < 1 || num_rel_trail < 0 || num_rel_trail >= bs_num_env)
+            return AVERROR_INVALIDDATA;
         ch_data->bs_num_env = bs_num_env;
 
         ch_data->t_env[ch_data->bs_num_env] = abs_bord_trail;
 
         for (i = 0; i < num_rel_lead; i++)
             ch_data->t_env[i + 1] = ch_data->t_env[i] + 2 * get_bits(gb, 2) + 2;
-        for (i = 0; i < num_rel_trail; i++)
-            ch_data->t_env[ch_data->bs_num_env - 1 - i] =
-                ch_data->t_env[ch_data->bs_num_env - i] - 2 * get_bits(gb, 2) - 2;
+        for (i = bs_num_env - 1; i >= bs_num_env - num_rel_trail; i--)
+            ch_data->t_env[i] = ch_data->t_env[i + 1] - 2 * get_bits(gb, 2) - 2;
 
         bs_pointer = get_bits(gb, ceil_log2[ch_data->bs_num_env]);
 

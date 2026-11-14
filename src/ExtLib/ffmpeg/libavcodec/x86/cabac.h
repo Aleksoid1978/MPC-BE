@@ -37,6 +37,21 @@
 
 #if HAVE_INLINE_ASM
 
+/*
+ * refill shift = tzcnt(low) - 16
+ * low is never 0 here, so this also works on CPUs without BMI1, which
+ * execute tzcnt as bsf.
+ */
+#define BRANCHLESS_GET_CABAC_REFILL(low, tmp) \
+        "movzwl (%%"FF_REG_c") , "tmp"                                  \n\t"\
+        "tzcnt  "low"       , %%ecx                                     \n\t"\
+        "bswap  "tmp"                                                   \n\t"\
+        "shr    $15         , "tmp"                                     \n\t"\
+        "sub    $16         , %%ecx                                     \n\t"\
+        "sub    $0xFFFF     , "tmp"                                     \n\t"\
+        "shl    %%cl        , "tmp"                                     \n\t"\
+        "add    "tmp"       , "low"                                     \n\t"
+
 #ifndef UNCHECKED_BITSTREAM_READER
 #define UNCHECKED_BITSTREAM_READER !CONFIG_SAFE_BITSTREAM_READER
 #endif
@@ -49,75 +64,33 @@
         "jge    1f                                                      \n\t"
 #endif
 
-#ifdef BROKEN_RELOCATIONS
-#define TABLES_ARG , "r"(tables)
+#if ARCH_X86_64
+#define TABLES_ARG , [tables]"r"(tables)
+#define CABAC_TMP_DECL int cabac_t1, cabac_t2;
+#define CABAC_TMP_OPERANDS , [cabac_t1]"=&r"(cabac_t1), [cabac_t2]"=&r"(cabac_t2)
 
-#if HAVE_FAST_CMOV
-#define BRANCHLESS_GET_CABAC_UPDATE(ret, retq, low, range, tmp) \
-        "cmp    "low"       , "tmp"                        \n\t"\
-        "cmova  %%ecx       , "range"                      \n\t"\
-        "sbb    %%rcx       , %%rcx                        \n\t"\
-        "and    %%ecx       , "tmp"                        \n\t"\
-        "xor    %%rcx       , "retq"                       \n\t"\
-        "sub    "tmp"       , "low"                        \n\t"
-#else /* HAVE_FAST_CMOV */
-#define BRANCHLESS_GET_CABAC_UPDATE(ret, retq, low, range, tmp) \
-/* P4 Prescott has crappy cmov,sbb,64-bit shift so avoid them */ \
-        "sub    "low"       , "tmp"                        \n\t"\
-        "sar    $31         , "tmp"                        \n\t"\
-        "sub    %%ecx       , "range"                      \n\t"\
-        "and    "tmp"       , "range"                      \n\t"\
-        "add    %%ecx       , "range"                      \n\t"\
-        "shl    $17         , %%ecx                        \n\t"\
-        "and    "tmp"       , %%ecx                        \n\t"\
-        "sub    %%ecx       , "low"                        \n\t"\
-        "xor    "tmp"       , "ret"                        \n\t"\
-        "movslq "ret"       , "retq"                       \n\t"
-#endif /* HAVE_FAST_CMOV */
-
-#ifdef __LZCNT__
-/* renormalisation shift = lzcnt(range) - 23, refill shift = tzcnt(low) - 16 */
-#define BRANCHLESS_GET_CABAC_RENORM(range, rangeq, norm_off, tables) \
-        "lzcnt  "range"     , %%ecx                                     \n\t"\
-        "sub    $23         , %%ecx                                     \n\t"
-#define BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables) \
-        "movzwl (%%"FF_REG_c") , "tmp"                                  \n\t"\
-        "tzcnt  "low"       , %%ecx                                     \n\t"\
-        "bswap  "tmp"                                                   \n\t"\
-        "shr    $15         , "tmp"                                     \n\t"\
-        "sub    $16         , %%ecx                                     \n\t"\
-        "sub    $0xFFFF     , "tmp"                                     \n\t"\
-        "shl    %%cl        , "tmp"                                     \n\t"\
-        "add    "tmp"       , "low"                                     \n\t"
-#else /* __LZCNT__ */
-#define BRANCHLESS_GET_CABAC_RENORM(range, rangeq, norm_off, tables) \
-        "movzbl "norm_off"("tables", "rangeq"), %%ecx                   \n\t"
-#define BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables) \
-        "movzwl (%%"FF_REG_c") , "tmp"                                  \n\t"\
-        "lea    -1("low")   , %%ecx                                     \n\t"\
-        "xor    "low"       , %%ecx                                     \n\t"\
-        "shr    $15         , %%ecx                                     \n\t"\
-        "bswap  "tmp"                                                   \n\t"\
-        "shr    $15         , "tmp"                                     \n\t"\
-        "movzbl "norm_off"("tables", %%rcx), %%ecx                      \n\t"\
-        "sub    $0xFFFF     , "tmp"                                     \n\t"\
-        "neg    %%ecx                                                   \n\t"\
-        "add    $7          , %%ecx                                     \n\t"\
-        "shl    %%cl        , "tmp"                                     \n\t"\
-        "add    "tmp"       , "low"                                     \n\t"
-#endif /* __LZCNT__ */
-
-#define BRANCHLESS_GET_CABAC(ret, retq, statep, low, lowword, range, rangeq, tmp, tmpbyte, byte, end, norm_off, lps_off, mlps_off, tables) \
+#define BRANCHLESS_GET_CABAC(ret, retq, statep, low, lowword, range, rangeq, tmp, tmpbyte, t1, t1q, t2, byte, end, norm_off, lps_off, mlps_off, tables) \
         "movzbl "statep"    , "ret"                                     \n\t"\
+        "mov    "low"       , "t1"                                      \n\t"\
+        "lea    ("tables", "retq"), %%rcx                               \n\t"\
+        "shr    $17         , "t1"                                      \n\t"\
         "mov    "range"     , "tmp"                                     \n\t"\
         "and    $0xC0       , "range"                                   \n\t"\
-        "lea    ("ret", "range", 2), %%ecx                              \n\t"\
-        "movzbl "lps_off"("tables", %%rcx), "range"                     \n\t"\
+        "add    $1          , "t1"                                      \n\t"\
+        "movzbl "lps_off"(%%rcx, "rangeq", 2), "range"                  \n\t"\
         "sub    "range"     , "tmp"                                     \n\t"\
-        "mov    "tmp"       , %%ecx                                     \n\t"\
+        "movzbl "norm_off"("tables", "rangeq"), %%ecx                   \n\t"\
+        "mov    "tmp"       , "t2"                                      \n\t"\
+        "shr    $8          , "t2"                                      \n\t"\
+        "xor    $1          , "t2"                                      \n\t"\
+        "cmp    "t1"        , "tmp"                                     \n\t"\
+        "cmovae "tmp"       , "range"                                   \n\t"\
+        "cmovae "t2"        , %%ecx                                     \n\t"\
+        "sbb    "t1q"       , "t1q"                                     \n\t"\
         "shl    $17         , "tmp"                                     \n\t"\
-        BRANCHLESS_GET_CABAC_UPDATE(ret, retq, low, range, tmp)              \
-        BRANCHLESS_GET_CABAC_RENORM(range, rangeq, norm_off, tables)         \
+        "and    "t1"        , "tmp"                                     \n\t"\
+        "xor    "t1q"       , "retq"                                    \n\t"\
+        "sub    "tmp"       , "low"                                     \n\t"\
         "shl    %%cl        , "range"                                   \n\t"\
         "movzbl "mlps_off"+128("tables", "retq"), "tmp"                 \n\t"\
         "shl    %%cl        , "low"                                     \n\t"\
@@ -128,12 +101,13 @@
         END_CHECK(end)\
         "add"FF_OPSIZE" $2  , "byte"                                    \n\t"\
         "1:                                                             \n\t"\
-        BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables)              \
+        BRANCHLESS_GET_CABAC_REFILL(low, tmp)                                \
         "2:                                                             \n\t"
 
-#else /* BROKEN_RELOCATIONS */
+#else /* ARCH_X86_64 */
+#define CABAC_TMP_DECL
+#define CABAC_TMP_OPERANDS
 #define TABLES_ARG NAMED_CONSTRAINTS_ARRAY_ADD(ff_h264_cabac_tables)
-#define RIP_ARG
 
 #if HAVE_FAST_CMOV
 #define BRANCHLESS_GET_CABAC_UPDATE(ret, low, range, tmp)\
@@ -164,34 +138,12 @@
 #define BRANCHLESS_GET_CABAC_RENORM(range, rangeq, norm_off, tables) \
         "lzcnt  "range"     , %%ecx                                     \n\t"\
         "sub    $23         , %%ecx                                     \n\t"
-#define BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables) \
-        "movzwl (%%"FF_REG_c") , "tmp"                                  \n\t"\
-        "tzcnt  "low"       , %%ecx                                     \n\t"\
-        "bswap  "tmp"                                                   \n\t"\
-        "shr    $15         , "tmp"                                     \n\t"\
-        "sub    $16         , %%ecx                                     \n\t"\
-        "sub    $0xFFFF     , "tmp"                                     \n\t"\
-        "shl    %%cl        , "tmp"                                     \n\t"\
-        "add    "tmp"       , "low"                                     \n\t"
 #else /* __LZCNT__ */
 #define BRANCHLESS_GET_CABAC_RENORM(range, rangeq, norm_off, tables) \
         "movzbl "MANGLE(ff_h264_cabac_tables)"+"norm_off"("range"), %%ecx    \n\t"
-#define BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables) \
-        "movzwl (%%"FF_REG_c") , "tmp"                                  \n\t"\
-        "lea    -1("low")   , %%ecx                                     \n\t"\
-        "xor    "low"       , %%ecx                                     \n\t"\
-        "shr    $15         , %%ecx                                     \n\t"\
-        "bswap  "tmp"                                                   \n\t"\
-        "shr    $15         , "tmp"                                     \n\t"\
-        "movzbl "MANGLE(ff_h264_cabac_tables)"+"norm_off"(%%ecx), %%ecx \n\t"\
-        "sub    $0xFFFF     , "tmp"                                     \n\t"\
-        "neg    %%ecx                                                   \n\t"\
-        "add    $7          , %%ecx                                     \n\t"\
-        "shl    %%cl        , "tmp"                                     \n\t"\
-        "add    "tmp"       , "low"                                     \n\t"
 #endif /* __LZCNT__ */
 
-#define BRANCHLESS_GET_CABAC(ret, retq, statep, low, lowword, range, rangeq, tmp, tmpbyte, byte, end, norm_off, lps_off, mlps_off, tables) \
+#define BRANCHLESS_GET_CABAC(ret, retq, statep, low, lowword, range, rangeq, tmp, tmpbyte, t1, t1q, t2, byte, end, norm_off, lps_off, mlps_off, tables) \
         "movzbl "statep"    , "ret"                                     \n\t"\
         "mov    "range"     , "tmp"                                     \n\t"\
         "and    $0xC0       , "range"                                   \n\t"\
@@ -209,10 +161,10 @@
         END_CHECK(end)\
         "add"FF_OPSIZE" $2  , "byte"                                    \n\t"\
         "1:                                                             \n\t"\
-        BRANCHLESS_GET_CABAC_REFILL(low, tmp, norm_off, tables)              \
+        BRANCHLESS_GET_CABAC_REFILL(low, tmp)                                \
         "2:                                                             \n\t"
 
-#endif /* BROKEN_RELOCATIONS */
+#endif /* ARCH_X86_64 */
 
 #if HAVE_X86_7REGS && !BROKEN_COMPILER
 #define get_cabac_inline get_cabac_inline_x86
@@ -225,10 +177,11 @@ av_always_inline
 int get_cabac_inline_x86(CABACContext *c, uint8_t *const state)
 {
     int bit, tmp;
-#ifdef BROKEN_RELOCATIONS
+    CABAC_TMP_DECL
+#if ARCH_X86_64
     void *tables;
 
-    __asm__ volatile(
+    __asm__(
         "lea    "MANGLE(ff_h264_cabac_tables)", %0      \n\t"
         : "=&r"(tables)
         : NAMED_CONSTRAINTS_ARRAY(ff_h264_cabac_tables)
@@ -236,19 +189,20 @@ int get_cabac_inline_x86(CABACContext *c, uint8_t *const state)
 #endif
 
     __asm__ volatile(
-        BRANCHLESS_GET_CABAC("%0", "%q0", "(%4)", "%1", "%w1",
-                             "%2", "%q2", "%3", "%b3",
-                             "%c6(%5)", "%c7(%5)",
+        BRANCHLESS_GET_CABAC("%[bit]", "%q[bit]", "(%[state])", "%[low]", "%w[low]",
+                             "%[range]", "%q[range]", "%[tmp]", "%b[tmp]",
+                             "%[cabac_t1]", "%q[cabac_t1]", "%[cabac_t2]",
+                             "%c[bs](%[c])", "%c[bsend](%[c])",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
                              AV_STRINGIFY(H264_MLPS_STATE_OFFSET),
-                             "%8")
-        : "=&r"(bit), "=&r"(c->low), "=&r"(c->range), "=&q"(tmp)
-        : "r"(state), "r"(c),
-          "i"(offsetof(CABACContext, bytestream)),
-          "i"(offsetof(CABACContext, bytestream_end))
+                             "%[tables]")
+        : [bit]"=&r"(bit), [low]"+&r"(c->low), [range]"+&r"(c->range), [tmp]"=&q"(tmp)
+          CABAC_TMP_OPERANDS
+        : [state]"r"(state), [c]"r"(c),
+          [bs]"i"(offsetof(CABACContext, bytestream)),
+          [bsend]"i"(offsetof(CABACContext, bytestream_end))
           TABLES_ARG
-          ,"1"(c->low), "2"(c->range)
         : "%"FF_REG_c, "memory"
     );
     return bit & 1;

@@ -56,9 +56,9 @@ pb_2to6_11x7: db 2, 3, 4, 5, 6
 pb_1toE_2xF:  db 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15
 pb_2toE_3xF:  db 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 15
 pb_13456_3xm1: db 1, 3, 4, 5, 6
-               times 3 db -1
+               times 11 db -1
 pb_6012_4xm1: db 6, 0, 1, 2
-              times 4 db -1
+              times 12 db -1
 pb_6xm1_246_8toE: times 6 db -1
                   db 2, 4, 6, 8, 9, 10, 11, 12, 13, 14
 pb_6xm1_BDF_0to6: times 6 db -1
@@ -68,7 +68,7 @@ pb_02468ACE_13579BDF: db 0, 2, 4, 6, 8, 10, 12, 14, 1, 3, 5, 7, 9, 11, 13, 15
 pb_15x0_1xm1: times 15 db 0
               db -1
 pb_0to2_5x3: db 0, 1, 2
-             times 5 db 3
+             times 13 db 3
 pb_6xm1_2x0: times 6 db -1
              times 2 db 0
 pb_6x0_2xm1: times 6 db 0
@@ -93,10 +93,11 @@ SECTION .text
 
 ; dc_NxN(uint8_t *dst, ptrdiff_t stride, const uint8_t *l, const uint8_t *a)
 
-INIT_MMX ssse3
-cglobal vp9_ipred_dc_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM ssse3
+cglobal vp9_ipred_dc_4x4, 4, 4, 2, dst, stride, l, a
     movd                    m0, [lq]
-    punpckldq               m0, [aq]
+    movq                    m1, [aq]
+    punpckldq               m0, m1
     pxor                    m1, m1
     psadbw                  m0, m1
     pmulhrsw                m0, [pw_4096]
@@ -108,7 +109,7 @@ cglobal vp9_ipred_dc_4x4, 4, 4, 0, dst, stride, l, a
     movd      [dstq+strideq*1], m0
     RET
 
-cglobal vp9_ipred_dc_8x8, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_8x8, 4, 4, 3, dst, stride, l, a
     movq                    m0, [lq]
     movq                    m1, [aq]
     DEFINE_ARGS dst, stride, stride3
@@ -215,7 +216,7 @@ DC_16to32_FUNCS
 ; dc_top/left_NxN(uint8_t *dst, ptrdiff_t stride, const uint8_t *l, const uint8_t *a)
 
 %macro DC_1D_4to8_FUNCS 2 ; dir (top or left), arg (a or l)
-cglobal vp9_ipred_dc_%1_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_4x4, 4, 4, 2, dst, stride, l, a
     movd                    m0, [%2q]
     pxor                    m1, m1
     psadbw                  m0, m1
@@ -228,7 +229,7 @@ cglobal vp9_ipred_dc_%1_4x4, 4, 4, 0, dst, stride, l, a
     movd      [dstq+strideq*1], m0
     RET
 
-cglobal vp9_ipred_dc_%1_8x8, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_8x8, 4, 4, 2, dst, stride, l, a
     movq                    m0, [%2q]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
@@ -248,7 +249,7 @@ cglobal vp9_ipred_dc_%1_8x8, 4, 4, 0, dst, stride, l, a
     RET
 %endmacro
 
-INIT_MMX ssse3
+INIT_XMM ssse3
 DC_1D_4to8_FUNCS top,  a
 DC_1D_4to8_FUNCS left, l
 
@@ -326,20 +327,21 @@ INIT_XMM ssse3
 DC_1D_16to32_FUNCS top,  a
 DC_1D_16to32_FUNCS left, l
 
-INIT_MMX mmx
-cglobal vp9_ipred_v_8x8, 4, 4, 0, dst, stride, l, a
-    movq                    m0, [aq]
+INIT_XMM sse
+cglobal vp9_ipred_v_8x8, 4, 4, 1, dst, stride, l, a
+    xorps                   m0, m0
+    movlps                  m0, [aq]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    movq      [dstq+strideq*0], m0
-    movq      [dstq+strideq*1], m0
-    movq      [dstq+strideq*2], m0
-    movq      [dstq+stride3q ], m0
+    movlps    [dstq+strideq*0], m0
+    movlps    [dstq+strideq*1], m0
+    movlps    [dstq+strideq*2], m0
+    movlps    [dstq+stride3q ], m0
     lea                   dstq, [dstq+strideq*4]
-    movq      [dstq+strideq*0], m0
-    movq      [dstq+strideq*1], m0
-    movq      [dstq+strideq*2], m0
-    movq      [dstq+stride3q ], m0
+    movlps    [dstq+strideq*0], m0
+    movlps    [dstq+strideq*1], m0
+    movlps    [dstq+strideq*2], m0
+    movlps    [dstq+stride3q ], m0
     RET
 
 INIT_XMM sse
@@ -512,8 +514,8 @@ H_XMM_FUNCS 4, 8
 INIT_XMM avx
 H_XMM_FUNCS 4, 8
 
-INIT_MMX ssse3
-cglobal vp9_ipred_tm_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM ssse3
+cglobal vp9_ipred_tm_4x4, 4, 4, 5, dst, stride, l, a
     pxor                    m1, m1
     movd                    m0, [aq]
     pinsrw                  m2, [aq-1], 0
@@ -731,15 +733,15 @@ TM_XMM_FUNCS
     pavgb                  m%1, m%2
 %endmacro
 
-INIT_MMX ssse3
-cglobal vp9_ipred_dl_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM ssse3
+cglobal vp9_ipred_dl_4x4, 4, 4, 4, dst, stride, l, a
     movq                    m1, [aq]
     pshufb                  m0, m1, [pb_0to5_2x7]
     pshufb                  m2, m1, [pb_2to6_3x7]
     psrlq                   m1, 8
     LOWPASS                  0, 1, 2, 3
 
-    pshufw                  m1, m0, q3321
+    pshuflw                 m1, m0, q3321
     movd      [dstq+strideq*0], m0
     movd      [dstq+strideq*2], m1
     psrlq                   m0, 8
@@ -896,16 +898,18 @@ DL_XMM_FUNCS
 
 ; dr
 
-INIT_MMX ssse3
-cglobal vp9_ipred_dr_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM sse2
+cglobal vp9_ipred_dr_4x4, 4, 4, 4, dst, stride, l, a
     movd                    m0, [lq]
-    punpckldq               m0, [aq-1]
+    movd                    m1, [aq-1]
+    punpckldq               m0, m1
     movd                    m1, [aq+3]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    palignr                 m1, m0, 1
-    psrlq                   m2, m1, 8
-    LOWPASS                  0, 1, 2, 3
+    punpcklqdq              m2, m0, m1
+    psrldq                  m2, 1
+    psrlq                   m1, m2, 8
+    LOWPASS                  0, 2, 1, 3
 
     movd      [dstq+stride3q ], m0
     psrlq                   m0, 8
@@ -1023,8 +1027,8 @@ DR_XMM_FUNCS
 
 ; vl
 
-INIT_MMX mmxext
-cglobal vp9_ipred_vl_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM sse2
+cglobal vp9_ipred_vl_4x4, 4, 4, 4, dst, stride, l, a
     movq                    m0, [aq]
     psrlq                   m1, m0, 8
     psrlq                   m2, m1, 8
@@ -1192,15 +1196,18 @@ VL_XMM_FUNCS
 
 ; vr
 
-INIT_MMX ssse3
-cglobal vp9_ipred_vr_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM ssse3
+cglobal vp9_ipred_vr_4x4, 4, 4, 5, dst, stride, l, a
     movq                    m1, [aq-1]
-    punpckldq               m2, [lq]
+    movq                    m4, [lq]
+    punpckldq               m2, m4
     movd                    m0, [aq]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
     pavgb                   m0, m1
-    palignr                 m1, m2, 5
+    psrlq                   m2, 40
+    psllq                   m1, 24
+    por                     m1, m2
     psrlq                   m2, m1, 8
     psllq                   m3, m1, 8
     LOWPASS                  2,  1, 3, 4
@@ -1388,10 +1395,11 @@ VR_XMM_FUNCS 6
 
 ; hd
 
-INIT_MMX mmxext
-cglobal vp9_ipred_hd_4x4, 4, 4, 0, dst, stride, l, a
+INIT_XMM sse2
+cglobal vp9_ipred_hd_4x4, 4, 4, 4, dst, stride, l, a
     movd                    m0, [lq]
-    punpckldq               m0, [aq-1]
+    movq                    m3, [aq-1]
+    punpckldq               m0, m3
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
     psrlq                   m1, m0, 8
@@ -1405,7 +1413,8 @@ cglobal vp9_ipred_hd_4x4, 4, 4, 0, dst, stride, l, a
     ; AEBF  | m2 contains EFGHIJxx
 
     punpcklbw               m1, m2
-    punpckhdq               m0, m1, m2
+    punpckldq               m0, m1, m2
+    psrldq                  m0, 8
 
     ; m1 contains AEBFCGDH
     ; m0 contains CGDHIJxx
@@ -1596,8 +1605,8 @@ HD_XMM_FUNCS
 INIT_XMM avx
 HD_XMM_FUNCS
 
-INIT_MMX ssse3
-cglobal vp9_ipred_hu_4x4, 3, 3, 0, dst, stride, l
+INIT_XMM ssse3
+cglobal vp9_ipred_hu_4x4, 3, 3, 4, dst, stride, l
     movd                    m0, [lq]
     pshufb                  m0, [pb_0to2_5x3]
     psrlq                   m1, m0, 8
@@ -1606,12 +1615,12 @@ cglobal vp9_ipred_hu_4x4, 3, 3, 0, dst, stride, l
     pavgb                   m1, m0
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
-    SBUTTERFLY              bw,  1, 2, 0
-    palignr                 m2, m1, 2
+    punpcklbw               m1, m2
+    psrldq                  m2, m1, 2
     movd      [dstq+strideq*0], m1
     movd      [dstq+strideq*1], m2
-    punpckhdq               m1, m1
-    punpckhdq               m2, m2
+    psrlq                   m1, 32
+    psrlq                   m2, 32
     movd      [dstq+strideq*2], m1
     movd      [dstq+stride3q ], m2
     RET

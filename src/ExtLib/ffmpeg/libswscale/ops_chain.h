@@ -21,10 +21,13 @@
 #ifndef SWSCALE_OPS_CHAIN_H
 #define SWSCALE_OPS_CHAIN_H
 
+#include "libavutil/avassert.h"
+#include "libavutil/avconfig.h"
 #include "libavutil/cpu.h"
 #include "libavutil/mem.h"
 
 #include "ops_internal.h"
+#include "swscale_internal.h"
 
 /**
  * Helpers for SIMD implementations based on chained kernels, using a
@@ -40,41 +43,20 @@
 typedef struct SwsUOpTable SwsUOpTable;
 
 /**
- * Private data for each kernel.
- */
-typedef union SwsOpPriv {
-    DECLARE_ALIGNED_16(char, data)[16];
-
-    /* Common types */
-    void *ptr;
-    uint8_t    u8[16];
-    int8_t     i8[16];
-    uint16_t   u16[8];
-    int16_t    i16[8];
-    uint32_t   u32[4];
-    int32_t    i32[4];
-    float      f32[4];
-    uint64_t   u64[2];
-    int64_t    i64[2];
-    uintptr_t uptr[2];
-    intptr_t  iptr[2];
-} SwsOpPriv;
-
-static_assert(sizeof(SwsOpPriv) == 16, "SwsOpPriv size mismatch");
-
-/**
  * Per-kernel execution context.
  *
  * Note: This struct is hard-coded in assembly, so do not change the layout.
  */
 typedef void (*SwsFuncPtr)(void);
 typedef struct SwsOpImpl {
-    SwsFuncPtr cont; /* [offset =  0] Continuation for this operation. */
-    SwsOpPriv  priv; /* [offset = 16] Private data for this operation. */
+    SwsFuncPtr func;   /* Function pointer for this operation. */
+    char       priv[]; /* Private data for this operation. */
 } SwsOpImpl;
 
-static_assert(sizeof(SwsOpImpl) == 32,         "SwsOpImpl layout mismatch");
-static_assert(offsetof(SwsOpImpl, priv) == 16, "SwsOpImpl layout mismatch");
+#if ARCH_X86_64 || ARCH_AARCH64
+static_assert(offsetof(SwsOpImpl, priv) == 8, "SwsOpImpl layout mismatch");
+static_assert(alignof(SwsOpImpl) == sizeof(void *), "SwsOpImpl alignment mismatch");
+#endif
 
 /**
  * Compiled "chain" of operations, which can be dispatched efficiently.
@@ -82,13 +64,20 @@ static_assert(offsetof(SwsOpImpl, priv) == 16, "SwsOpImpl layout mismatch");
  * private data for each operation.
  */
 typedef struct SwsOpChain {
-#define SWS_MAX_OPS 16
-    SwsOpImpl impl[SWS_MAX_OPS + 1]; /* reserve extra space for the entrypoint */
-    void (*free[SWS_MAX_OPS + 1])(SwsOpPriv *);
-    int num_impl;
+    /* Generic data buffer. This contains a packed representation of
+     * continuation addresses and kernel private data. This is placed at
+     * the front of the struct so SIMD kernels can access it directly. */
+    DECLARE_ALIGNED_8(uint8_t, impl)[1024];
+    int impl_size;
+
+    /* Metadata for the chain */
     int cpu_flags;      /* set of all used CPU flags */
     int over_read[4];   /* chain over-reads input by this many bytes */
     int over_write[4];  /* chain over-writes output by this many bytes */
+
+    /* Extra references owned by each kernel */
+    const void *ref[16];
+    int num_ref;
 } SwsOpChain;
 
 SwsOpChain *ff_sws_op_chain_alloc(void);
@@ -99,8 +88,16 @@ static inline void ff_sws_op_chain_free(SwsOpChain *chain)
 }
 
 /* Returns 0 on success, or a negative error code. */
-int ff_sws_op_chain_append(SwsOpChain *chain, SwsFuncPtr func,
-                           void (*free)(SwsOpPriv *), const SwsOpPriv *priv);
+int ff_sws_op_chain_append(SwsOpChain *chain, SwsFuncPtr func, const void *ref,
+                           const void *data, size_t data_size);
+
+/**
+ * Attach a SwsOpChain and all metadata to a SwsCompiledOp (as out->priv).
+ *
+ * Note: This does not initialize *out. The caller is responsible for
+ * assigning out->func.
+ */
+void ff_sws_op_chain_attach(const SwsOpChain *chain, SwsCompiledOp *out);
 
 typedef struct SwsImplParams {
     const SwsUOpTable *table;
@@ -110,10 +107,13 @@ typedef struct SwsImplParams {
 
 typedef struct SwsImplResult {
     SwsFuncPtr func; /* overrides `SwsUOpEntry.func` if non-NULL */
-    SwsOpPriv priv; /* private data for this implementation instance */
-    void (*free)(SwsOpPriv *priv); /* free function for `priv` */
     int over_read[4];  /* implementation over-reads input by this many bytes */
     int over_write[4]; /* implementation over-writes output by this many bytes */
+    const void *ref; /* external data backing `priv`, ownership passes to caller */
+
+    /* Private data for this kernel */
+    size_t priv_size;
+    uint8_t priv[128];
 } SwsImplResult;
 
 typedef struct SwsUOpEntry {
@@ -133,14 +133,19 @@ typedef struct SwsUOpEntry {
 int ff_sws_setup_scalar(const SwsImplParams *params, SwsImplResult *out);
 int ff_sws_setup_vec4(const SwsImplParams *params, SwsImplResult *out);
 
-static inline void ff_op_priv_free(SwsOpPriv *priv)
+#define SWS_OP_PRIV_PACK(out, data) ff_sws_op_priv_pack(out, &data, sizeof(data))
+static inline void ff_sws_op_priv_pack(SwsImplResult *out, const void *data, size_t size)
 {
-    av_freep(&priv->ptr);
+    av_assert0(out->priv_size + size <= sizeof(out->priv));
+    memcpy(&out->priv[out->priv_size], data, size);
+    out->priv_size += size;
 }
 
-static inline void ff_op_priv_unref(SwsOpPriv *priv)
+static inline void ff_sws_op_priv_pack_refptr(SwsImplResult *out, const void *data)
 {
-    av_refstruct_unref(&priv->ptr);
+    ff_sws_op_priv_pack(out, &data, sizeof(data));
+    av_assert0(!out->ref);
+    out->ref = data;
 }
 
 struct SwsUOpTable {

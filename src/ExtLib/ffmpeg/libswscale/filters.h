@@ -39,7 +39,13 @@ enum {
      */
     SWS_FILTER_SCALE    = (1 << 14),
     SWS_FILTER_SIZE_MAX = 256,
+    SWS_FILTER_PAD_ROWS = 32, /* extra zero rows past `weights` */
 };
+
+/**
+ * Return the friendly name of a given scaler enum, or NULL if invalid.
+ */
+const char *ff_sws_scaler_name(SwsScaler scaler);
 
 /* Parameters for filter generation. */
 typedef struct SwsFilterParams {
@@ -107,6 +113,7 @@ typedef struct SwsFilterWeights {
     /**
      * Copy of the parameters used to generate this filter, for reference.
      */
+    SwsScaler scaler; /* SWS_SCALE_AUTO is resolved */
     int src_size;
     int dst_size;
     double virtual_size;
@@ -116,7 +123,6 @@ typedef struct SwsFilterWeights {
      * Extra metadata about the filter, used to inform the optimizer / range
      * tracker about the filter's behavior.
      */
-    char name[16];    /* name of the configured filter kernel */
     int sum_positive; /* (maximum) sum of all positive weights */
     int sum_negative; /* (minimum) sum of all negative weights */
 } SwsFilterWeights;

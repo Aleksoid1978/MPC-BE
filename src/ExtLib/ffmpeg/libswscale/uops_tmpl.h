@@ -42,10 +42,10 @@
 #endif
 
 typedef union block_t {
-    uint8_t   u8[SWS_BLOCK_SIZE];
-    uint16_t u16[SWS_BLOCK_SIZE];
-    uint32_t u32[SWS_BLOCK_SIZE];
     float    f32[SWS_BLOCK_SIZE];
+    uint32_t u32[SWS_BLOCK_SIZE];
+    uint16_t u16[SWS_BLOCK_SIZE];
+    uint8_t   u8[SWS_BLOCK_SIZE];
 } block_t;
 
 #define SIZEOF_BLOCK (sizeof(pixel_t) * SWS_BLOCK_SIZE)
@@ -62,6 +62,26 @@ typedef struct SwsOpIter {
     /* Link back to per-slice execution context */
     const SwsOpExec *exec;
 } SwsOpIter;
+
+/* Private data for generic kernels. */
+typedef union SwsOpPriv {
+    float    f32[4];
+    uint32_t u32[4];
+    uint16_t u16[4];
+    uint8_t  u8[4];
+    void    *ptr;
+} SwsOpPriv;
+
+#define SWS_OP_PRIV(impl) ((const void *) (impl)->priv)
+
+/* Private data for filtered reads */
+typedef struct SwsFilterPriv {
+    void *weights;
+    int filter_size;
+} SwsFilterPriv;
+
+static_assert(alignof(SwsFilterPriv) <= alignof(SwsOpPriv),
+              "SwsFilterPriv alignment exceeds SwsOpPriv");
 
 /* UBSan checks inside the loop body defeat the vectorizer, so do not ask
  * for it in those builds. Clang warns for every loop otherwise. */
@@ -108,12 +128,16 @@ typedef struct SwsOpIter {
 
 #define CALL(NAME, ...) fn(NAME)(iter, impl, x, y, z, w, __VA_ARGS__)
 
-/* Helper macro to call into the next continuation with a given type */
-#define CONTINUE(...)                                                           \
+#define NEXT_IMPL(N)                                                            \
+    ((const SwsOpImpl *) &impl->priv[FFALIGN(N, alignof(SwsOpImpl))])
+
+/* Helper macro to call into the next continuation with a given type; N gives
+ * the size of private data consumed by this op */
+#define CONTINUE(N, ...)                                                        \
     ((void (*)(SwsOpIter *, const SwsOpImpl *,                                  \
                void *restrict x, void *restrict y,                              \
-               void *restrict z, void *restrict w)) impl->cont)                 \
-        (iter, &impl[1], __VA_ARGS__)
+               void *restrict z, void *restrict w)) NEXT_IMPL(N)->func)         \
+        (iter, NEXT_IMPL(N), __VA_ARGS__)
 
 /* Helper macros for common op setup code */
 #define DECL_SETUP(NAME, PARAMS, OUT)                                           \

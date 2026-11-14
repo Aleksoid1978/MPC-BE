@@ -29,6 +29,7 @@
 #include "csputils.h"
 #include "ops_internal.h"
 #include "config_components.h"
+#include "swscale_internal.h"
 
 #define RET(x)                                                                 \
     do {                                                                       \
@@ -232,8 +233,8 @@ static const LegacyFormatEntry legacy_format_entries[] = {
     [AV_PIX_FMT_GRAYF32BE]      = { 1, 1 },
     [AV_PIX_FMT_GRAYF16LE]      = { 1, 0 },
     [AV_PIX_FMT_GRAYF16BE]      = { 1, 0 },
-    [AV_PIX_FMT_YAF32LE]        = { 1, 0 },
-    [AV_PIX_FMT_YAF32BE]        = { 1, 0 },
+    [AV_PIX_FMT_YAF32LE]        = { 1, 1 },
+    [AV_PIX_FMT_YAF32BE]        = { 1, 1 },
     [AV_PIX_FMT_YAF16LE]        = { 1, 0 },
     [AV_PIX_FMT_YAF16BE]        = { 1, 0 },
     [AV_PIX_FMT_YUVA422P12BE]   = { 1, 1 },
@@ -268,8 +269,10 @@ static const LegacyFormatEntry legacy_format_entries[] = {
     [AV_PIX_FMT_RGBAF16LE]      = { 1, 0 },
     [AV_PIX_FMT_RGBF16BE]       = { 1, 0 },
     [AV_PIX_FMT_RGBF16LE]       = { 1, 0 },
-    [AV_PIX_FMT_RGBF32BE]       = { 1, 0 },
-    [AV_PIX_FMT_RGBF32LE]       = { 1, 0 },
+    [AV_PIX_FMT_RGBF32BE]       = { 1, 1 },
+    [AV_PIX_FMT_RGBF32LE]       = { 1, 1 },
+    [AV_PIX_FMT_RGBAF32BE]      = { 1, 1 },
+    [AV_PIX_FMT_RGBAF32LE]      = { 1, 1 },
     [AV_PIX_FMT_XV30LE]         = { 1, 1 },
     [AV_PIX_FMT_XV36LE]         = { 1, 1 },
     [AV_PIX_FMT_XV36BE]         = { 1, 1 },
@@ -1329,7 +1332,7 @@ static AVRational64 *generate_bayer_matrix(const int size_log2)
 {
     const int size = 1 << size_log2;
     const int num_entries = size * size;
-    AVRational64 *m = av_refstruct_allocz(sizeof(*m) * num_entries);
+    AVRational64 *m = ff_refstruct_calloc(num_entries, sizeof(*m));
     av_assert1(size_log2 < 16);
     if (!m)
         return NULL;

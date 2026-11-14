@@ -101,6 +101,17 @@ static inline SwsPixel ff_sws_pixel_from_q64(SwsPixelType type, AVRational64 val
     return (SwsPixel) {0};
 }
 
+/* Expand pixel value to 32-bits by repeating as necessary */
+static inline SwsPixel ff_sws_pixel_expand32(SwsPixelType type, SwsPixel val)
+{
+    switch (type) {
+    case SWS_PIXEL_U8:  val.u32 = val.u8  * 0x01010101u; break;
+    case SWS_PIXEL_U16: val.u32 = val.u16 * 0x00010001u; break;
+    default: break;
+    }
+    return val;
+}
+
 static inline bool ff_sws_pixel_is_1s(SwsPixelType type, SwsPixel val)
 {
     switch (ff_sws_pixel_type_size(type)) {
@@ -244,6 +255,10 @@ typedef struct SwsPackUOp {
     uint8_t pattern[4]; /* bit depth pattern, from MSB to LSB */
 } SwsPackUOp;
 
+/**
+ * The clear values (SwsUOp.data.vec4) are always expanded to repeating 32-bit
+ * patterns, so they remain valid if the uop is executed as a smaller type.
+ */
 typedef struct SwsClearUOp {
     SwsCompMask one;  /* mask of coefficients equal to all 1s */
     SwsCompMask zero; /* mask of coefficients equal to all 0s */

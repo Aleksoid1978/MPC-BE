@@ -571,7 +571,8 @@ static int compile_single(const CompileArgs *args, const SwsOpList *ops,
                                     input, 0, c.slice_align, c.func_opaque,
                                     NULL, c.priv, c.free, output);
         if (ret >= 0) {
-            (*output)->backend = c.backend->flags;
+            (*output)->backend   = c.backend->flags;
+            (*output)->cpu_flags = c.cpu_flags;
             op_list_get_plane_copy(ops, *output);
             ff_sws_pass_link_output(*output, link);
         }
@@ -585,8 +586,10 @@ static int compile_single(const CompileArgs *args, const SwsOpList *ops,
     p->pixel_bits_out = rw_pixel_bits(write);
     p->palette_idx    = -1;
     p->num_blocks     = (dst->width + comp->block_size - 1) / comp->block_size;
-    if (p->num_blocks * comp->block_size < (unsigned) dst->width)
-        return AVERROR(ERANGE);
+    if (p->num_blocks * comp->block_size < (unsigned) dst->width) {
+        ret = AVERROR(ERANGE);
+        goto fail;
+    }
 
     SwsOpExec *exec = &p->exec_base;
     *exec = (SwsOpExec) {
@@ -689,7 +692,8 @@ static int compile_single(const CompileArgs *args, const SwsOpList *ops,
     if (ret < 0)
         return ret;
 
-    (*output)->backend = comp->backend->flags;
+    (*output)->backend   = comp->backend->flags;
+    (*output)->cpu_flags = comp->cpu_flags;
     op_list_get_plane_copy(ops, *output);
     ff_sws_pass_link_output(*output, link);
     align_pass(*output, comp->block_size, comp->over_write, p->pixel_bits_out);
@@ -743,11 +747,7 @@ static int compile_subpass(const CompileArgs *args, SwsOpList **pops,
         }
     }
 
-    ret = compile_single(args, ops, link, input, output);
-    if (ret != AVERROR(ENOTSUP))
-        goto fail; /* either success or a hard error */
-
-    /* Find any unresolved filter */
+    /* Split off any unresolved filters, since no backend implements these */
     for (int idx = 1; idx < ops->num_ops - 1; idx++) {
         const SwsOp *op = &ops->ops[idx];
         if (op->op == SWS_OP_FILTER_H || op->op == SWS_OP_FILTER_V) {
@@ -766,11 +766,11 @@ static int compile_subpass(const CompileArgs *args, SwsOpList **pops,
         }
     }
 
-    /* If we didn't find any more operations to eliminate, then this ops list
-     * is simply unsupported by any of the available backends */
-    av_log(ctx, AV_LOG_WARNING, "No backend found for operations:\n");
-    ff_sws_op_list_print(ctx, AV_LOG_WARNING, AV_LOG_TRACE, ops);
-    ret = AVERROR(ENOTSUP);
+    ret = compile_single(args, ops, link, input, output);
+    if (ret == AVERROR(ENOTSUP)) {
+        av_log(ctx, AV_LOG_WARNING, "No backend found for operations:\n");
+        ff_sws_op_list_print(ctx, AV_LOG_WARNING, AV_LOG_TRACE, ops);
+    }
 
 fail:
     ff_sws_op_list_free(&ops);
