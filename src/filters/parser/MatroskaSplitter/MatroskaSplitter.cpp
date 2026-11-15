@@ -1957,9 +1957,9 @@ void CMatroskaSplitterFilter::SetupChapters(LPCSTR lng, ChapterAtom* parent, int
 		tabs += L' ';
 	}
 
-	for (const auto& ca : parent->ChapterAtoms) {
+	for (const auto& chapterAtom : parent->ChapterAtoms) {
 		// ChapUID zero not allow by Matroska specs
-		const UINT64 ChapUID  = ca->ChapterUID;
+		const UINT64 ChapUID  = chapterAtom->ChapterUID;
 		ChapterAtom* ca = (ChapUID == 0) ? nullptr : m_pFile->m_segment.FindChapterAtom(ChapUID);
 
 		if (ca) {
