@@ -115,6 +115,8 @@ SetupIconFile=..\src\apps\mplayerc\res\icon.ico
 AppReadmeFile={app}\Readme.md
 WizardImageFile=WizardImageFile.png
 WizardSmallImageFile=WizardSmallImageFile.png
+WizardImageFileDynamicDark=WizardImageFile.png
+WizardSmallImageFileDynamicDark=WizardSmallImageFile.png
 #if VER >= EncodeVer(6,6,0)
 WizardStyle=modern dynamic
 #endif
