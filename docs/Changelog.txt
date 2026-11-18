@@ -5,6 +5,7 @@
 Updated Italian translation (by mapi68).
 
 Updated libraries:
+	dav1d 1.5.5;
 	ffmpeg n9.1-dev-3598-gcf8e0c40b6.
 
 
