@@ -715,22 +715,28 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret)
 
 static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 {
-	CString buff;
+	CStringW buff;
+	int val = 0;
 
 	struct lrc {
-		CString text;
-		int start, end;
+		CStringW text;
+		int start, end; // ms
 	};
 	std::vector<lrc> lrc_lines;
+	int offset = 0;
 
 	for(unsigned line = 0; file->ReadString(buff); ++line) {
-		if (line == 10 && lrc_lines.empty()) {
+		if (line == 20 && lrc_lines.empty()) {
 			break; // this is not a lrc file, stop analysis
 		}
 
 		FastTrim(buff);
-		if (buff.IsEmpty()) {
+		if (buff.IsEmpty() || buff[0] != L'[') {
 			continue;
+		}
+
+		if (swscanf_s(buff, L"[offset:%d]", &val) == 1) {
+			offset = val;
 		}
 
 		const std::wregex regex(L"\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2}))?\\]");
@@ -754,7 +760,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 			continue;
 		}
 
-		CString txt(text);
+		CStringW txt(text);
 		FastTrim(txt);
 
 		for (const auto& time : times) {
@@ -775,7 +781,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 
 	for (const auto& line : lrc_lines) {
 		if (line.text.GetLength() && line.start < line.end) {
-			ret.Add(line.text, line.start, line.end);
+			ret.Add(line.text, line.start + offset, line.end + offset);
 		}
 	}
 
