@@ -715,6 +715,9 @@ static bool OpenOldSubRipper(CTextFile* file, CSimpleTextSubtitle& ret)
 
 static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 {
+	// "https://en.wikipedia.org/wiki/LRC_(file_format)"
+	// https://amll.dev/en/guides/lyric/formats.html#lrc
+
 	CStringW buff;
 	int val = 0;
 
@@ -739,7 +742,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 			offset = -val; // A positive offset in an LRC file causes the text to appear earlier.
 		}
 
-		const std::wregex regex(L"\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2}))?\\]");
+		const std::wregex regex(L"\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2,3}))?\\]");
 		std::wcmatch match;
 
 		std::vector<int> times;
@@ -749,6 +752,9 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 				int mm = match[1].matched ? _wtoi(match[1].first) : 0;
 				int ss = match[2].matched ? _wtoi(match[2].first) : 0;
 				int ms = match[3].matched ? _wtoi(match[3].first) : 0;
+				if (match[3].length() == 2) {
+					ms *= 10;
+				}
 
 				times.push_back(((mm * 60) + ss) * 1000 + ms);
 			}
