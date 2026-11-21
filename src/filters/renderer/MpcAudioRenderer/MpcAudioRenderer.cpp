@@ -780,7 +780,7 @@ STDMETHODIMP CMpcAudioRenderer::Run(REFERENCE_TIME rtStart)
 		NewSegment();
 	}
 
-	{
+	if (!m_bEOS && m_bIsAudioClientStarted) {
 		CAutoLock cCheckLock(&m_csCheck);
 		if (m_pAudioClock && !m_pSyncClock->IsSlave()) {
 			CAutoLock cAutoLock(&m_csAudioClock);
@@ -828,7 +828,13 @@ STDMETHODIMP CMpcAudioRenderer::Pause()
 		StartReleaseTimer();
 	}
 
-	return CBaseRenderer::Pause();
+	HRESULT hr = CBaseRenderer::Pause();
+	if (hr == S_FALSE) {
+		Ready();
+		hr = S_OK;
+	}
+
+	return hr;
 };
 
 // === IBasicAudio
@@ -3183,6 +3189,10 @@ HRESULT CMpcAudioRenderer::EndFlush()
 	HRESULT hr = CBaseRenderer::EndFlush();
 
 	m_FlushEvent.Reset();
+
+	if (m_State == State_Paused) {
+		Ready();
+	}
 
 	return hr;
 }
