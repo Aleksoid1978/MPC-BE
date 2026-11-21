@@ -1,6 +1,6 @@
 /*
  * (C) 2003-2006 Gabest
- * (C) 2006-2025 see Authors.txt
+ * (C) 2006-2026 see Authors.txt
  *
  * This file is part of MPC-BE.
  *
@@ -736,7 +736,7 @@ static bool OpenLRC(CTextFile* file, CSimpleTextSubtitle& ret)
 		}
 
 		if (swscanf_s(buff, L"[offset:%d]", &val) == 1) {
-			offset = val;
+			offset = -val; // A positive offset in an LRC file causes the text to appear earlier.
 		}
 
 		const std::wregex regex(L"\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2}))?\\]");
