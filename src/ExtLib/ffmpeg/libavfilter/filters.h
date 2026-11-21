@@ -493,7 +493,7 @@ static inline const FFFilter *fffilter(const AVFilter *f)
 #define AVFILTER_DEFINE_CLASS(fname) \
     AVFILTER_DEFINE_CLASS_EXT(fname, #fname, fname##_options)
 
-#define D2TS(d)      (isnan(d) ? AV_NOPTS_VALUE : (int64_t)(d))
+#define D2TS(d)      ((d) >= INT64_MIN && (d) < (double)INT64_MAX ? (int64_t)(d) : AV_NOPTS_VALUE)
 #define TS2D(ts)     ((ts) == AV_NOPTS_VALUE ? NAN : (double)(ts))
 #define TS2T(ts, tb) ((ts) == AV_NOPTS_VALUE ? NAN : (double)(ts) * av_q2d(tb))
 
@@ -508,6 +508,30 @@ static inline const FFFilter *fffilter(const AVFilter *f)
  * events.
  */
 void ff_filter_set_ready(AVFilterContext *filter, unsigned priority);
+
+/**
+ * Longest line, in bytes, that ff_filter_log_lines() passes to a single
+ * av_log() call. It leaves room for the log prefix in fixed-size line
+ * buffers such as the 1024-byte one of ffmpeg's -report callback.
+ */
+#define FF_FILTER_LOG_LINE_MAX 896
+
+struct AVBPrint;
+
+/**
+ * Log text built in an AVBPrint with one av_log() call per line, so that
+ * output from other threads cannot land in the middle of a line and every
+ * line gets its own prefix. Lines longer than FF_FILTER_LOG_LINE_MAX bytes
+ * are split before a space if there is one near the limit; no byte is lost.
+ *
+ * If the buffer is incomplete, the text it holds is logged, followed by a
+ * warning.
+ *
+ * @param ctx   logging context
+ * @param level log level of the text
+ * @param bp    text to log; a missing final newline is supplied
+ */
+void ff_filter_log_lines(void *ctx, int level, const struct AVBPrint *bp);
 
 /**
  * Get the number of frames available on the link.

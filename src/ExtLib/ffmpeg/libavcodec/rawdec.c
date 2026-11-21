@@ -81,7 +81,8 @@ static av_cold int raw_init_decoder(AVCodecContext *avctx)
     else if (avctx->codec_tag == MKTAG('W', 'R', 'A', 'W'))
         avctx->pix_fmt = avpriv_pix_fmt_find(PIX_FMT_LIST_AVI,
                                       avctx->bits_per_coded_sample);
-    else if (avctx->codec_tag && (avctx->codec_tag & 0xFFFFFF) != MKTAG('B','I','T', 0))
+    else if (avctx->codec_tag && (avctx->codec_tag & 0xFFFFFF) != MKTAG('B','I','T', 0) &&
+             avctx->codec_tag != MKTAG('u','n','c','v'))
         avctx->pix_fmt = avpriv_pix_fmt_find(PIX_FMT_LIST_RAW, avctx->codec_tag);
     else if (avctx->pix_fmt == AV_PIX_FMT_NONE && avctx->bits_per_coded_sample)
         avctx->pix_fmt = avpriv_pix_fmt_find(PIX_FMT_LIST_AVI,
@@ -428,7 +429,8 @@ static int raw_decode(AVCodecContext *avctx, AVFrame *frame,
         avctx->codec_tag == MKTAG('Y', 'V', 'U', '9'))
         FFSWAP(uint8_t *, frame->data[1], frame->data[2]);
 
-    if (avctx->codec_tag == AV_RL32("I420") && (avctx->width+1)*(avctx->height+1) * 3/2 == buf_size) {
+    if (avctx->codec_tag == AV_RL32("I420") && !((avctx->width | avctx->height) & 1) &&
+        (avctx->width+1)*(avctx->height+1) * 3/2 == buf_size) {
         frame->data[1] = frame->data[1] +  (avctx->width+1)*(avctx->height+1) -avctx->width*avctx->height;
         frame->data[2] = frame->data[2] + ((avctx->width+1)*(avctx->height+1) -avctx->width*avctx->height)*5/4;
     }

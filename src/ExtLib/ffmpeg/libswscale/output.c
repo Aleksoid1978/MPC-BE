@@ -1671,7 +1671,7 @@ YUV2PACKED16WRAPPER(yuv2, rgba64_full, rgbxf32le_full, AV_PIX_FMT_RGBAF32, LE, 0
  * correct RGB values into the destination buffer.
  */
 static av_always_inline void
-yuv2rgb_write(uint8_t *_dest, int i, int Y1, int Y2,
+yuv2rgb_write(uint8_t *_dest, int i, int dstW, int Y1, int Y2,
               unsigned A1, unsigned A2,
               const void *_r, const void *_g, const void *_b, int y,
               enum AVPixelFormat target, int hasAlpha)
@@ -1755,7 +1755,10 @@ yuv2rgb_write(uint8_t *_dest, int i, int Y1, int Y2,
         }
 
         dest[i * 2 + 0] = r[Y1 + dr1] + g[Y1 + dg1] + b[Y1 + db1];
-        dest[i * 2 + 1] = r[Y2 + dr2] + g[Y2 + dg2] + b[Y2 + db2];
+        /* these formats have no full chroma interpolation and so are
+         * output in pairs for odd widths too */
+        if (i * 2 + 1 < dstW)
+            dest[i * 2 + 1] = r[Y2 + dr2] + g[Y2 + dg2] + b[Y2 + db2];
     } else if (target == AV_PIX_FMT_X2RGB10 || target == AV_PIX_FMT_X2BGR10) {
         uint32_t *dest = (uint32_t *) _dest;
         const uint32_t *r = (const uint32_t *) _r;
@@ -1845,7 +1848,7 @@ yuv2rgb_X_c_template(SwsInternal *c, const int16_t *lumFilter,
         g = (c->table_gU[U + YUVRGB_TABLE_HEADROOM] + c->table_gV[V + YUVRGB_TABLE_HEADROOM]);
         b =  c->table_bU[U + YUVRGB_TABLE_HEADROOM];
 
-        yuv2rgb_write(dest, i, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
+        yuv2rgb_write(dest, i, dstW, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
                       r, g, b, y, target, hasAlpha);
     }
 }
@@ -1885,7 +1888,7 @@ yuv2rgb_2_c_template(SwsInternal *c, const int16_t *buf[2],
             A2 = av_clip_uint8(A2);
         }
 
-        yuv2rgb_write(dest, i, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
+        yuv2rgb_write(dest, i, dstW, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
                       r, g, b, y, target, hasAlpha);
     }
 }
@@ -1918,7 +1921,7 @@ yuv2rgb_1_c_template(SwsInternal *c, const int16_t *buf0,
                 A2 = av_clip_uint8(A2);
             }
 
-            yuv2rgb_write(dest, i, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
+            yuv2rgb_write(dest, i, dstW, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
                           r, g, b, y, target, hasAlpha);
         }
     } else {
@@ -1943,7 +1946,7 @@ yuv2rgb_1_c_template(SwsInternal *c, const int16_t *buf0,
                 A2 = av_clip_uint8(A2);
             }
 
-            yuv2rgb_write(dest, i, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
+            yuv2rgb_write(dest, i, dstW, Y1, Y2, hasAlpha ? A1 : 0, hasAlpha ? A2 : 0,
                           r, g, b, y, target, hasAlpha);
         }
     }
@@ -2522,9 +2525,9 @@ yuv2gbrp16_full_X_c(SwsInternal *c, const int16_t *lumFilter,
         Y -= c->yuv2rgb_y_offset;
         Y *= c->yuv2rgb_y_coeff;
         Y += (1 << 13) - (1 << 29);
-        R = V * c->yuv2rgb_v2r_coeff;
-        G = V * c->yuv2rgb_v2g_coeff + U * c->yuv2rgb_u2g_coeff;
-        B =                            U * c->yuv2rgb_u2b_coeff;
+        R = V * (unsigned)c->yuv2rgb_v2r_coeff;
+        G = V * (unsigned)c->yuv2rgb_v2g_coeff + U * (unsigned)c->yuv2rgb_u2g_coeff;
+        B =                                      U * (unsigned)c->yuv2rgb_u2b_coeff;
 
         dest16[2][i] = av_clip_uintp2(((Y + (int64_t)R) >> 14) + (1<<15), 16);
         dest16[0][i] = av_clip_uintp2(((Y + (int64_t)G) >> 14) + (1<<15), 16);
@@ -2595,13 +2598,13 @@ yuv2gbrpf32_full_X_c(SwsInternal *c, const int16_t *lumFilter,
         Y -= c->yuv2rgb_y_offset;
         Y *= c->yuv2rgb_y_coeff;
         Y += (1 << 13) - (1 << 29);
-        R = V * c->yuv2rgb_v2r_coeff;
-        G = V * c->yuv2rgb_v2g_coeff + U * c->yuv2rgb_u2g_coeff;
-        B =                            U * c->yuv2rgb_u2b_coeff;
+        R = V * (unsigned)c->yuv2rgb_v2r_coeff;
+        G = V * (unsigned)c->yuv2rgb_v2g_coeff + U * (unsigned)c->yuv2rgb_u2g_coeff;
+        B =                                      U * (unsigned)c->yuv2rgb_u2b_coeff;
 
-        R = av_clip_uintp2(((Y + R) >> 14) + (1<<15), 16);
-        G = av_clip_uintp2(((Y + G) >> 14) + (1<<15), 16);
-        B = av_clip_uintp2(((Y + B) >> 14) + (1<<15), 16);
+        R = av_clip_uintp2(((Y + (int64_t)R) >> 14) + (1<<15), 16);
+        G = av_clip_uintp2(((Y + (int64_t)G) >> 14) + (1<<15), 16);
+        B = av_clip_uintp2(((Y + (int64_t)B) >> 14) + (1<<15), 16);
 
         dest32[0][i] = av_float2int(float_mult * (float)G);
         dest32[1][i] = av_float2int(float_mult * (float)B);

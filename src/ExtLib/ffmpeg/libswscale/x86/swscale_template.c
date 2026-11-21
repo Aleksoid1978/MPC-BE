@@ -30,6 +30,22 @@
 #define REAL_MOVNTQ(a,b) "movntq " #a ", " #b " \n\t"
 #define MOVNTQ(a,b)  REAL_MOVNTQ(a,b)
 
+#define REAL_NEXT_PIXEL_BLOCK(dstw, index, step_back) \
+    "add      $16, "#index"     \n\t"\
+    "cmp   "dstw", "#index"     \n\t"\
+    "lea -8("#index"), "#index" \n\t"\
+    " jbe      1b               \n\t"\
+    "cmp   "dstw", "#index"     \n\t"\
+    " jae      3f               \n\t"\
+    "add       $8, "#index"     \n\t"\
+    "sub   "dstw", "#index"     \n\t"\
+    step_back \
+    "mov   "dstw", "#index"     \n\t"\
+    "sub       $8, "#index"     \n\t"\
+    " jmp      1b               \n\t"\
+    "3:                         \n\t"
+#define NEXT_PIXEL_BLOCK(dstw, index, step_back)  REAL_NEXT_PIXEL_BLOCK(dstw, index, step_back)
+
 #define YSCALEYUV2PACKEDX_UV \
     __asm__ volatile(\
         "xor                %%"FF_REG_a", %%"FF_REG_a"  \n\t"\
@@ -242,9 +258,7 @@
     MOVNTQ(   q2, 16(dst, index, 4))\
     MOVNTQ(   q3, 24(dst, index, 4))\
 \
-    "add      $8, "#index"      \n\t"\
-    "cmp  "dstw", "#index"      \n\t"\
-    " jb      1b                \n\t"
+    NEXT_PIXEL_BLOCK(dstw, index, )
 #define WRITEBGR32(dst, dstw, index, b, g, r, a, q0, q2, q3, t)  REAL_WRITEBGR32(dst, dstw, index, b, g, r, a, q0, q2, q3, t)
 
 static void RENAME(yuv2rgb32_X_ar)(SwsInternal *c, const int16_t *lumFilter,
@@ -361,9 +375,7 @@ static void RENAME(yuv2bgr32_X)(SwsInternal *c, const int16_t *lumFilter,
     MOVNTQ(%%mm2,  (dst, index, 2))\
     MOVNTQ(%%mm1, 8(dst, index, 2))\
 \
-    "add             $8, "#index"   \n\t"\
-    "cmp         "dstw", "#index"   \n\t"\
-    " jb             1b             \n\t"
+    NEXT_PIXEL_BLOCK(dstw, index, )
 #define WRITERGB16(dst, dstw, index)  REAL_WRITERGB16(dst, dstw, index)
 
 static void RENAME(yuv2rgb565_X_ar)(SwsInternal *c, const int16_t *lumFilter,
@@ -434,9 +446,7 @@ static void RENAME(yuv2rgb565_X)(SwsInternal *c, const int16_t *lumFilter,
     MOVNTQ(%%mm2,  (dst, index, 2))\
     MOVNTQ(%%mm1, 8(dst, index, 2))\
 \
-    "add             $8, "#index"   \n\t"\
-    "cmp         "dstw", "#index"   \n\t"\
-    " jb             1b             \n\t"
+    NEXT_PIXEL_BLOCK(dstw, index, )
 #define WRITERGB15(dst, dstw, index)  REAL_WRITERGB15(dst, dstw, index)
 
 static void RENAME(yuv2rgb555_X_ar)(SwsInternal *c, const int16_t *lumFilter,
@@ -527,9 +537,9 @@ static void RENAME(yuv2rgb555_X)(SwsInternal *c, const int16_t *lumFilter,
 \
     "add      $24, "#dst"       \n\t"\
 \
-    "add       $8, "#index"     \n\t"\
-    "cmp   "dstw", "#index"     \n\t"\
-    " jb       1b               \n\t"
+    NEXT_PIXEL_BLOCK(dstw, index, "sub "#index", "#dst" \n\t"\
+                                  "sub "#index", "#dst" \n\t"\
+                                  "sub "#index", "#dst" \n\t")
 
 #undef WRITEBGR24
 #define WRITEBGR24(dst, dstw, index)  WRITEBGR24MMXEXT(dst, dstw, index)
@@ -598,9 +608,7 @@ static void RENAME(yuv2bgr24_X)(SwsInternal *c, const int16_t *lumFilter,
     MOVNTQ(%%mm1, (dst, index, 2))\
     MOVNTQ(%%mm7, 8(dst, index, 2))\
 \
-    "add          $8, "#index"  \n\t"\
-    "cmp      "dstw", "#index"  \n\t"\
-    " jb          1b            \n\t"
+    NEXT_PIXEL_BLOCK(dstw, index, )
 #define WRITEYUY2(dst, dstw, index)  REAL_WRITEYUY2(dst, dstw, index)
 
 static void RENAME(yuv2yuyv422_X_ar)(SwsInternal *c, const int16_t *lumFilter,
