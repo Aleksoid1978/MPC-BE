@@ -2,6 +2,23 @@
 
 1.9.3.x dev
 =============================
+MpaSplitter
+Added ignoring of EXE and DLL files.
+
+Subtitles
+Improved support for PGS subtitles in HDR videos.
+Added support for offset in the Simple LRC format (.lrc).
+
+yt-dlp
+Improved audio track selection (using the "source_preference" property).
+
+Player
+Added support for ARE Audio Renderer.
+Improved detection of the main video for Ultra HD Blu-ray.
+
+Installer
+Updated images for the installer interface.
+
 Updated Italian translation (by mapi68).
 
 Updated libraries:
