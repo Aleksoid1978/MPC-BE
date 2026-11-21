@@ -2339,6 +2339,12 @@ END
 
 STRINGTABLE
 BEGIN
+    IDS_LYRICS              "Lyrics"
+    IDS_LYRICS_OFF          "Off"
+END
+
+STRINGTABLE
+BEGIN
     IDR_MAINFRAME           "MPC-BE"
 END
 

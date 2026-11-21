@@ -159,6 +159,7 @@
     <ClCompile Include="PlayerChildView.cpp" />
     <ClCompile Include="PlayerPreView.cpp" />
     <ClCompile Include="PlayerInfoBar.cpp" />
+    <ClCompile Include="PlayerLyrics.cpp" />
     <ClCompile Include="PlayerListCtrl.cpp" />
     <ClCompile Include="PlayerNavigationBar.cpp" />
     <ClCompile Include="PlayerPlaylistBar.cpp" />
@@ -300,6 +301,7 @@
     <ClInclude Include="PlayerChildView.h" />
     <ClInclude Include="PlayerPreView.h" />
     <ClInclude Include="PlayerInfoBar.h" />
+    <ClInclude Include="PlayerLyrics.h" />
     <ClInclude Include="PlayerListCtrl.h" />
     <ClInclude Include="PlayerNavigationBar.h" />
     <ClInclude Include="PlayerPlaylistBar.h" />

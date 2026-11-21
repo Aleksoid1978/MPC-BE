@@ -403,6 +403,9 @@
 #define ID_SUBTITLES_SUBITEM_END        2399
 #define ID_VIDEO_STREAMS_SUBITEM_START  2400
 #define ID_VIDEO_STREAMS_SUBITEM_END    2499
+#define ID_LYRICS_OFF                  2500
+#define ID_LYRICS_TRACK_FIRST          2501
+#define ID_LYRICS_TRACK_LAST           2599
 #define ID_FAVORITES_FILE_START         2800
 #define ID_FAVORITES_FILE_END           3799
 #define ID_FAVORITES_DVD_START          3800
@@ -1808,6 +1811,8 @@
 #define IDS_NAVIGATE_AUDIO              43001
 #define IDS_AG_STEP                     43004
 #define IDS_AG_LOAD_AUDIO               43006
+#define IDS_LYRICS                     43007
+#define IDS_LYRICS_OFF                 43008
 #define IDS_AG_OSD_LOCAL_TIME           44002
 #define IDS_AG_OSD_FILE_NAME            44004
 #define IDS_AG_WINDOW_TO_PRIMARYSCREEN  44102

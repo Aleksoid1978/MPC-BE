@@ -21,6 +21,9 @@
 
 #pragma once
 
+#include <afxrich.h>
+#include "Subtitles/STS.h"
+
 class CMainFrame;
 
 class CChildView : public CWnd
@@ -36,6 +39,13 @@ class CChildView : public CWnd
 	CPoint m_lastMousePoint{ -1, -1 };
 
 	CMainFrame* m_pMainFrame = nullptr;
+	CRichEditCtrl m_lyrics;
+	CString m_lyricText;
+	STSStyle m_lyricStyle;
+	LONG m_lyricFontSize = 0;
+	int m_lyricBoldStart = 0;
+	int m_lyricBoldLength = 0;
+	bool LayoutLyrics();
 
 public:
 	CChildView(CMainFrame* pMainFrame);
@@ -47,6 +57,7 @@ public:
 	DECLARE_DYNAMIC(CChildView)
 
 	void SetVideoRect(CRect r = {});
+	void SetLyrics(const CString& text, int boldStart, int boldLength);
 
 	CRect GetVideoRect() const {
 		return(m_videoRect);

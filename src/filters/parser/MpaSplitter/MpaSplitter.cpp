@@ -87,7 +87,52 @@ STDMETHODIMP CMpaSplitterFilter::NonDelegatingQueryInterface(REFIID riid, void**
 	CheckPointer(ppv, E_POINTER);
 
 	return
+		QI(IMpaSyncLyrics)
 		__super::NonDelegatingQueryInterface(riid, ppv);
+}
+
+STDMETHODIMP_(UINT) CMpaSplitterFilter::GetLyricTrackCount()
+{
+	return static_cast<UINT>(m_lyricTracks.size());
+}
+
+STDMETHODIMP CMpaSplitterFilter::GetLyricTrack(UINT track, BSTR* language, BSTR* descriptor, UINT* entryCount)
+{
+	if (!language || !descriptor || !entryCount) {
+		return E_POINTER;
+	}
+	*language = *descriptor = nullptr;
+	*entryCount = 0;
+	if (track >= m_lyricTracks.size()) {
+		return E_INVALIDARG;
+	}
+	const auto& lyrics = m_lyricTracks[track];
+	CComBSTR lang(CString(lyrics.language).GetString());
+	CComBSTR desc(lyrics.descriptor.GetString());
+	if (!lang || !desc) {
+		return E_OUTOFMEMORY;
+	}
+	*language = lang.Detach();
+	*descriptor = desc.Detach();
+	*entryCount = static_cast<UINT>(lyrics.entries.size());
+	return S_OK;
+}
+
+STDMETHODIMP CMpaSplitterFilter::GetLyricEntry(UINT track, UINT entry, REFERENCE_TIME* time, BSTR* text)
+{
+	if (!time || !text) {
+		return E_POINTER;
+	}
+	*text = nullptr;
+	*time = 0;
+	if (track >= m_lyricTracks.size() || entry >= m_lyricTracks[track].entries.size()) {
+		return E_INVALIDARG;
+	}
+	const auto& lyrics = m_lyricTracks[track];
+	const auto& cue = lyrics.entries[entry];
+	*text = cue.text.AllocSysString();
+	*time = m_pFile->GetLyricTime(lyrics.timestampFormat, cue.timestamp);
+	return *text ? S_OK : E_OUTOFMEMORY;
 }
 
 STDMETHODIMP CMpaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
@@ -111,6 +156,7 @@ STDMETHODIMP CMpaSplitterFilter::QueryFilterInfo(FILTER_INFO* pInfo)
 HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 {
 	CheckPointer(pAsyncReader, E_POINTER);
+	m_lyricTracks.clear();
 
 	HRESULT hr = E_FAIL;
 
@@ -135,6 +181,13 @@ HRESULT CMpaSplitterFilter::CreateOutputs(IAsyncReader* pAsyncReader)
 
 	SetID3TagProperties(this, m_pFile->m_pID3Tag.get());
 	SetAPETagProperties(this, m_pFile->m_pAPETag.get());
+	if (m_pFile->m_pID3Tag && m_pFile->IsMP3()) {
+		for (auto& lyrics : m_pFile->m_pID3Tag->SyncLyrics) {
+			if (lyrics.contentType == 1) {
+				m_lyricTracks.emplace_back(std::move(lyrics));
+			}
+		}
+	}
 
 	return m_pOutputs.size() > 0 ? S_OK : E_FAIL;
 }

@@ -140,6 +140,99 @@ static void ReadLang(CGolombBuffer &gb, DWORD &size)
 	size -= 3;
 }
 
+void CID3Tag::ReadSyncLyrics(const std::vector<BYTE>& data)
+{
+	if (data.size() < 7 || data[0] > (m_major == 4 ? UTF8 : UTF16BOM)
+			|| (data[4] != 1 && data[4] != 2)) {
+		return;
+	}
+
+	const BYTE encoding = data[0];
+	const size_t width = encoding == UTF16BOM || encoding == UTF16BE ? 2 : 1;
+	size_t pos = 6;
+	bool bigEndian = encoding == UTF16BE;
+	bool hasByteOrder = encoding != UTF16BOM;
+
+	const auto ReadString = [&](CString& text) {
+		size_t start = pos;
+		while (data.size() - pos >= width
+				&& (data[pos] || (width == 2 && data[pos + 1]))) {
+			pos += width;
+		}
+		if (data.size() - pos < width) {
+			return false;
+		}
+
+		const size_t end = pos;
+		pos += width;
+		if (encoding == UTF16BOM && end - start >= 2) {
+			const WORD bom = (data[start] << 8) | data[start + 1];
+			if (bom == 0xfeff || bom == 0xfffe) {
+				bigEndian = bom == 0xfeff;
+				hasByteOrder = true;
+				start += 2;
+			}
+		}
+		if (start == end) {
+			return true;
+		}
+		if (!hasByteOrder) {
+			return false;
+		}
+
+		if (encoding == UTF8) {
+			const int length = static_cast<int>(end - start);
+			const auto bytes = reinterpret_cast<LPCCH>(data.data() + start);
+			const int chars = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, bytes, length, nullptr, 0);
+			if (!chars) {
+				return false;
+			}
+			MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, bytes, length, text.GetBufferSetLength(chars), chars);
+			text.ReleaseBufferSetLength(chars);
+		} else {
+			const int chars = static_cast<int>((end - start) / width);
+			auto buffer = text.GetBufferSetLength(chars);
+			for (int i = 0; i < chars; i++, start += width) {
+				if (width == 1) {
+					buffer[i] = data[start];
+				} else if (bigEndian) {
+					buffer[i] = (data[start] << 8) | data[start + 1];
+				} else {
+					buffer[i] = data[start] | (data[start + 1] << 8);
+				}
+			}
+			text.ReleaseBufferSetLength(chars);
+		}
+		return true;
+	};
+
+	ID3SyncLyrics lyrics;
+	lyrics.language = CStringA(reinterpret_cast<LPCSTR>(data.data() + 1), 3);
+	lyrics.timestampFormat = data[4];
+	lyrics.contentType = data[5];
+	if (!ReadString(lyrics.descriptor)) {
+		return;
+	}
+
+	while (pos < data.size()) {
+		ID3SyncLyricEntry entry;
+		if (!ReadString(entry.text) || data.size() - pos < 4) {
+			return;
+		}
+		entry.timestamp = (DWORD(data[pos]) << 24) | (DWORD(data[pos + 1]) << 16)
+			| (DWORD(data[pos + 2]) << 8) | data[pos + 3];
+		pos += 4;
+		if (!lyrics.entries.empty() && entry.timestamp < lyrics.entries.back().timestamp) {
+			return;
+		}
+		lyrics.entries.emplace_back(std::move(entry));
+	}
+
+	if (!lyrics.entries.empty()) {
+		SyncLyrics.emplace_back(std::move(lyrics));
+	}
+}
+
 pID3TagItem CID3Tag::ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size)
 {
 	BYTE encoding = (BYTE)gbData.BitRead(8);
@@ -264,8 +357,27 @@ void CID3Tag::ReadChapter(CGolombBuffer& gbData, DWORD &size)
 #define ID3v2_FLAG_DATALEN 0x0001
 #define ID3v2_FLAG_UNSYNCH 0x0002
 
+static void RemoveID3Unsynchronization(std::vector<BYTE>& bytes)
+{
+	size_t output = 0;
+	for (size_t i = 0; i < bytes.size(); i++) {
+		bytes[output++] = bytes[i];
+		if (bytes[i] == 0xff && i + 1 < bytes.size() && !bytes[i + 1]) {
+			i++;
+		}
+	}
+	bytes.resize(output);
+}
+
 BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 {
+	std::vector<BYTE> tagData;
+	if (m_major < 4 && (m_flags & 0x80)) {
+		tagData.assign(buf, buf + len);
+		RemoveID3Unsynchronization(tagData);
+		buf = tagData.data();
+		len = tagData.size();
+	}
 	CGolombBuffer gb(buf, len);
 
 	DWORD tag;
@@ -281,26 +393,28 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 	} else {
 		if (m_flags & 0x40) {
 			// Extended header present, skip it
+			if (len < 4) {
+				return FALSE;
+			}
 			DWORD extlen = gb.BitRead(32);
-			extlen = hexdec2uint(extlen);
 			if (m_major == 4) {
+				extlen = hexdec2uint(extlen);
 				if (extlen < 4) {
 					return FALSE;
 				}
 				extlen -= 4;
 			}
-			if (extlen + 4 > len) {
+			if (extlen > len - 4) {
 				return FALSE;
 			}
 
 			gb.SkipBytes(extlen);
-			len -= extlen + 4;
 		}
 		tagsize = 10;
 	}
 	int pos = gb.GetPos();
 
-	while (!gb.IsEOF()) {
+	while (static_cast<size_t>(pos) + tagsize <= len) {
 		if (m_major == 2) {
 			tag   = (DWORD)gb.BitRead(24);
 			size  = (DWORD)gb.BitRead(24);
@@ -313,7 +427,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			}
 		}
 
-		if (pos + tagsize + size > len) {
+		if (size > len - pos - tagsize) {
 			break;
 		}
 
@@ -339,35 +453,29 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			continue;
 		}
 
-		if (flags & ID3v2_FLAG_DATALEN) {
-			if (size < 4) {
-				break;
-			}
-			gb.SkipBytes(4);
-			size -= 4;
+		if ((m_major == 3 && (flags & 0x00c0)) || (m_major == 4 && (flags & 0x000c))) {
+			gb.Seek(pos);
+			continue;
 		}
 
-		std::vector<BYTE> Data;
-		BOOL bUnSync = m_flags & 0x80 || flags & ID3v2_FLAG_UNSYNCH;
-		if (bUnSync) {
-			DWORD dwSize = size;
-			while (dwSize) {
-				BYTE b = gb.ReadByte();
-				Data.push_back(b);
-				dwSize--;
-				if (b == 0xFF && dwSize > 1) {
-					b = gb.ReadByte();
-					dwSize--;
-					if (!b) {
-						b = gb.ReadByte();
-						dwSize--;
-					}
-					Data.push_back(b);
-				}
-			}
-		} else {
-			Data.resize(size);
-			gb.ReadBuffer(Data.data(), size);
+		std::vector<BYTE> Data(size);
+		gb.ReadBuffer(Data.data(), size);
+		if (m_major == 4 && ((m_flags & 0x80) || (flags & ID3v2_FLAG_UNSYNCH))) {
+			RemoveID3Unsynchronization(Data);
+		}
+		size_t prefix = 0;
+		if ((m_major == 3 && (flags & 0x0020)) || (m_major == 4 && (flags & 0x0040))) {
+			prefix++;
+		}
+		if (m_major == 4 && (flags & ID3v2_FLAG_DATALEN)) {
+			prefix += 4;
+		}
+		if (prefix >= Data.size()) {
+			gb.Seek(pos);
+			continue;
+		}
+		if (prefix) {
+			Data.erase(Data.begin(), Data.begin() + prefix);
 		}
 		CGolombBuffer gbData(Data.data(), Data.size());
 		size = Data.size();
@@ -388,6 +496,8 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 			if (item) {
 				TagItems.emplace_back(std::move(item));
 			}
+		} else if (tag == 'SYLT' || tag == '\0SLT') {
+			ReadSyncLyrics(Data);
 		} else if (tag == 'CHAP') {
 			ReadChapter(gbData, size);
 		}
@@ -401,7 +511,7 @@ BOOL CID3Tag::ReadTagsV2(BYTE *buf, size_t len)
 		}
 	}
 
-	return !TagItems.empty() ? TRUE : FALSE;
+	return !TagItems.empty() || !SyncLyrics.empty();
 }
 
 static const LPCSTR s_genre[] = {

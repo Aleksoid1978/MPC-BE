@@ -52,6 +52,17 @@ CMpaSplitterFile::CMpaSplitterFile(IAsyncReader* pAsyncReader, HRESULT& hr)
 
 #define ID3v1_TAG_SIZE 128
 
+REFERENCE_TIME CMpaSplitterFile::GetLyricTime(BYTE format, DWORD timestamp) const
+{
+	if (format == 2) {
+		return MILLISECONDS_TO_100NS_UNITS(REFERENCE_TIME(timestamp));
+	}
+	const auto waveFormat = reinterpret_cast<const WAVEFORMATEX*>(m_mt.Format());
+	const DWORD sampleRate = waveFormat->nSamplesPerSec;
+	const int samplesPerFrame = sampleRate >= 32000 ? 1152 : 576;
+	return REFERENCE_TIME(timestamp) * samplesPerFrame * 10000000 / sampleRate;
+}
+
 HRESULT CMpaSplitterFile::Init()
 {
 	m_startpos = 0;

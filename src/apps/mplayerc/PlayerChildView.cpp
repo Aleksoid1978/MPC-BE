@@ -314,9 +314,144 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 	return TRUE;
 }
 
+void CChildView::SetLyrics(const CString& text, int boldStart, int boldLength)
+{
+	const auto& style = AfxGetAppSettings().subdefstyle;
+	constexpr LONG twipsPerPoint = 20;
+	const double fontSize = std::isfinite(style.fontSize) ? std::clamp(style.fontSize, 1.0, 1636.0) : 18.0;
+	const LONG fontHeight = std::lround(fontSize * twipsPerPoint);
+	if (text == m_lyricText && boldStart == m_lyricBoldStart && boldLength == m_lyricBoldLength
+			&& (text.IsEmpty() || style == m_lyricStyle)) {
+		return;
+	}
+	if (text.IsEmpty()) {
+		if (m_lyrics.GetSafeHwnd()) {
+			m_lyrics.ShowWindow(SW_HIDE);
+			Invalidate();
+		}
+	} else {
+		if (!m_lyrics.GetSafeHwnd()) {
+			CRect view;
+			GetClientRect(view);
+			if (!AfxInitRichEdit2() || !m_lyrics.Create(WS_CHILD | ES_MULTILINE | ES_CENTER | ES_READONLY,
+					CRect(0, view.bottom, view.right, view.bottom), this, 0)) {
+				return;
+			}
+			m_lyrics.SetBackgroundColor(FALSE, RGB(0, 0, 0));
+		}
+
+		// WM_SETREDRAW(TRUE) can make a hidden window visible.
+		const bool wasVisible = m_lyrics.IsWindowVisible();
+		if (wasVisible) {
+			m_lyrics.SetRedraw(FALSE);
+		}
+		if (text != m_lyricText) {
+			m_lyrics.SetWindowTextW(text);
+		}
+		const auto blendOnBlack = [](COLORREF color, BYTE transparency) {
+			const int opacity = 255 - transparency;
+			return RGB(MulDiv(GetRValue(color), opacity, 255),
+				MulDiv(GetGValue(color), opacity, 255), MulDiv(GetBValue(color), opacity, 255));
+		};
+		CHARFORMAT2 format = {};
+		format.cbSize = sizeof(format);
+		format.dwMask = CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE | CFM_STRIKEOUT | CFM_WEIGHT
+			| CFM_COLOR | CFM_FACE | CFM_SIZE | CFM_CHARSET | CFM_SPACING | CFM_BACKCOLOR;
+		format.dwEffects = (style.fontWeight >= FW_BOLD ? CFE_BOLD : 0)
+			| (style.fItalic ? CFE_ITALIC : 0)
+			| (style.fUnderline ? CFE_UNDERLINE : 0)
+			| (style.fStrikeOut ? CFE_STRIKEOUT : 0)
+			| (style.borderStyle == 1 ? 0 : CFE_AUTOBACKCOLOR);
+		format.wWeight = static_cast<WORD>(style.fontWeight);
+		format.crTextColor = blendOnBlack(style.colors[0], style.alpha[0]);
+		format.crBackColor = blendOnBlack(style.colors[2], style.alpha[2]);
+		format.bCharSet = static_cast<BYTE>(style.charSet);
+		if (std::isfinite(style.fontSpacing)) {
+			format.sSpacing = static_cast<SHORT>(std::lround(std::clamp(style.fontSpacing, -2000.0, 2000.0) * 15));
+		}
+		format.yHeight = fontHeight;
+		wcsncpy_s(format.szFaceName, style.fontName, _TRUNCATE);
+		m_lyrics.SetSel(0, -1);
+		m_lyrics.SetSelectionCharFormat(format);
+		const WORD alignments[] = {PFA_LEFT, PFA_CENTER, PFA_RIGHT};
+		const int alignment = style.scrAlignment >= 1 && style.scrAlignment <= 9 ? style.scrAlignment : 2;
+		PARAFORMAT paragraph = {};
+		paragraph.cbSize = sizeof(paragraph);
+		paragraph.dwMask = PFM_ALIGNMENT;
+		paragraph.wAlignment = alignments[(alignment - 1) % 3];
+		m_lyrics.SetParaFormat(paragraph);
+
+		if (boldLength > 0) {
+			format.dwMask = CFM_BOLD | CFM_SIZE | CFM_WEIGHT;
+			format.dwEffects = CFE_BOLD;
+			format.wWeight = std::max<WORD>(format.wWeight, FW_BOLD);
+			format.yHeight += 2 * twipsPerPoint;
+			m_lyrics.SetSel(boldStart, boldStart + boldLength);
+			m_lyrics.SetSelectionCharFormat(format);
+		}
+		m_lyrics.SetSel(0, 0);
+		m_lyricStyle = style;
+		m_lyricFontSize = fontHeight;
+		const bool positioned = LayoutLyrics();
+		if (wasVisible) {
+			m_lyrics.SetRedraw(TRUE);
+		}
+		if (positioned) {
+			m_lyrics.ShowWindow(SW_SHOWNA);
+			m_lyrics.Invalidate();
+		} else {
+			m_lyrics.ShowWindow(SW_HIDE);
+			Invalidate();
+		}
+	}
+	m_lyricText = text;
+	m_lyricBoldStart = boldStart;
+	m_lyricBoldLength = boldLength;
+}
+
+bool CChildView::LayoutLyrics()
+{
+	if (m_lyrics.GetSafeHwnd()) {
+		CRect rect;
+		GetClientRect(rect);
+		const auto& margins = m_lyricStyle.marginRect;
+		rect.DeflateRect(m_pMainFrame->ScaleX(margins.left), m_pMainFrame->ScaleY(margins.top),
+			m_pMainFrame->ScaleX(margins.right), m_pMainFrame->ScaleY(margins.bottom));
+		if (rect.Width() > 0 && rect.Height() > 0) {
+			CRect current;
+			m_lyrics.GetWindowRect(current);
+			ScreenToClient(current);
+			if (current.Width() != rect.Width()) {
+				m_lyrics.SetWindowPos(nullptr, 0, 0, rect.Width(), current.Height(),
+					SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOREDRAW | SWP_NOCOPYBITS);
+			}
+			const int lineHeight = m_pMainFrame->ScaleY(MulDiv(m_lyricFontSize + 40, 96, 1440) + 4);
+			const int height = std::min(rect.Height(), m_lyrics.GetLineCount() * lineHeight);
+			int top = rect.bottom - height;
+			if (m_lyricStyle.scrAlignment >= 7) {
+				top = rect.top;
+			} else if (m_lyricStyle.scrAlignment >= 4) {
+				top = rect.top + (rect.Height() - height) / 2;
+			}
+			const CRect target(rect.left, top, rect.right, top + height);
+			if (current != target) {
+				m_lyrics.SetWindowPos(nullptr, target.left, target.top, target.Width(), target.Height(),
+					SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+				// Repaint the parent where the previous lyric rectangle was exposed.
+				Invalidate();
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
 void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
+	if (!m_lyricText.IsEmpty()) {
+		m_lyrics.ShowWindow(LayoutLyrics() ? SW_SHOWNA : SW_HIDE);
+	}
 
 	m_pMainFrame->MoveVideoWindow();
 	m_pMainFrame->UpdateThumbnailClip();

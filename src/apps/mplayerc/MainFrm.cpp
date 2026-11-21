@@ -410,6 +410,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CFrameWnd)
 	ON_COMMAND(ID_AUDIO_OPTIONS, OnMenuAudioOption)
 	ON_COMMAND(ID_SUBTITLES_OPTIONS, OnMenuSubtitlesOption)
 	ON_COMMAND(ID_SUBTITLES_ENABLE, OnMenuSubtitlesEnable)
+	ON_COMMAND_RANGE(ID_LYRICS_OFF, ID_LYRICS_TRACK_LAST, OnSelectLyrics)
 	ON_UPDATE_COMMAND_UI(ID_SUBTITLES_ENABLE, OnUpdateSubtitlesEnable)
 	ON_COMMAND(ID_SUBTITLES_STYLES, OnMenuSubtitlesStyle)
 	ON_UPDATE_COMMAND_UI(ID_SUBTITLES_STYLES, OnUpdateSubtitlesStyle)
@@ -2626,6 +2627,7 @@ void CMainFrame::OnTimer(UINT_PTR nIDEvent)
 				m_wndSeekBar.Enable(!g_bNoDuration);
 				m_wndSeekBar.SetRange(rtDur);
 				m_wndSeekBar.SetPos(rtNow);
+				UpdateLyrics(timeFormat == TIME_FORMAT_MEDIA_TIME ? rtNow : -1);
 				m_OSD.SetPosAndRange(rtNow, rtDur);
 				m_Lcd.SetMediaRange(0, rtDur);
 				m_Lcd.SetMediaPos(rtNow);
@@ -3112,6 +3114,7 @@ bool CMainFrame::DoAfterPlaybackEvent()
 bool CMainFrame::GraphEventComplete()
 {
 	m_bGraphEventComplete = true;
+	m_wndView.SetLyrics({}, 0, 0);
 
 	CAppSettings& s = AfxGetAppSettings();
 
@@ -4570,6 +4573,7 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 
 	// remember OpenMediaData for later use
 	m_lastOMD = std::move(pOMD);
+	SetupLyrics();
 
 	if (m_bIsBDPlay == FALSE) {
 		m_BDPlaylists.clear();
@@ -4819,6 +4823,9 @@ void CMainFrame::OnFilePostOpenMedia(std::unique_ptr<OpenMediaData>& pOMD)
 void CMainFrame::OnFilePostCloseMedia()
 {
 	DLog(L"CMainFrame::OnFilePostCloseMedia() : start");
+	m_lyricTrack = -1;
+	m_lyricTracks.clear();
+	m_wndView.SetLyrics({}, 0, 0);
 
 	SetPlaybackMode(PM_NONE);
 	SetLoadState(MLS_CLOSED);
@@ -5341,6 +5348,7 @@ void CMainFrame::OnStreamSubOnOff()
 
 	if ((GetPlaybackMode() == PM_DVD && m_pDVDI)
 			|| m_pDVS
+			|| !m_lyricTracks.empty()
 			|| m_pSubStreams.size()) {
 		ToggleSubtitleOnOff(true);
 	}
@@ -8407,6 +8415,7 @@ void CMainFrame::OnPlayPlayPause()
 void CMainFrame::OnPlayStop()
 {
 	if (m_eMediaLoadState == MLS_LOADED) {
+		m_wndView.SetLyrics({}, 0, 0);
 		if (GetPlaybackMode() == PM_FILE) {
 			LONGLONG pos = 0;
 			m_pMS->SetPositions(&pos, AM_SEEKING_AbsolutePositioning, nullptr, AM_SEEKING_NoPositioning);
@@ -13837,9 +13846,9 @@ void CMainFrame::SubFlags(CString strname, bool& forced, bool& def)
 	}
 }
 
-size_t CMainFrame::GetSubSelIdx()
+size_t CMainFrame::GetSubSelIdx(const std::vector<Stream>& streams)
 {
-	if (m_SubtitlesStreams.size()) {
+	if (!streams.empty()) {
 		CAppSettings& s = AfxGetAppSettings();
 		CString pattern = s.strSubtitlesLanguageOrder;
 
@@ -13850,13 +13859,13 @@ size_t CMainFrame::GetSubSelIdx()
 
 		if (s.fPrioritizeExternalSubtitles) { // try external sub ...
 			size_t nIdx	= 0;
-			BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, TRUE, nIdx, !bSubtitlesOffIfPatternNotMatch);
+			BOOL bMatch = SelectMatchTrack(streams, pattern, TRUE, nIdx, !bSubtitlesOffIfPatternNotMatch);
 
 			if (bMatch) {
 				return nIdx;
 			} else {
-				for (size_t iIndex = 0; iIndex < m_SubtitlesStreams.size(); iIndex++) {
-					if (m_SubtitlesStreams[iIndex].Ext) {
+				for (size_t iIndex = 0; iIndex < streams.size(); iIndex++) {
+					if (streams[iIndex].Ext) {
 						return iIndex;
 					}
 				}
@@ -13864,7 +13873,7 @@ size_t CMainFrame::GetSubSelIdx()
 		}
 
 		size_t nIdx = 0;
-		BOOL bMatch = SelectMatchTrack(m_SubtitlesStreams, pattern, FALSE, nIdx, !bSubtitlesOffIfPatternNotMatch);
+		BOOL bMatch = SelectMatchTrack(streams, pattern, FALSE, nIdx, !bSubtitlesOffIfPatternNotMatch);
 
 		if (bMatch) {
 			return nIdx;
@@ -13962,7 +13971,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 
 			if (s.fUseInternalSelectTrackLogic) {
-				SelectSubtilesAMStream(GetSubSelIdx());
+				SelectSubtilesAMStream(GetSubSelIdx(m_SubtitlesStreams));
 			} else if (subcount && !s.fPrioritizeExternalSubtitles) {
 				m_pDVS->put_SelectedLanguage(nLangs - 1);
 			}
@@ -14146,7 +14155,7 @@ void CMainFrame::OpenSetupSubStream(OpenMediaData* pOMD)
 			}
 			SelectSubtilesAMStream(checkedsplsub);
 		} else {
-			size_t defsub = GetSubSelIdx();
+			size_t defsub = GetSubSelIdx(m_SubtitlesStreams);
 
 			if (m_pMainSourceFilter && s.fDisableInternalSubtitles) {
 				defsub++;
@@ -15416,6 +15425,7 @@ void CMainFrame::SetupSubtitleTracksSubMenu()
 
 	if (GetPlaybackMode() == PM_FILE || (GetPlaybackMode() == PM_CAPTURE && AfxGetAppSettings().iDefaultCaptureDevice == 1)) {
 		SetupSubtilesAMStreamSubMenu(submenu, id);
+		SetupLyricsMenu(submenu);
 	} else if (GetPlaybackMode() == PM_DVD) {
 		ULONG ulStreamsAvailable, ulCurrentStream;
 		BOOL bIsDisabled;
@@ -16883,6 +16893,9 @@ void CMainFrame::ToggleSubtitleOnOff(bool bDisplayMessage/* = false*/)
 		}
 
 		UpdateSubtitle(bDisplayMessage);
+		if (!m_lyricTracks.empty()) {
+			OnTimer(TIMER_STREAMPOSPOLLER);
+		}
 	}
 }
 

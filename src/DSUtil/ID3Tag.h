@@ -76,6 +76,19 @@ protected:
 
 using pID3TagItem = std::unique_ptr<CID3TagItem>;
 
+struct ID3SyncLyricEntry {
+	DWORD timestamp;
+	CString text;
+};
+
+struct ID3SyncLyrics {
+	CStringA language;
+	CString descriptor;
+	BYTE timestampFormat;
+	BYTE contentType;
+	std::vector<ID3SyncLyricEntry> entries;
+};
+
 class CID3Tag
 {
 protected:
@@ -87,11 +100,13 @@ protected:
 
 	pID3TagItem ReadTag(const DWORD tag, CGolombBuffer& gbData, DWORD &size);
 	void ReadChapter(CGolombBuffer& gbData, DWORD &size);
+	void ReadSyncLyrics(const std::vector<BYTE>& data);
 
 public:
 	std::map<DWORD, CString> Tags;
 	std::list<pID3TagItem>   TagItems;
 	std::list<Chapters>      ChaptersList;
+	std::vector<ID3SyncLyrics> SyncLyrics;
 
 	CID3Tag(BYTE major = 0, BYTE flags = 0);
 	~CID3Tag() = default;

@@ -28,6 +28,7 @@
 #include "PlayerSeekBar.h"
 #include "PlayerToolBar.h"
 #include "PlayerInfoBar.h"
+#include "PlayerLyrics.h"
 #include "PlayerStatusBar.h"
 #include "PlayerSubresyncBar.h"
 #include "PlayerPlaylistBar.h"
@@ -283,6 +284,11 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 	void SetupSubtitlesRButtonMenu();
 	void SetupAudioTracksSubMenu();
 	void SetupSubtitleTracksSubMenu();
+	void SetupLyrics();
+	void SetupLyricsMenu(CMenu& menu);
+	void UpdateLyrics(REFERENCE_TIME position);
+	std::vector<LyricTrack> m_lyricTracks;
+	int m_lyricTrack = -1;
 	void SetupVideoStreamsSubMenu();
 	void SetupNavChaptersSubMenu();
 	void SetupFavoritesSubMenu();
@@ -315,7 +321,7 @@ class CMainFrame : public CFrameWnd, public CDropTarget, public CDPI
 
 	std::vector<Stream> m_SubtitlesStreams;
 	void SubFlags(CString strname, bool& forced, bool& def);
-	size_t GetSubSelIdx();
+	size_t GetSubSelIdx(const std::vector<Stream>& streams);
 	int m_nInternalSubsCount;
 	int m_nSelSub2;
 
@@ -1090,6 +1096,7 @@ public:
 	afx_msg void OnMenuAudioOption();
 	afx_msg void OnMenuSubtitlesOption();
 	afx_msg void OnMenuSubtitlesEnable();
+	afx_msg void OnSelectLyrics(UINT id);
 	afx_msg void OnUpdateSubtitlesEnable(CCmdUI* pCmdUI);
 	afx_msg void OnMenuSubtitlesStyle();
 	afx_msg void OnUpdateSubtitlesStyle(CCmdUI* pCmdUI);

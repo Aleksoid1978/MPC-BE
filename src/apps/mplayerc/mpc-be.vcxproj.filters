@@ -204,6 +204,9 @@
     <ClCompile Include="PlayerInfoBar.cpp">
       <Filter>Toolbars</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerLyrics.cpp">
+      <Filter>Toolbars</Filter>
+    </ClCompile>
     <ClCompile Include="PlayerSeekBar.cpp">
       <Filter>Toolbars</Filter>
     </ClCompile>
@@ -681,6 +684,9 @@
       <Filter>Toolbars</Filter>
     </ClInclude>
     <ClInclude Include="PlayerInfoBar.h">
+      <Filter>Toolbars</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerLyrics.h">
       <Filter>Toolbars</Filter>
     </ClInclude>
     <ClInclude Include="PlayerSeekBar.h">

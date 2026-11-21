@@ -73,6 +73,10 @@ public:
 	REFERENCE_TIME GetDuration() {
 		return m_rtDuration;
 	}
+	REFERENCE_TIME GetLyricTime(BYTE format, DWORD timestamp) const;
+	bool IsMP3() const {
+		return m_mode == mode::mpa && m_mpahdr.layer == 3 && m_mpahdr.Samplerate > 0;
+	}
 
 	__int64 GetStartPos() {
 		return m_startpos;

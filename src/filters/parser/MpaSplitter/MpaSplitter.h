@@ -27,10 +27,19 @@
 #define MpaSplitterName L"MPC Mpa Splitter"
 #define MpaSourceName   L"MPC Mpa Source"
 
+interface __declspec(uuid("B9128B0C-6271-48A9-85A8-CFE36B14687D"))
+	IMpaSyncLyrics : public IUnknown
+{
+	STDMETHOD_(UINT, GetLyricTrackCount)() PURE;
+	STDMETHOD(GetLyricTrack)(UINT track, BSTR* language, BSTR* descriptor, UINT* entryCount) PURE;
+	STDMETHOD(GetLyricEntry)(UINT track, UINT entry, REFERENCE_TIME* time, BSTR* text) PURE;
+};
+
 class __declspec(uuid("0E9D4BF7-CBCB-46C7-BD80-4EF223A3DC2B"))
-	CMpaSplitterFilter : public CBaseSplitterFilter
+	CMpaSplitterFilter : public CBaseSplitterFilter, public IMpaSyncLyrics
 {
 	REFERENCE_TIME m_rtime = 0;
+	std::vector<ID3SyncLyrics> m_lyricTracks;
 
 protected:
 	std::unique_ptr<CMpaSplitterFile> m_pFile;
@@ -47,6 +56,9 @@ public:
 
 	DECLARE_IUNKNOWN
 	STDMETHODIMP NonDelegatingQueryInterface(REFIID riid, void** ppv);
+	STDMETHODIMP_(UINT) GetLyricTrackCount() override;
+	STDMETHODIMP GetLyricTrack(UINT track, BSTR* language, BSTR* descriptor, UINT* entryCount) override;
+	STDMETHODIMP GetLyricEntry(UINT track, UINT entry, REFERENCE_TIME* time, BSTR* text) override;
 
 	// CBaseFilter
 
