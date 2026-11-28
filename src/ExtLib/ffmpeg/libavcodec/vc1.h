@@ -407,7 +407,9 @@ typedef struct VC1Context{
     int recovered;
     // ==> End patch MPC
 
-    DECLARE_ALIGNED_32(int16_t, blocks)[6][64];
+    // FIXME: The 4x4 and 4x8 LASX and 4x8 MSA inverse transform DSP functions
+    // overread the (offsetted) input block, hence the padding.
+    DECLARE_ALIGNED_32(int16_t, blk)[64 + 4 * (HAVE_LASX || HAVE_MSA)];
 } VC1Context;
 
 /**

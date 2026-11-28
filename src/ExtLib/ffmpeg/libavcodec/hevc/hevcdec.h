@@ -517,17 +517,26 @@ typedef struct HEVCTileSlice {
     const HEVCFrame *collocated_ref;    ///< temporal MVP target of this slice
 } HEVCTileSlice;
 
-/* Start and state of one tile, for tiles bound by entry points and for one
- * slice per tile alike. */
-typedef struct HEVCTileStream {
-    const SliceHeader *sh;  ///< header of the slice this tile belongs to
+/* One CABAC substream within a tile and the state of the slice it belongs
+ * to. A tile is decoded from one or more segments.
+ */
+typedef struct HEVCTileSegment {
+    const SliceHeader *sh;  ///< header of the slice this segment belongs to
     const RefPicList *rpl;  ///< reference lists of that slice, NULL for I slices
     const HEVCFrame *collocated_ref;    ///< temporal MVP target of that slice
     const uint8_t *data;    ///< start of the CABAC substream
     size_t size;
     int qp_y_seed;
-    int start_ts;           ///< first CTB of the tile, in tile scan order
-    int ended;              ///< the substream signalled its end (damaged input)
+    int start_ts;           ///< first CTB of the segment, in tile scan order
+} HEVCTileSegment;
+
+/* Decoding position within one tile. The segments of the tile are
+ * tile_segments[next_seg, end_seg) in increasing start_ts.
+ */
+typedef struct HEVCTileStream {
+    const HEVCTileSegment *seg; ///< segment being decoded, NULL if none
+    unsigned next_seg;
+    unsigned end_seg;
 } HEVCTileStream;
 
 typedef struct HEVCContext {
@@ -629,17 +638,23 @@ typedef struct HEVCContext {
     AVBufferRef *rpu_buf;       ///< 0 or 1 Dolby Vision RPUs.
     DOVIContext dovi_ctx;       ///< Dolby Vision decoding context
 
-    /* Slices deferred when every tile carries its own slice, or when the
-     * slices of an untiled picture are decoded in parallel. Frame and layer
-     * are kept so that leftovers are dropped, not decoded into another
-     * frame. */
+    /* Independent slices of one picture that stay within single tiles,
+     * buffered for decoding in row major order. The frame and layer are
+     * kept so that leftovers from another picture are dropped instead of
+     * being decoded into the current frame. The slices of an untiled picture
+     * are buffered here as well, for parallel decoding.
+     */
     HEVCTileSlice *tile_slices;
     unsigned nb_tile_slices;
     unsigned tile_slices_alloc;
     const HEVCFrame *tile_slices_frame;
     int tile_slices_layer;
 
-    /* Per-tile substream table of the picture, one entry per tile */
+    /* Segments of the picture in the row major traversal, grouped by tile */
+    HEVCTileSegment *tile_segments;
+    unsigned tile_segments_alloc;
+
+    /* One entry per tile */
     HEVCTileStream *tile_streams;
     unsigned tile_streams_alloc;
 

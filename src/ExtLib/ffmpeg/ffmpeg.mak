@@ -662,7 +662,6 @@ SRCS_LC_B = \
 	libavcodec/x86/utvideodsp_init.c \
 	libavcodec/x86/v210-init.c \
 	libavcodec/x86/vc1dsp_init.c \
-	libavcodec/x86/vc1dsp_mmx.c \
 	libavcodec/x86/videodsp_init.c \
 	libavcodec/x86/vorbisdsp_init.c \
 	libavcodec/x86/vp3dsp_init.c \

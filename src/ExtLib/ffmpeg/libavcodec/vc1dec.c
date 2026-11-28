@@ -374,7 +374,10 @@ static av_cold int vc1_decode_init_alloc_tables(VC1Context *v)
         return AVERROR(ENOMEM);
 
     v->n_allocated_blks = s->mb_width + 2;
-    v->block            = av_malloc(sizeof(*v->block) * v->n_allocated_blks);
+    // FIXME: The 4x4 and 4x8 LASX and 4x8 MSA inverse transform DSP functions
+    // overread the (offsetted) input block, hence the padding.
+    v->block            = av_malloc(sizeof(*v->block) * v->n_allocated_blks +
+                                    4 * sizeof(***v->block) * (HAVE_LASX || HAVE_MSA));
     v->cbp_base         = av_malloc(sizeof(v->cbp_base[0]) * 3 * s->mb_stride);
     if (!v->block || !v->cbp_base)
         return AVERROR(ENOMEM);
@@ -420,7 +423,7 @@ static av_cold int vc1_decode_init_alloc_tables(VC1Context *v)
                 return AVERROR(ENOMEM);
     }
 
-    ret = ff_intrax8_common_init(s->avctx, &v->x8, v->blocks[0],
+    ret = ff_intrax8_common_init(s->avctx, &v->x8, v->blk,
                                  s->mb_width, s->mb_height);
     if (ret < 0)
         return ret;
